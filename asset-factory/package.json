@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Production-grade cloud-based pixel art asset pipeline for RPG/Discord inventories using free AI APIs",
   "scripts": {
+    "start": "node scripts/tui.mjs",
     "clean": "node scripts/clean-generated.mjs",
     "prompts": "node scripts/generate-prompts.mjs",
     "gen": "node scripts/cloud-generate.mjs",
@@ -29,5 +30,9 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "figlet": "^1.10.0",
+    "inquirer": "^13.2.2"
   }
 }

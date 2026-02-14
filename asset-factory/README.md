@@ -2,6 +2,16 @@
 
 Production-grade cloud-based pipeline for generating pixel-art item/icon assets for RPG inventories, Discord embeds, and emoji-scale usage. Uses free cloud AI APIs for generation and enforces strict post-processing + validation.
 
+## Quick Start
+
+Run the interactive TUI:
+
+```bash
+npm start
+```
+
+This launches a clean ASCII art interface for controlling the asset factory.
+
 Quick start command presets are in `COMMANDS.md`.
 Use `--profile detailed` on `normalize/package/validate/registry` for higher-detail exports (64 base, up to 512).
 

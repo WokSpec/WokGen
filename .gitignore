@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+*.log
+.cache/
+registry/validation-report.json
+dataset/inbox/*
+!dataset/inbox/.gitkeep
+!dataset/inbox/_licenses.csv
+dataset/accepted/
+dataset/rejected/
+dataset/train/
+dataset/manifests/

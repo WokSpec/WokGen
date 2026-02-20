@@ -1,0 +1,48 @@
+MIT License with Commons Clause
+
+Copyright (c) 2026 Wok Specialists / WokGen Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+Commons Clause Restriction:
+
+The rights granted above do not include the right to sell the Software as a
+commercial hosted service. For the purpose of this clause, "sell" means
+providing the Software, substantially unmodified, as a paid hosted service
+(e.g., SaaS) where the primary value to the customer is access to the
+Software's functionality. This restriction does not apply to:
+
+  - Self-hosting the Software for personal or internal organizational use.
+  - Incorporating the Software as a component of a larger application where
+    the primary value is not the Software itself.
+  - Offering paid support, consulting, or customization services.
+  - Distributing the Software under this license as-is (open source).
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Attribution Notice:
+
+If you use, modify, or distribute WokGen, you must retain this license and
+clearly attribute the original project:
+
+  WokGen — https://github.com/WokSpecialists/WokGen
+  Copyright (c) 2026 Wok Specialists / WokGen Contributors
+
+You may not remove or obscure attribution in public-facing UI, documentation,
+or API responses without written permission from the original authors.

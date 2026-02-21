@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Space_Grotesk } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
 import { NavLink } from './_components/NavLink';
@@ -10,6 +10,13 @@ import { NavLink } from './_components/NavLink';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  weight: ['500', '600', '700'],
   display: 'swap',
 });
 
@@ -55,7 +62,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0d0d14',
+  themeColor: '#0d0d0d',
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
@@ -67,13 +74,25 @@ export const viewport: Viewport = {
 function NavBar() {
   return (
     <nav className="nav-bar" aria-label="Main navigation">
+      {/* Wokspec backlink — subtle, left edge */}
+      <a
+        href="https://wokspec.org"
+        className="hidden sm:inline-flex items-center gap-1 mr-4 flex-shrink-0"
+        style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textDecoration: 'none', fontFamily: 'var(--font-heading)', letterSpacing: '0.02em', transition: 'color 0.15s' }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; }}
+      >
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        wokspec.org
+      </a>
+
       {/* Logo */}
       <Link
         href="/"
         className="flex items-center gap-2.5 mr-4 flex-shrink-0"
         aria-label="WokGen home"
       >
-        {/* Pixel-art wok icon — SVG inline so no extra fetch */}
+        {/* Pixel-art wok icon */}
         <svg
           width="28"
           height="28"
@@ -83,35 +102,33 @@ function NavBar() {
           aria-hidden="true"
           className="flex-shrink-0"
         >
-          {/* Wok body */}
           <rect x="4"  y="14" width="20" height="10" rx="2" fill="#41A6F6" />
           <rect x="6"  y="16" width="16" height="6"  rx="1" fill="#1e2d52" />
-          {/* Steam pixels */}
           <rect x="9"  y="8"  width="2"  height="4"  rx="1" fill="#73EFF7" opacity="0.7" />
           <rect x="13" y="6"  width="2"  height="6"  rx="1" fill="#73EFF7" opacity="0.7" />
           <rect x="17" y="8"  width="2"  height="4"  rx="1" fill="#73EFF7" opacity="0.7" />
-          {/* Handle */}
           <rect x="22" y="17" width="4"  height="3"  rx="1" fill="#566C86" />
-          {/* Pixel accents */}
           <rect x="8"  y="17" width="2"  height="2"  fill="#41A6F6" opacity="0.5" />
           <rect x="11" y="19" width="2"  height="2"  fill="#41A6F6" opacity="0.4" />
           <rect x="15" y="17" width="2"  height="2"  fill="#73EFF7" opacity="0.4" />
         </svg>
         <span
           className="text-base font-bold tracking-tight"
-          style={{ color: 'var(--text-primary)' }}
+          style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-heading)' }}
         >
           WokGen
         </span>
+        {/* Badge in WokSpec's emerald — matches how wokspec.org identifies this product */}
         <span
           className="text-xs font-medium px-1.5 py-0.5 rounded"
           style={{
-            background: 'var(--accent-dim)',
-            color: 'var(--accent)',
-            border: '1px solid var(--accent-muted)',
+            background: 'rgba(52,211,153,0.1)',
+            color: '#6ee7b7',
+            border: '1px solid rgba(52,211,153,0.2)',
+            fontFamily: 'var(--font-heading)',
           }}
         >
-          v0.1
+          v0.1 · Preview
         </span>
       </Link>
 
@@ -171,6 +188,86 @@ function NavBar() {
 }
 
 // ---------------------------------------------------------------------------
+// Footer
+// ---------------------------------------------------------------------------
+function Footer() {
+  return (
+    <footer
+      style={{
+        borderTop: '1px solid var(--surface-border)',
+        background: 'var(--surface-base)',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '72rem',
+          margin: '0 auto',
+          padding: '1.25rem 1.5rem',
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '0.75rem',
+        }}
+      >
+        {/* Left — attribution */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <a
+            href="https://wokspec.org"
+            style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textDecoration: 'none', fontFamily: 'var(--font-heading)', transition: 'color 0.15s' }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; }}
+          >
+            Wok Specialists
+          </a>
+          <span style={{ color: 'var(--text-disabled)', fontSize: '0.75rem' }}>/</span>
+          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6ee7b7', fontFamily: 'var(--font-heading)' }}>WokGen</span>
+          <span
+            style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-disabled)', background: 'var(--surface-raised)', border: '1px solid var(--surface-border)', borderRadius: '0.25rem', padding: '0.15rem 0.4rem', fontFamily: 'var(--font-heading)' }}
+          >
+            Early Preview · v0.1
+          </span>
+        </div>
+
+        {/* Right — links */}
+        <nav aria-label="Footer navigation" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+          {[
+            { label: 'wokspec.org', href: 'https://wokspec.org', external: true },
+            { label: 'Docs', href: '/docs', external: false },
+            { label: 'Gallery', href: '/gallery', external: false },
+            { label: 'GitHub', href: 'https://github.com/WokSpec/WokGen', external: true },
+          ].map(({ label, href, external }) => (
+            external ? (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textDecoration: 'none', fontFamily: 'var(--font-heading)', transition: 'color 0.15s' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; }}
+              >
+                {label}
+              </a>
+            ) : (
+              <Link
+                key={label}
+                href={href}
+                style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textDecoration: 'none', fontFamily: 'var(--font-heading)', transition: 'color 0.15s' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; }}
+              >
+                {label}
+              </Link>
+            )
+          ))}
+        </nav>
+      </div>
+    </footer>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Root Layout
 // ---------------------------------------------------------------------------
 export default function RootLayout({
@@ -179,7 +276,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable} data-theme="dark">
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`} data-theme="dark">
       <head>
         {/* Preconnect to font CDN */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -189,16 +286,17 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
-        {/* Favicon — inline SVG data URI */}
+        {/* Favicon */}
         <link
           rel="icon"
-          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230d0d14'/><rect x='4' y='16' width='24' height='12' rx='2' fill='%2341A6F6'/><rect x='6' y='18' width='20' height='8' rx='1' fill='%231e2d52'/><rect x='26' y='19' width='4' height='4' rx='1' fill='%23566C86'/><rect x='10' y='8' width='3' height='6' rx='1' fill='%2373EFF7' opacity='0.7'/><rect x='15' y='5' width='3' height='9' rx='1' fill='%2373EFF7' opacity='0.7'/><rect x='20' y='8' width='3' height='6' rx='1' fill='%2373EFF7' opacity='0.7'/></svg>"
+          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230d0d0d'/><rect x='4' y='16' width='24' height='12' rx='2' fill='%2341A6F6'/><rect x='6' y='18' width='20' height='8' rx='1' fill='%231e2d52'/><rect x='26' y='19' width='4' height='4' rx='1' fill='%23566C86'/><rect x='10' y='8' width='3' height='6' rx='1' fill='%2373EFF7' opacity='0.7'/><rect x='15' y='5' width='3' height='9' rx='1' fill='%2373EFF7' opacity='0.7'/><rect x='20' y='8' width='3' height='6' rx='1' fill='%2373EFF7' opacity='0.7'/></svg>"
           type="image/svg+xml"
         />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <NavBar />
-        <main id="main-content">{children}</main>
+        <main id="main-content" style={{ flex: 1 }}>{children}</main>
+        <Footer />
       </body>
     </html>
   );

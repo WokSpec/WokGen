@@ -7,8 +7,8 @@
    Mirrors spec.json palette exactly so CSS vars + Tailwind classes stay in sync
 ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Surface layers */
-  --surface-base:    #0d0d14;
+  /* Surface layers — base matches WokSpec charcoal (#0d0d0d) */
+  --surface-base:    #0d0d0d;
   --surface-raised:  #13131f;
   --surface-overlay: #1a1a2e;
   --surface-border:  #252538;
@@ -84,11 +84,15 @@
   body {
     background-color: var(--surface-base);
     color: var(--text-primary);
-    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-inter, 'Inter'), ui-sans-serif, system-ui, sans-serif;
     font-size: 0.9rem;
     line-height: 1.6;
     min-height: 100dvh;
     overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading, 'Space Grotesk'), var(--font-inter, 'Inter'), ui-sans-serif, system-ui, sans-serif;
   }
 
   /* Focus ring — visible, accessible, branded */

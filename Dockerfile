@@ -45,8 +45,8 @@ RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Bring in installed node_modules from deps stage
+# (npm workspaces installs everything into root node_modules — no apps/web/node_modules)
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 
 # Copy full source
 COPY . .
@@ -92,7 +92,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next          ./apps/we
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public         ./apps/web/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/package.json   ./apps/web/package.json
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/prisma         ./apps/web/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/node_modules   ./apps/web/node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules            ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json            ./package.json
 

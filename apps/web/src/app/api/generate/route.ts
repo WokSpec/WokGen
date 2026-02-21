@@ -36,7 +36,7 @@ import type { ProviderName, Tool, GenerateParams } from '@/lib/providers';
 
 export const runtime = 'nodejs';
 // Allow up to 10 minutes for slow local ComfyUI or high-demand cloud providers
-export const maxDuration = 600;
+export const maxDuration = 300; // Vercel Hobby plan max (300s)
 
 export async function POST(req: NextRequest) {
   // --------------------------------------------------------------------------

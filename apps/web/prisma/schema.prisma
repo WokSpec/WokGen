@@ -1,0 +1,126 @@
+// WokGen — Prisma schema
+// SQLite for zero-dependency self-hosting; swap provider to "postgresql" for production.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Job — tracks a single generation request through its lifecycle
+// ---------------------------------------------------------------------------
+model Job {
+  id        String   @id @default(cuid())
+
+  /// Tool that created this job: generate | animate | rotate | inpaint | scene
+  tool      String   @default("generate")
+
+  /// Lifecycle: pending → running → succeeded | failed
+  status    String   @default("pending")
+
+  /// Provider that ran the job: replicate | fal | together | comfyui
+  provider  String   @default("replicate")
+
+  // ---- Inputs ---------------------------------------------------------------
+  prompt    String
+  negPrompt String?
+
+  /// Width in pixels (canonical export size: 32 | 64 | 128 | 256 | 512)
+  width     Int      @default(512)
+  height    Int      @default(512)
+
+  /// Deterministic seed; null = random
+  seed      Int?
+
+  /// JSON-encoded extra params per tool (e.g. { "style": "rpg", "steps": 20 })
+  params    String?
+
+  // ---- Outputs --------------------------------------------------------------
+  /// Primary result URL (single image tools)
+  resultUrl   String?
+
+  /// JSON-encoded array of URLs (multi-output tools: rotate, scenes)
+  resultUrls  String?
+
+  /// Error message when status = "failed"
+  error       String?
+
+  // ---- Metadata -------------------------------------------------------------
+  /// Whether this job is visible in the public gallery
+  isPublic    Boolean  @default(false)
+
+  /// Optional display title set by the user after generation
+  title       String?
+
+  /// JSON-encoded tags list for gallery search
+  tags        String?
+
+  /// ISO-8601 timestamp string of external provider prediction (for polling)
+  providerJobId String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // A job can optionally produce a persisted gallery asset
+  asset       GalleryAsset?
+
+  @@index([status])
+  @@index([tool])
+  @@index([isPublic, createdAt])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// GalleryAsset — a finalised, curated asset promoted from a Job
+// ---------------------------------------------------------------------------
+model GalleryAsset {
+  id        String   @id @default(cuid())
+
+  jobId     String   @unique
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  /// Human-readable title
+  title     String?
+
+  /// Primary image URL (hosted by provider CDN or data: URI for local)
+  imageUrl  String
+
+  /// Thumbnail URL (same as imageUrl if not separately generated)
+  thumbUrl  String?
+
+  /// Canonical export size used for generation
+  size      Int      @default(512)
+
+  /// Tool that generated it
+  tool      String   @default("generate")
+
+  /// Provider used
+  provider  String   @default("replicate")
+
+  /// Original prompt
+  prompt    String
+
+  /// JSON-encoded tags
+  tags      String?
+
+  /// Rarity label from spec.json rarities (optional, set by user or pipeline)
+  rarity    String?
+
+  /// Whether visible in the public gallery
+  isPublic  Boolean  @default(true)
+
+  /// SHA-256 of the image bytes (for dedup)
+  hash      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isPublic, createdAt])
+  @@index([tool])
+  @@index([rarity])
+  @@index([hash])
+}

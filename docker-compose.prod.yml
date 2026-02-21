@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wokgen
+      POSTGRES_PASSWORD: change_me
+      POSTGRES_DB: wokgen
+    volumes:
+      - wokgen-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    image: wokspec/wokgen:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://wokgen:change_me@db:5432/wokgen"
+      NEXT_PUBLIC_BASE_URL: "https://wokspec.org/wokgen"
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Optional: Caddy as simple TLS reverse-proxy with automatic Let's Encrypt (example)
+  # Uncomment and provide a Caddyfile (see DEPLOYMENT.md) to enable HTTPS.
+  # caddy:
+  #   image: caddy:2-alpine
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - caddy_data:/data
+  #     - caddy_config:/config
+  #     - ./Caddyfile:/etc/caddy/Caddyfile:ro
+  #   depends_on:
+  #     - web
+
+volumes:
+  wokgen-db:
+  # caddy_data:
+  # caddy_config:

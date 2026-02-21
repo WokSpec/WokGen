@@ -1,0 +1,12 @@
+.env
+.env.local
+.env.production
+.env.development
+node_modules
+.next
+prisma/*.db
+prisma/*.db-journal
+prisma/*.db-shm
+prisma/*.db-wal
+.git
+README.md

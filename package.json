@@ -1,8 +1,16 @@
 {
   "name": "wokgen",
   "version": "1.0.0",
-  "description": "WokGen - Production-grade cloud-based pixel art asset pipeline for RPG/Discord inventories using free AI APIs",
+  "description": "WokGen - AI pixel art generation platform (web app + asset pipeline)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
+    "web:dev": "npm run dev --workspace=apps/web",
+    "web:build": "npm run build --workspace=apps/web",
+    "web:start": "npm run start --workspace=apps/web",
+    "web:lint": "npm run lint --workspace=apps/web",
     "start": "node scripts/tui.mjs",
     "clean": "node scripts/clean-generated.mjs",
     "prompts": "node scripts/generate-prompts.mjs",

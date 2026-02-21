@@ -23,7 +23,7 @@ RUN if [ -d prisma ]; then npx prisma generate || true; fi
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 # Placeholder DATABASE_URL for build-time schema validation only
-ENV DATABASE_URL=file:/tmp/build-placeholder.db
+ENV DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder
 
 RUN npm run build
 

@@ -1,0 +1,49 @@
+# Render Blueprint — WokGen web app
+# Deploy: render.com → New → Blueprint → connect WokSpec/WokGen → Apply
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: wokgen-web
+    env: node
+    plan: free
+    region: oregon
+    rootDir: apps/web
+
+    buildCommand: npm install --legacy-peer-deps && npx prisma generate && npm run build
+    # prisma db push syncs schema to the DB on every deploy (safe for additive changes)
+    startCommand: npx prisma db push && node .next/standalone/server.js
+
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wokgen-db
+          property: connectionString
+      - key: NEXT_PUBLIC_BASE_URL
+        value: https://wokgen.wokspec.org
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: HOSTNAME
+        value: "0.0.0.0"
+      # Auto-generate a random secret — no manual setup needed
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      # Provider keys (optional — add in Render dashboard if using server-side keys)
+      # - key: TOGETHER_API_KEY
+      #   sync: false
+      # - key: REPLICATE_API_TOKEN
+      #   sync: false
+      # - key: FAL_API_KEY
+      #   sync: false
+
+databases:
+  - name: wokgen-db
+    databaseName: wokgen
+    user: wokgen
+    plan: free
+    # ⚠️  Render free PostgreSQL expires after 90 days.
+    #     Upgrade plan or recreate and re-run `prisma db push` before expiry.

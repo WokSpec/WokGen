@@ -472,18 +472,28 @@ export default function HomePage() {
 
             {/* Left: text */}
             <div className="flex-1 min-w-0 text-center lg:text-left">
-              {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2 mb-6 animate-fade-in">
+              {/* Eyebrow + attribution */}
+              <div className="flex flex-col items-center lg:items-start gap-2 mb-6 animate-fade-in">
                 <span
-                  className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full"
+                  className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded"
                   style={{
-                    background: 'var(--accent-dim)',
-                    border: '1px solid var(--accent-muted)',
-                    color: 'var(--accent)',
+                    background: 'rgba(52,211,153,0.08)',
+                    border: '1px solid rgba(52,211,153,0.2)',
+                    color: '#6ee7b7',
+                    fontFamily: 'var(--font-heading)',
                   }}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
-                  Open-source · MIT + Commons Clause
+                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#34d399' }} />
+                  Early Preview · Active development — expect changes
+                </span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                  Open-source · MIT + Commons Clause · by{' '}
+                  <a
+                    href="https://wokspec.org"
+                    style={{ color: 'var(--text-muted)', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+                  >
+                    Wok Specialists
+                  </a>
                 </span>
               </div>
 

@@ -4,6 +4,8 @@ import Link from 'next/link';
 import './globals.css';
 import { NavLink } from './_components/NavLink';
 
+export const dynamic = 'force-dynamic';
+
 // ---------------------------------------------------------------------------
 // Fonts
 // ---------------------------------------------------------------------------

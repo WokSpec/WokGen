@@ -1,12 +1,13 @@
 // WokGen — Prisma schema
-// SQLite for zero-dependency self-hosting; swap provider to "postgresql" for production.
+// PostgreSQL for production (Neon/Vercel Postgres); use sqlite only for local dev.
+// To use SQLite locally: set DATABASE_URL="file:./dev.db" in apps/web/.env
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

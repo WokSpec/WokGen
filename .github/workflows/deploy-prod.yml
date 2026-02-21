@@ -1,16 +1,13 @@
-name: Build & Deploy WokGen (prod)
+name: Deploy WokGen to Vercel (prod)
 
 on:
   push:
     branches:
-      - deploy/wokgen-prod
+      - main
   workflow_dispatch:
 
-env:
-  IMAGE_NAME: wokspec/wokgen
-
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,41 +17,29 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build and generate Prisma client
+      - name: Install dependencies & generate Prisma client
         working-directory: apps/web
         run: |
           npm install --legacy-peer-deps
-          npx prisma generate || true
-          npm run build
+          npx prisma generate
 
-      - name: Build Docker image
+      - name: Build check
+        working-directory: apps/web
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_BASE_URL: "https://wokgen.wokspec.org"
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: npm run build
+
+      # Vercel deploy — requires VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID secrets
+      - name: Deploy to Vercel
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          docker build -t $IMAGE_NAME:latest -f apps/web/Dockerfile apps/web
-
-      # Optional: push to registry (requires DOCKERHUB_USERNAME and DOCKERHUB_TOKEN secrets)
-      - name: Log in to DockerHub
-        if: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Push image (optional)
-        if: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
-        run: |
-          docker tag $IMAGE_NAME:latest ${{ secrets.DOCKERHUB_USERNAME }}/wokgen:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/wokgen:latest
-
-      # Optional SSH deploy step (operator must configure DEPLOY_SSH_* secrets)
-      - name: Deploy to server via SSH
-        if: ${{ secrets.DEPLOY_SSH_HOST != '' && secrets.DEPLOY_SSH_USER != '' && secrets.DEPLOY_SSH_KEY != '' }}
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEPLOY_SSH_HOST }}
-          username: ${{ secrets.DEPLOY_SSH_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
-            docker pull $IMAGE_NAME:latest || true
-            cd /srv/wokgen || true
-            docker compose -f docker-compose.prod.yml pull || true
-            docker compose -f docker-compose.prod.yml up -d --build
+          npm install -g vercel
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          vercel build --prod --token=$VERCEL_TOKEN
+          vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN

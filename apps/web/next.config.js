@@ -133,15 +133,11 @@ const nextConfig = {
   },
 
   // ---------------------------------------------------------------------------
-  // Standalone output — produces a minimal self-contained Node.js server in
-  // .next/standalone — required for lean Docker images.
-  //
-  // IMPORTANT: when using standalone output you must also copy:
-  //   .next/static  →  .next/standalone/.next/static
-  //   public/       →  .next/standalone/public
-  //
+  // Standalone output — for Docker/self-hosted builds only.
+  // Disabled for Vercel (Vercel manages its own output format).
+  // Uncomment this line if building a Docker image:
+  // output: 'standalone',
   // ---------------------------------------------------------------------------
-  output: 'standalone',
 
   // ---------------------------------------------------------------------------
   // Webpack customisation

@@ -13,7 +13,8 @@ export default auth((req) => {
   // Account and billing require a real session
   const needsAuth =
     pathname.startsWith('/account') ||
-    pathname.startsWith('/billing');
+    pathname.startsWith('/billing') ||
+    pathname.startsWith('/admin');
 
   if (needsAuth && !session) {
     const loginUrl = new URL('/login', req.url);
@@ -32,6 +33,8 @@ export const config = {
     '/studio/:path*',
     '/account/:path*',
     '/billing/:path*',
+    '/admin/:path*',
+    '/admin',
     '/api/generate/:path*',
     '/api/generate',
   ],

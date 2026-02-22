@@ -7,6 +7,8 @@ const LEFT_LINKS = [
   { label: 'Gallery',    href: '/gallery',                             external: false },
   { label: 'Billing',    href: '/billing',                             external: false },
   { label: 'Docs',       href: '/docs',                                external: false },
+  { label: 'Terms',      href: '/terms',                               external: false },
+  { label: 'Privacy',    href: '/privacy',                             external: false },
 ];
 
 const RIGHT_LINKS = [
@@ -47,7 +49,6 @@ export function Footer() {
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-faint)'; }}>
                   Wok Specialists
                 </a>
-                {' '}· Early Preview
               </span>
             </div>
 
@@ -62,7 +63,8 @@ export function Footer() {
 
           <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
             <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)' }}>
-              © {new Date().getFullYear()} Wok Specialists LLC. Released under a modified MIT license.
+              © {new Date().getFullYear()} Wok Specialists LLC. Released under the{' '}
+              <a href="/license" style={{ color: 'var(--text-faint)', textDecoration: 'none' }}>MIT license</a>.
             </p>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <span className="tag tag-gray" style={{ fontSize: '0.58rem' }}>Next.js</span>

@@ -49,14 +49,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
+    url: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://wokgen.wokspec.org',
     title: 'WokGen — AI Pixel Art Studio',
     description: 'Generate game assets, sprites and tilesets with AI.',
     siteName: 'WokGen',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'WokGen — AI Pixel Art Studio' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'WokGen — AI Pixel Art Studio',
     description: 'Generate game assets, sprites and tilesets with AI.',
+    images: ['/og.png'],
   },
   robots: {
     index: true,
@@ -90,7 +93,6 @@ function NavBar() {
       <Link href="/" className="nav-wordmark mr-4 flex-shrink-0" aria-label="WokGen home">
         <span style={{ color: 'var(--text-muted)' }}>Wok</span>
         <span style={{ color: '#a78bfa' }}>Gen</span>
-        <span className="badge-preview ml-2">Preview</span>
       </Link>
 
       {/* Nav links */}

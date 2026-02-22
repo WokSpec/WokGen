@@ -21,8 +21,8 @@ const STEPS = [
 
 const PLANS = [
   { id: 'free',  label: 'Free',    price: '$0',   note: 'Forever',   features: ['Unlimited standard generation', 'Pollinations AI', 'Download originals'], accent: 'var(--text-muted)' },
-  { id: 'plus',  label: 'Plus',    price: '$2',   note: '/month',    features: ['30 HD credits/mo', 'Replicate models', 'FLUX.1 quality'],                   accent: '#a78bfa', highlight: true },
-  { id: 'pro',   label: 'Pro',     price: '$6',   note: '/month',    features: ['100 HD credits/mo', 'Priority queue', 'All Plus features'],                 accent: '#a78bfa' },
+  { id: 'plus',  label: 'Plus',    price: '$2',   note: '/month',    features: ['100 HD credits/mo', 'Replicate models', 'FLUX.1 quality'],                   accent: '#a78bfa', highlight: true },
+  { id: 'pro',   label: 'Pro',     price: '$6',   note: '/month',    features: ['500 HD credits/mo', 'Priority queue', 'All Plus features'],                 accent: '#a78bfa' },
 ] as const;
 
 // ─── Subcomponents ───────────────────────────────────────────────────────────

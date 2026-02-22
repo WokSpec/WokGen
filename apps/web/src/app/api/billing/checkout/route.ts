@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     customerId = customer.id;
   }
 
-  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://wokgen.wokspec.org';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://wokgen.wokspec.org';
 
   const checkoutSession = await stripe.checkout.sessions.create({
     customer:   customerId,

@@ -21,7 +21,7 @@ export async function POST() {
     return NextResponse.json({ error: 'No billing account found' }, { status: 404 });
   }
 
-  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://wokgen.wokspec.org';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://wokgen.wokspec.org';
 
   const portalSession = await stripe.billingPortal.sessions.create({
     customer:   subscription.stripeCustomerId,

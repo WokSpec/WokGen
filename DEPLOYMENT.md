@@ -33,10 +33,26 @@ In **Project → Settings → Environment Variables**, add:
 | `DATABASE_URL` | Your Neon connection string |
 | `NEXT_PUBLIC_BASE_URL` | `https://wokgen.wokspec.org` |
 | `NEXT_TELEMETRY_DISABLED` | `1` |
-| `NEXTAUTH_SECRET` | Run `openssl rand -base64 32` and paste output |
+| `AUTH_SECRET` | Run `openssl rand -base64 32` and paste output |
+| `AUTH_GITHUB_ID` | GitHub OAuth App client ID |
+| `AUTH_GITHUB_SECRET` | GitHub OAuth App client secret |
+| `RESEND_API_KEY` | Resend API key (domain must be verified in Resend dashboard) |
+| `ADMIN_EMAIL` | Email of the GitHub account with admin panel access |
 | `TOGETHER_API_KEY` | *(optional)* your Together key |
 | `REPLICATE_API_TOKEN` | *(optional)* your Replicate token |
 | `FAL_API_KEY` | *(optional)* your fal.ai key |
+
+**GitHub OAuth App setup:**
+1. Go to https://github.com/settings/developers → OAuth Apps → New OAuth App
+2. Homepage URL: `https://wokgen.wokspec.org`
+3. Authorization callback URL: `https://wokgen.wokspec.org/api/auth/callback/github`
+4. Copy the Client ID and generate a Client Secret
+
+**Resend email setup (for wokspec.org on Cloudflare):**
+1. Create account at https://resend.com
+2. Domains → Add Domain → enter `wokspec.org`
+3. Add the TXT (SPF) and CNAME (DKIM) records Resend provides into Cloudflare DNS
+4. Click Verify in Resend dashboard → emails will send as `noreply@wokspec.org`
 
 ### 4 — First database migration
 

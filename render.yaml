@@ -11,8 +11,7 @@ services:
     rootDir: apps/web
 
     buildCommand: npm install --legacy-peer-deps && npx prisma generate && npm run build
-    # prisma db push syncs schema to the DB on every deploy (safe for additive changes)
-    startCommand: npx prisma db push && node .next/standalone/server.js
+    startCommand: npx prisma migrate deploy && node .next/standalone/server.js
 
     healthCheckPath: /api/health
 
@@ -29,9 +28,19 @@ services:
         value: "1"
       - key: HOSTNAME
         value: "0.0.0.0"
-      # Auto-generate a random secret — no manual setup needed
-      - key: NEXTAUTH_SECRET
+      # Auth — NextAuth v5
+      - key: AUTH_SECRET
         generateValue: true
+      - key: AUTH_GITHUB_ID
+        sync: false
+      - key: AUTH_GITHUB_SECRET
+        sync: false
+      # Email via Resend (add wokspec.org domain in Resend dashboard first)
+      # - key: RESEND_API_KEY
+      #   sync: false
+      # Admin panel access
+      # - key: ADMIN_EMAIL
+      #   sync: false
       # Provider keys (optional — add in Render dashboard if using server-side keys)
       # - key: TOGETHER_API_KEY
       #   sync: false
@@ -46,4 +55,4 @@ databases:
     user: wokgen
     plan: free
     # ⚠️  Render free PostgreSQL expires after 90 days.
-    #     Upgrade plan or recreate and re-run `prisma db push` before expiry.
+    #     Upgrade plan or recreate and re-run `prisma migrate deploy` before expiry.

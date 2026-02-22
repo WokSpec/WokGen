@@ -1,190 +1,218 @@
 # WokGen
 
-WokGen is a production-grade cloud-based pipeline for generating pixel-art item/icon assets for RPG inventories, Discord embeds, and emoji-scale usage. Uses free cloud AI APIs for generation and enforces strict post-processing + validation.
+**A multi-engine AI asset factory.** Specialized pipelines for every kind of digital asset — pixel sprites, brand systems, UI components, vectors, and more.
 
-## Quick Start
+Live platform: **[wokgen.wokspec.org](https://wokgen.wokspec.org)** — part of the [WokSpec](https://wokspec.org) platform.
 
-Run the interactive TUI:
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)
 
-```bash
-npm start
+---
+
+## What WokGen is
+
+WokGen is a multi-mode generative asset platform. Each mode is a specialized pipeline with its own prompt schema, model routing, quality constraints, output formats, and tooling.
+
+It is **not** a generic image generator. It is a purpose-built factory.
+
+## Asset Engines
+
+| Engine | Purpose | Status |
+|--------|---------|--------|
+| **Pixel** | Game sprites, tilesets, animations, HUD elements | ✅ Live |
+| **Business** | Logos, brand kits, slide visuals, banners | ✅ Live |
+| **UI/UX** | React/HTML components, landing pages, dashboards | ✅ Live |
+| **Vector** | SVG icons, illustration sets, design systems | 🔜 Soon |
+| **Emoji** | Emoji packs, sticker sets, platform reactions | 🔜 Soon |
+
+More engines are in development. Each engine is isolated — no cross-mode bleed.
+
+## Architecture Overview
+
+```
+apps/
+  web/               Next.js 14 app (frontend + API routes)
+    src/lib/         Server-side engine (providers, prompt builders, routing)
+    src/app/         Pages and API routes
+
+packages/
+  core/              Domain interfaces (public TypeScript contracts)
+  prompts/           OSS stub prompt builders
+  schemas/           API request/response schemas
+
+modes/
+  pixel/             Pixel mode plugin interface
+  business/          Business mode plugin interface
+  vector/            Vector mode plugin interface
+  emoji/             Emoji mode plugin interface
+  uiux/              UI/UX mode plugin interface
+
+docs/               Architecture and contributor documentation
+examples/           Workflow examples per engine
 ```
 
-This launches a clean ASCII art interface for controlling the asset factory.
+## Quickstart (Self-Hosted)
 
-Quick start command presets are in `COMMANDS.md`.
-Use `--profile detailed` on `normalize/package/validate/registry` for higher-detail exports (64 base, up to 512).
+**Prerequisites:** Node.js 18+, pnpm, PostgreSQL (or Neon)
 
-## Drag-and-Drop Training Dataset Intake
+```bash
+git clone https://github.com/WokSpec/WokGen
+cd WokGen
+pnpm install
 
-This repo includes a license-aware intake flow so you can drag downloaded art packs into one folder and build a clean training dataset.
+# Configure environment
+cp apps/web/.env.example apps/web/.env.local
+# Edit .env.local — see Environment Setup below
 
-1. Reset dataset workspace:
-   - `npm run data:reset`
-2. Drag/drop files or extracted packs into:
-   - `dataset/inbox/`
-3. Add license metadata (recommended):
-   - `dataset/inbox/_licenses.csv` with columns:
-   - `path,license,source_url,title,author`
-4. Run intake:
-   - `npm run data:intake`
+# Initialize database
+cd apps/web && pnpm prisma db push
 
-Outputs:
-- Accepted files: `dataset/accepted/`
-- Training copy: `dataset/train/images/`
-- Rejected files (missing/unsupported license): `dataset/rejected/`
-- Manifests: `dataset/manifests/`
-- Attribution file: `dataset/manifests/ATTRIBUTION.md`
+# Start dev server
+pnpm dev
+```
 
-Default licenses allowed for training:
-- `CC0`
-- `CC-BY-3.0`
-- `CC-BY-4.0`
-- `OGA-BY`
+Open [http://localhost:3000](http://localhost:3000).
 
-## What this repo guarantees
+## Environment Setup
 
-- Pixel-art pipeline with base `32x32` canonical assets.
-- Export variants: `32, 64, 128, 256` transparent PNG.
-- Deterministic generation with seeds (via prompts).
-- Rarity-driven prompt composition and style extras.
-- Hard validation for dimensions, alpha, palette membership, file size limits, and unique IDs.
-- Uses free cloud AI APIs (Replicate with free credits for new users).
+Minimum required for self-hosted operation:
 
-## Folder structure
+```env
+# Database (Postgres or Neon)
+DATABASE_URL=postgresql://...
 
-- `art/source/`
-- `art/parts/base`
-- `art/parts/material`
-- `art/parts/modifier`
-- `art/parts/frame`
-- `assets/raw/`
-- `assets/clean/`
-- `assets/rendered/icons/{32,64,128,256}/`
-- `assets/rendered/sheets/`
-- `registry/`
-- `prompts/`
-- `scripts/`
-- `comfyui/workflows/`
+# At least one image generation API (all free tiers available)
+TOGETHER_API_KEY=      # together.ai — FLUX.1-schnell-Free (recommended)
+HF_TOKEN=             # huggingface.co — free inference
+# Pollinations works without any key
 
-## Prerequisites
+# Auth (NextAuth)
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-here
 
-### Universal
+# Self-hosted mode (disables billing and auth requirements)
+SELF_HOSTED=true
+```
 
-1. Install GitHub CLI:
-   - Linux: `sudo apt update && sudo apt install -y gh && gh auth login`
-   - Or follow https://cli.github.com/
-2. Install Node.js 20+:
-   - Linux: `sudo apt update && sudo apt install -y nodejs npm`
-3. Install image tools:
-   - Linux: `sudo apt install -y imagemagick pngquant oxipng`
+Optional (for HD generation):
+```env
+FAL_KEY=              # fal.ai
+REPLICATE_API_TOKEN=  # replicate.com
+```
 
-### Cloud Generation
+See [docs/development.md](./docs/development.md) for the full environment reference.
 
-1. Sign up for Replicate: https://replicate.com/
-2. Get your API token from https://replicate.com/account/api-tokens
-3. Set environment variable: `export REPLICATE_API_TOKEN=your_token_here`
-4. (Optional) For local ComfyUI fallback: Follow old instructions below.
+## Provider Support
 
-### Local ComfyUI (Optional Fallback)
+WokGen supports multiple inference providers with automatic fallback routing:
 
-1. Install Python 3.10+:
-   - `sudo apt install -y python3 python3-pip`
-2. Install ComfyUI:
-   - `git clone https://github.com/comfyanonymous/ComfyUI.git`
-   - `cd ComfyUI && python3 -m pip install -r requirements.txt`
-   - `python main.py`
+| Provider | Models | Free? |
+|----------|--------|-------|
+| Together.ai | FLUX.1-schnell-Free | ✅ Yes |
+| Hugging Face | FLUX.1-schnell | ✅ Yes (free token) |
+| Pollinations | FLUX | ✅ Yes (no key) |
+| fal.ai | FLUX.1-dev | Credits |
+| Replicate | SDXL, FLUX | Credits |
+| ComfyUI | Any local model | ✅ Local |
 
-## ComfyUI model placement
+## Mode Isolation Model
 
-- Put SD checkpoints in `ComfyUI/models/checkpoints/`.
-- Optionally put pixel-art LoRA files in `ComfyUI/models/loras/`.
-- Edit `comfyui/workflows/pixel_icon_workflow.json` and set:
-  - `CheckpointLoaderSimple.inputs.ckpt_name` to your checkpoint filename.
-- If your workflow uses LoRA nodes, add them and keep node titles for positive/negative prompt + sampler intact.
+Each mode is a sealed pipeline:
 
-## Install and run this repo
+```
+User Request
+    ↓
+Mode Router (mode field in request body)
+    ↓
+Mode-specific prompt schema validation
+    ↓
+Variant builder (batch slot mutation)
+    ↓
+Prompt validator (sanitize, length, conflict resolution)
+    ↓
+Negative bank assembly (global + tool + preset)
+    ↓
+Provider quality matrix (optimal provider for mode+tool+tier)
+    ↓
+Provider dispatch → fallback chain
+    ↓
+Job persistence (Postgres)
+    ↓
+Response
+```
 
-1. Install local JS project dependencies:
-   - `npm install`
-2. Set up cloud generation:
-   - Sign up for Replicate, get API token, set `REPLICATE_API_TOKEN`
-3. Generate prompt jobs:
-   - `npm run prompts -- --count 200`
-4. Generate raw images via cloud AI:
-   - `npm run gen`
-5. Normalize and hard-enforce baseline style constraints:
-   - `npm run normalize`
-6. Package export sizes + sprite sheets:
-   - `npm run package`
-7. Validate:
-   - `npm run validate`
-8. Build registry:
-   - `npm run registry`
+No mode shares prompt logic, gallery, templates, or output format with another mode.
 
-Single command:
+## WokSpec Relationship
 
-- `npm run all`
+WokGen is the generation engine. [WokSpec](https://wokspec.org) is the services layer above it.
 
-## Script reference
+WokSpec provides professional implementation, production polish, and scale on top of WokGen outputs:
 
-- `npm run prompts -- --count 200 --seedBase 1234`
-- `npm run prompts -- --count 50 --rarity rare --category items/weapons`
-- `npm run gen` (uses Replicate SDXL with pixel art style)
-- `npm run gen:cpu` (procedural fallback, no AI model required)
-- `npm run normalize`
-- `npm run package`
-- `npm run validate`
-- `npm run registry`
+- Pixel → game art pipelines, engine integration, atlas packing
+- Business → brand system finalization, multi-channel rollout
+- UI/UX → production-ready frontend scaffolding, design systems
 
-## Troubleshooting
+The SaaS generates. WokSpec delivers.
 
-- `ComfyUI connection refused`:
-  - Start ComfyUI (`python main.py`) and verify it is listening on `8188`.
-- `Checkpoint not found`:
-  - Ensure checkpoint file name in workflow matches a file under `ComfyUI/models/checkpoints/`.
-- `pngquant not found` / `magick not found` / `oxipng not found`:
-  - Install required system binaries and ensure they are in PATH.
-- `validate` reports palette violations:
-  - Run `npm run normalize` again and inspect raw source images for anti-aliased edges or gradients.
-- `No clean assets found` during packaging:
-  - Confirm `assets/clean/` has PNG files and that normalize step completed.
-- Output looks muddy at 32x32:
-  - Increase prompt strictness for silhouette simplicity; avoid complex scenes; keep single centered object.
+## What's Open vs. Closed
 
-## Low-Memory CPU Mode
+This repository is Apache-2.0 licensed. The following are open:
 
-For constrained systems (CPU-only, low RAM), use:
+- Frontend application code
+- API route structure and scaffolding
+- Mode schema type definitions
+- OSS stub prompt builders (functional, generic quality)
+- Provider capability types
+- Export pipeline interfaces
+- UI components
 
-- Checkpoint: `full_int2_sd.pth` in `ComfyUI/models/checkpoints/`
-- Workflow: `comfyui/workflows/pixel_icon_lowmem_workflow.json`
-- ComfyUI start flags:
-  - `python main.py --listen 127.0.0.1 --port 8190 --cpu --novram --cache-none --preview-method none --disable-all-custom-nodes --disable-manager-ui`
-- Generation command:
-  - `npm run gen:lowmem`
+The following are **not** included in this repository:
 
-This mode is slower and lower quality, but minimizes memory pressure.
+- Production prompt token chains (WokSpec proprietary quality layer)
+- Model fine-tuning parameters
+- Billing and rate-limit implementation
+- Abuse detection heuristics
+- Provider-specific model IDs and inference credentials
 
-If your machine cannot keep a diffusion checkpoint loaded, use the strict fallback:
+Self-hosted deployments use the OSS stub prompt builders and produce good results.
+The hosted platform at wokgen.wokspec.org uses a private quality layer on top.
 
-- `npm run gen:cpu`
+See [docs/licensing.md](./docs/licensing.md) for the full boundary definition.
 
-This generates deterministic pixel-style placeholders from seeds/categories so the rest of the pipeline (`normalize -> package -> validate -> registry`) remains fully operational on low-spec hardware.
+## Contributing
 
-### Rotating Unique Batches
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to:
 
-- `npm run prompts` now rotates through catalog items automatically.
-- Each run emits a different unique batch (default 8 items).
-- Rotation state is stored in `.cache/prompt-rotation.json`.
-- Reset rotation to the first batch:
-  - `node scripts/generate-prompts.mjs --resetRotation`
-- Generate only one category:
-  - `npm run prompts -- --category items/weapons --count 6`
-- Generate from multiple categories:
-  - `npm run prompts -- --categories items/weapons,items/armor --count 8`
+- Set up your local environment
+- Add a new asset engine mode
+- Add a new provider adapter
+- Submit a pull request
 
-## Production notes
+Please read [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) before contributing.
 
-- Keep `registry/assets.json` as your single source of truth for bot/game lookups.
-- Use pre-rendered icon sizes instead of runtime image composition in Discord.
-- For maximum consistency, prefer layered parts workflows (`art/parts/*`) and reserve diffusion generation for unique/high-rarity items.
+## Security
+
+To report a vulnerability, see [SECURITY.md](./SECURITY.md). Do not open public issues for security reports.
+
+## Roadmap
+
+- [ ] Vector engine (SVG generation pipeline)
+- [ ] Emoji engine (platform-aware export)
+- [ ] Batch export and ZIP packing UI
+- [ ] API key management dashboard
+- [ ] Public gallery curation tools
+- [ ] Mode plugin registry
+
+## License
+
+Apache-2.0. See [LICENSE](./LICENSE) for details.
+
+Assets generated by the platform are subject to the terms of the underlying model providers.
+See [docs/licensing.md](./docs/licensing.md) for asset usage rights.
+
+---
+
+Built by [WokSpec](https://wokspec.org)
+

@@ -1,0 +1,9 @@
+{
+  "name": "@wokgen/prompts",
+  "version": "0.1.0",
+  "description": "WokGen OSS prompt builders — stub implementations for self-hosted deployments",
+  "main": "src/stub.ts",
+  "types": "src/stub.ts",
+  "license": "Apache-2.0",
+  "private": false
+}

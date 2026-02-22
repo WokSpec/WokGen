@@ -1,0 +1,9 @@
+{
+  "name": "@wokgen/schemas",
+  "version": "0.1.0",
+  "description": "WokGen API request/response contracts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "license": "Apache-2.0",
+  "private": false
+}

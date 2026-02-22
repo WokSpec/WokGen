@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface Plan {
@@ -84,6 +85,21 @@ const PACKS = [
 
 export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdCredits }: Props) {
   const [loading, setLoading] = useState<string | null>(null);
+  const [toast, setToast]     = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const creditsSuccess = searchParams.get('credits_success');
+    if (success === '1') {
+      setToast('Subscription activated! Your credits are ready.');
+      router.replace('/billing');
+    } else if (creditsSuccess === '1') {
+      setToast('Credits added to your account!');
+      router.replace('/billing');
+    }
+  }, [searchParams, router]);
 
   const handleUpgrade = async (planId: string) => {
     if (planId === currentPlanId) return;
@@ -131,6 +147,23 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
 
   return (
     <main style={{ maxWidth: 1040, margin: '0 auto', padding: '3rem 1.5rem' }}>
+
+      {/* ── Success toast ─────────────────────────────────────────────── */}
+      {toast && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: 'rgba(167,139,250,.12)', border: '1px solid rgba(167,139,250,.3)',
+          borderRadius: 4, padding: '0.75rem 1rem', marginBottom: '1.5rem',
+          fontSize: '0.875rem', color: '#c4b5fd',
+        }}>
+          <span>✓ {toast}</span>
+          <button
+            onClick={() => setToast(null)}
+            style={{ background: 'none', border: 'none', color: '#c4b5fd', cursor: 'pointer', fontSize: '1rem', lineHeight: 1 }}
+            aria-label="Dismiss"
+          >×</button>
+        </div>
+      )}
 
       {/* ── Header ──────────────────────────────────────────────────── */}
       <div style={{ marginBottom: '2.5rem' }}>

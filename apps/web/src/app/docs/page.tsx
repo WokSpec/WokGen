@@ -470,33 +470,40 @@ export default function DocsPage() {
         <SectionTitle id="quick-start" icon="⚡">Quick Start</SectionTitle>
 
         <P>
-          WokGen is a self-hosted AI pixel art studio. It runs a Next.js web app backed
-          by a SQLite database and can use any combination of cloud AI providers — or your
-          own local ComfyUI instance.
+          WokGen is a hosted AI pixel art studio. The fastest way to use it is to visit{' '}
+          <a href="https://wokgen.wokspec.org" style={{ color: 'var(--accent)' }}>wokgen.wokspec.org</a>{' '}
+          — no setup, no API keys, no install required.
         </P>
 
         <Callout type="tip">
-          You need <strong>Node.js 20+</strong> and at least one AI provider key.
-          Together.ai offers a completely free <InlineCode>FLUX.1-schnell-Free</InlineCode> model
-          that requires no billing setup.
+          <strong>Hosted users:</strong> Standard generation is always free via Pollinations (no sign-in required).
+          HD generation via Replicate requires a Plus plan or credit top-up. See{' '}
+          <a href="/billing" style={{ color: 'var(--accent)' }}>Plans & Credits</a>.
         </Callout>
+
+        <P>
+          If you want to self-host WokGen with your own provider keys, follow the steps below.
+          You need <strong>Node.js 20+</strong>.
+        </P>
 
         <SubTitle>1. Clone & install</SubTitle>
         <CodeBlock lang="bash">
-{`git clone https://github.com/WokSpecialists/WokGen.git
+{`git clone https://github.com/WokSpec/WokGen.git
 cd WokGen
 npm install`}
         </CodeBlock>
 
         <SubTitle>2. Configure environment</SubTitle>
         <CodeBlock lang="bash">
-{`cp .env.example .env.local
-# Open .env.local and add at least one provider key:
+{`cp apps/web/.env.example apps/web/.env.local
+# Open .env.local and configure:
 #
-#   TOGETHER_API_KEY=your_together_key   # free tier — recommended for new users
-#   REPLICATE_API_TOKEN=r8_...
-#   FAL_KEY=...
-#   COMFYUI_HOST=http://127.0.0.1:8188   # if running ComfyUI locally`}
+#   DATABASE_URL="file:./dev.db"          # local SQLite (default)
+#   REPLICATE_API_TOKEN=r8_...            # for HD generation
+#   FAL_API_KEY=...                       # alternative HD provider
+#   COMFYUI_HOST=http://127.0.0.1:8188   # if running ComfyUI locally
+#
+# Standard generation uses Pollinations (no key needed)`}
         </CodeBlock>
 
         <SubTitle>3. Set up the database</SubTitle>
@@ -563,13 +570,17 @@ cd ../..`}
           ]}
         />
 
-        <SubTitle>BYOK — Bring Your Own Key</SubTitle>
+        <SubTitle>Quality modes</SubTitle>
         <P>
-          Open the <strong>Config</strong> icon in the tool rail sidebar (or press the ⚙ button).
-          Enter your API keys in the settings modal. Keys are stored in your browser's
-          <InlineCode>localStorage</InlineCode> and are only sent to the server
-          as part of generation requests — they are never persisted to the database.
+          WokGen has two quality modes, selectable in the Studio control panel:
         </P>
+        <Table
+          headers={['Mode', 'Provider', 'Cost', 'Requires']}
+          rows={[
+            ['Standard', 'Pollinations FLUX', 'Free, unlimited', 'Nothing — works as guest'],
+            ['HD ✦', 'Replicate FLUX.1-schnell', 'HD credits', 'Plus plan or credit pack'],
+          ]}
+        />
 
         <HR />
 
@@ -578,32 +589,32 @@ cd ../..`}
 
         <P>
           WokGen exposes a REST API that can be called programmatically. All endpoints
-          accept and return JSON. No authentication is required for self-hosted deployments.
+          accept and return JSON.
         </P>
 
         <Callout type="info">
-          All API routes are prefixed with <InlineCode>/api</InlineCode>. The server runs at
-          <InlineCode>http://localhost:3000</InlineCode> by default.
+          All API routes are prefixed with <InlineCode>/api</InlineCode>.
+          The hosted API base URL is <InlineCode>https://wokgen.wokspec.org</InlineCode>.
+          Self-hosted default is <InlineCode>http://localhost:3000</InlineCode>.
         </Callout>
 
         {/* POST /api/generate */}
         <SubTitle>POST /api/generate</SubTitle>
-        <P>Generate pixel art. Runs the full generation synchronously and returns the result.</P>
+        <P>Generate pixel art. Standard quality (Pollinations) is always free. HD quality requires credits.</P>
 
         <CodeBlock lang="json" label="Request body">
 {`{
   "tool":        "generate",          // generate | animate | rotate | inpaint | scene
-  "provider":    "together",          // replicate | fal | together | comfyui
   "prompt":      "iron sword, RPG icon, ornate crossguard",
   "negPrompt":   "blurry, 3d render", // optional
   "width":       512,                 // 32 | 64 | 128 | 256 | 512
   "height":      512,
+  "quality":     "standard",          // "standard" (free) | "hd" (credits required)
   "seed":        1337,                // optional — omit for random
   "steps":       4,                   // optional
   "guidance":    3.5,                 // optional
   "stylePreset": "rpg_icon",          // optional
-  "isPublic":    false,               // save to gallery if true
-  "apiKey":      "your-key-here"      // optional BYOK override
+  "isPublic":    false
 }`}
         </CodeBlock>
 
@@ -614,32 +625,29 @@ cd ../..`}
     "id":        "cly1abc...",
     "tool":      "generate",
     "status":    "succeeded",
-    "provider":  "together",
+    "provider":  "pollinations",
     "prompt":    "iron sword, RPG icon, ornate crossguard",
     "width":     512,
     "height":    512,
     "seed":      1337,
     "resultUrl": "https://...",
     "isPublic":  false,
-    "createdAt": "2026-01-01T00:00:00.000Z",
-    "updatedAt": "2026-01-01T00:00:05.231Z"
+    "createdAt": "2026-01-01T00:00:00.000Z"
   },
-  "resultUrl":   "https://cdn.together.xyz/...",
-  "resultUrls":  null,
-  "durationMs":  5231,
+  "resultUrl":   "https://image.pollinations.ai/...",
+  "durationMs":  2100,
   "resolvedSeed": 1337
 }`}
         </CodeBlock>
 
         <CodeBlock lang="bash" label="curl example">
-{`curl -X POST http://localhost:3000/api/generate \\
+{`curl -X POST https://wokgen.wokspec.org/api/generate \\
   -H "Content-Type: application/json" \\
   -d '{
     "prompt": "health potion, glowing red liquid, crystal vial",
-    "provider": "together",
+    "quality": "standard",
     "width": 256,
-    "stylePreset": "rpg_icon",
-    "apiKey": "YOUR_TOGETHER_API_KEY"
+    "stylePreset": "rpg_icon"
   }'`}
         </CodeBlock>
 
@@ -706,46 +714,43 @@ cd ../..`}
         <SectionTitle id="providers" icon="☁">Provider Setup</SectionTitle>
 
         <P>
-          WokGen supports four AI providers. You can configure any combination — the Studio
-          will show which are available. At least one provider key is required.
+          Hosted WokGen uses two providers. Self-hosted deployments can also add fal.ai or a local ComfyUI instance.
         </P>
 
         <Callout type="tip">
-          <strong>Recommended for new users:</strong> Sign up for Together.ai and set
-          <InlineCode>TOGETHER_API_KEY</InlineCode>. The <InlineCode>FLUX.1-schnell-Free</InlineCode> model
-          is completely free with no billing required.
+          <strong>Standard generation</strong> uses Pollinations — completely free, no key needed,
+          works for guests and signed-in users alike.
+          <strong> HD generation</strong> uses Replicate and requires <InlineCode>REPLICATE_API_TOKEN</InlineCode>
+          on the server (hosted: your Vercel env; self-hosted: your <InlineCode>.env.local</InlineCode>).
         </Callout>
 
-        <SubTitle>Replicate</SubTitle>
+        <SubTitle>Pollinations (standard — no key)</SubTitle>
         <P>
-          Runs SDXL and FLUX models in the cloud. Free credits are available for new accounts.
+          Free FLUX model via <a href="https://pollinations.ai" style={{ color: 'var(--accent)' }}>pollinations.ai</a>.
+          No API key, no account, no rate limits enforced by the provider.
+          Used automatically for all standard quality requests.
+        </P>
+
+        <SubTitle>Replicate (HD)</SubTitle>
+        <P>
+          Runs FLUX.1-schnell and SDXL in the cloud with higher quality output.
+          On the hosted app, this is gated behind HD credits. On self-hosted, any request
+          with <InlineCode>quality: &quot;hd&quot;</InlineCode> will use this if the token is set.
         </P>
         <CodeBlock lang="bash">
 {`# 1. Sign up at https://replicate.com/
 # 2. Get your token: https://replicate.com/account/api-tokens
-# 3. Add to .env.local:
+# 3. Add to .env.local (or Vercel env):
 REPLICATE_API_TOKEN=r8_xxxxxxxxxxxxxxxxxxxxxxxx`}
         </CodeBlock>
 
-        <SubTitle>fal.ai</SubTitle>
+        <SubTitle>fal.ai (optional)</SubTitle>
         <P>Fast inference with FLUX models. Free trial credits on signup.</P>
         <CodeBlock lang="bash">
 {`# 1. Sign up at https://fal.ai/
 # 2. Get your key: https://fal.ai/dashboard/keys
 # 3. Add to .env.local:
-FAL_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`}
-        </CodeBlock>
-
-        <SubTitle>Together.ai</SubTitle>
-        <P>
-          <InlineCode>FLUX.1-schnell-Free</InlineCode> is completely free — unlimited
-          generations with no billing required.
-        </P>
-        <CodeBlock lang="bash">
-{`# 1. Sign up at https://api.together.xyz/
-# 2. Get your key: https://api.together.xyz/settings/api-keys
-# 3. Add to .env.local:
-TOGETHER_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`}
+FAL_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`}
         </CodeBlock>
 
         <SubTitle>ComfyUI (Local)</SubTitle>
@@ -851,22 +856,29 @@ npm run start        # serves at http://localhost:3000`}
         <Table
           headers={['Variable', 'Required', 'Default', 'Description']}
           rows={[
-            [<InlineCode>DATABASE_URL</InlineCode>, '✓', '—', 'SQLite path, e.g. file:./prisma/wokgen.db'],
-            [<InlineCode>REPLICATE_API_TOKEN</InlineCode>, '—', '—', 'Replicate API token'],
-            [<InlineCode>FAL_KEY</InlineCode>, '—', '—', 'fal.ai API key'],
-            [<InlineCode>TOGETHER_API_KEY</InlineCode>, '—', '—', 'Together.ai API key'],
+            [<InlineCode>DATABASE_URL</InlineCode>, '✓', '—', 'DB connection — file:./dev.db for SQLite; Neon postgres URL for production'],
+            [<InlineCode>AUTH_SECRET</InlineCode>, 'hosted', '—', 'NextAuth v5 JWT secret — generate with: openssl rand -base64 32'],
+            [<InlineCode>GOOGLE_CLIENT_ID</InlineCode>, 'hosted', '—', 'Google OAuth app client ID'],
+            [<InlineCode>GOOGLE_CLIENT_SECRET</InlineCode>, 'hosted', '—', 'Google OAuth app client secret'],
+            [<InlineCode>NEXTAUTH_URL</InlineCode>, 'hosted', '—', 'Canonical URL, e.g. https://wokgen.wokspec.org'],
+            [<InlineCode>REPLICATE_API_TOKEN</InlineCode>, '—', '—', 'Required for HD generation (Replicate FLUX/SDXL)'],
+            [<InlineCode>FAL_API_KEY</InlineCode>, '—', '—', 'fal.ai API key (optional HD provider)'],
             [<InlineCode>COMFYUI_HOST</InlineCode>, '—', 'http://127.0.0.1:8188', 'ComfyUI base URL'],
             [<InlineCode>COMFYUI_CHECKPOINT</InlineCode>, '—', 'v1-5-pruned-emaonly.safetensors', 'Default ComfyUI checkpoint filename'],
+            [<InlineCode>STRIPE_SECRET_KEY</InlineCode>, 'billing', '—', 'Stripe secret key for subscription + credit pack checkout'],
+            [<InlineCode>STRIPE_WEBHOOK_SECRET</InlineCode>, 'billing', '—', 'Stripe webhook signing secret'],
+            [<InlineCode>STRIPE_PRICE_ID_PLUS</InlineCode>, 'billing', '—', 'Stripe price ID for Plus plan ($2/mo)'],
+            [<InlineCode>STRIPE_PRICE_ID_PRO</InlineCode>, 'billing', '—', 'Stripe price ID for Pro plan ($6/mo)'],
+            [<InlineCode>STRIPE_PRICE_ID_MAX</InlineCode>, 'billing', '—', 'Stripe price ID for Max plan ($15/mo)'],
+            [<InlineCode>NEXT_PUBLIC_BASE_URL</InlineCode>, '—', 'http://localhost:3000', 'Base URL for metadata and sitemap'],
             [<InlineCode>GENERATION_TIMEOUT_MS</InlineCode>, '—', '300000', 'Per-request generation timeout in ms'],
-            [<InlineCode>NODE_ENV</InlineCode>, '—', 'development', 'Set to production for prod builds'],
-            [<InlineCode>PORT</InlineCode>, '—', '3000', 'HTTP port'],
           ]}
         />
 
         <Callout type="warning">
-          At least one of <InlineCode>REPLICATE_API_TOKEN</InlineCode>, <InlineCode>FAL_KEY</InlineCode>,
-          or <InlineCode>TOGETHER_API_KEY</InlineCode> must be set for cloud generation. Alternatively,
-          run ComfyUI locally and set <InlineCode>COMFYUI_HOST</InlineCode>.
+          Standard generation (Pollinations) requires no provider key.
+          HD generation requires <InlineCode>REPLICATE_API_TOKEN</InlineCode> on the server.
+          Never expose provider keys to the client.
         </Callout>
 
         <SubTitle>systemd service</SubTitle>

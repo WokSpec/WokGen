@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { stripe, PLANS } from '@/lib/stripe';
 import { prisma } from '@/lib/db';
+import { Suspense } from 'react';
 import BillingClient from './_client';
 
 export default async function BillingPage() {
@@ -24,12 +25,14 @@ export default async function BillingPage() {
   const topUpCredits        = user?.hdTopUpCredits ?? 0;
 
   return (
-    <BillingClient
-      currentPlanId={currentPlanId}
-      stripeEnabled={stripeEnabled}
-      plans={Object.values(PLANS)}
-      hdCredits={{ monthly: monthlyRemaining, topUp: topUpCredits }}
-      creditPacks={[]}
-    />
+    <Suspense>
+      <BillingClient
+        currentPlanId={currentPlanId}
+        stripeEnabled={stripeEnabled}
+        plans={Object.values(PLANS)}
+        hdCredits={{ monthly: monthlyRemaining, topUp: topUpCredits }}
+        creditPacks={[]}
+      />
+    </Suspense>
   );
 }

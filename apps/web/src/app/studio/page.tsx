@@ -1177,6 +1177,9 @@ function StudioInner() {
   const [history, setHistory]           = useState<HistoryItem[]>([]);
   const [providers, setProviders]       = useState<ProviderInfo[]>([]);
 
+  // HD credit balance (hosted mode)
+  const [hdBalance, setHdBalance] = useState<{ monthly: number; topUp: number } | null>(null);
+
   // BYOK keys (only used in self-hosted mode)
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === 'true';
   const [apiKeys, setApiKeys] = useState<Record<Provider, string>>({
@@ -1201,6 +1204,17 @@ function StudioInner() {
         // Graceful fallback — providers endpoint failure should not block studio
       });
   }, []);
+
+  // ── Fetch HD credit balance (hosted mode only) ─────────────────────────────
+  const refreshCredits = useCallback(() => {
+    if (isSelfHosted) return;
+    fetch('/api/credits')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d) setHdBalance({ monthly: d.monthlyRemaining ?? 0, topUp: d.topUpCredits ?? 0 }); })
+      .catch(() => {});
+  }, [isSelfHosted]);
+
+  useEffect(() => { refreshCredits(); }, [refreshCredits]);
 
   // ── Restore BYOK keys from localStorage ───────────────────────────────────
   useEffect(() => {
@@ -1326,13 +1340,15 @@ function StudioInner() {
       }
 
       if (isPublic) setSavedToGallery(true);
+      // Refresh HD balance after successful HD generation
+      if (useHD) refreshCredits();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       setJobStatus('failed');
     }
   }, [
     activeTool, prompt, negPrompt, size, stylePreset, steps, guidance,
-    provider, seed, isPublic, apiKeys, comfyuiHost,
+    provider, seed, isPublic, apiKeys, comfyuiHost, useHD, refreshCredits,
   ]);
 
   // ── Download ───────────────────────────────────────────────────────────────
@@ -1631,6 +1647,39 @@ function StudioInner() {
           {jobStatus === 'pending' && (
             <div className="animate-fade-in-fast">
               <ProgressBar indeterminate />
+            </div>
+          )}
+
+          {/* HD credit balance widget (hosted mode, HD selected) */}
+          {!isSelfHosted && useHD && hdBalance !== null && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              fontSize: '0.72rem', color: 'var(--text-faint)', padding: '0.25rem 0',
+            }}>
+              <span>
+                <span style={{ color: hdBalance.monthly + hdBalance.topUp > 0 ? 'var(--text-muted)' : '#ef4444' }}>
+                  HD:{' '}
+                  <strong style={{ color: hdBalance.monthly + hdBalance.topUp > 0 ? '#c4b5fd' : '#ef4444' }}>
+                    {hdBalance.monthly + hdBalance.topUp}
+                  </strong>
+                  {' '}credit{hdBalance.monthly + hdBalance.topUp !== 1 ? 's' : ''} left
+                </span>
+                {hdBalance.topUp > 0 && (
+                  <span style={{ color: 'var(--text-faint)', marginLeft: 4 }}>
+                    ({hdBalance.monthly} monthly · {hdBalance.topUp} pack)
+                  </span>
+                )}
+              </span>
+              <a href="/billing" style={{ color: '#a78bfa', textDecoration: 'none', fontSize: '0.7rem' }}>
+                {hdBalance.monthly + hdBalance.topUp === 0 ? 'Add credits →' : 'Manage →'}
+              </a>
+            </div>
+          )}
+          {!isSelfHosted && useHD && hdBalance === null && (
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-faint)', paddingTop: '0.25rem' }}>
+              <a href="/billing" style={{ color: '#a78bfa', textDecoration: 'none' }}>
+                HD credits — sign in or upgrade →
+              </a>
             </div>
           )}
         </div>

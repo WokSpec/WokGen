@@ -1282,17 +1282,22 @@ function StudioInner() {
         body: JSON.stringify(body),
       });
 
-      const data = await res.json();
+      let data: Record<string, unknown> = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Server error (HTTP ${res.status}) — check that your provider API key is set in Settings.`);
+      }
 
       if (!res.ok || !data.ok) {
-        throw new Error(data.error ?? `HTTP ${res.status}`);
+        throw new Error((data.error as string | undefined) ?? `HTTP ${res.status}`);
       }
 
       const gen: GenerationResult = {
-        jobId:        data.job.id,
-        resultUrl:    data.resultUrl ?? null,
-        resultUrls:   data.resultUrls ?? null,
-        durationMs:   data.durationMs,
+        jobId:        (data.job as Record<string, unknown> | null)?.id as string ?? 'local',
+        resultUrl:    data.resultUrl as string ?? null,
+        resultUrls:   data.resultUrls as string[] ?? null,
+        durationMs:   data.durationMs as number | undefined,
         resolvedSeed: data.resolvedSeed,
       };
 

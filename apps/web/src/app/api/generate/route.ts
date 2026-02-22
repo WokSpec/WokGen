@@ -116,21 +116,33 @@ export async function POST(req: NextRequest) {
 
   // --------------------------------------------------------------------------
   // 3. Create the Job record in the database (status = "running")
+  //    DB is optional — if DATABASE_URL is not configured or the schema has
+  //    not been migrated yet, we skip job tracking and still run generation.
   // --------------------------------------------------------------------------
-  let job = await prisma.job.create({
-    data: {
-      tool:       tool as Tool,
-      status:     'running',
-      provider:   provider as ProviderName,
-      prompt:     String(prompt).trim(),
-      negPrompt:  typeof negPrompt === 'string' ? negPrompt.trim() || null : null,
-      width:      clampSize(Number(width) || 512),
-      height:     clampSize(Number(height) || 512),
-      seed:       typeof seed === 'number' && seed > 0 ? seed : null,
-      isPublic:   Boolean(isPublic),
-      params:     extra ? JSON.stringify(extra) : null,
-    },
-  });
+  const dbAvailable = Boolean(process.env.DATABASE_URL);
+  let job: Awaited<ReturnType<typeof prisma.job.create>> | null = null;
+
+  if (dbAvailable) {
+    try {
+      job = await prisma.job.create({
+        data: {
+          tool:       tool as Tool,
+          status:     'running',
+          provider:   provider as ProviderName,
+          prompt:     String(prompt).trim(),
+          negPrompt:  typeof negPrompt === 'string' ? negPrompt.trim() || null : null,
+          width:      clampSize(Number(width) || 512),
+          height:     clampSize(Number(height) || 512),
+          seed:       typeof seed === 'number' && seed > 0 ? seed : null,
+          isPublic:   Boolean(isPublic),
+          params:     extra ? JSON.stringify(extra) : null,
+        },
+      });
+    } catch (dbErr) {
+      // Non-fatal — log and continue without job tracking
+      console.warn('[generate] DB unavailable, running without job tracking:', (dbErr as Error).message);
+    }
+  }
 
   // --------------------------------------------------------------------------
   // 4. Build GenerateParams and run the provider
@@ -155,22 +167,27 @@ export async function POST(req: NextRequest) {
     // ------------------------------------------------------------------------
     // 5a. Update Job as succeeded
     // ------------------------------------------------------------------------
-    job = await prisma.job.update({
-      where: { id: job.id },
-      data: {
-        status:         'succeeded',
-        resultUrl:      result.resultUrl ?? null,
-        resultUrls:     result.resultUrls ? JSON.stringify(result.resultUrls) : null,
-        providerJobId:  result.providerJobId ?? null,
-        // Persist the resolved seed back for reproducibility
-        seed:           result.resolvedSeed ?? job.seed,
-      },
-    });
+    if (job) {
+      try {
+        job = await prisma.job.update({
+          where: { id: job.id },
+          data: {
+            status:         'succeeded',
+            resultUrl:      result.resultUrl ?? null,
+            resultUrls:     result.resultUrls ? JSON.stringify(result.resultUrls) : null,
+            providerJobId:  result.providerJobId ?? null,
+            seed:           result.resolvedSeed ?? job.seed,
+          },
+        });
+      } catch (dbErr) {
+        console.warn('[generate] Failed to update job record:', (dbErr as Error).message);
+      }
+    }
 
     // ------------------------------------------------------------------------
     // 5b. If the generation succeeded and isPublic, also create a GalleryAsset
     // ------------------------------------------------------------------------
-    if (Boolean(isPublic) && result.resultUrl) {
+    if (job && Boolean(isPublic) && result.resultUrl) {
       await prisma.galleryAsset.create({
         data: {
           jobId:    job.id,
@@ -190,7 +207,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok:             true,
-      job:            serializeJob(job),
+      job:            job ? serializeJob(job) : null,
       resultUrl:      result.resultUrl,
       resultUrls:     result.resultUrls,
       durationMs:     result.durationMs,
@@ -202,22 +219,24 @@ export async function POST(req: NextRequest) {
     // ------------------------------------------------------------------------
     const serialized = serializeError(err);
 
-    await prisma.job.update({
-      where: { id: job.id },
-      data: {
-        status: 'failed',
-        error:  serialized.error,
-      },
-    }).catch(console.error); // best-effort — don't mask the original error
+    if (job) {
+      await prisma.job.update({
+        where: { id: job.id },
+        data: {
+          status: 'failed',
+          error:  serialized.error,
+        },
+      }).catch(console.error); // best-effort — don't mask the original error
+    }
 
-    console.error(`[generate] Job ${job.id} failed:`, err);
+    console.error(`[generate] Job ${job?.id ?? '(no-db)'} failed:`, err);
 
     const statusCode = serialized.statusCode ?? 500;
 
     return NextResponse.json(
       {
         ok:    false,
-        jobId: job.id,
+        jobId: job?.id ?? null,
         ...serialized,
       },
       { status: statusCode >= 400 ? statusCode : 500 },

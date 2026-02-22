@@ -300,6 +300,14 @@ function BusinessStudioInner() {
       .catch(() => { /* silently ignore — history isn't critical */ });
   }, []);
 
+  // ── Init isPublic from user's default preference ───────────────────────────
+  useEffect(() => {
+    fetch('/api/user/settings')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.publicGenerationsDefault) setIsPublic(true); })
+      .catch(() => {});
+  }, []);
+
   // ── Keyboard shortcut ─────────────────────────────────────────────────────
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

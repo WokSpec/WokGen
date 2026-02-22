@@ -10,6 +10,35 @@ export function NavAuth() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Public-by-default setting
+  const [publicDefault, setPublicDefault]   = useState(false);
+  const [savingDefault, setSavingDefault]   = useState(false);
+
+  // Fetch user setting when authenticated
+  useEffect(() => {
+    if (!session?.user) return;
+    fetch('/api/user/settings')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setPublicDefault(d.publicGenerationsDefault ?? false); })
+      .catch(() => null);
+  }, [session]);
+
+  const togglePublicDefault = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (savingDefault) return;
+    setSavingDefault(true);
+    const next = !publicDefault;
+    try {
+      const res = await fetch('/api/user/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicGenerationsDefault: next }),
+      });
+      if (res.ok) setPublicDefault(next);
+    } catch { /* ignore */ }
+    setSavingDefault(false);
+  };
+
   // Close on click outside
   useEffect(() => {
     if (!open) return;
@@ -83,30 +112,55 @@ export function NavAuth() {
             )}
           </div>
           <div className="nav-user-menu-divider" />
-          <Link
-            href="/profile"
-            className="nav-user-item"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-          >
+          <Link href="/community" className="nav-user-item" role="menuitem" onClick={() => setOpen(false)}>
+            🌐 Community
+          </Link>
+          <Link href="/profile" className="nav-user-item" role="menuitem" onClick={() => setOpen(false)}>
             Profile
           </Link>
-          <Link
-            href="/account"
-            className="nav-user-item"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-          >
+          <Link href="/account" className="nav-user-item" role="menuitem" onClick={() => setOpen(false)}>
             Account
           </Link>
-          <Link
-            href="/billing"
-            className="nav-user-item"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-          >
+          <Link href="/billing" className="nav-user-item" role="menuitem" onClick={() => setOpen(false)}>
             Billing & Plans
           </Link>
+          <div className="nav-user-menu-divider" />
+          {/* Public-by-default toggle */}
+          <button
+            className="nav-user-item nav-user-item--toggle"
+            role="menuitem"
+            onClick={togglePublicDefault}
+            disabled={savingDefault}
+            title="When on, new generations default to public in the community gallery"
+          >
+            <span style={{ flex: 1, textAlign: 'left' }}>Public generations</span>
+            <span
+              style={{
+                width: 28,
+                height: 16,
+                borderRadius: 8,
+                background: publicDefault ? 'var(--accent)' : 'var(--surface-border)',
+                position: 'relative',
+                display: 'inline-block',
+                flexShrink: 0,
+                transition: 'background 0.2s ease',
+                opacity: savingDefault ? 0.5 : 1,
+              }}
+            >
+              <span
+                style={{
+                  position: 'absolute',
+                  top: 2,
+                  left: publicDefault ? 14 : 2,
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  background: '#fff',
+                  transition: 'left 0.2s ease',
+                }}
+              />
+            </span>
+          </button>
           <div className="nav-user-menu-divider" />
           <button
             className="nav-user-item nav-user-item--danger"
@@ -161,7 +215,7 @@ export function NavAuth() {
         .nav-user-menu {
           position: absolute; top: calc(100% + 6px); right: 0;
           background: var(--bg-surface, #111); border: 1px solid var(--border, #2a2a2a);
-          border-radius: 8px; overflow: hidden; min-width: 200px; z-index: 200;
+          border-radius: 8px; overflow: hidden; min-width: 210px; z-index: 200;
           box-shadow: 0 12px 32px rgba(0,0,0,.6), 0 2px 8px rgba(0,0,0,.4);
           animation: menuIn 0.1s ease;
         }
@@ -183,7 +237,7 @@ export function NavAuth() {
           height: 1px; background: var(--border-subtle, #1e1e1e); margin: 0.2rem 0;
         }
         .nav-user-item {
-          display: flex; align-items: center;
+          display: flex; align-items: center; gap: 0.5rem;
           padding: 0.5rem 0.875rem; font-size: 0.82rem;
           color: var(--text-muted, #888); text-decoration: none;
           background: none; border: none; text-align: left; cursor: pointer; width: 100%;
@@ -191,7 +245,11 @@ export function NavAuth() {
         }
         .nav-user-item:hover { background: var(--surface-raised, #1e1e1e); color: var(--text, #f0f0f0); }
         .nav-user-item--danger:hover { color: #ef4444; background: rgba(239,68,68,.06); }
+        .nav-user-item--toggle { justify-content: space-between; }
+        .nav-user-item--toggle:hover { background: var(--surface-raised, #1e1e1e); color: var(--text, #f0f0f0); }
+        .nav-user-item:disabled { opacity: 0.6; cursor: wait; }
       `}</style>
     </div>
   );
 }
+

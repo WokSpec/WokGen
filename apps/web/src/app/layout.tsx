@@ -100,7 +100,7 @@ function NavBar() {
       {/* Nav links */}
       <div className="flex items-center gap-1 flex-1">
         <NavLink href="/pixel/studio">Studio</NavLink>
-        <NavLink href="/pixel/gallery">Gallery</NavLink>
+        <NavLink href="/community">Community</NavLink>
         <NavLink href="/docs">Docs</NavLink>
       </div>
 

@@ -2122,6 +2122,15 @@ function StudioInner() {
 
   useEffect(() => { refreshCredits(); }, [refreshCredits]);
 
+  // ── Init isPublic from user's default preference ───────────────────────────
+  useEffect(() => {
+    if (isSelfHosted) return;
+    fetch('/api/user/settings')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.publicGenerationsDefault) setIsPublic(true); })
+      .catch(() => {});
+  }, [isSelfHosted]);
+
   // ── Restore BYOK keys from localStorage ───────────────────────────────────
   useEffect(() => {
     try {

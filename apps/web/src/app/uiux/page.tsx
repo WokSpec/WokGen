@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { WaitlistForm } from '@/app/_components/WaitlistForm';
 
 export const metadata: Metadata = {
   title: 'WokGen UI/UX — Design-to-Code Generation — Coming Soon',
@@ -33,7 +34,8 @@ export default function UIUXPage() {
         <p className="coming-soon-note">
           This is the highest-leverage mode on WokGen. It turns prompts into production-ready front-end code.
         </p>
-        <div className="landing-cta-row">
+        <WaitlistForm mode="UI/UX" accent="#f472b6" />
+        <div className="landing-cta-row" style={{ marginTop: '1.5rem' }}>
           <Link href="/" className="btn-ghost btn-lg">← Back to Platform</Link>
         </div>
       </div>

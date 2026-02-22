@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { WaitlistForm } from '@/app/_components/WaitlistForm';
 
 export const metadata: Metadata = {
   title: 'WokGen Emoji — Custom Emoji & Icon Packs — Coming Soon',
@@ -32,7 +33,8 @@ export default function EmojiPage() {
         <p className="coming-soon-note">
           Want early access? Join the waitlist and be first to know.
         </p>
-        <div className="landing-cta-row">
+        <WaitlistForm mode="Emoji" accent="#fb923c" />
+        <div className="landing-cta-row" style={{ marginTop: '1.5rem' }}>
           <Link href="/" className="btn-ghost btn-lg">← Back to Platform</Link>
         </div>
       </div>

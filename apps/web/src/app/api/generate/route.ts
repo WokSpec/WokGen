@@ -502,10 +502,24 @@ export async function GET(req: NextRequest) {
   const cursor = searchParams.get('cursor') ?? undefined;
   const tool   = searchParams.get('tool')   ?? undefined;
   const status = searchParams.get('status') ?? undefined;
+  const mode   = searchParams.get('mode')   ?? undefined;
+
+  // Optional: require auth for ?mine=true
+  let userId: string | undefined;
+  const mine = searchParams.get('mine') === 'true';
+  if (mine && !process.env.SELF_HOSTED) {
+    try {
+      const { auth } = await import('@/lib/auth');
+      const session = await auth();
+      if (session?.user?.id) userId = session.user.id;
+    } catch { /* ignore */ }
+  }
 
   const where: Record<string, unknown> = {};
   if (tool   && isValidTool(tool))     where.tool   = tool;
   if (status)                          where.status = status;
+  if (mode)                            where.mode   = mode;
+  if (userId)                          where.userId = userId;
 
   const jobs = await prisma.job.findMany({
     where,
@@ -534,7 +548,7 @@ export async function GET(req: NextRequest) {
   const nextCursor = hasMore ? trimmed[trimmed.length - 1].id : null;
 
   return NextResponse.json({
-    jobs:       trimmed,
+    jobs:       trimmed.map(j => ({ ...j, imageUrl: j.resultUrl })),
     nextCursor,
     hasMore,
   });

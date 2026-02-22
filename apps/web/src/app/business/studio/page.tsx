@@ -270,6 +270,26 @@ function BusinessStudioInner() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prompt, activeTool, style, mood, industry, colorDirection, platform, slideFormat, useHD, isPublic, jobStatus]);
 
+  // ── Load history from API on mount ───────────────────────────────────────
+  useEffect(() => {
+    fetch('/api/generate?limit=20&status=succeeded&mode=business')
+      .then(r => r.ok ? r.json() : null)
+      .then((data: { jobs: Array<{ id?: string; prompt: string; tool: string; resultUrl?: string; imageUrl?: string; width?: number; height?: number; createdAt: string }> } | null) => {
+        if (!data?.jobs) return;
+        const items = data.jobs.map(j => ({
+          id: j.id ?? crypto.randomUUID(),
+          tool: (j.tool as BusinessTool) ?? 'logo',
+          prompt: j.prompt,
+          resultUrl: j.imageUrl ?? j.resultUrl ?? '',
+          width: j.width ?? 1024,
+          height: j.height ?? 1024,
+          createdAt: j.createdAt,
+        }));
+        setHistory(items);
+      })
+      .catch(() => { /* silently ignore — history isn't critical */ });
+  }, []);
+
   // ── Keyboard shortcut ─────────────────────────────────────────────────────
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

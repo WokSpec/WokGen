@@ -1824,7 +1824,7 @@ function StudioInner() {
 
   // ── Load history from recent jobs ─────────────────────────────────────────
   useEffect(() => {
-    fetch('/api/generate?limit=20&status=succeeded')
+    fetch('/api/generate?limit=20&status=succeeded&mode=pixel')
       .then((r) => r.json())
       .then((data) => {
         if (data.jobs) {

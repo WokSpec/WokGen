@@ -434,7 +434,7 @@ function detectProvider(): ProviderName {
 }
 
 const VALID_TOOLS    = new Set(['generate', 'animate', 'rotate', 'inpaint', 'scene']);
-const VALID_PROVIDERS = new Set(['replicate', 'fal', 'together', 'comfyui']);
+const VALID_PROVIDERS = new Set(['replicate', 'fal', 'together', 'comfyui', 'pollinations']);
 const VALID_PRESETS  = new Set(['rpg_icon', 'emoji', 'tileset', 'sprite_sheet', 'raw', 'game_ui']);
 
 function isValidTool(v: unknown): v is Tool {

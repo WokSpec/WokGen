@@ -50,8 +50,9 @@ export async function POST(req: NextRequest) {
       ?? req.headers.get('x-real-ip')
       ?? 'unknown';
 
-    // Guests: 5 req/min; authed users: 20 req/min
-    const maxReqs = authedUserId ? 20 : 5;
+    // Guests: 10 req/min; authed users: 30 req/min
+    // (increased to handle brand-kit which fires 4 parallel requests)
+    const maxReqs = authedUserId ? 30 : 10;
     const rl = await checkRateLimit(rateLimitKey, maxReqs);
     if (!rl.allowed) {
       return NextResponse.json(

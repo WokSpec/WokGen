@@ -73,6 +73,15 @@ const STYLE_PRESETS: { id: StylePreset; label: string; description: string }[] =
 const SIZES = [32, 64, 128, 256, 512] as const;
 type PixelSize = (typeof SIZES)[number];
 
+const ASPECT_RATIOS = [
+  { id: '1:1',   label: '1:1',   w: 1, h: 1 },
+  { id: '4:3',   label: '4:3',   w: 4, h: 3 },
+  { id: '3:4',   label: '3:4',   w: 3, h: 4 },
+  { id: '16:9',  label: '16:9',  w: 16, h: 9 },
+  { id: '9:16',  label: '9:16',  w: 9, h: 16 },
+] as const;
+type AspectRatio = (typeof ASPECT_RATIOS)[number]['id'];
+
 const PROVIDER_COLORS: Record<Provider, string> = {
   replicate:    '#0066FF',
   fal:          '#7B2FBE',
@@ -548,6 +557,9 @@ function OutputPanel({
   onReroll,
   onCopyImage,
   savedToGallery,
+  batchResults,
+  selectedBatch,
+  onSelectBatch,
 }: {
   status: JobStatus;
   result: GenerationResult | null;
@@ -557,6 +569,9 @@ function OutputPanel({
   onReroll: () => void;
   onCopyImage: () => void;
   savedToGallery: boolean;
+  batchResults?: GenerationResult[];
+  selectedBatch?: number;
+  onSelectBatch?: (i: number) => void;
 }) {
   const [zoom, setZoom] = useState(1);
   const [activeUrl, setActiveUrl] = useState<string | null>(null);
@@ -804,6 +819,42 @@ function OutputPanel({
         ) : null}
       </div>
 
+      {/* Batch thumbnail strip */}
+      {batchResults && batchResults.length > 1 && (
+        <div
+          className="flex items-center gap-2 px-4 py-2 flex-shrink-0 overflow-x-auto"
+          style={{ borderTop: '1px solid var(--surface-border)', background: 'var(--surface-overlay)' }}
+        >
+          {batchResults.map((br, i) => br.resultUrl && (
+            <button
+              key={i}
+              onClick={() => onSelectBatch?.(i)}
+              title={`Variation ${i + 1} — seed ${br.resolvedSeed ?? '?'}`}
+              style={{
+                flex: '0 0 auto',
+                width: 52, height: 52,
+                padding: 2,
+                border: `2px solid ${selectedBatch === i ? 'var(--accent)' : 'var(--surface-border)'}`,
+                borderRadius: 6,
+                background: 'var(--surface-raised)',
+                cursor: 'pointer',
+                overflow: 'hidden',
+              }}
+            >
+              <img
+                src={br.resultUrl}
+                alt={`Variation ${i + 1}`}
+                className="pixel-art"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            </button>
+          ))}
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginLeft: 4 }}>
+            {batchResults.length} variations — click to select
+          </span>
+        </div>
+      )}
+
       {/* Seed / meta strip */}
       {result && (
         <div
@@ -847,6 +898,8 @@ function GenerateForm({
   setNegPrompt,
   size,
   setSize,
+  aspectRatio,
+  setAspectRatio,
   stylePreset,
   setStylePreset,
   seed,
@@ -870,6 +923,8 @@ function GenerateForm({
   setNegPrompt: (v: string) => void;
   size: PixelSize;
   setSize: (v: PixelSize) => void;
+  aspectRatio: AspectRatio;
+  setAspectRatio: (v: AspectRatio) => void;
   stylePreset: StylePreset;
   setStylePreset: (v: StylePreset) => void;
   seed: string;
@@ -1017,6 +1072,31 @@ function GenerateForm({
         </div>
         <p className="form-hint mt-2">
           Generation is done at {size}×{size}px. Pixel art is most crisp at 32–128px.
+        </p>
+      </div>
+
+      {/* Aspect Ratio */}
+      <SectionHeader>Aspect Ratio</SectionHeader>
+      <div className="p-4">
+        <div className="flex gap-1.5 flex-wrap">
+          {ASPECT_RATIOS.map((ar) => (
+            <button
+              key={ar.id}
+              onClick={() => setAspectRatio(ar.id)}
+              className="flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150"
+              style={{
+                background: aspectRatio === ar.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
+                border: `1px solid ${aspectRatio === ar.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
+                color: aspectRatio === ar.id ? 'var(--accent)' : 'var(--text-muted)',
+                minWidth: 42,
+              }}
+            >
+              {ar.label}
+            </button>
+          ))}
+        </div>
+        <p className="form-hint mt-2">
+          {aspectRatio === '1:1' ? 'Square output' : `${aspectRatio} — size scales to fit`}
         </p>
       </div>
 
@@ -1216,12 +1296,16 @@ function StudioInner() {
   const [prompt, setPrompt]           = useState(initialPrompt);
   const [negPrompt, setNegPrompt]     = useState('');
   const [size, setSize]               = useState<PixelSize>(512);
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
   const [stylePreset, setStylePreset] = useState<StylePreset>('rpg_icon');
   const [seed, setSeed]               = useState('');
   const [steps, setSteps]             = useState(4);
   const [guidance, setGuidance]       = useState(3.5);
   const [provider, setProvider]       = useState<Provider>('together');
   const [isPublic, setIsPublic]       = useState(false);
+  const [batchCount, setBatchCount]   = useState<1|2|4>(1);
+  const [batchResults, setBatchResults] = useState<GenerationResult[]>([]);
+  const [selectedBatch, setSelectedBatch] = useState<number>(0);
   const [useHD, setUseHD]             = useState(false); // HD = Replicate; Standard = Pollinations
 
   // Job state
@@ -1331,85 +1415,103 @@ function StudioInner() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
+    // Compute dimensions from size + aspect ratio
+    const ar = ASPECT_RATIOS.find(a => a.id === aspectRatio) ?? ASPECT_RATIOS[0];
+    const baseSize = size;
+    const genWidth  = Math.min(1024, Math.round(baseSize * ar.w / Math.max(ar.w, ar.h)));
+    const genHeight = Math.min(1024, Math.round(baseSize * ar.h / Math.max(ar.w, ar.h)));
+
     setJobStatus('pending');
     setResult(null);
+    setBatchResults([]);
     setError(null);
     setSavedToGallery(false);
 
     try {
-      const body: Record<string, unknown> = {
+      const baseSeed = seed ? parseInt(seed, 10) : Math.floor(Math.random() * 2147483647);
+      const makeBody = (seedValue: number): Record<string, unknown> => ({
         tool:        activeTool,
         provider,
         prompt:      prompt.trim(),
         negPrompt:   negPrompt.trim() || undefined,
-        width:       size,
-        height:      size,
+        width:       genWidth,
+        height:      genHeight,
         stylePreset,
         steps,
         guidance,
         isPublic,
         quality:     useHD ? 'hd' : 'standard',
-        ...(seed ? { seed: parseInt(seed, 10) } : {}),
+        seed:        seedValue,
         ...(apiKeys[provider] ? { apiKey: apiKeys[provider] } : {}),
         ...(provider === 'comfyui' ? { comfyuiHost } : {}),
-      };
-
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
       });
 
-      let data: Record<string, unknown> = {};
-      try {
-        data = await res.json();
-      } catch {
-        throw new Error(`Server error (HTTP ${res.status}) — check that your provider API key is set in Settings.`);
-      }
+      const seeds = Array.from({ length: batchCount }, (_, i) =>
+        i === 0 ? baseSeed : baseSeed + i * 137
+      );
 
-      if (!res.ok || !data.ok) {
-        throw new Error((data.error as string | undefined) ?? `HTTP ${res.status}`);
-      }
-
-      const gen: GenerationResult = {
-        jobId:        (data.job as Record<string, unknown> | null)?.id as string ?? 'local',
-        resultUrl:    data.resultUrl as string ?? null,
-        resultUrls:   data.resultUrls as string[] ?? null,
-        durationMs:   data.durationMs as number | undefined,
-        resolvedSeed: data.resolvedSeed as number | undefined,
+      const fetchOne = async (s: number) => {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(makeBody(s)),
+        });
+        let data: Record<string, unknown> = {};
+        try { data = await res.json(); } catch { throw new Error(`Server error (HTTP ${res.status})`); }
+        if (!res.ok || !data.ok) throw new Error((data.error as string | undefined) ?? `HTTP ${res.status}`);
+        return {
+          jobId:        (data.job as Record<string, unknown> | null)?.id as string ?? 'local',
+          resultUrl:    data.resultUrl as string ?? null,
+          resultUrls:   data.resultUrls as string[] ?? null,
+          durationMs:   data.durationMs as number | undefined,
+          resolvedSeed: data.resolvedSeed as number | undefined,
+        } as GenerationResult;
       };
 
-      setResult(gen);
-      setJobStatus('succeeded');
-
-      // Prepend to history
-      if (gen.resultUrl) {
-        setHistory((prev) => [
-          {
-            id:        (data.job as Record<string, unknown> | null)?.id as string ?? gen.jobId,
-            tool:      activeTool,
-            prompt:    prompt.trim(),
-            resultUrl: gen.resultUrl,
-            provider,
-            width:     size,
-            height:    size,
-            seed:      gen.resolvedSeed ?? null,
-            createdAt: new Date().toISOString(),
-          },
-          ...prev.slice(0, 49),
-        ]);
+      if (batchCount === 1) {
+        const gen = await fetchOne(baseSeed);
+        setResult(gen);
+        setSelectedBatch(0);
+        setBatchResults([gen]);
+        setJobStatus('succeeded');
+        if (gen.resultUrl) {
+          setHistory(prev => [
+            { id: gen.jobId, tool: activeTool, prompt: prompt.trim(), resultUrl: gen.resultUrl, provider, width: genWidth, height: genHeight, seed: gen.resolvedSeed ?? null, createdAt: new Date().toISOString() },
+            ...prev.slice(0, 49),
+          ]);
+        }
+      } else {
+        const results = await Promise.allSettled(seeds.map(fetchOne));
+        const fulfilled = results
+          .filter((r): r is PromiseFulfilledResult<GenerationResult> => r.status === 'fulfilled')
+          .map(r => r.value);
+        if (fulfilled.length === 0) {
+          const firstErr = results.find(r => r.status === 'rejected') as PromiseRejectedResult;
+          throw new Error(firstErr?.reason?.message ?? 'All generations failed');
+        }
+        setBatchResults(fulfilled);
+        setSelectedBatch(0);
+        setResult(fulfilled[0]);
+        setJobStatus('succeeded');
+        fulfilled.forEach(gen => {
+          if (gen.resultUrl) {
+            setHistory(prev => [
+              { id: gen.jobId, tool: activeTool, prompt: prompt.trim(), resultUrl: gen.resultUrl, provider, width: genWidth, height: genHeight, seed: gen.resolvedSeed ?? null, createdAt: new Date().toISOString() },
+              ...prev.slice(0, 49),
+            ]);
+          }
+        });
       }
 
       if (isPublic) setSavedToGallery(true);
-      // Refresh HD balance after successful HD generation
       if (useHD) refreshCredits();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       setJobStatus('failed');
     }
   }, [
-    activeTool, prompt, negPrompt, size, stylePreset, steps, guidance,
-    provider, seed, isPublic, apiKeys, comfyuiHost, useHD, refreshCredits,
+    activeTool, prompt, negPrompt, size, aspectRatio, stylePreset, steps, guidance,
+    provider, seed, isPublic, apiKeys, comfyuiHost, useHD, refreshCredits, batchCount,
   ]);
 
   // ── Download ───────────────────────────────────────────────────────────────
@@ -1624,6 +1726,8 @@ function StudioInner() {
           setNegPrompt={setNegPrompt}
           size={size}
           setSize={setSize}
+          aspectRatio={aspectRatio}
+          setAspectRatio={setAspectRatio}
           stylePreset={stylePreset}
           setStylePreset={setStylePreset}
           seed={seed}
@@ -1764,10 +1868,37 @@ function StudioInner() {
             </div>
           )}
           {!isSelfHosted && !useHD && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', color: 'var(--text-faint)', paddingTop: '0.125rem' }}>
-              <span style={{ color: '#10b981', marginRight: '0.25rem' }}>∞</span>
-              Standard generation is always free
-            </div>
+            <>
+              {/* Batch count toggle */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '0.25rem' }}>
+                <span>Batch</span>
+                <div className="flex gap-1">
+                  {([1, 2, 4] as const).map(n => (
+                    <button
+                      key={n}
+                      onClick={() => setBatchCount(n)}
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        border: '1px solid',
+                        borderColor: batchCount === n ? 'var(--accent-muted)' : 'var(--surface-border)',
+                        background:  batchCount === n ? 'var(--accent-dim)' : 'transparent',
+                        color:       batchCount === n ? 'var(--accent)' : 'var(--text-muted)',
+                        cursor: 'pointer',
+                        fontSize: '0.72rem',
+                        fontWeight: batchCount === n ? 600 : 400,
+                      }}
+                    >
+                      ×{n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', color: 'var(--text-faint)', paddingTop: '0.125rem' }}>
+                <span style={{ color: '#10b981', marginRight: '0.25rem' }}>∞</span>
+                Standard generation is always free
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -1783,6 +1914,12 @@ function StudioInner() {
           onReroll={handleReroll}
           onCopyImage={handleCopyImage}
           savedToGallery={savedToGallery}
+          batchResults={batchResults}
+          selectedBatch={selectedBatch}
+          onSelectBatch={(i) => {
+            setSelectedBatch(i);
+            setResult(batchResults[i] ?? null);
+          }}
         />
 
         {/* History drawer overlay */}

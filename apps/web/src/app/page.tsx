@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -132,6 +133,10 @@ function PlanCard({ plan }: { plan: typeof PLANS[number] }) {
 
 export default function HomePage() {
   const { data: session } = useSession();
+  const [genCount, setGenCount] = useState<number | null>(null);
+  useEffect(() => {
+    fetch('/api/stats').then(r => r.json()).then(d => setGenCount(d.totalGenerations)).catch(() => {});
+  }, []);
 
   return (
     <div>
@@ -205,6 +210,14 @@ export default function HomePage() {
             </a>
             {' '}· Open-source · MIT + Commons Clause
           </p>
+          {genCount !== null && genCount > 0 && (
+            <p style={{ marginTop: '0.5rem', fontSize: '0.72rem', color: 'var(--text-faint)' }}>
+              <span style={{ color: '#a78bfa', fontWeight: 600 }}>
+                {genCount.toLocaleString()}
+              </span>{' '}
+              pixel art assets generated so far
+            </p>
+          )}
         </div>
       </section>
 

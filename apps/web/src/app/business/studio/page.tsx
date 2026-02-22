@@ -574,9 +574,9 @@ export default function BusinessStudio() {
                 <button
                   key={t}
                   className="studio-chip"
-                  onClick={() => { switchTool(t); setTimeout(handleGenerate, 100); }}
+                  onClick={() => { switchTool(t); setPrompt(EXAMPLE_PROMPTS[t]); }}
                 >
-                  {EXAMPLE_PROMPTS[t].slice(0, 40)}…
+                  {EXAMPLE_PROMPTS[t].slice(0, 50)}…
                 </button>
               ))}
             </div>

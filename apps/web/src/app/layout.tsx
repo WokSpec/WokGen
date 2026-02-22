@@ -29,37 +29,38 @@ const spaceGrotesk = Space_Grotesk({
 // ---------------------------------------------------------------------------
 export const metadata: Metadata = {
   title: {
-    default: 'WokGen — AI Pixel Art Studio',
+    default: 'WokGen — AI Asset Generation Platform',
     template: '%s · WokGen',
   },
   description:
-    'Generate sprites, animations, tilesets, and game assets with AI. ' +
-    'Works with Replicate, fal.ai, Together.ai, or your local ComfyUI. Free to self-host.',
+    'Multi-vertical AI asset generation: pixel art game assets, business branding, ' +
+    'vector icons, emoji packs, and UI/UX components. Free to start. Powered by WokSpec.',
   keywords: [
+    'AI asset generator',
     'pixel art generator',
-    'AI game assets',
+    'AI logo generator',
+    'brand kit AI',
+    'game asset generator',
     'sprite generator',
-    'tileset generator',
-    'RPG icons',
-    'pixel art AI',
-    'ComfyUI',
-    'FLUX pixel art',
+    'AI image generation',
+    'WokGen',
+    'WokSpec',
   ],
-  authors: [{ name: 'Wok Specialists', url: 'https://github.com/WokSpecialists' }],
+  authors: [{ name: 'Wok Specialists', url: 'https://wokspec.org' }],
   creator: 'Wok Specialists',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://wokgen.wokspec.org',
-    title: 'WokGen — AI Pixel Art Studio',
-    description: 'Generate game assets, sprites and tilesets with AI.',
+    title: 'WokGen — AI Asset Generation Platform',
+    description: 'Generate game assets, brand kits, icons, and UI components with AI.',
     siteName: 'WokGen',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'WokGen — AI Pixel Art Studio' }],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'WokGen — AI Asset Generation Platform' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'WokGen — AI Pixel Art Studio',
-    description: 'Generate game assets, sprites and tilesets with AI.',
+    title: 'WokGen — AI Asset Generation Platform',
+    description: 'Generate game assets, brand kits, icons, and UI components with AI.',
     images: ['/og.png'],
   },
   robots: {
@@ -98,8 +99,8 @@ function NavBar() {
 
       {/* Nav links */}
       <div className="flex items-center gap-1 flex-1">
-        <NavLink href="/studio">Studio</NavLink>
-        <NavLink href="/gallery">Gallery</NavLink>
+        <NavLink href="/pixel/studio">Studio</NavLink>
+        <NavLink href="/pixel/gallery">Gallery</NavLink>
         <NavLink href="/docs">Docs</NavLink>
       </div>
 

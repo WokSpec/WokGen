@@ -10,6 +10,13 @@ import { checkRateLimit } from '@/lib/rate-limit';
 import { sendLowCreditsEmail } from '@/lib/email';
 import { isSupportedMode, getMode } from '@/lib/modes';
 import type { ProviderName, Tool, GenerateParams } from '@/lib/providers';
+import {
+  buildBusinessPrompt,
+  type BusinessTool,
+  type BusinessStyle,
+  type BusinessMood,
+  type BusinessPlatform,
+} from '@/lib/prompt-builder-business';
 
 // ---------------------------------------------------------------------------
 // POST /api/generate
@@ -172,18 +179,64 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // --------------------------------------------------------------------------
+  // Business mode: enrich prompt via buildBusinessPrompt + normalize tool name
+  // --------------------------------------------------------------------------
+  const extraRecord = (extra as Record<string, unknown>) ?? {};
+  let effectiveTool: string   = typeof tool === 'string' ? tool : 'generate';
+  let effectivePrompt: string = typeof prompt === 'string' ? prompt.trim() : '';
+  let effectiveNeg: string | undefined = typeof negPrompt === 'string' ? negPrompt.trim() || undefined : undefined;
+  let effectiveWidth: number  = clampSize(Number(width)  || 512);
+  let effectiveHeight: number = clampSize(Number(height) || 512);
+
+  if (resolvedMode === 'business') {
+    // All business tools map to the standard 'generate' pipeline
+    effectiveTool = 'generate';
+    const bizTool     = ((extraRecord.businessTool ?? effectiveTool) as BusinessTool) || 'logo';
+    const bizStyle    = (extraRecord.businessStyle  ?? body.style)  as BusinessStyle  | undefined;
+    const bizMood     = (extraRecord.businessMood   ?? body.mood)   as BusinessMood   | undefined;
+    const bizPlatform = (extraRecord.businessPlatform ?? body.platform) as BusinessPlatform | undefined;
+    const bizIndex    = typeof extraRecord.brandKitIndex === 'number'
+      ? extraRecord.brandKitIndex as 1 | 2 | 3 | 4
+      : undefined;
+    const built = buildBusinessPrompt({
+      tool:           bizTool,
+      concept:        effectivePrompt || 'professional brand visual',
+      industry:       typeof body.industry      === 'string' ? body.industry      || undefined : undefined,
+      style:          bizStyle,
+      mood:           bizMood,
+      platform:       bizPlatform,
+      colorDirection: typeof body.colorDirection === 'string' ? body.colorDirection || undefined : undefined,
+      brandKitIndex:  bizIndex,
+    });
+    effectivePrompt  = built.prompt;
+    effectiveNeg     = built.negPrompt;
+    // For brand-kit each index has different dimensions; use builder output
+    if (bizTool === 'brand-kit') {
+      effectiveWidth  = built.width;
+      effectiveHeight = built.height;
+    } else {
+      // For other business tools the studio passes correct dimensions; keep them
+      // but fall back to builder dims if studio sent defaults
+      if (effectiveWidth === 512 && effectiveHeight === 512) {
+        effectiveWidth  = built.width;
+        effectiveHeight = built.height;
+      }
+    }
+  }
+
   // Validate required fields
-  if (typeof prompt !== 'string' || prompt.trim().length === 0) {
+  if (effectivePrompt.length === 0) {
     return NextResponse.json(
       { error: 'prompt is required and must be a non-empty string' },
       { status: 400 },
     );
   }
 
-  if (!isValidTool(tool)) {
+  if (!isValidTool(effectiveTool)) {
     return NextResponse.json(
       {
-        error: `Invalid tool "${tool}". Must be one of: generate, animate, rotate, inpaint, scene`,
+        error: `Invalid tool "${effectiveTool}". Must be one of: generate, animate, rotate, inpaint, scene`,
       },
       { status: 400 },
     );
@@ -228,13 +281,13 @@ export async function POST(req: NextRequest) {
     try {
       job = await prisma.job.create({
         data: {
-          tool:       tool as Tool,
+          tool:       effectiveTool as Tool,
           status:     'running',
           provider:   resolvedProvider,
-          prompt:     String(prompt).trim(),
-          negPrompt:  typeof negPrompt === 'string' ? negPrompt.trim() || null : null,
-          width:      clampSize(Number(width) || 512),
-          height:     clampSize(Number(height) || 512),
+          prompt:     effectivePrompt,
+          negPrompt:  effectiveNeg ?? null,
+          width:      effectiveWidth,
+          height:     effectiveHeight,
           seed:       typeof seed === 'number' && seed > 0 ? seed : null,
           isPublic:   Boolean(isPublic),
           params:     extra ? JSON.stringify(extra) : null,
@@ -253,11 +306,11 @@ export async function POST(req: NextRequest) {
   // 4. Build GenerateParams and run the provider
   // --------------------------------------------------------------------------
   const genParams: GenerateParams = {
-    tool:           tool as Tool,
-    prompt:         String(prompt).trim(),
-    negPrompt:      typeof negPrompt === 'string' ? negPrompt.trim() || undefined : undefined,
-    width:          clampSize(Number(width) || 512),
-    height:         clampSize(Number(height) || 512),
+    tool:           effectiveTool as Tool,
+    prompt:         effectivePrompt,
+    negPrompt:      effectiveNeg,
+    width:          effectiveWidth,
+    height:         effectiveHeight,
     seed:           typeof seed === 'number' && seed > 0 ? seed : undefined,
     steps:          typeof steps === 'number' ? steps : undefined,
     guidance:       typeof guidance === 'number' ? guidance : undefined,

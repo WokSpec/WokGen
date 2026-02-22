@@ -11,6 +11,7 @@ interface GalleryAsset {
   width?: number;
   height?: number;
   resultUrl: string;
+  imageUrl: string;
   createdAt: string;
 }
 
@@ -177,7 +178,7 @@ export default function BusinessGallery() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={asset.resultUrl}
+                src={asset.imageUrl}
                 alt={asset.prompt ?? 'Business asset'}
                 className="gallery-card-img"
                 loading="lazy"
@@ -208,7 +209,7 @@ export default function BusinessGallery() {
             <button className="gallery-lightbox-close" onClick={() => setSelected(null)}>✕</button>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={selected.resultUrl}
+              src={selected.imageUrl}
               alt={selected.prompt ?? ''}
               className="gallery-lightbox-img biz-lightbox-img"
             />
@@ -217,7 +218,7 @@ export default function BusinessGallery() {
             )}
             <div className="gallery-lightbox-actions">
               <a
-                href={selected.resultUrl}
+                href={selected.imageUrl}
                 download
                 className="btn-ghost btn-sm"
                 onClick={e => e.stopPropagation()}

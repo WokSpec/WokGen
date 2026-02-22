@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const LEFT_LINKS = [
-  { label: 'Studio',     href: '/studio',                              external: false },
-  { label: 'Gallery',    href: '/gallery',                             external: false },
-  { label: 'Billing',    href: '/billing',                             external: false },
-  { label: 'Docs',       href: '/docs',                                external: false },
-  { label: 'Terms',      href: '/terms',                               external: false },
-  { label: 'Privacy',    href: '/privacy',                             external: false },
+  { label: 'Pixel Studio',     href: '/pixel/studio',                        external: false },
+  { label: 'Gallery',          href: '/pixel/gallery',                       external: false },
+  { label: 'Billing',          href: '/billing',                             external: false },
+  { label: 'Docs',             href: '/docs',                                external: false },
+  { label: 'Terms',            href: '/terms',                               external: false },
+  { label: 'Privacy',          href: '/privacy',                             external: false },
 ];
 
 const RIGHT_LINKS = [
@@ -31,7 +31,7 @@ function NavItem({ label, href, external }: { label: string; href: string; exter
 
 export function Footer() {
   const pathname = usePathname();
-  if (pathname === '/studio') return null;
+  if (pathname === '/studio' || pathname.endsWith('/studio')) return null;
 
   return (
     <footer>

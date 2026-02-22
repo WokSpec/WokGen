@@ -19,6 +19,21 @@ const STEPS = [
   { n: '03', title: 'Export',        body: 'Download your asset. Use it however you want.' },
 ] as const;
 
+const EXAMPLE_PROMPTS = [
+  'iron sword with ornate crossguard, RPG inventory icon',
+  'health potion, glowing red liquid in crystal vial',
+  'leather shield with iron boss, battle-worn',
+  'fire scroll with golden wax seal',
+  'warrior in plate armor, front facing sprite',
+  'ancient wooden staff with crystal orb',
+  'dungeon entrance, pixel art tileset',
+  'gem deposit, blue crystal in cave wall',
+  'pixel art dragon, side view',
+  'wooden chest with gold trim, treasure',
+  'magic wand, sparkling tip',
+  'skull key for dungeon door',
+] as const;
+
 const PLANS = [
   { id: 'free',  label: 'Free',    price: '$0',   note: 'Forever',   features: ['Unlimited standard generation', 'Pollinations AI', 'Download originals'], accent: 'var(--text-muted)', highlight: false },
   { id: 'plus',  label: 'Plus',    price: '$2',   note: '/month',    features: ['100 HD credits/mo', 'Replicate models', 'FLUX.1 quality'],                   accent: '#a78bfa', highlight: true },
@@ -139,10 +154,10 @@ export default function HomePage() {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
             <span className="tag tag-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
               <span
-                style={{ width: 6, height: 6, borderRadius: '50%', background: '#a78bfa', display: 'inline-block', animation: 'pulse 2s infinite' }}
+                style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block', animation: 'pulse 2s infinite' }}
                 aria-hidden="true"
               />
-              Early Preview · Active development
+              Open Beta · Free to use
             </span>
           </div>
 
@@ -295,6 +310,43 @@ export default function HomePage() {
             >
               View on GitHub →
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Example prompts ─────────────────────────────────────────────────── */}
+      <section style={{ padding: '4rem 1.5rem', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: '64rem', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <h2 style={{ fontSize: 'clamp(1.5rem,4vw,2rem)', fontWeight: 700, letterSpacing: '-0.02em', fontFamily: 'var(--font-heading)', color: 'var(--text)', marginBottom: '0.5rem' }}>
+              What will you create?
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+              Click any prompt to open it in the studio
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.75rem' }}>
+            {EXAMPLE_PROMPTS.map((p) => (
+              <Link
+                key={p}
+                href={`/studio?prompt=${encodeURIComponent(p)}`}
+                style={{
+                  display: 'block',
+                  padding: '0.875rem 1rem',
+                  borderRadius: '0.625rem',
+                  border: '1px solid var(--border)',
+                  background: 'var(--bg-elevated)',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.8rem',
+                  lineHeight: 1.5,
+                  transition: 'all 0.15s',
+                }}
+                className="example-prompt-card"
+              >
+                <span style={{ color: '#a78bfa', marginRight: '0.375rem' }}>✦</span>
+                {p}
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { useToast } from '@/components/Toast';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 type Tool = 'generate' | 'animate' | 'rotate' | 'inpaint' | 'scene';
-type Provider = 'replicate' | 'fal' | 'together' | 'comfyui';
+type Provider = 'replicate' | 'fal' | 'together' | 'comfyui' | 'huggingface' | 'pollinations';
 type StylePreset = 'rpg_icon' | 'emoji' | 'tileset' | 'sprite_sheet' | 'raw' | 'game_ui';
 type JobStatus = 'idle' | 'pending' | 'succeeded' | 'failed';
 
@@ -41,7 +42,7 @@ interface HistoryItem {
   tool: Tool;
   prompt: string;
   resultUrl: string | null;
-  provider: Provider;
+  provider: string;
   width: number;
   height: number;
   seed: number | null;
@@ -73,17 +74,21 @@ const SIZES = [32, 64, 128, 256, 512] as const;
 type PixelSize = (typeof SIZES)[number];
 
 const PROVIDER_COLORS: Record<Provider, string> = {
-  replicate: '#0066FF',
-  fal:       '#7B2FBE',
-  together:  '#00A67D',
-  comfyui:   '#E06C00',
+  replicate:    '#0066FF',
+  fal:          '#7B2FBE',
+  together:     '#00A67D',
+  comfyui:      '#E06C00',
+  huggingface:  '#FF9D00',
+  pollinations: '#6D28D9',
 };
 
 const PROVIDER_LABELS: Record<Provider, string> = {
-  replicate: 'Replicate',
-  fal:       'fal.ai',
-  together:  'Together.ai',
-  comfyui:   'ComfyUI',
+  replicate:    'Replicate',
+  fal:          'fal.ai',
+  together:     'Together.ai',
+  comfyui:      'ComfyUI',
+  huggingface:  'HuggingFace',
+  pollinations: 'Pollinations',
 };
 
 const EXAMPLE_PROMPTS: Record<Tool, string[]> = {
@@ -218,17 +223,19 @@ function FormField({
 // ---------------------------------------------------------------------------
 // Provider badge
 // ---------------------------------------------------------------------------
-function ProviderBadge({ provider }: { provider: Provider }) {
+function ProviderBadge({ provider }: { provider: string }) {
+  const color = (PROVIDER_COLORS as Record<string, string>)[provider] ?? '#888';
+  const label = (PROVIDER_LABELS as Record<string, string>)[provider] ?? provider;
   return (
     <span
       className="provider-chip"
-      style={{ borderColor: PROVIDER_COLORS[provider] + '40' }}
+      style={{ borderColor: color + '40' }}
     >
       <span
         className="provider-dot"
-        style={{ background: PROVIDER_COLORS[provider] }}
+        style={{ background: color }}
       />
-      {PROVIDER_LABELS[provider]}
+      {label}
     </span>
   );
 }
@@ -252,17 +259,21 @@ function SettingsModal({
   const [keys, setKeys] = useState<Record<Provider, string>>({ ...apiKeys });
   const [host, setHost] = useState(comfyuiHost);
   const [showKeys, setShowKeys] = useState<Record<Provider, boolean>>({
-    replicate: false,
-    fal: false,
-    together: false,
-    comfyui: false,
+    replicate:    false,
+    fal:          false,
+    together:     false,
+    comfyui:      false,
+    huggingface:  false,
+    pollinations: false,
   });
 
   const ENV_VARS: Record<Provider, string> = {
-    replicate: 'REPLICATE_API_TOKEN',
-    fal:       'FAL_KEY',
-    together:  'TOGETHER_API_KEY',
-    comfyui:   '',
+    replicate:    'REPLICATE_API_TOKEN',
+    fal:          'FAL_KEY',
+    together:     'TOGETHER_API_KEY',
+    comfyui:      '',
+    huggingface:  'HF_TOKEN',
+    pollinations: '',
   };
 
   return (
@@ -533,6 +544,7 @@ function OutputPanel({
   onDownload,
   onSaveToGallery,
   onReroll,
+  onCopyImage,
   savedToGallery,
 }: {
   status: JobStatus;
@@ -541,10 +553,21 @@ function OutputPanel({
   onDownload: () => void;
   onSaveToGallery: () => void;
   onReroll: () => void;
+  onCopyImage: () => void;
   savedToGallery: boolean;
 }) {
   const [zoom, setZoom] = useState(1);
   const [activeUrl, setActiveUrl] = useState<string | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (status === 'pending') {
+      setElapsed(0);
+      const start = Date.now();
+      const iv = setInterval(() => setElapsed(Math.floor((Date.now() - start) / 1000)), 500);
+      return () => clearInterval(iv);
+    }
+  }, [status]);
 
   useEffect(() => {
     if (result?.resultUrl) {
@@ -595,10 +618,10 @@ function OutputPanel({
           </div>
           <div className="text-center">
             <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-              Generating…
+              Generating… {elapsed > 0 && <span style={{ color: 'var(--text-muted)' }}>{elapsed}s</span>}
             </p>
             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-              This usually takes 5–60 seconds
+              Usually 3–15 seconds
             </p>
           </div>
           <div className="w-48">
@@ -610,6 +633,10 @@ function OutputPanel({
   }
 
   if (status === 'failed') {
+    const isCredits = error?.includes('credit') || error?.includes('402');
+    const isRateLimit = error?.includes('Rate limit') || error?.includes('429');
+    const isProvider = error?.includes('provider') || error?.includes('API key');
+
     return (
       <div className="output-canvas flex-1 flex flex-col gap-4 items-center justify-center p-8">
         <div
@@ -622,22 +649,38 @@ function OutputPanel({
           ✕
         </div>
         <div className="text-center max-w-sm">
-          <p className="text-sm font-semibold mb-1" style={{ color: 'var(--danger-hover)' }}>
+          <p className="text-sm font-semibold mb-2" style={{ color: 'var(--danger-hover)' }}>
             Generation failed
           </p>
+          {isCredits && (
+            <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
+              HD credits exhausted. Use standard mode (free) or top up your credits.
+            </p>
+          )}
+          {isRateLimit && (
+            <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
+              You&apos;re generating too fast. Wait a moment and try again.
+            </p>
+          )}
+          {isProvider && !isCredits && (
+            <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
+              Provider unavailable. Standard (free) generation will retry automatically.
+            </p>
+          )}
           <p
-            className="text-xs leading-relaxed p-3 rounded-lg"
+            className="text-xs leading-relaxed p-3 rounded-lg font-mono"
             style={{
               color: 'var(--text-muted)',
               background: 'var(--danger-muted)',
               border: '1px solid var(--danger)',
+              wordBreak: 'break-word',
             }}
           >
             {error ?? 'An unknown error occurred.'}
           </p>
         </div>
         <button className="btn-secondary" onClick={onReroll}>
-          Try again
+          ↻ Retry
         </button>
       </div>
     );
@@ -697,6 +740,9 @@ function OutputPanel({
           title="Reroll with new seed"
         >
           ↻ Reroll
+        </button>
+        <button className="btn-ghost btn-sm" onClick={onCopyImage} title="Copy image to clipboard">
+          ⎘ Copy
         </button>
         <button className="btn-secondary btn-sm" onClick={onDownload}>
           ↓ Download
@@ -768,7 +814,16 @@ function OutputPanel({
         >
           <span>Job: <code style={{ color: 'var(--text-muted)' }}>{result.jobId.slice(0, 12)}…</code></span>
           {result.resolvedSeed != null && (
-            <span>Seed: <code style={{ color: 'var(--text-muted)' }}>{result.resolvedSeed}</code></span>
+            <button
+              className="flex items-center gap-1"
+              title="Click to copy seed"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-disabled)', fontSize: 'inherit', padding: 0 }}
+              onClick={() => {
+                navigator.clipboard.writeText(String(result.resolvedSeed)).catch(() => {});
+              }}
+            >
+              Seed: <code style={{ color: 'var(--text-muted)' }}>{result.resolvedSeed}</code> <span style={{ opacity: 0.5 }}>⎘</span>
+            </button>
           )}
           {urls.length > 1 && (
             <span>{urls.length} outputs</span>
@@ -1147,6 +1202,8 @@ function GenerateForm({
 function StudioInner() {
   const searchParams = useSearchParams();
   const initialTool = (searchParams.get('tool') as Tool | null) ?? 'generate';
+  const initialPrompt = searchParams.get('prompt') ?? '';
+  const { success: toastSuccess, error: toastError } = useToast();
 
   // ── State ──────────────────────────────────────────────────────────────────
   const [activeTool, setActiveTool] = useState<Tool>(
@@ -1154,7 +1211,7 @@ function StudioInner() {
   );
 
   // Form state
-  const [prompt, setPrompt]           = useState('');
+  const [prompt, setPrompt]           = useState(initialPrompt);
   const [negPrompt, setNegPrompt]     = useState('');
   const [size, setSize]               = useState<PixelSize>(512);
   const [stylePreset, setStylePreset] = useState<StylePreset>('rpg_icon');
@@ -1183,10 +1240,12 @@ function StudioInner() {
   // BYOK keys (only used in self-hosted mode)
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === 'true';
   const [apiKeys, setApiKeys] = useState<Record<Provider, string>>({
-    replicate: '',
-    fal: '',
-    together: '',
-    comfyui: '',
+    replicate:    '',
+    fal:          '',
+    together:     '',
+    comfyui:      '',
+    huggingface:  '',
+    pollinations: '',
   });
   const [comfyuiHost, setComfyuiHost] = useState('http://127.0.0.1:8188');
 
@@ -1362,7 +1421,8 @@ function StudioInner() {
     a.href = url;
     a.download = `wokgen-${activeTool}-${Date.now()}.png`;
     a.click();
-  }, [result, activeTool]);
+    toastSuccess('Image downloaded');
+  }, [result, activeTool, toastSuccess]);
 
   // ── Save to gallery ────────────────────────────────────────────────────────
   const handleSaveToGallery = useCallback(async () => {
@@ -1373,11 +1433,30 @@ function StudioInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jobId: result.jobId, isPublic: true }),
       });
-      if (res.ok) setSavedToGallery(true);
+      if (res.ok) {
+        setSavedToGallery(true);
+        toastSuccess('Saved to gallery!');
+      } else {
+        toastError('Failed to save to gallery');
+      }
     } catch {
-      // non-fatal
+      toastError('Failed to save to gallery');
     }
-  }, [result, savedToGallery]);
+  }, [result, savedToGallery, toastSuccess, toastError]);
+
+  // ── Copy image ─────────────────────────────────────────────────────────────
+  const handleCopyImage = useCallback(async () => {
+    const url = result?.resultUrl ?? result?.resultUrls?.[0];
+    if (!url) return;
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      toastSuccess('Image copied to clipboard');
+    } catch {
+      toastError('Clipboard not supported in this browser');
+    }
+  }, [result, toastSuccess, toastError]);
 
   // ── Reroll ─────────────────────────────────────────────────────────────────
   const handleReroll = useCallback(() => {
@@ -1694,6 +1773,7 @@ function StudioInner() {
           onDownload={handleDownload}
           onSaveToGallery={handleSaveToGallery}
           onReroll={handleReroll}
+          onCopyImage={handleCopyImage}
           savedToGallery={savedToGallery}
         />
 

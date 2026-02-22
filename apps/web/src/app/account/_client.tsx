@@ -94,7 +94,7 @@ export default function AccountClient({ user, plan, hdCredits }: Props) {
         .credit-label { font-size: 0.75rem; color: var(--text-muted, #666); }
         .credit-value { font-size: 1.25rem; font-weight: 700; }
         .credits-note { font-size: 0.8rem; color: var(--text-muted, #666); margin: 0; }
-        .upgrade-link { color: #10b981; text-decoration: none; font-weight: 500; }
+        .upgrade-link { color: #a78bfa; text-decoration: none; font-weight: 500; }
         .upgrade-link:hover { text-decoration: underline; }
         .signout-btn {
           background: none;

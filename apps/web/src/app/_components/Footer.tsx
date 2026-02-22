@@ -2,74 +2,74 @@
 
 import Link from 'next/link';
 
-const footerLinks = [
-  { label: 'wokspec.org', href: 'https://wokspec.org', external: true },
-  { label: 'Docs',        href: '/docs',               external: false },
-  { label: 'Gallery',     href: '/gallery',            external: false },
-  { label: 'GitHub',      href: 'https://github.com/WokSpec/WokGen', external: true },
+const LEFT_LINKS = [
+  { label: 'Studio',     href: '/studio',                              external: false },
+  { label: 'Gallery',    href: '/gallery',                             external: false },
+  { label: 'Billing',    href: '/billing',                             external: false },
+  { label: 'Docs',       href: '/docs',                                external: false },
 ];
 
-const linkStyle: React.CSSProperties = {
-  fontSize: '0.72rem',
-  color: 'var(--text-muted)',
-  textDecoration: 'none',
-  fontFamily: 'var(--font-heading)',
-  transition: 'color 0.15s',
-};
+const RIGHT_LINKS = [
+  { label: 'wokspec.org', href: 'https://wokspec.org',                  external: true },
+  { label: 'GitHub',      href: 'https://github.com/WokSpec/WokGen',   external: true },
+];
 
-function hoverIn(e: React.MouseEvent<HTMLElement>) {
-  (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)';
-}
-function hoverOut(e: React.MouseEvent<HTMLElement>) {
-  (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+function NavItem({ label, href, external }: { label: string; href: string; external: boolean }) {
+  const style: React.CSSProperties = { fontSize: '0.78rem', color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' };
+  const props = {
+    style,
+    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.color = 'var(--text)'; },
+    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; },
+  };
+  return external
+    ? <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{label}</a>
+    : <Link href={href} {...props}>{label}</Link>;
 }
 
 export function Footer() {
   return (
-    <footer style={{ borderTop: '1px solid var(--surface-border)', background: 'var(--surface-base)' }}>
-      <div
-        style={{
-          maxWidth: '72rem',
-          margin: '0 auto',
-          padding: '1.25rem 1.5rem',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '0.75rem',
-        }}
-      >
-        {/* Attribution */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <a
-            href="https://wokspec.org"
-            style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textDecoration: 'none', fontFamily: 'var(--font-heading)', transition: 'color 0.15s' }}
-            onMouseEnter={hoverIn}
-            onMouseLeave={hoverOut}
-          >
-            Wok Specialists
-          </a>
-          <span style={{ color: 'var(--text-disabled)', fontSize: '0.75rem' }}>/</span>
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6ee7b7', fontFamily: 'var(--font-heading)' }}>WokGen</span>
-          <span style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-disabled)', background: 'var(--surface-raised)', border: '1px solid var(--surface-border)', borderRadius: '0.25rem', padding: '0.15rem 0.4rem', fontFamily: 'var(--font-heading)' }}>
-            Early Preview · v0.1
-          </span>
-        </div>
+    <footer>
+      <div className="divider-gradient" />
+      <div style={{ background: 'var(--bg-surface)' }}>
+        <div style={{ maxWidth: '72rem', margin: '0 auto', padding: '2rem 1.5rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
 
-        {/* Nav links */}
-        <nav aria-label="Footer navigation" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          {footerLinks.map(({ label, href, external }) =>
-            external ? (
-              <a key={label} href={href} target="_blank" rel="noopener noreferrer" style={linkStyle} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
-                {label}
-              </a>
-            ) : (
-              <Link key={label} href={href} style={linkStyle} onMouseEnter={hoverIn} onMouseLeave={hoverOut}>
-                {label}
-              </Link>
-            )
-          )}
-        </nav>
+            {/* Brand */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Wok</span>
+                <span style={{ color: '#a78bfa' }}>Gen</span>
+              </span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-faint)' }}>
+                by{' '}
+                <a href="https://wokspec.org" style={{ color: 'var(--text-faint)', textDecoration: 'none', transition: 'color 0.15s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-faint)'; }}>
+                  Wok Specialists
+                </a>
+                {' '}· Early Preview
+              </span>
+            </div>
+
+            {/* Links */}
+            <nav style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1.5rem' }} aria-label="Footer navigation">
+              {LEFT_LINKS.map(l => <NavItem key={l.label} {...l} />)}
+              <span style={{ color: 'var(--border)', fontSize: '0.7rem' }}>·</span>
+              {RIGHT_LINKS.map(l => <NavItem key={l.label} {...l} />)}
+            </nav>
+
+          </div>
+
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)' }}>
+              © {new Date().getFullYear()} Wok Specialists LLC. Released under a modified MIT license.
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <span className="tag tag-gray" style={{ fontSize: '0.58rem' }}>Next.js</span>
+              <span className="tag tag-gray" style={{ fontSize: '0.58rem' }}>Vercel</span>
+            </div>
+          </div>
+        </div>
       </div>
     </footer>
   );

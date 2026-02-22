@@ -67,9 +67,9 @@ function LoginForm() {
         .login-card {
           width: 100%;
           max-width: 380px;
-          background: var(--surface-card, #161616);
-          border: 1px solid var(--border-subtle, #262626);
-          border-radius: 8px;
+          background: var(--bg-surface, #141414);
+          border: 1px solid var(--border, #2c2c2c);
+          border-radius: 4px;
           padding: 2.5rem;
           display: flex;
           flex-direction: column;
@@ -87,10 +87,10 @@ function LoginForm() {
           font-weight: 600;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: #10b981;
-          background: rgba(16,185,129,.12);
-          border: 1px solid rgba(16,185,129,.25);
-          border-radius: 4px;
+          color: #a78bfa;
+          background: rgba(167,139,250,.1);
+          border: 1px solid rgba(167,139,250,.25);
+          border-radius: 2px;
           padding: 2px 8px;
         }
         .login-title {

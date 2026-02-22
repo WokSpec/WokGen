@@ -195,14 +195,14 @@ export default function BillingClient({
         .billing-page { max-width: 980px; margin: 0 auto; padding: 3rem 1.5rem; }
         .credits-banner {
           display: flex; gap: 1rem; align-items: center;
-          background: rgba(16,185,129,.08);
-          border: 1px solid rgba(16,185,129,.2);
+          background: rgba(167,139,250,.08);
+          border: 1px solid rgba(167,139,250,.2);
           border-radius: 8px;
           padding: 0.75rem 1.25rem;
           margin-bottom: 2rem;
           font-size: 0.875rem;
         }
-        .credits-label { font-weight: 600; color: #10b981; }
+        .credits-label { font-weight: 600; color: #a78bfa; }
         .credits-value { color: var(--text-secondary, #888); }
         .billing-header { margin-bottom: 2rem; }
         .billing-header h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 0.5rem; }
@@ -222,12 +222,12 @@ export default function BillingClient({
           gap: 0.9rem;
           position: relative;
         }
-        .plan-card--current { border-color: #10b981; }
+        .plan-card--current { border-color: #a78bfa; }
         .plan-badge {
           position: absolute; top: 0.75rem; right: 0.75rem;
           font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-          color: #10b981; background: rgba(16,185,129,.12);
-          border: 1px solid rgba(16,185,129,.25); border-radius: 4px; padding: 2px 6px;
+          color: #a78bfa; background: rgba(167,139,250,.12);
+          border: 1px solid rgba(167,139,250,.25); border-radius: 4px; padding: 2px 6px;
         }
         .plan-name { font-size: 1.05rem; font-weight: 600; margin: 0; }
         .plan-price { display: flex; align-items: baseline; gap: 0.2rem; }
@@ -236,13 +236,13 @@ export default function BillingClient({
         .plan-price-period { color: var(--text-muted, #666); font-size: 0.85rem; }
         .plan-features { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
         .plan-features li { font-size: 0.85rem; color: var(--text-secondary, #888); padding-left: 1.1rem; position: relative; }
-        .plan-features li::before { content: '✓'; position: absolute; left: 0; color: #10b981; }
+        .plan-features li::before { content: '✓'; position: absolute; left: 0; color: #a78bfa; }
         .pack-name { font-weight: 600; font-size: 0.95rem; }
         .pack-credits { font-size: 0.875rem; color: var(--text-secondary, #888); flex: 1; }
         .pack-price { font-size: 1.4rem; font-weight: 700; }
         .plan-cta, .pack-cta {
           margin-top: auto; width: 100%; padding: 0.55rem 1rem;
-          border-radius: 6px; background: #10b981; color: #000;
+          border-radius: 6px; background: #a78bfa; color: #fff;
           border: none; font-size: 0.875rem; font-weight: 600; cursor: pointer;
         }
         .plan-cta:disabled, .pack-cta:disabled { opacity: 0.6; cursor: not-allowed; }

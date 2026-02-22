@@ -6,6 +6,7 @@ import {
   assertKeyPresent,
   serializeError,
 } from '@/lib/providers';
+import { checkRateLimit } from '@/lib/rate-limit';
 import type { ProviderName, Tool, GenerateParams } from '@/lib/providers';
 
 // ---------------------------------------------------------------------------
@@ -38,6 +39,18 @@ export async function POST(req: NextRequest) {
       );
     }
     authedUserId = session.user.id;
+
+    // Rate limit: 10 requests/min per user
+    const rl = checkRateLimit(authedUserId);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Rate limit exceeded. Try again in ${rl.retryAfter}s.` },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rl.retryAfter) },
+        },
+      );
+    }
 
     // Parse quality preference from body (peek ahead)
     let rawBody: Record<string, unknown> = {};
@@ -120,6 +133,14 @@ export async function POST(req: NextRequest) {
   const resolvedProvider: ProviderName = isSelfHosted
     ? (provider as ProviderName)
     : useHD ? 'replicate' : 'pollinations';
+
+  // Guard: HD requires REPLICATE_API_TOKEN on server
+  if (useHD && !process.env.REPLICATE_API_TOKEN) {
+    return NextResponse.json(
+      { error: 'HD generation is temporarily unavailable. Please try standard quality.' },
+      { status: 503 },
+    );
+  }
 
   // Validate required fields
   if (typeof prompt !== 'string' || prompt.trim().length === 0) {

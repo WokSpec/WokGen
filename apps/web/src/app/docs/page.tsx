@@ -4,324 +4,128 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 // ---------------------------------------------------------------------------
-// Types
+// Nav sections
 // ---------------------------------------------------------------------------
 
-interface DocSection {
-  id: string;
-  label: string;
-  icon: string;
-}
-
-// ---------------------------------------------------------------------------
-// Sidebar sections
-// ---------------------------------------------------------------------------
-
-const SECTIONS: DocSection[] = [
-  { id: 'quick-start',   label: 'Quick Start',       icon: '⚡' },
-  { id: 'studio',        label: 'Studio Guide',       icon: '✦' },
-  { id: 'api',           label: 'REST API',           icon: '⊞' },
-  { id: 'providers',     label: 'Provider Setup',     icon: '☁' },
-  { id: 'pipeline',      label: 'Asset Pipeline CLI', icon: '⚙' },
-  { id: 'self-hosting',  label: 'Self-Hosting',       icon: '🖥' },
-  { id: 'docker',        label: 'Docker',             icon: '🐳' },
-  { id: 'license',       label: 'License',            icon: '⚖' },
+const SECTIONS = [
+  { id: 'overview',       label: 'Overview',              icon: '✦' },
+  { id: 'studio',         label: 'Studio Guide',          icon: '🎨' },
+  { id: 'tools',          label: 'Tools',                 icon: '⚙' },
+  { id: 'generation',     label: 'Generation Settings',   icon: '⊞' },
+  { id: 'api',            label: 'API Reference',         icon: '{}' },
+  { id: 'credits',        label: 'Plans & Credits',       icon: '💳' },
+  { id: 'faq',            label: 'FAQ',                   icon: '?' },
 ];
 
 // ---------------------------------------------------------------------------
-// Small primitives
+// Helpers
 // ---------------------------------------------------------------------------
 
-function Anchor({ id }: { id: string }) {
+function H2({ id, children }: { id?: string; children: React.ReactNode }) {
   return (
-    <span
+    <h2
       id={id}
-      style={{ position: 'absolute', top: -72 }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function SectionTitle({
-  id,
-  icon,
-  children,
-}: {
-  id: string;
-  icon: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div style={{ position: 'relative' }}>
-      <Anchor id={id} />
-      <h2
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          fontSize: '1.35rem',
-          fontWeight: 700,
-          color: 'var(--text-primary)',
-          marginBottom: '1rem',
-          paddingBottom: '0.75rem',
-          borderBottom: '1px solid var(--surface-border)',
-        }}
-      >
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 32,
-            height: 32,
-            borderRadius: 8,
-            background: 'var(--accent-dim)',
-            border: '1px solid var(--accent-muted)',
-            color: 'var(--accent)',
-            fontSize: 14,
-            flexShrink: 0,
-          }}
-        >
-          {icon}
-        </span>
-        {children}
-      </h2>
-    </div>
-  );
-}
-
-function SubTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h3
       style={{
-        fontSize: '1rem',
-        fontWeight: 600,
-        color: 'var(--text-primary)',
-        marginBottom: '0.5rem',
-        marginTop: '1.5rem',
+        fontSize: '1.2rem', fontWeight: 700, letterSpacing: '-0.015em',
+        fontFamily: 'var(--font-heading)', color: 'var(--text)',
+        marginBottom: '0.75rem', marginTop: '2.5rem', paddingTop: '2.5rem',
+        borderTop: '1px solid var(--border)',
+        scrollMarginTop: 80,
       }}
-    >
+    >{children}</h2>
+  );
+}
+
+function H3({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text)', fontFamily: 'var(--font-heading)', marginBottom: '0.5rem', marginTop: '1.5rem' }}>
       {children}
     </h3>
   );
 }
 
 function P({ children }: { children: React.ReactNode }) {
+  return <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.75, marginBottom: '0.75rem' }}>{children}</p>;
+}
+
+function Code({ children }: { children: React.ReactNode }) {
   return (
-    <p
-      style={{
-        color: 'var(--text-secondary)',
-        lineHeight: 1.75,
-        marginBottom: '0.85rem',
-        fontSize: '0.875rem',
-      }}
-    >
-      {children}
-    </p>
+    <code style={{
+      fontFamily: 'monospace', fontSize: '0.78rem', color: '#c4b5fd',
+      background: 'rgba(167,139,250,.08)', border: '1px solid rgba(167,139,250,.15)',
+      borderRadius: 3, padding: '1px 5px',
+    }}>{children}</code>
   );
 }
 
-function InlineCode({ children }: { children: React.ReactNode }) {
-  return (
-    <code
-      style={{
-        background: 'var(--surface-overlay)',
-        border: '1px solid var(--surface-border)',
-        borderRadius: 3,
-        padding: '0.1em 0.38em',
-        fontSize: '0.82em',
-        color: 'var(--accent-hover)',
-        fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
-      }}
-    >
-      {children}
-    </code>
-  );
-}
-
-function CodeBlock({
-  lang,
-  label,
-  children,
-}: {
-  lang?: string;
-  label?: string;
-  children: string;
-}) {
+function Pre({ children }: { children: string }) {
   const [copied, setCopied] = useState(false);
-
-  const copy = async () => {
-    await navigator.clipboard.writeText(children.trim()).catch(() => null);
+  const copy = () => {
+    navigator.clipboard.writeText(children).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
-
   return (
-    <div
-      style={{
-        borderRadius: 8,
-        overflow: 'hidden',
-        border: '1px solid var(--surface-border)',
-        marginBottom: '1.25rem',
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '7px 14px',
-          background: 'var(--surface-overlay)',
-          borderBottom: '1px solid var(--surface-border)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ display: 'flex', gap: 5 }}>
-            <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#B13E53', display: 'block' }} />
-            <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#FFCD75', display: 'block' }} />
-            <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#38B764', display: 'block' }} />
-          </div>
-          <span
-            style={{
-              fontSize: '0.7rem',
-              color: 'var(--text-muted)',
-              fontFamily: 'monospace',
-            }}
-          >
-            {label ?? lang ?? 'code'}
-          </span>
-        </div>
-        <button
-          onClick={copy}
-          style={{
-            fontSize: '0.7rem',
-            color: copied ? 'var(--success)' : 'var(--text-muted)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'color 0.15s ease',
-            padding: 0,
-          }}
-        >
-          {copied ? '✓ Copied' : '⊕ Copy'}
-        </button>
-      </div>
-      {/* Body */}
-      <pre
-        style={{
-          margin: 0,
-          padding: '14px 16px',
-          background: 'var(--surface-muted)',
-          overflowX: 'auto',
-          fontSize: '0.8rem',
-          lineHeight: 1.7,
-          color: 'var(--text-secondary)',
-          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
-          border: 'none',
-          borderRadius: 0,
-        }}
-      >
+    <div style={{ position: 'relative', marginBottom: '1rem' }}>
+      <pre style={{
+        background: '#0a0a0a', border: '1px solid var(--border)',
+        borderRadius: 4, padding: '1rem 1.25rem',
+        fontSize: '0.78rem', color: '#a78bfa', fontFamily: 'monospace',
+        lineHeight: 1.65, overflowX: 'auto', whiteSpace: 'pre',
+      }}>
         {children}
       </pre>
+      <button
+        onClick={copy}
+        style={{
+          position: 'absolute', top: '0.5rem', right: '0.5rem',
+          background: 'rgba(167,139,250,.12)', border: '1px solid rgba(167,139,250,.2)',
+          borderRadius: 3, color: '#a78bfa', fontSize: '0.65rem',
+          padding: '2px 7px', cursor: 'pointer', transition: 'opacity 0.15s',
+        }}
+      >
+        {copied ? 'Copied!' : 'Copy'}
+      </button>
     </div>
   );
 }
 
-function Callout({
-  type = 'info',
-  children,
-}: {
-  type?: 'info' | 'warning' | 'tip' | 'danger';
-  children: React.ReactNode;
-}) {
+function InfoBox({ children, variant = 'info' }: { children: React.ReactNode; variant?: 'info' | 'tip' | 'warn' }) {
   const styles = {
-    info:    { bg: 'var(--accent-dim)',   border: 'var(--accent-muted)',  color: 'var(--accent)',       icon: 'ℹ' },
-    warning: { bg: 'var(--warning-muted)', border: 'var(--warning)',      color: 'var(--warning)',      icon: '⚠' },
-    tip:     { bg: 'var(--success-muted)', border: 'var(--success)',      color: 'var(--success)',      icon: '✓' },
-    danger:  { bg: 'var(--danger-muted)',  border: 'var(--danger)',       color: 'var(--danger-hover)', icon: '✕' },
-  }[type];
-
+    info: { bg: 'rgba(167,139,250,.07)', border: 'rgba(167,139,250,.2)', color: '#c4b5fd', icon: 'ℹ' },
+    tip:  { bg: 'rgba(52,211,153,.07)',  border: 'rgba(52,211,153,.2)',  color: '#34d399', icon: '✓' },
+    warn: { bg: 'rgba(245,158,11,.07)',  border: 'rgba(245,158,11,.2)',  color: '#fcd34d', icon: '⚠' },
+  }[variant];
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 10,
-        padding: '12px 14px',
-        borderRadius: 8,
-        background: styles.bg,
-        border: `1px solid ${styles.border}`,
-        marginBottom: '1rem',
-        alignItems: 'flex-start',
-      }}
-    >
-      <span style={{ color: styles.color, flexShrink: 0, fontSize: 13, paddingTop: 1 }}>
-        {styles.icon}
-      </span>
-      <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-        {children}
-      </div>
+    <div style={{
+      display: 'flex', gap: '0.6rem', alignItems: 'flex-start',
+      background: styles.bg, border: `1px solid ${styles.border}`,
+      borderRadius: 4, padding: '0.75rem 1rem', marginBottom: '1rem',
+    }}>
+      <span style={{ color: styles.color, flexShrink: 0, lineHeight: 1.75, fontSize: '0.85rem' }}>{styles.icon}</span>
+      <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.65 }}>{children}</span>
     </div>
   );
 }
 
-function Table({
-  headers,
-  rows,
-}: {
-  headers: string[];
-  rows: (string | React.ReactNode)[][];
-}) {
+function Table({ headers, rows }: { headers: string[]; rows: string[][] }) {
   return (
-    <div
-      style={{
-        overflowX: 'auto',
-        borderRadius: 8,
-        border: '1px solid var(--surface-border)',
-        marginBottom: '1.25rem',
-      }}
-    >
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+    <div style={{ overflowX: 'auto', marginBottom: '1rem' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
         <thead>
-          <tr style={{ background: 'var(--surface-overlay)' }}>
-            {headers.map((h, i) => (
-              <th
-                key={i}
-                style={{
-                  padding: '9px 14px',
-                  textAlign: 'left',
-                  fontWeight: 600,
-                  color: 'var(--text-muted)',
-                  borderBottom: '1px solid var(--surface-border)',
-                  whiteSpace: 'nowrap',
-                  letterSpacing: '0.03em',
-                  fontSize: '0.72rem',
-                  textTransform: 'uppercase',
-                }}
-              >
+          <tr>
+            {headers.map(h => (
+              <th key={h} style={{ textAlign: 'left', padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border)', color: 'var(--text-faint)', fontWeight: 600, letterSpacing: '0.05em', fontSize: '0.7rem', textTransform: 'uppercase' }}>
                 {h}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, ri) => (
-            <tr
-              key={ri}
-              style={{
-                background: ri % 2 === 0 ? 'transparent' : 'var(--surface-muted)',
-                borderBottom: ri < rows.length - 1 ? '1px solid var(--surface-border)' : 'none',
-              }}
-            >
-              {row.map((cell, ci) => (
-                <td
-                  key={ci}
-                  style={{
-                    padding: '9px 14px',
-                    color: 'var(--text-secondary)',
-                    verticalAlign: 'top',
-                  }}
-                >
+          {rows.map((row, i) => (
+            <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+              {row.map((cell, j) => (
+                <td key={j} style={{ padding: '0.55rem 0.75rem', color: j === 0 ? 'var(--text)' : 'var(--text-muted)', fontFamily: j === 0 ? 'monospace' : undefined, fontSize: j === 0 ? '0.78rem' : '0.8rem' }}>
                   {cell}
                 </td>
               ))}
@@ -333,718 +137,427 @@ function Table({
   );
 }
 
-function HR() {
-  return (
-    <hr
-      style={{
-        border: 'none',
-        borderTop: '1px solid var(--surface-border)',
-        margin: '2.5rem 0',
-      }}
-    />
-  );
-}
-
 // ---------------------------------------------------------------------------
-// Page
+// Main page
 // ---------------------------------------------------------------------------
 
 export default function DocsPage() {
-  const [activeSection, setActiveSection] = useState('quick-start');
+  const [activeSection, setActiveSection] = useState('overview');
 
   const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
     setActiveSection(id);
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        minHeight: 'calc(100dvh - 56px)',
-        background: 'var(--surface-base)',
-      }}
-    >
+    <div style={{ display: 'flex', minHeight: '100dvh', maxWidth: '72rem', margin: '0 auto' }}>
 
-      {/* ── Sidebar ──────────────────────────────────────────────────────── */}
-      <aside
-        style={{
-          width: 220,
-          flexShrink: 0,
-          position: 'sticky',
-          top: 56,
-          height: 'calc(100dvh - 56px)',
-          overflowY: 'auto',
-          background: 'var(--surface-raised)',
-          borderRight: '1px solid var(--surface-border)',
-          padding: '20px 0',
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'var(--surface-border) transparent',
-        }}
-      >
-        <div style={{ padding: '0 12px 12px', borderBottom: '1px solid var(--surface-border)', marginBottom: 8 }}>
-          <p
-            style={{
-              fontSize: '0.65rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: 'var(--text-disabled)',
-              padding: '0 8px',
-            }}
-          >
-            Documentation
-          </p>
-        </div>
-        {SECTIONS.map((section) => (
+      {/* Sidebar */}
+      <aside style={{
+        width: 220, flexShrink: 0,
+        padding: '2rem 0 2rem 1.5rem',
+        position: 'sticky', top: 56, height: 'calc(100dvh - 56px)',
+        overflowY: 'auto',
+        borderRight: '1px solid var(--border)',
+        display: 'flex', flexDirection: 'column', gap: '0.15rem',
+      }}>
+        <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: '0.75rem', paddingLeft: '0.5rem' }}>
+          Documentation
+        </p>
+        {SECTIONS.map(s => (
           <button
-            key={section.id}
-            onClick={() => scrollTo(section.id)}
+            key={s.id}
+            onClick={() => scrollTo(s.id)}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              width: '100%',
-              padding: '7px 20px',
-              background: activeSection === section.id ? 'var(--accent-dim)' : 'transparent',
-              border: 'none',
-              borderLeft: `2px solid ${activeSection === section.id ? 'var(--accent)' : 'transparent'}`,
-              color: activeSection === section.id ? 'var(--accent)' : 'var(--text-muted)',
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              padding: '0.4rem 0.5rem',
+              borderRadius: 4, border: 'none', cursor: 'pointer',
+              textAlign: 'left', width: '100%',
+              background: activeSection === s.id ? 'rgba(167,139,250,.1)' : 'transparent',
+              color: activeSection === s.id ? '#a78bfa' : 'var(--text-muted)',
               fontSize: '0.82rem',
-              fontWeight: activeSection === section.id ? 600 : 400,
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: 'all 0.14s ease',
-            }}
-            onMouseEnter={(e) => {
-              if (activeSection !== section.id) {
-                (e.currentTarget as HTMLElement).style.background = 'var(--surface-hover)';
-                (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeSection !== section.id) {
-                (e.currentTarget as HTMLElement).style.background = 'transparent';
-                (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
-              }
+              transition: 'background 0.15s, color 0.15s',
             }}
           >
-            <span style={{ fontSize: 12, flexShrink: 0 }}>{section.icon}</span>
-            {section.label}
+            <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>{s.icon}</span>
+            {s.label}
           </button>
         ))}
 
-        {/* Links */}
-        <div style={{ borderTop: '1px solid var(--surface-border)', marginTop: 16, padding: '16px 20px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <a
-            href="https://github.com/WokSpecialists/WokGen"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            <span>↗</span> GitHub
-          </a>
-          <Link
-            href="/studio"
-            style={{ fontSize: '0.78rem', color: 'var(--accent)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            <span>✦</span> Open Studio
-          </Link>
+        <div style={{ marginTop: 'auto', paddingTop: '1.5rem', paddingLeft: '0.5rem' }}>
+          <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', lineHeight: 1.6 }}>
+            Self-hosting?{' '}
+            <a href="https://github.com/WokSpec/WokGen" target="_blank" rel="noopener noreferrer" style={{ color: '#a78bfa', textDecoration: 'none' }}>
+              See the open-source repo →
+            </a>
+          </p>
         </div>
       </aside>
 
-      {/* ── Content ──────────────────────────────────────────────────────── */}
-      <main
-        style={{
-          flex: 1,
-          minWidth: 0,
-          padding: '40px 48px',
-          maxWidth: 820,
-        }}
-      >
+      {/* Content */}
+      <main style={{ flex: 1, padding: '2.5rem 2.5rem 4rem', minWidth: 0 }}>
 
-        {/* ── Quick Start ───────────────────────────────────────────────── */}
-        <SectionTitle id="quick-start" icon="⚡">Quick Start</SectionTitle>
+        {/* ── Overview ─────────────────────────────────────────────────── */}
+        <div id="overview" style={{ scrollMarginTop: 80 }}>
+          <div style={{ marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#a78bfa', fontFamily: 'var(--font-heading)', marginBottom: '0.4rem' }}>
+              WokGen Documentation
+            </p>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.025em', color: 'var(--text)', fontFamily: 'var(--font-heading)', marginBottom: '0.6rem' }}>
+              Overview
+            </h1>
+            <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '42rem' }}>
+              WokGen is an AI pixel art generation studio for game developers. Generate sprites, tilesets, animations,
+              and UI elements directly from text prompts. No setup required — just sign in and create.
+            </p>
+          </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            {[
+              { label: '5 tools', body: 'Generate, Animate, Rotate, Inpaint, Scene' },
+              { label: 'Free forever', body: 'Standard generation — always free, unlimited' },
+              { label: 'HD quality', body: 'Replicate FLUX.1-schnell on paid plans' },
+              { label: 'GitHub auth', body: 'Sign in with GitHub — no password required' },
+            ].map(c => (
+              <div key={c.label} style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 4, padding: '1rem' }}>
+                <p style={{ fontWeight: 600, fontSize: '0.83rem', color: 'var(--text)', fontFamily: 'var(--font-heading)', marginBottom: '0.3rem' }}>{c.label}</p>
+                <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>{c.body}</p>
+              </div>
+            ))}
+          </div>
+
+          <InfoBox variant="tip">
+            WokGen is hosted at{' '}
+            <a href="https://wokgen.wokspec.org" style={{ color: '#34d399' }}>wokgen.wokspec.org</a>.
+            An open-source, self-hostable version is available at{' '}
+            <a href="https://github.com/WokSpec/WokGen" target="_blank" rel="noopener noreferrer" style={{ color: '#34d399' }}>github.com/WokSpec/WokGen</a>.
+          </InfoBox>
+        </div>
+
+        {/* ── Studio Guide ─────────────────────────────────────────────── */}
+        <H2 id="studio">Studio Guide</H2>
+
+        <P>The WokGen Studio is a single-page workspace with a left prompt panel and a right output panel.</P>
+
+        <H3>Getting started</H3>
         <P>
-          WokGen is a hosted AI pixel art studio. The fastest way to use it is to visit{' '}
-          <a href="https://wokgen.wokspec.org" style={{ color: 'var(--accent)' }}>wokgen.wokspec.org</a>{' '}
-          — no setup, no API keys, no install required.
+          1. Sign in with GitHub at the top-right corner.<br />
+          2. You&#39;ll be taken to the Studio automatically after sign-in.<br />
+          3. Enter a prompt describing what you want to generate.<br />
+          4. Click <Code>Generate</Code> or press <Code>⌘ + ↵</Code> (Ctrl+Enter on Windows).
         </P>
 
-        <Callout type="tip">
-          <strong>Hosted users:</strong> Standard generation is always free via Pollinations (no sign-in required).
-          HD generation via Replicate requires a Plus plan or credit top-up. See{' '}
-          <a href="/billing" style={{ color: 'var(--accent)' }}>Plans & Credits</a>.
-        </Callout>
+        <H3>Left panel</H3>
+        <P>The left panel contains all inputs:</P>
+        <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.75rem' }}>
+          {[
+            ['Tool tabs', 'Switch between Generate, Animate, Rotate, Inpaint, and Scene'],
+            ['Prompt textarea', 'Your description of the asset. Be specific for best results.'],
+            ['Negative prompt', 'What to avoid in the output. Filled automatically based on category.'],
+            ['Size picker', 'Output resolution: 32×32 to 512×512 (HD up to 1024×1024).'],
+            ['Style preset', '18 curated pixel art presets including RPG, chibi, sci-fi, isometric.'],
+            ['Asset category', '15 asset categories that tune the prompt intelligently.'],
+            ['Era', 'NES, Game Boy, SNES, GBA, or Modern — controls pixel era vocabulary.'],
+            ['Background', 'Transparent, dark, or scene — toggles checkerboard preview.'],
+            ['Outline / Palette', 'Outline style and color palette size controls.'],
+          ].map(([k, v]) => (
+            <li key={k as string} style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+              <span style={{ color: 'var(--text)', fontWeight: 500 }}>{k as string}</span> — {v as string}
+            </li>
+          ))}
+        </ul>
 
+        <H3>Right panel (Output)</H3>
         <P>
-          If you want to self-host WokGen with your own provider keys, follow the steps below.
-          You need <strong>Node.js 20+</strong>.
+          The output panel shows your generated image centered on a transparent checkerboard background.
+          Use the zoom controls (+/−) to inspect pixel-level detail. The toolbar has:
+        </P>
+        <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.3rem', marginBottom: '0.75rem' }}>
+          {[
+            ['↻ Reroll', 'Generate again with a new random seed'],
+            ['⎘ Copy', 'Copy the image to clipboard as PNG'],
+            ['↓ Download', 'Download as PNG or GIF — filename includes tool, size, and prompt'],
+            ['⊕ Save to Gallery', 'Publish the image to the public community gallery'],
+          ].map(([k, v]) => (
+            <li key={k as string} style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+              <Code>{k as string}</Code> — {v as string}
+            </li>
+          ))}
+        </ul>
+
+        <InfoBox variant="info">
+          Click any prompt chip in the idle state to instantly load an example prompt and jump-start your session.
+        </InfoBox>
+
+        {/* ── Tools ────────────────────────────────────────────────────── */}
+        <H2 id="tools">Tools</H2>
+
+        <H3>✦ Generate</H3>
+        <P>
+          The primary tool. Text-to-pixel-art for any asset type: characters, weapons, tiles, effects, UI elements.
+          Supports all style presets, categories, era tokens, and background modes.
+        </P>
+        <InfoBox variant="tip">Use the <strong>batch mode (×2 / ×4)</strong> to generate multiple variations simultaneously and pick your favorite.</InfoBox>
+
+        <H3>▶ Animate</H3>
+        <P>
+          Generates multi-frame GIF animations. Choose an animation type (Idle, Walk, Run, Attack, Cast, Death,
+          or particle effects) and set frame count, FPS, and loop mode. Each frame is generated with per-frame
+          motion context tokens to maintain consistency.
+        </P>
+        <InfoBox variant="warn">Animation generation costs multiple standard credits (one per frame). Aim for 4–6 frames for best quality/speed balance.</InfoBox>
+
+        <H3>↻ Rotate</H3>
+        <P>
+          Generates a 4-direction turntable view (front, back, left, right) of a character or object.
+          Each direction gets specialized view tokens while maintaining consistent style/palette.
         </P>
 
-        <SubTitle>1. Clone & install</SubTitle>
-        <CodeBlock lang="bash">
-{`git clone https://github.com/WokSpec/WokGen.git
-cd WokGen
-npm install`}
-        </CodeBlock>
-
-        <SubTitle>2. Configure environment</SubTitle>
-        <CodeBlock lang="bash">
-{`cp apps/web/.env.example apps/web/.env.local
-# Open .env.local and configure:
-#
-#   DATABASE_URL="file:./dev.db"          # local SQLite (default)
-#   REPLICATE_API_TOKEN=r8_...            # for HD generation
-#   FAL_API_KEY=...                       # alternative HD provider
-#   COMFYUI_HOST=http://127.0.0.1:8188   # if running ComfyUI locally
-#
-# Standard generation uses Pollinations (no key needed)`}
-        </CodeBlock>
-
-        <SubTitle>3. Set up the database</SubTitle>
-        <CodeBlock lang="bash">
-{`cd apps/web
-npx prisma db push
-cd ../..`}
-        </CodeBlock>
-
-        <SubTitle>4. Start the dev server</SubTitle>
-        <CodeBlock lang="bash">
-{`npm run dev
-# → http://localhost:3000`}
-        </CodeBlock>
-
+        <H3>⬛ Inpaint</H3>
         <P>
-          Open <InlineCode>http://localhost:3000</InlineCode> in your browser.
-          Navigate to <strong>Studio</strong> to start generating pixel art.
+          Upload an existing sprite PNG, paint a mask over the region to modify, and describe what should
+          replace it. Uses ControlNet-style inpainting. Ideal for iterating on a near-complete asset.
         </P>
 
-        <HR />
-
-        {/* ── Studio Guide ──────────────────────────────────────────────── */}
-        <SectionTitle id="studio" icon="✦">Studio Guide</SectionTitle>
-
+        <H3>⊞ Scene</H3>
         <P>
-          The Studio at <InlineCode>/studio</InlineCode> is the main generation interface.
-          It is a single-page application with a three-column layout: tool rail, control panel,
-          and output canvas.
+          Generates tilesets, dungeon maps, and environmental assets. Themes include Dungeon, Forest, Castle,
+          Desert, Cave, Ocean, Cyberpunk, and more. Can generate 4×4 coherent tile grids in one pass.
         </P>
 
-        <SubTitle>Tools</SubTitle>
-        <Table
-          headers={['Tool', 'Shortcut', 'Description']}
-          rows={[
-            [<InlineCode>Generate</InlineCode>, '1', 'Text → pixel art sprite or icon at any supported size.'],
-            [<InlineCode>Animate</InlineCode>,  '2', 'Turn a static sprite into a looping GIF animation with text control.'],
-            [<InlineCode>Rotate</InlineCode>,   '3', 'Generate 4 or 8 directional views of any sprite.'],
-            [<InlineCode>Inpaint</InlineCode>,  '4', 'Edit specific regions using a paint mask.'],
-            [<InlineCode>Scenes & Maps</InlineCode>, '5', 'Generate tilesets, environments, and game maps.'],
-          ]}
-        />
+        {/* ── Generation Settings ──────────────────────────────────────── */}
+        <H2 id="generation">Generation Settings</H2>
 
-        <SubTitle>Style Presets</SubTitle>
+        <H3>Prompting tips</H3>
+        <P>
+          WokGen uses a layered prompt system — your text is combined with smart tokens from the category,
+          era, style, and background settings. You don&#39;t need to manually specify &#34;pixel art&#34; or &#34;32-bit&#34;
+          — the system handles that. Focus your prompt on the <em>content</em>:
+        </P>
+        <Pre>{`✓ iron sword with ornate crossguard, battle-worn blade
+✓ warrior in plate armor, front-facing, detailed face
+✓ dungeon stone floor, cracked and mossy, seamless tile
+✗ pixel art sword (redundant — era tokens handle this)
+✗ make a good sprite (too vague — describe the content)`}</Pre>
+
+        <H3>Style presets</H3>
         <Table
           headers={['Preset', 'Best for']}
           rows={[
-            [<InlineCode>RPG Icon</InlineCode>,     'Dark background game inventory items'],
-            [<InlineCode>Emoji</InlineCode>,        'Bright simple icons with no background'],
-            [<InlineCode>Tileset</InlineCode>,      'Seamlessly repeating flat terrain tiles'],
-            [<InlineCode>Sprite Sheet</InlineCode>, 'Multiple character poses on one sheet'],
-            [<InlineCode>Game UI</InlineCode>,      'HUD elements, buttons, and widgets'],
-            [<InlineCode>Raw</InlineCode>,          'No preset — pure model output'],
+            ['rpg_icon', 'Inventory icons, RPG items (weapons, potions, armor)'],
+            ['character_idle', 'Front-facing standing character sprites'],
+            ['character_side', 'Side-scroll platformer characters'],
+            ['top_down_char', 'Top-down RPG characters (Zelda-style)'],
+            ['isometric', '3/4 isometric objects and characters'],
+            ['chibi', 'Super-deformed cute characters, 2:1 head ratio'],
+            ['tileset', 'Seamless tiled backgrounds and environments'],
+            ['sprite_sheet', 'Multi-sprite sheet layout'],
+            ['game_ui', 'UI elements: buttons, frames, health bars'],
+            ['animated_effect', 'High-contrast particles and spell effects'],
+            ['portrait', 'Character busts and face closeups'],
+            ['sci_fi', 'Technological, metallic, neon-accented assets'],
+            ['horror', 'Dark, desaturated, high-contrast scary assets'],
+            ['nature_tile', 'Organic environment tiles (grass, trees, water)'],
+            ['badge_icon', 'App-style flat icons, centered on clean background'],
+            ['weapon_icon', 'Dedicated weapon sprites with clean silhouette'],
+            ['emoji', 'Expressive, bold, single-concept icons'],
+            ['raw', 'No style preset — pure user prompt'],
           ]}
         />
 
-        <SubTitle>Keyboard shortcuts</SubTitle>
+        <H3>Pixel era</H3>
         <Table
-          headers={['Shortcut', 'Action']}
+          headers={['Era', 'Vocabulary']}
           rows={[
-            ['⌘ + Enter', 'Generate (when prompt is focused)'],
-            ['1 – 5', 'Switch active tool'],
-            ['Esc', 'Close modals'],
+            ['NES 8-bit', '54-color palette, very blocky, hard edges, 8×8 tile unit'],
+            ['Game Boy', '4-shade green mono, 160×144 scale aesthetic'],
+            ['SNES 16-bit', '256 colors, detailed sprites, smooth gradients'],
+            ['GBA 32-bit', 'Rich palette, smoother while remaining pixel art'],
+            ['Modern Pixel', 'HD pixel art, no era restriction, maximum detail'],
           ]}
         />
 
-        <SubTitle>Quality modes</SubTitle>
+        <H3>Background mode</H3>
+        <Table
+          headers={['Mode', 'Use case']}
+          rows={[
+            ['Transparent', 'Game engine sprites — adds alpha channel tokens, checkered preview'],
+            ['Dark', 'Moody atmospheric assets on dark backgrounds'],
+            ['Scene', 'Contextual environment — asset shown in its environment'],
+          ]}
+        />
+
+        {/* ── API Reference ────────────────────────────────────────────── */}
+        <H2 id="api">API Reference</H2>
+
+        <InfoBox variant="warn">
+          The REST API is currently for internal use. External API key authentication is on the roadmap.
+          For now, API calls require a valid session cookie (i.e., be signed in).
+        </InfoBox>
+
+        <H3>POST /api/generate</H3>
+        <P>Generate a single pixel art image.</P>
+
+        <Pre>{`POST /api/generate
+Content-Type: application/json
+
+{
+  "prompt": "iron sword with ornate crossguard",
+  "negPrompt": "",
+  "size": 64,
+  "stylePreset": "rpg_icon",
+  "assetCategory": "weapon",
+  "pixelEra": "modern",
+  "backgroundMode": "transparent",
+  "outlineStyle": "bold",
+  "paletteSize": 32,
+  "steps": 4,
+  "guidance": 3.5,
+  "seed": null,
+  "provider": "pollinations",
+  "useHD": false
+}`}</Pre>
+
+        <H3>Response</H3>
+        <Pre>{`{
+  "ok": true,
+  "jobId": "cm...",
+  "resultUrl": "data:image/png;base64,...",
+  "provider": "pollinations",
+  "resolvedSeed": 1234567,
+  "durationMs": 1823,
+  "width": 64,
+  "height": 64
+}`}</Pre>
+
+        <H3>POST /api/animate</H3>
+        <P>Generate a multi-frame GIF animation.</P>
+        <Pre>{`POST /api/animate
+Content-Type: application/json
+
+{
+  "prompt": "warrior knight, idle breathing",
+  "animationType": "idle",
+  "frameCount": 6,
+  "fps": 8,
+  "loop": "loop",
+  "size": 64,
+  "stylePreset": "character_idle",
+  "pixelEra": "modern"
+}`}</Pre>
+
+        <H3>GET /api/gallery</H3>
+        <P>Fetch public gallery assets.</P>
+        <Pre>{`GET /api/gallery?tool=generate&sort=newest&limit=20&cursor=<cursor>
+
+Response:
+{
+  "assets": [...],
+  "nextCursor": "...",
+  "hasMore": true,
+  "total": 147
+}`}</Pre>
+
+        {/* ── Plans & Credits ──────────────────────────────────────────── */}
+        <H2 id="credits">Plans & Credits</H2>
+
+        <H3>Standard generation (always free)</H3>
         <P>
-          WokGen has two quality modes, selectable in the Studio control panel:
+          Standard generation uses the Pollinations FLUX model. It is completely free and unlimited —
+          no account needed, no credits required. Quality is solid for rapid prototyping and casual use.
+        </P>
+
+        <H3>HD generation (requires credits)</H3>
+        <P>
+          HD generation uses Replicate&#39;s FLUX.1-schnell model, producing significantly higher quality
+          output. HD generation costs 1 HD credit per image.
+        </P>
+
+        <H3>Subscription plans</H3>
+        <Table
+          headers={['Plan', 'Price', 'Monthly HD credits', 'Notes']}
+          rows={[
+            ['Free', '$0', '0 (unlimited standard)', 'No card required'],
+            ['Plus', '$2/mo', '100', '~$0.02/credit'],
+            ['Pro', '$6/mo', '500', '~$0.012/credit, priority queue'],
+            ['Max', '$20/mo', '2,000', '~$0.01/credit, bulk export'],
+          ]}
+        />
+
+        <H3>Credit top-up packs</H3>
+        <P>
+          One-time credit purchases that never expire. Credits from top-up packs are used after your
+          monthly allocation runs out.
         </P>
         <Table
-          headers={['Mode', 'Provider', 'Cost', 'Requires']}
+          headers={['Pack', 'Price', 'Credits']}
           rows={[
-            ['Standard', 'Pollinations FLUX', 'Free, unlimited', 'Nothing — works as guest'],
-            ['HD ✦', 'Replicate FLUX.1-schnell', 'HD credits', 'Plus plan or credit pack'],
+            ['Micro', '$1', '30 credits'],
+            ['Small', '$3', '100 credits'],
+            ['Medium', '$8', '400 credits'],
+            ['Large', '$20', '1,200 credits (best value)'],
           ]}
         />
 
-        <HR />
-
-        {/* ── REST API ──────────────────────────────────────────────────── */}
-        <SectionTitle id="api" icon="⊞">REST API</SectionTitle>
-
         <P>
-          WokGen exposes a REST API that can be called programmatically. All endpoints
-          accept and return JSON.
+          Manage your subscription, view invoices, or cancel anytime at{' '}
+          <Link href="/billing" style={{ color: '#a78bfa', textDecoration: 'none' }}>wokgen.wokspec.org/billing</Link>.
         </P>
 
-        <Callout type="info">
-          All API routes are prefixed with <InlineCode>/api</InlineCode>.
-          The hosted API base URL is <InlineCode>https://wokgen.wokspec.org</InlineCode>.
-          Self-hosted default is <InlineCode>http://localhost:3000</InlineCode>.
-        </Callout>
+        {/* ── FAQ ──────────────────────────────────────────────────────── */}
+        <H2 id="faq">FAQ</H2>
 
-        {/* POST /api/generate */}
-        <SubTitle>POST /api/generate</SubTitle>
-        <P>Generate pixel art. Standard quality (Pollinations) is always free. HD quality requires credits.</P>
+        {[
+          {
+            q: 'Do I need an account to use WokGen?',
+            a: 'No — you can generate images without signing in using standard quality. An account is required to save to gallery, view history, and access HD generation.',
+          },
+          {
+            q: 'What is the difference between standard and HD?',
+            a: 'Standard uses Pollinations FLUX (free, fast, no limit). HD uses Replicate FLUX.1-schnell (costs 1 credit, higher quality, better prompt adherence).',
+          },
+          {
+            q: 'Do unused monthly credits roll over?',
+            a: 'On Plus: unused credits from the monthly allocation roll to your top-up bank. On Pro and Max: unused credits do not roll over, but you can always buy top-up packs.',
+          },
+          {
+            q: 'Can I use generated assets in commercial games?',
+            a: 'Yes. You own the output. WokGen places no restrictions on how you use generated assets. Check your game engine and distribution store for any policy on AI-generated art.',
+          },
+          {
+            q: 'Is there a self-hosted version?',
+            a: 'Yes — an open-source community edition is available at github.com/WokSpec/WokGen. It supports running your own instance with your own provider API keys.',
+          },
+          {
+            q: 'Why does my transparent background show colors?',
+            a: 'Most AI models generate on a white or black background — true transparency requires post-processing. Enable "Transparent" background mode for checkerboard preview and optimized tokens, then remove the background in your image editor or sprite tool.',
+          },
+          {
+            q: 'How do I cancel my subscription?',
+            a: 'Go to /billing and click "Manage billing →". You will be taken to the Stripe customer portal where you can cancel, pause, or switch plans.',
+          },
+          {
+            q: 'Is the API publicly available?',
+            a: 'An API key-based system for external integrations is on the roadmap. Currently, API access requires an active session (signed in).',
+          },
+        ].map(({ q, a }) => (
+          <div key={q} style={{ marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.35rem', fontFamily: 'var(--font-heading)' }}>{q}</p>
+            <p style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{a}</p>
+          </div>
+        ))}
 
-        <CodeBlock lang="json" label="Request body">
-{`{
-  "tool":        "generate",          // generate | animate | rotate | inpaint | scene
-  "prompt":      "iron sword, RPG icon, ornate crossguard",
-  "negPrompt":   "blurry, 3d render", // optional
-  "width":       512,                 // 32 | 64 | 128 | 256 | 512
-  "height":      512,
-  "quality":     "standard",          // "standard" (free) | "hd" (credits required)
-  "seed":        1337,                // optional — omit for random
-  "steps":       4,                   // optional
-  "guidance":    3.5,                 // optional
-  "stylePreset": "rpg_icon",          // optional
-  "isPublic":    false
-}`}
-        </CodeBlock>
-
-        <CodeBlock lang="json" label="Response">
-{`{
-  "ok":          true,
-  "job": {
-    "id":        "cly1abc...",
-    "tool":      "generate",
-    "status":    "succeeded",
-    "provider":  "pollinations",
-    "prompt":    "iron sword, RPG icon, ornate crossguard",
-    "width":     512,
-    "height":    512,
-    "seed":      1337,
-    "resultUrl": "https://...",
-    "isPublic":  false,
-    "createdAt": "2026-01-01T00:00:00.000Z"
-  },
-  "resultUrl":   "https://image.pollinations.ai/...",
-  "durationMs":  2100,
-  "resolvedSeed": 1337
-}`}
-        </CodeBlock>
-
-        <CodeBlock lang="bash" label="curl example">
-{`curl -X POST https://wokgen.wokspec.org/api/generate \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "prompt": "health potion, glowing red liquid, crystal vial",
-    "quality": "standard",
-    "width": 256,
-    "stylePreset": "rpg_icon"
-  }'`}
-        </CodeBlock>
-
-        {/* GET /api/jobs/[id] */}
-        <SubTitle>GET /api/jobs/[id]</SubTitle>
-        <P>Fetch the current state of a job by its ID.</P>
-        <CodeBlock lang="bash">
-{`GET /api/jobs/cly1abc123`}
-        </CodeBlock>
-
-        {/* PATCH /api/jobs/[id] */}
-        <SubTitle>PATCH /api/jobs/[id]</SubTitle>
-        <P>Update a job's title, visibility, or tags.</P>
-        <CodeBlock lang="json" label="Request body">
-{`{
-  "title":    "Iron Sword — Legendary",
-  "isPublic": true,
-  "tags":     ["weapon", "sword", "legendary", "rpg"]
-}`}
-        </CodeBlock>
-
-        {/* DELETE /api/jobs/[id] */}
-        <SubTitle>DELETE /api/jobs/[id]</SubTitle>
-        <P>Permanently delete a job and its gallery asset (if any). Image URLs hosted on provider CDNs are not affected.</P>
-
-        {/* GET /api/gallery */}
-        <SubTitle>GET /api/gallery</SubTitle>
-        <P>List public gallery assets with filtering and pagination.</P>
-        <Table
-          headers={['Parameter', 'Type', 'Default', 'Description']}
-          rows={[
-            ['limit',  'number', '24',    'Max results (1–100)'],
-            ['cursor', 'string', '—',     'Pagination cursor from previous response'],
-            ['tool',   'string', '—',     'Filter by tool: generate | animate | rotate | inpaint | scene'],
-            ['rarity', 'string', '—',     'Filter by rarity: common | uncommon | rare | epic | legendary'],
-            ['search', 'string', '—',     'Substring search on prompt and title'],
-            ['sort',   'string', 'newest','newest | oldest'],
-          ]}
-        />
-
-        {/* POST /api/gallery */}
-        <SubTitle>POST /api/gallery</SubTitle>
-        <P>Promote a succeeded job to the public gallery.</P>
-        <CodeBlock lang="json" label="Request body">
-{`{
-  "jobId":    "cly1abc123",
-  "title":    "Iron Sword",
-  "rarity":   "rare",
-  "isPublic": true,
-  "tags":     ["weapon", "sword"]
-}`}
-        </CodeBlock>
-
-        {/* GET /api/providers */}
-        <SubTitle>GET /api/providers</SubTitle>
-        <P>
-          Returns availability status for all configured providers. Does not expose key values —
-          only boolean presence flags. Used by the Studio UI to determine which providers are ready.
-        </P>
-
-        <HR />
-
-        {/* ── Provider Setup ────────────────────────────────────────────── */}
-        <SectionTitle id="providers" icon="☁">Provider Setup</SectionTitle>
-
-        <P>
-          Hosted WokGen uses two providers. Self-hosted deployments can also add fal.ai or a local ComfyUI instance.
-        </P>
-
-        <Callout type="tip">
-          <strong>Standard generation</strong> uses Pollinations — completely free, no key needed,
-          works for guests and signed-in users alike.
-          <strong> HD generation</strong> uses Replicate and requires <InlineCode>REPLICATE_API_TOKEN</InlineCode>
-          on the server (hosted: your Vercel env; self-hosted: your <InlineCode>.env.local</InlineCode>).
-        </Callout>
-
-        <SubTitle>Pollinations (standard — no key)</SubTitle>
-        <P>
-          Free FLUX model via <a href="https://pollinations.ai" style={{ color: 'var(--accent)' }}>pollinations.ai</a>.
-          No API key, no account, no rate limits enforced by the provider.
-          Used automatically for all standard quality requests.
-        </P>
-
-        <SubTitle>Replicate (HD)</SubTitle>
-        <P>
-          Runs FLUX.1-schnell and SDXL in the cloud with higher quality output.
-          On the hosted app, this is gated behind HD credits. On self-hosted, any request
-          with <InlineCode>quality: &quot;hd&quot;</InlineCode> will use this if the token is set.
-        </P>
-        <CodeBlock lang="bash">
-{`# 1. Sign up at https://replicate.com/
-# 2. Get your token: https://replicate.com/account/api-tokens
-# 3. Add to .env.local (or Vercel env):
-REPLICATE_API_TOKEN=r8_xxxxxxxxxxxxxxxxxxxxxxxx`}
-        </CodeBlock>
-
-        <SubTitle>fal.ai (optional)</SubTitle>
-        <P>Fast inference with FLUX models. Free trial credits on signup.</P>
-        <CodeBlock lang="bash">
-{`# 1. Sign up at https://fal.ai/
-# 2. Get your key: https://fal.ai/dashboard/keys
-# 3. Add to .env.local:
-FAL_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`}
-        </CodeBlock>
-
-        <SubTitle>ComfyUI (Local)</SubTitle>
-        <P>
-          Run your own ComfyUI instance locally or on a remote server. 100% free — runs on your GPU
-          using any checkpoint you have installed.
-        </P>
-        <CodeBlock lang="bash">
-{`# 1. Install ComfyUI:
-git clone https://github.com/comfyanonymous/ComfyUI.git
-cd ComfyUI
-python3 -m pip install -r requirements.txt
-
-# 2. Download a checkpoint (e.g. v1-5-pruned-emaonly.safetensors)
-#    and place it in ComfyUI/models/checkpoints/
-
-# 3. Start ComfyUI:
-python main.py --listen 127.0.0.1 --port 8188
-
-# 4. Add to .env.local:
-COMFYUI_HOST=http://127.0.0.1:8188`}
-        </CodeBlock>
-
-        <Callout type="info">
-          When using Docker, set <InlineCode>COMFYUI_HOST=http://host.docker.internal:8188</InlineCode>
-          to reach a ComfyUI instance running on the host machine.
-        </Callout>
-
-        <HR />
-
-        {/* ── Asset Pipeline CLI ────────────────────────────────────────── */}
-        <SectionTitle id="pipeline" icon="⚙">Asset Pipeline CLI</SectionTitle>
-
-        <P>
-          The <InlineCode>packages/asset-pipeline</InlineCode> package is a production-grade
-          batch generation tool for building game asset catalogs. It is separate from the
-          web studio — use it when you need to generate dozens or hundreds of assets
-          programmatically.
-        </P>
-
-        <SubTitle>Quick start</SubTitle>
-        <CodeBlock lang="bash">
-{`cd packages/asset-pipeline
-npm install
-export REPLICATE_API_TOKEN=r8_...
-
-# Run the interactive TUI:
-npm start
-
-# Or run the full pipeline non-interactively:
-npm run cycle                              # 5 items, default categories
-npm run cycle -- --category items/weapons  # filter to weapons
-npm run cycle -- --engine cpu              # CPU procedural fallback (no AI)`}
-        </CodeBlock>
-
-        <SubTitle>Pipeline stages</SubTitle>
-        <Table
-          headers={['Command', 'Description']}
-          rows={[
-            [<InlineCode>npm run prompts</InlineCode>, 'Generate deterministic prompt jobs from the 450+ item catalog'],
-            [<InlineCode>npm run gen</InlineCode>,     'Call Replicate SDXL/FLUX to generate raw images'],
-            [<InlineCode>npm run normalize</InlineCode>, 'Resize, remap palette, and enforce pixel art constraints'],
-            [<InlineCode>npm run package</InlineCode>,   'Export icon variants at 32/64/128/256/512px and build sprite sheets'],
-            [<InlineCode>npm run validate</InlineCode>,  'Validate dimensions, alpha, palette membership, file sizes, duplicates'],
-            [<InlineCode>npm run registry</InlineCode>,  'Build registry/assets.json — single source of truth for game lookups'],
-            [<InlineCode>npm run all</InlineCode>,       'Run all stages in sequence'],
-          ]}
-        />
-
-        <SubTitle>Dataset intake</SubTitle>
-        <P>
-          Drop downloaded art packs into <InlineCode>dataset/inbox/</InlineCode> with optional
-          license metadata in <InlineCode>dataset/inbox/_licenses.csv</InlineCode>. The intake
-          pipeline filters by license (CC0, CC-BY-*, OGA-BY), deduplicates by hash, and
-          generates an attribution file.
-        </P>
-        <CodeBlock lang="bash">
-{`npm run data:reset           # clean workspace
-# drag files into dataset/inbox/
-npm run data:intake          # accept/reject by license, dedup, build ATTRIBUTION.md
-npm run data:report          # dry run — show what would happen`}
-        </CodeBlock>
-
-        <HR />
-
-        {/* ── Self-Hosting ──────────────────────────────────────────────── */}
-        <SectionTitle id="self-hosting" icon="🖥">Self-Hosting</SectionTitle>
-
-        <P>
-          WokGen is designed to run on any server with Node.js 20+ and no external
-          dependencies beyond the SQLite database file. No Redis, no queues, no external
-          storage required.
-        </P>
-
-        <SubTitle>Production build</SubTitle>
-        <CodeBlock lang="bash">
-{`cd apps/web
-npm run build
-npm run start        # serves at http://localhost:3000`}
-        </CodeBlock>
-
-        <SubTitle>Environment variables</SubTitle>
-        <Table
-          headers={['Variable', 'Required', 'Default', 'Description']}
-          rows={[
-            [<InlineCode>DATABASE_URL</InlineCode>, '✓', '—', 'DB connection — file:./dev.db for SQLite; Neon postgres URL for production'],
-            [<InlineCode>AUTH_SECRET</InlineCode>, 'hosted', '—', 'NextAuth v5 JWT secret — generate with: openssl rand -base64 32'],
-            [<InlineCode>AUTH_GITHUB_ID</InlineCode>, 'hosted', '—', 'GitHub OAuth app client ID'],
-            [<InlineCode>AUTH_GITHUB_SECRET</InlineCode>, 'hosted', '—', 'GitHub OAuth app client secret'],
-            [<InlineCode>AUTH_URL</InlineCode>, 'hosted', '—', 'Canonical URL, e.g. https://wokgen.wokspec.org (NextAuth v5)'],
-            [<InlineCode>REPLICATE_API_TOKEN</InlineCode>, '—', '—', 'Required for HD generation (Replicate FLUX/SDXL)'],
-            [<InlineCode>FAL_API_KEY</InlineCode>, '—', '—', 'fal.ai API key (optional HD provider)'],
-            [<InlineCode>COMFYUI_HOST</InlineCode>, '—', 'http://127.0.0.1:8188', 'ComfyUI base URL'],
-            [<InlineCode>COMFYUI_CHECKPOINT</InlineCode>, '—', 'v1-5-pruned-emaonly.safetensors', 'Default ComfyUI checkpoint filename'],
-            [<InlineCode>STRIPE_SECRET_KEY</InlineCode>, 'billing', '—', 'Stripe secret key for subscription + credit pack checkout'],
-            [<InlineCode>STRIPE_WEBHOOK_SECRET</InlineCode>, 'billing', '—', 'Stripe webhook signing secret'],
-            [<InlineCode>STRIPE_PRICE_ID_PLUS</InlineCode>, 'billing', '—', 'Stripe price ID for Plus plan ($2/mo)'],
-            [<InlineCode>STRIPE_PRICE_ID_PRO</InlineCode>, 'billing', '—', 'Stripe price ID for Pro plan ($6/mo)'],
-            [<InlineCode>STRIPE_PRICE_ID_MAX</InlineCode>, 'billing', '—', 'Stripe price ID for Max plan ($15/mo)'],
-            [<InlineCode>NEXT_PUBLIC_BASE_URL</InlineCode>, '—', 'http://localhost:3000', 'Base URL for metadata and sitemap'],
-            [<InlineCode>GENERATION_TIMEOUT_MS</InlineCode>, '—', '300000', 'Per-request generation timeout in ms'],
-          ]}
-        />
-
-        <Callout type="warning">
-          Standard generation (Pollinations) requires no provider key.
-          HD generation requires <InlineCode>REPLICATE_API_TOKEN</InlineCode> on the server.
-          Never expose provider keys to the client.
-        </Callout>
-
-        <SubTitle>systemd service</SubTitle>
-        <CodeBlock lang="ini" label="/etc/systemd/system/wokgen.service">
-{`[Unit]
-Description=WokGen AI Pixel Art Studio
-After=network.target
-
-[Service]
-Type=simple
-User=wokgen
-WorkingDirectory=/opt/wokgen
-EnvironmentFile=/opt/wokgen/.env.local
-ExecStart=/usr/bin/node apps/web/node_modules/.bin/next start apps/web --port 3000
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target`}
-        </CodeBlock>
-
-        <CodeBlock lang="bash">
-{`sudo systemctl enable --now wokgen
-sudo systemctl status wokgen
-journalctl -u wokgen -f`}
-        </CodeBlock>
-
-        <HR />
-
-        {/* ── Docker ────────────────────────────────────────────────────── */}
-        <SectionTitle id="docker" icon="🐳">Docker</SectionTitle>
-
-        <P>
-          The included <InlineCode>Dockerfile</InlineCode> uses a multi-stage build to produce a
-          minimal production image. A persistent volume at <InlineCode>/data</InlineCode> stores
-          the SQLite database between container restarts.
-        </P>
-
-        <SubTitle>Build & run</SubTitle>
-        <CodeBlock lang="bash">
-{`# Build the image
-docker build -t wokgen .
-
-# Run with env file
-docker run -d \\
-  --name wokgen \\
-  -p 3000:3000 \\
-  --env-file .env.local \\
-  -v wokgen-data:/data \\
-  wokgen`}
-        </CodeBlock>
-
-        <SubTitle>docker-compose.yml</SubTitle>
-        <CodeBlock lang="yaml" label="docker-compose.yml">
-{`version: '3.8'
-services:
-  wokgen:
-    build: .
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env.local
-    environment:
-      - DATABASE_URL=file:/data/wokgen.db
-      - NODE_ENV=production
-    volumes:
-      - wokgen-data:/data
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/providers"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-volumes:
-  wokgen-data:`}
-        </CodeBlock>
-
-        <CodeBlock lang="bash">
-{`docker compose up -d
-docker compose logs -f wokgen`}
-        </CodeBlock>
-
-        <Callout type="info">
-          When using ComfyUI on the host machine from within Docker, set
-          <InlineCode>COMFYUI_HOST=http://host.docker.internal:8188</InlineCode>
-          in your <InlineCode>.env.local</InlineCode>.
-        </Callout>
-
-        <HR />
-
-        {/* ── License ───────────────────────────────────────────────────── */}
-        <SectionTitle id="license" icon="⚖">License</SectionTitle>
-
-        <P>
-          WokGen is licensed under the <strong>MIT License with Commons Clause</strong>.
-        </P>
-
-        <div
-          style={{
-            padding: '16px 18px',
-            borderRadius: 8,
-            background: 'var(--surface-overlay)',
-            border: '1px solid var(--surface-border)',
-            marginBottom: '1.25rem',
-          }}
-        >
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>
-            <strong style={{ color: 'var(--text-primary)' }}>MIT License</strong> — You are free to use,
-            copy, modify, and distribute the software for any purpose, including commercial use, subject to
-            the MIT conditions.<br /><br />
-            <strong style={{ color: 'var(--warning)' }}>Commons Clause</strong> — You may not sell the
-            software as an unmodified hosted service (i.e., you cannot offer "WokGen as a Service" without
-            significant modification). Self-hosting, modification, and personal/commercial use of outputs
-            are explicitly permitted.
+        <div style={{ marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)' }}>
+            WokGen is built by{' '}
+            <a href="https://wokspec.org" style={{ color: '#a78bfa', textDecoration: 'none' }}>WokSpec</a>.
+            {' '}View the{' '}
+            <a href="https://github.com/WokSpec/WokGen" target="_blank" rel="noopener noreferrer" style={{ color: '#a78bfa', textDecoration: 'none' }}>open-source repo</a>.
+            {' '}<Link href="/terms" style={{ color: 'var(--text-faint)', textDecoration: 'underline' }}>Terms</Link>
+            {' · '}<Link href="/privacy" style={{ color: 'var(--text-faint)', textDecoration: 'underline' }}>Privacy</Link>
           </p>
         </div>
-
-        <Table
-          headers={['Use case', 'Allowed']}
-          rows={[
-            ['Self-host for personal use', '✓ Yes'],
-            ['Self-host for your company', '✓ Yes'],
-            ['Modify and redistribute', '✓ Yes'],
-            ['Use generated images commercially', '✓ Yes'],
-            ['Sell hosted WokGen as a service (unmodified)', '✕ No (Commons Clause)'],
-          ]}
-        />
-
-        <P>
-          Copyright © 2026 Wok Specialists / WokGen Contributors.{' '}
-          <a
-            href="https://github.com/WokSpecialists/WokGen/blob/main/LICENSE"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Full license text →
-          </a>
-        </P>
-
-        {/* Bottom nav */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 12,
-            paddingTop: 24,
-            marginTop: 12,
-            borderTop: '1px solid var(--surface-border)',
-          }}
-        >
-          <Link href="/studio" className="btn-primary btn-sm">
-            ✦ Open Studio
-          </Link>
-          <Link href="/gallery" className="btn-secondary btn-sm">
-            Browse Gallery
-          </Link>
-          <a
-            href="https://github.com/WokSpecialists/WokGen"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-ghost btn-sm"
-          >
-            GitHub →
-          </a>
-        </div>
-
       </main>
     </div>
   );

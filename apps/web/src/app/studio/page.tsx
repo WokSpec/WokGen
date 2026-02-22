@@ -23,6 +23,9 @@ interface GenerationResult {
   resultUrls: string[] | null;
   durationMs?: number;
   resolvedSeed?: number;
+  width?: number;
+  height?: number;
+  seed?: number | null;
 }
 
 interface ProviderInfo {
@@ -601,6 +604,9 @@ function OutputPanel({
   batchResults,
   selectedBatch,
   onSelectBatch,
+  bgMode,
+  tool,
+  onFillPrompt,
 }: {
   status: JobStatus;
   result: GenerationResult | null;
@@ -613,6 +619,9 @@ function OutputPanel({
   batchResults?: GenerationResult[];
   selectedBatch?: number;
   onSelectBatch?: (i: number) => void;
+  bgMode?: string;
+  tool?: string;
+  onFillPrompt?: (p: string) => void;
 }) {
   const [zoom, setZoom] = useState(1);
   const [activeUrl, setActiveUrl] = useState<string | null>(null);
@@ -638,22 +647,70 @@ function OutputPanel({
   }, [result]);
 
   if (status === 'idle') {
+    const idleExamples = (tool ? EXAMPLE_PROMPTS[tool as Tool] ?? EXAMPLE_PROMPTS.generate : EXAMPLE_PROMPTS.generate).slice(0, 4);
     return (
-      <div className="output-canvas flex-1">
-        <div className="empty-state">
+      <div className="output-canvas flex-1" style={{ background: 'var(--surface-muted)' }}>
+        <div className="empty-state" style={{ maxWidth: 380, textAlign: 'center' }}>
+          {/* Pixel art inspired placeholder grid */}
           <div
-            className="empty-state-icon"
-            style={{ fontSize: '2.5rem' }}
+            aria-hidden="true"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(8, 10px)',
+              gap: 2,
+              marginBottom: '1.5rem',
+              opacity: 0.18,
+            }}
           >
-            ✦
+            {Array.from({ length: 64 }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: 10, height: 10, borderRadius: 2,
+                  background: [0, 7, 14, 21, 42, 49, 56, 63, 9, 18, 27, 36, 45, 54].includes(i) ? '#a78bfa' : '#333',
+                }}
+              />
+            ))}
           </div>
-          <h3 className="empty-state-title">Ready to generate</h3>
-          <p className="empty-state-body">
-            Set your prompt in the left panel and click Generate.
+          <h3 className="empty-state-title" style={{ marginBottom: '0.5rem' }}>Start with a prompt</h3>
+          <p className="empty-state-body" style={{ marginBottom: '1.25rem' }}>
+            Describe what you want — or click an example below.
           </p>
-          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-disabled)' }}>
+          {onFillPrompt && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%' }}>
+              {idleExamples.map((ex, i) => (
+                <button
+                  key={i}
+                  onClick={() => onFillPrompt(ex)}
+                  style={{
+                    textAlign: 'left',
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: 4,
+                    border: '1px solid var(--surface-border)',
+                    background: 'var(--surface-raised)',
+                    color: 'var(--text-muted)',
+                    fontSize: '0.76rem',
+                    lineHeight: 1.4,
+                    cursor: 'pointer',
+                    transition: 'border-color 0.15s, color 0.15s',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(167,139,250,.4)';
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--text)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--surface-border)';
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)';
+                  }}
+                >
+                  <span style={{ color: '#a78bfa', marginRight: '0.4rem' }}>✦</span>{ex}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-disabled)', marginTop: '1.25rem' }}>
             <kbd>⌘</kbd><span>+</span><kbd>↵</kbd>
-            <span style={{ color: 'var(--text-disabled)' }}>to generate</span>
+            <span>to generate</span>
           </div>
         </div>
       </div>
@@ -815,7 +872,18 @@ function OutputPanel({
       </div>
 
       {/* Canvas */}
-      <div className="output-canvas flex-1 relative overflow-auto p-8">
+      <div
+        className="output-canvas flex-1 relative overflow-auto"
+        style={{
+          background: bgMode === 'transparent'
+            ? 'repeating-conic-gradient(#1a1a1a 0% 25%, #111 0% 50%) 0 0 / 16px 16px'
+            : 'var(--surface-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem',
+        }}
+      >
         {urls.length > 1 ? (
           // Multi-output grid (rotate / scene)
           <div className="flex flex-col items-center gap-6 w-full">
@@ -830,20 +898,34 @@ function OutputPanel({
                       ? '2px solid var(--accent)'
                       : '1px solid var(--surface-border)',
                     boxShadow: activeUrl === url ? 'var(--glow-md)' : undefined,
+                    background: 'transparent',
                   }}
                 >
                   <img
                     src={url}
                     alt={`Result ${i + 1}`}
-                    className="pixel-art max-w-[200px] max-h-[200px] object-contain"
-                    style={{ transform: `scale(${zoom})`, transformOrigin: 'center', transition: 'transform 0.15s ease' }}
+                    className="pixel-art"
+                    style={{ maxWidth: 200, maxHeight: 200, objectFit: 'contain', transform: `scale(${zoom})`, transformOrigin: 'center', transition: 'transform 0.15s ease' }}
                   />
                 </button>
               ))}
             </div>
           </div>
         ) : activeUrl ? (
-          <div className="output-image-frame p-4">
+          <div
+            className="output-image-frame"
+            style={{
+              background: 'transparent',
+              border: '1px solid rgba(167,139,250,.15)',
+              borderRadius: 4,
+              padding: '0.75rem',
+              maxWidth: '90%',
+              maxHeight: '90%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <img
               src={activeUrl}
               alt="Generated result"
@@ -854,10 +936,37 @@ function OutputPanel({
                 transformOrigin: 'center',
                 transition: 'transform 0.15s ease',
                 maxWidth: '100%',
+                maxHeight: '100%',
+                display: 'block',
               }}
             />
           </div>
         ) : null}
+
+        {/* Size + provider readout */}
+        {result && activeUrl && (
+          <div style={{
+            position: 'absolute',
+            bottom: '0.75rem',
+            right: '0.75rem',
+            display: 'flex',
+            gap: '0.5rem',
+            alignItems: 'center',
+          }}>
+            {activeUrl.startsWith('data:image/gif') && (
+              <span style={{
+                fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+                padding: '2px 6px', borderRadius: 3,
+                background: 'rgba(52,211,153,.15)', color: '#34d399', border: '1px solid rgba(52,211,153,.3)',
+              }}>GIF</span>
+            )}
+            {result.width && result.height && (
+              <span style={{ fontSize: '0.65rem', color: 'var(--text-disabled)', background: 'rgba(0,0,0,.5)', padding: '2px 6px', borderRadius: 3 }}>
+                {result.width}×{result.height}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Batch thumbnail strip */}
@@ -1915,12 +2024,21 @@ function StudioInner() {
       result?.resultUrls?.[0];
     if (!url) return;
 
+    // Build a descriptive filename
+    const promptSlug = prompt.trim().slice(0, 40).replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
+    const ext = url.startsWith('data:image/gif') || url.includes('.gif') ? 'gif' : 'png';
+    const w = result?.width ?? size;
+    const h = result?.height ?? size;
+    const sizeStr = `${w}x${h}`;
+    const seedStr = (result?.resolvedSeed ?? result?.seed) != null ? `-s${result?.resolvedSeed ?? result?.seed}` : '';
+    const filename = `wokgen-${activeTool}-${sizeStr}-${promptSlug || 'asset'}${seedStr}.${ext}`;
+
     const a = document.createElement('a');
     a.href = url;
-    a.download = `wokgen-${activeTool}-${Date.now()}.png`;
+    a.download = filename;
     a.click();
     toastSuccess('Image downloaded');
-  }, [result, activeTool, toastSuccess]);
+  }, [result, activeTool, prompt, size, toastSuccess]);
 
   // ── Save to gallery ────────────────────────────────────────────────────────
   const handleSaveToGallery = useCallback(async () => {
@@ -2318,6 +2436,9 @@ function StudioInner() {
           savedToGallery={savedToGallery}
           batchResults={batchResults}
           selectedBatch={selectedBatch}
+          bgMode={bgMode}
+          tool={activeTool}
+          onFillPrompt={setPrompt}
           onSelectBatch={(i) => {
             setSelectedBatch(i);
             setResult(batchResults[i] ?? null);

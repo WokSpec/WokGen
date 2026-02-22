@@ -85,18 +85,19 @@ const PACKS = [
 
 export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdCredits }: Props) {
   const [loading, setLoading] = useState<string | null>(null);
-  const [toast, setToast]     = useState<string | null>(null);
+  const [toast, setToast]     = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const highlightPlan = searchParams.get('plan') ?? null;
 
   useEffect(() => {
     const success = searchParams.get('success');
     const creditsSuccess = searchParams.get('credits_success');
     if (success === '1') {
-      setToast('Subscription activated! Your credits are ready.');
+      setToast({ msg: 'Subscription activated! Your credits are ready.', type: 'success' });
       router.replace('/billing');
     } else if (creditsSuccess === '1') {
-      setToast('Credits added to your account!');
+      setToast({ msg: 'Credits added to your account!', type: 'success' });
       router.replace('/billing');
     }
   }, [searchParams, router]);
@@ -111,8 +112,8 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-      else alert(data.error ?? 'Checkout failed.');
-    } catch { alert('Failed to start checkout. Please try again.'); }
+      else setToast({ msg: data.error ?? 'Checkout failed. Please try again.', type: 'error' });
+    } catch { setToast({ msg: 'Network error. Please try again.', type: 'error' }); }
     finally { setLoading(null); }
   };
 
@@ -125,8 +126,8 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-      else alert(data.error ?? 'Checkout failed.');
-    } catch { alert('Failed to start checkout. Please try again.'); }
+      else setToast({ msg: data.error ?? 'Checkout failed. Please try again.', type: 'error' });
+    } catch { setToast({ msg: 'Network error. Please try again.', type: 'error' }); }
     finally { setLoading(null); }
   };
 
@@ -136,7 +137,8 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
       const res  = await fetch('/api/billing/portal', { method: 'POST' });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-    } catch { alert('Failed to open billing portal.'); }
+      else setToast({ msg: data.error ?? 'Could not open billing portal.', type: 'error' });
+    } catch { setToast({ msg: 'Network error. Please try again.', type: 'error' }); }
     finally { setLoading(null); }
   };
 
@@ -148,24 +150,39 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
   return (
     <main style={{ maxWidth: 1040, margin: '0 auto', padding: '3rem 1.5rem' }}>
 
-      {/* ── Success toast ─────────────────────────────────────────────── */}
+      {/* ── Toast ─────────────────────────────────────────────── */}
       {toast && (
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: 'rgba(167,139,250,.12)', border: '1px solid rgba(167,139,250,.3)',
+          background: toast.type === 'error' ? 'rgba(239,68,68,.1)' : 'rgba(167,139,250,.12)',
+          border: `1px solid ${toast.type === 'error' ? 'rgba(239,68,68,.3)' : 'rgba(167,139,250,.3)'}`,
           borderRadius: 4, padding: '0.75rem 1rem', marginBottom: '1.5rem',
-          fontSize: '0.875rem', color: '#c4b5fd',
+          fontSize: '0.875rem',
+          color: toast.type === 'error' ? '#fca5a5' : '#c4b5fd',
         }}>
-          <span>✓ {toast}</span>
+          <span>{toast.type === 'error' ? '⚠ ' : '✓ '}{toast.msg}</span>
           <button
             onClick={() => setToast(null)}
-            style={{ background: 'none', border: 'none', color: '#c4b5fd', cursor: 'pointer', fontSize: '1rem', lineHeight: 1 }}
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '1rem', lineHeight: 1, marginLeft: '1rem' }}
             aria-label="Dismiss"
           >×</button>
         </div>
       )}
 
-      {/* ── Header ──────────────────────────────────────────────────── */}
+      {/* ── Stripe unavailable banner ────────────────────────────── */}
+      {!stripeEnabled && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '0.75rem',
+          background: 'rgba(245,158,11,.07)', border: '1px solid rgba(245,158,11,.25)',
+          borderRadius: 4, padding: '0.75rem 1rem', marginBottom: '1.5rem',
+          fontSize: '0.83rem', color: '#fcd34d',
+        }}>
+          <span style={{ fontSize: '1rem' }}>⚠</span>
+          <span>Billing is not configured on this deployment. Standard generation is still free and unlimited.</span>
+        </div>
+      )}
+
+
       <div style={{ marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)', color: 'var(--text)' }}>
           Plans & Credits
@@ -199,15 +216,17 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '3rem' }}>
         {sortedPlans.map((plan) => {
           const meta      = PLAN_META[plan.id] ?? { tagline: '', features: [] };
-          const isCurrent = plan.id === currentPlanId;
-          const isPopular = meta.badge === 'Most Popular';
+          const isCurrent   = plan.id === currentPlanId;
+          const isPopular   = meta.badge === 'Most Popular';
+          const isHighlight = plan.id === highlightPlan && !isCurrent;
           const isPaid    = plan.priceUsdCents > 0;
           const isDowngrade = isPaid && (plans.find(p => p.id === currentPlanId)?.priceUsdCents ?? 0) > plan.priceUsdCents;
 
           return (
             <div key={plan.id} style={{
               background: 'var(--bg-surface)',
-              border: `1px solid ${isCurrent ? 'rgba(167,139,250,.5)' : isPopular ? 'rgba(167,139,250,.25)' : 'var(--border)'}`,
+              border: `1px solid ${isCurrent ? 'rgba(167,139,250,.5)' : isHighlight ? 'rgba(167,139,250,.6)' : isPopular ? 'rgba(167,139,250,.25)' : 'var(--border)'}`,
+              boxShadow: isHighlight ? '0 0 0 2px rgba(167,139,250,.25)' : undefined,
               borderRadius: 4,
               padding: '1.5rem',
               display: 'flex',

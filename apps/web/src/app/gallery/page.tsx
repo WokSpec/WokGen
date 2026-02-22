@@ -57,17 +57,21 @@ const SORT_OPTIONS = [
 ] as const;
 
 const PROVIDER_COLORS: Record<string, string> = {
-  replicate: '#0066FF',
-  fal:       '#7B2FBE',
-  together:  '#00A67D',
-  comfyui:   '#E06C00',
+  replicate:    '#0066FF',
+  fal:          '#7B2FBE',
+  together:     '#00A67D',
+  comfyui:      '#E06C00',
+  huggingface:  '#FF9D00',
+  pollinations: '#a78bfa',
 };
 
 const PROVIDER_LABELS: Record<string, string> = {
-  replicate: 'Replicate',
-  fal:       'fal.ai',
-  together:  'Together.ai',
-  comfyui:   'ComfyUI',
+  replicate:    'Replicate',
+  fal:          'fal.ai',
+  together:     'Together.ai',
+  comfyui:      'ComfyUI',
+  huggingface:  'HuggingFace',
+  pollinations: 'Pollinations',
 };
 
 const RARITY_COLORS: Record<string, string> = {
@@ -621,18 +625,7 @@ function GalleryCard({
       aria-label={asset.title ?? asset.prompt}
     >
       {/* Image */}
-      <div
-        style={{
-          width: '100%',
-          aspectRatio: '1',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'var(--surface-muted)',
-          padding: 8,
-          position: 'relative',
-        }}
-      >
+      <div className="gallery-card-image">
         <img
           src={asset.thumbUrl ?? asset.imageUrl}
           alt={asset.title ?? asset.prompt}
@@ -708,42 +701,88 @@ function GalleryCard({
 // Empty state
 // ---------------------------------------------------------------------------
 
-function EmptyState({ search }: { search: string }) {
+// ---------------------------------------------------------------------------
+// Static showcase tiles (shown when gallery is empty)
+// ---------------------------------------------------------------------------
+
+const SHOWCASE_PROMPTS = [
+  { prompt: 'iron sword with ornate crossguard, battle-worn blade', tool: 'generate', size: 64 },
+  { prompt: 'health potion, glowing red liquid in crystal vial', tool: 'generate', size: 32 },
+  { prompt: 'warrior in plate armor, full body, front-facing sprite', tool: 'generate', size: 128 },
+  { prompt: 'treasure chest, gold-banded oak, glowing keyhole', tool: 'generate', size: 64 },
+  { prompt: 'dungeon stone floor tile, cracked and mossy', tool: 'scene', size: 64 },
+  { prompt: 'fire spirit creature, idle breathing animation', tool: 'animate', size: 64 },
+  { prompt: 'leather shield with iron boss, dented edge', tool: 'generate', size: 64 },
+  { prompt: 'skull key for dungeon door, ancient runes', tool: 'generate', size: 32 },
+] as const;
+
+function ShowcaseCard({ item, index }: { item: typeof SHOWCASE_PROMPTS[number]; index: number }) {
   return (
-    <div className="empty-state" style={{ gridColumn: '1 / -1', padding: '80px 20px' }}>
-      <div className="empty-state-icon animate-float" style={{ fontSize: '2rem', animationDuration: '4s' }}>
-        🖼
+    <a
+      href={`/studio?prompt=${encodeURIComponent(item.prompt)}`}
+      className="gallery-card"
+      style={{
+        textDecoration: 'none',
+        animationDelay: `${index * 0.04}s`,
+      }}
+    >
+      <div className="gallery-card-image">
+        {/* Placeholder pixel grid */}
+        <div aria-hidden="true" style={{
+          width: '100%', height: '100%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          opacity: 0.25,
+        }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 12px)', gap: 3 }}>
+            {Array.from({ length: 36 }).map((_, i) => (
+              <div key={i} style={{
+                width: 12, height: 12, borderRadius: 2,
+                background: [0, 5, 12, 17, 23, 30, 35].includes(i) ? '#a78bfa' : '#333',
+              }} />
+            ))}
+          </div>
+        </div>
       </div>
-      <h3 className="empty-state-title">
-        {search ? 'No results found' : 'Gallery is empty'}
-      </h3>
-      <p className="empty-state-body">
-        {search
-          ? `No assets match "${search}". Try a different search term.`
-          : 'Generate some pixel art in the Studio and save it to the gallery to see it here.'}
-      </p>
-      {!search && (
-        <a
-          href="/studio"
-          style={{
-            marginTop: 8,
-            padding: '8px 18px',
-            borderRadius: 6,
-            background: 'var(--accent)',
-            color: '#0d0d14',
-            fontSize: '0.82rem',
-            fontWeight: 600,
-            textDecoration: 'none',
-            transition: 'all 0.15s ease',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          ✦ Open Studio
-        </a>
-      )}
-    </div>
+      <div className="gallery-card-overlay" style={{ opacity: 1, background: 'linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.2) 60%, transparent 100%)' }}>
+        <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', lineHeight: 1.4, marginBottom: 6 }}>
+          {item.prompt}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: '0.58rem', color: '#a78bfa', background: 'rgba(167,139,250,.15)', border: '1px solid rgba(167,139,250,.25)', borderRadius: 3, padding: '1px 5px' }}>
+            Try this →
+          </span>
+          <span style={{ fontSize: '0.58rem', color: 'var(--text-disabled)' }}>{item.size}px</span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function EmptyState({ search }: { search: string }) {
+  if (search) {
+    return (
+      <div className="empty-state" style={{ gridColumn: '1 / -1', padding: '80px 20px' }}>
+        <div className="empty-state-icon" style={{ fontSize: '2rem' }}>🔍</div>
+        <h3 className="empty-state-title">No results for &ldquo;{search}&rdquo;</h3>
+        <p className="empty-state-body">Try a different search term or clear filters.</p>
+      </div>
+    );
+  }
+  return (
+    <>
+      <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2.5rem 0 1.25rem' }}>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+          No community assets yet — be the first to share!
+        </p>
+        <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>
+          Generate something in the Studio and save it to the gallery.
+          Here are some prompt ideas to get you started:
+        </p>
+      </div>
+      {SHOWCASE_PROMPTS.map((item, i) => (
+        <ShowcaseCard key={i} item={item} index={i} />
+      ))}
+    </>
   );
 }
 

@@ -7,17 +7,24 @@ import { useState, useEffect } from 'react';
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const TOOLS = [
-  { id: 'generate', icon: '✦', label: 'Generate',     description: 'Text → pixel art sprite or scene at any resolution.' },
-  { id: 'animate',  icon: '▶', label: 'Animate',      description: 'Turn a static sprite into a looping animation.' },
-  { id: 'rotate',   icon: '↻', label: 'Rotate',       description: '4 or 8-direction views from a single sprite.' },
-  { id: 'inpaint',  icon: '⬛', label: 'Inpaint',      description: 'Edit specific regions with a brush mask.' },
-  { id: 'scene',    icon: '⊞', label: 'Scenes',       description: 'Generate tilesets, maps, and environments.' },
+  { id: 'generate', icon: '✦', label: 'Generate',  description: 'Text-to-pixel-art. Any style, size, era, or category.', example: 'iron sword, ornate crossguard' },
+  { id: 'animate',  icon: '▶', label: 'Animate',   description: 'Static sprites become looping GIF animations in seconds.', example: 'knight walking cycle, 8 frames' },
+  { id: 'rotate',   icon: '↻', label: 'Rotate',    description: '4 or 8-direction turntable views from a single character.', example: 'warrior sprite, all 4 directions' },
+  { id: 'inpaint',  icon: '⬛', label: 'Inpaint',   description: 'Mask + repaint any region with brush-precision edits.', example: 'replace sword with axe' },
+  { id: 'scene',    icon: '⊞', label: 'Scenes',    description: 'Full tilesets, maps, and environments — entire game scenes.', example: 'dungeon stone floor tileset' },
 ] as const;
 
 const STEPS = [
-  { n: '01', title: 'Sign in',       body: 'Create a free account. No credit card required.' },
-  { n: '02', title: 'Describe',      body: 'Type a prompt. Standard generation is always free.' },
-  { n: '03', title: 'Export',        body: 'Download your asset. Use it however you want.' },
+  { n: '01', title: 'Sign in',  body: 'Create a free account with GitHub. No credit card required.' },
+  { n: '02', title: 'Describe', body: 'Type a prompt. Choose your style, size, and era. Generate.' },
+  { n: '03', title: 'Export',   body: 'Download your PNG or GIF. License is yours — use it anywhere.' },
+] as const;
+
+const FEATURES = [
+  { icon: '∞', label: 'Free forever',     body: 'Standard generation is unlimited. Always free.' },
+  { icon: '⚡', label: 'HD quality',       body: 'Upgrade for Replicate FLUX.1 at HD resolution.' },
+  { icon: '🎞', label: 'Real GIF animate', body: 'Multi-frame GIF generation — not just a filter.' },
+  { icon: '🎮', label: 'Game-ready',       body: 'Transparent bg, pixel-perfect, export-ready.' },
 ] as const;
 
 const EXAMPLE_PROMPTS = [
@@ -36,9 +43,9 @@ const EXAMPLE_PROMPTS = [
 ] as const;
 
 const PLANS = [
-  { id: 'free',  label: 'Free',    price: '$0',   note: 'Forever',   features: ['Unlimited standard generation', 'Pollinations AI', 'Download originals'], accent: 'var(--text-muted)', highlight: false },
-  { id: 'plus',  label: 'Plus',    price: '$2',   note: '/month',    features: ['100 HD credits/mo', 'Replicate models', 'FLUX.1 quality'],                   accent: '#a78bfa', highlight: true },
-  { id: 'pro',   label: 'Pro',     price: '$6',   note: '/month',    features: ['500 HD credits/mo', 'Priority queue', 'All Plus features'],                 accent: '#a78bfa', highlight: false },
+  { id: 'free',  label: 'Free',  price: '$0',  note: 'Forever',  features: ['Unlimited standard generation', 'Pollinations AI model', 'Download originals'], highlight: false },
+  { id: 'plus',  label: 'Plus',  price: '$2',  note: '/month',   features: ['100 HD credits/mo', 'Replicate FLUX.1', 'FLUX-quality output'], highlight: true },
+  { id: 'pro',   label: 'Pro',   price: '$6',  note: '/month',   features: ['500 HD credits/mo', 'Priority queue', 'All Plus features'], highlight: false },
 ] as const;
 
 // ─── Subcomponents ───────────────────────────────────────────────────────────
@@ -55,18 +62,37 @@ function ToolCard({ tool, index }: { tool: typeof TOOLS[number]; index: number }
         padding: '1.25rem',
         textDecoration: 'none',
         animationDelay: `${index * 0.06}s`,
-        transition: 'border-color 0.2s, background 0.2s',
+        transition: 'border-color 0.2s, background 0.2s, transform 0.15s',
       }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(167,139,250,0.35)'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = ''; }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(167,139,250,0.4)';
+        (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.borderColor = '';
+        (e.currentTarget as HTMLElement).style.transform = '';
+      }}
     >
       <span style={{ fontSize: '1.1rem', color: '#a78bfa', lineHeight: 1 }} aria-hidden="true">{tool.icon}</span>
       <div>
         <p style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.3rem', fontFamily: 'var(--font-heading)' }}>{tool.label}</p>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>{tool.description}</p>
       </div>
+      <p style={{ fontSize: '0.68rem', color: 'var(--text-faint)', fontStyle: 'italic', lineHeight: 1.4, margin: 0 }}>
+        e.g. &ldquo;{tool.example}&rdquo;
+      </p>
       <span style={{ fontSize: '0.7rem', color: 'var(--text-faint)', marginTop: 'auto' }}>Open in Studio →</span>
     </Link>
+  );
+}
+
+function FeatureCallout({ f }: { f: typeof FEATURES[number] }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <span style={{ fontSize: '1.4rem', lineHeight: 1 }} aria-hidden="true">{f.icon}</span>
+      <p style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text)', fontFamily: 'var(--font-heading)' }}>{f.label}</p>
+      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.55 }}>{f.body}</p>
+    </div>
   );
 }
 
@@ -89,20 +115,18 @@ function PlanCard({ plan }: { plan: typeof PLANS[number] }) {
         flexDirection: 'column',
         gap: '1rem',
         padding: '1.5rem',
-        borderColor: plan.highlight ? 'rgba(167,139,250,0.3)' : undefined,
+        borderColor: plan.highlight ? 'rgba(167,139,250,0.4)' : undefined,
+        boxShadow: plan.highlight ? '0 0 0 1px rgba(167,139,250,.15)' : undefined,
         position: 'relative',
       }}
     >
       {plan.highlight && (
-        <span
-          className="tag tag-purple"
-          style={{ position: 'absolute', top: '1rem', right: '1rem', fontSize: '0.6rem' }}
-        >
+        <span className="tag tag-purple" style={{ position: 'absolute', top: '1rem', right: '1rem', fontSize: '0.6rem' }}>
           Most popular
         </span>
       )}
       <div>
-        <p style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: plan.accent, fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
+        <p style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: plan.highlight ? '#a78bfa' : 'var(--text-muted)', fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
           {plan.label}
         </p>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
@@ -113,13 +137,13 @@ function PlanCard({ plan }: { plan: typeof PLANS[number] }) {
       <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', listStyle: 'none', padding: 0, margin: 0 }}>
         {plan.features.map(f => (
           <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            <span style={{ color: plan.accent, flexShrink: 0, marginTop: '0.1rem' }}>✓</span>
+            <span style={{ color: plan.highlight ? '#a78bfa' : 'var(--text-faint)', flexShrink: 0, marginTop: '0.1rem' }}>✓</span>
             {f}
           </li>
         ))}
       </ul>
       <Link
-        href="/billing"
+        href={`/billing?plan=${plan.id}`}
         className={plan.highlight ? 'btn-primary' : 'btn-ghost'}
         style={{ marginTop: 'auto', textAlign: 'center', fontSize: '0.8rem' }}
       >
@@ -146,78 +170,68 @@ export default function HomePage() {
         className="bg-grid"
         style={{ padding: 'clamp(4rem, 10vw, 7rem) 1.5rem', borderBottom: '1px solid var(--border)' }}
       >
-        {/* Purple orb */}
-        <div
-          className="orb orb-purple"
-          style={{ top: 0, left: '50%', transform: 'translateX(-50%)', width: 600, height: 400, opacity: 0.5 }}
-          aria-hidden="true"
-        />
+        <div className="orb orb-purple" style={{ top: 0, left: '50%', transform: 'translateX(-50%)', width: 700, height: 500, opacity: 0.45 }} aria-hidden="true" />
 
-        <div style={{ maxWidth: '52rem', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
+        <div style={{ maxWidth: '56rem', margin: '0 auto', position: 'relative' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '1.75rem' }}>
 
-          {/* Status badge */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            {/* Status badge */}
             <span className="tag tag-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-              <span
-                style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block', animation: 'pulse 2s infinite' }}
-                aria-hidden="true"
-              />
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block', animation: 'pulse 2s infinite' }} aria-hidden="true" />
               Open Beta · Free to use
             </span>
-          </div>
 
-          <h1
-            style={{
-              fontSize: 'clamp(2.2rem, 6vw, 3.5rem)',
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              lineHeight: 1.1,
-              marginBottom: '1.25rem',
-              fontFamily: 'var(--font-heading)',
-            }}
-          >
-            <span style={{ color: 'var(--text)' }}>Free AI pixel art.</span>
-            <br />
-            <span className="gradient-text">No setup required.</span>
-          </h1>
+            <div>
+              <h1 style={{ fontSize: 'clamp(2.4rem, 6vw, 3.75rem)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.08, marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
+                <span style={{ color: 'var(--text)' }}>AI pixel art,</span>
+                <br />
+                <span className="gradient-text">ready for your game.</span>
+              </h1>
+              <p style={{ fontSize: 'clamp(0.95rem, 2vw, 1.1rem)', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '40rem' }}>
+                Sign in with GitHub, type a prompt, generate. Standard quality is always free and unlimited.
+                HD generation is available on any paid plan.
+              </p>
+            </div>
 
-          <p style={{ fontSize: '1.05rem', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '38rem', margin: '0 auto 2.5rem' }}>
-            Sign in, type a prompt, generate. Standard quality is always free.
-            Upgrade for HD resolution and higher model quality.
-          </p>
-
-          {/* CTAs */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'center', alignItems: 'center' }}>
-            {session ? (
-              <Link href="/studio" className="btn-primary" style={{ minWidth: 160 }}>
-                Open Studio →
+            {/* CTAs */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+              {session ? (
+                <Link href="/studio" className="btn-primary" style={{ minWidth: 160, fontSize: '0.9rem', padding: '0.65rem 1.5rem' }}>
+                  Open Studio →
+                </Link>
+              ) : (
+                <Link href="/login" className="btn-primary" style={{ minWidth: 160, fontSize: '0.9rem', padding: '0.65rem 1.5rem' }}>
+                  Start for free →
+                </Link>
+              )}
+              <Link href="/gallery" className="btn-ghost" style={{ fontSize: '0.9rem' }}>
+                Browse Gallery
               </Link>
-            ) : (
-              <Link href="/login" className="btn-primary" style={{ minWidth: 160 }}>
-                Start for free →
+              <Link href="/docs" className="btn-ghost" style={{ fontSize: '0.9rem' }}>
+                Documentation
               </Link>
-            )}
-            <Link href="/gallery" className="btn-ghost">
-              Browse Gallery
-            </Link>
-          </div>
+            </div>
 
-          {/* Trust line */}
-          <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'var(--text-faint)' }}>
-            By{' '}
-            <a href="https://wokspec.org" style={{ color: 'var(--text-faint)', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
-              Wok Specialists
-            </a>
-            {' '}· Open-source · MIT + Commons Clause
-          </p>
-          {genCount !== null && genCount > 0 && (
-            <p style={{ marginTop: '0.5rem', fontSize: '0.72rem', color: 'var(--text-faint)' }}>
-              <span style={{ color: '#a78bfa', fontWeight: 600 }}>
-                {genCount.toLocaleString()}
-              </span>{' '}
-              pixel art assets generated so far
-            </p>
-          )}
+            {/* Social proof */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+              {genCount !== null && genCount > 0 && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-faint)' }}>
+                  <span style={{ color: '#a78bfa', fontWeight: 700 }}>{genCount.toLocaleString()}</span> assets generated
+                </span>
+              )}
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-faint)' }}>
+                By <a href="https://wokspec.org" style={{ color: 'var(--text-faint)', textDecoration: 'underline', textUnderlineOffset: '2px' }}>WokSpec</a>
+              </span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-faint)' }}>Open source</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Feature callouts ─────────────────────────────────────────────── */}
+      <section style={{ padding: '3rem 1.5rem', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: '64rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '2rem' }}>
+          {FEATURES.map(f => <FeatureCallout key={f.label} f={f} />)}
         </div>
       </section>
 
@@ -225,23 +239,14 @@ export default function HomePage() {
       <section style={{ padding: '4rem 1.5rem', background: 'var(--bg-elevated)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ maxWidth: '64rem', margin: '0 auto' }}>
           <div style={{ marginBottom: '2.5rem' }}>
-            <h2
-              style={{ fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)', color: 'var(--text)' }}
-            >
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)', color: 'var(--text)' }}>
               Five tools. One studio.
             </h2>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Everything needed to produce game-ready pixel art assets — all in one tab.
+              Everything you need to produce game-ready pixel art assets — all in one tab.
             </p>
           </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-              gap: '0.75rem',
-            }}
-          >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
             {TOOLS.map((tool, i) => <ToolCard key={tool.id} tool={tool} index={i} />)}
           </div>
         </div>
@@ -272,69 +277,33 @@ export default function HomePage() {
               Pricing
             </h2>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Start free. Pay only for HD model access. Cancel anytime.
+              Start free — no card required. Pay only for HD model access.
             </p>
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
             {PLANS.map(plan => <PlanCard key={plan.id} plan={plan} />)}
           </div>
-
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>
-            Need more? <Link href="/billing" style={{ color: '#a78bfa', textDecoration: 'none' }}>View all plans and credit packs →</Link>
-          </p>
-        </div>
-      </section>
-
-      {/* ── Callout ───────────────────────────────────────────────────────── */}
-      <section style={{ padding: '4rem 1.5rem', background: 'var(--bg)' }}>
-        <div style={{ maxWidth: '48rem', margin: '0 auto' }}>
-          <div
-            className="card"
-            style={{
-              padding: '2rem',
-              background: 'rgba(124,58,237,0.05)',
-              borderColor: 'rgba(167,139,250,0.2)',
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '1.5rem',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <p style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#a78bfa', fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
-                Batch workflows
-              </p>
-              <p style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.4rem', fontFamily: 'var(--font-heading)' }}>
-                Need bulk production? Use the Asset Pipeline.
-              </p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                <code style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>packages/asset-pipeline</code> runs
-                automated generate → normalize → package → validate cycles. 450+ item catalog included.
-              </p>
-            </div>
-            <a
-              href="https://github.com/WokSpec/WokGen/tree/main/packages/asset-pipeline"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-ghost"
-              style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
-            >
-              View on GitHub →
-            </a>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center' }}>
+            <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>
+              Need bulk HD credits?{' '}
+              <Link href="/billing" style={{ color: '#a78bfa', textDecoration: 'none' }}>View all plans and credit packs →</Link>
+            </p>
+            <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>
+              What is an HD credit?{' '}
+              <Link href="/docs#credits" style={{ color: '#a78bfa', textDecoration: 'none' }}>Learn more →</Link>
+            </p>
           </div>
         </div>
       </section>
 
       {/* ── Example prompts ─────────────────────────────────────────────────── */}
-      <section style={{ padding: '4rem 1.5rem', borderBottom: '1px solid var(--border)' }}>
+      <section style={{ padding: '4rem 1.5rem', borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
         <div style={{ maxWidth: '64rem', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: 'clamp(1.5rem,4vw,2rem)', fontWeight: 700, letterSpacing: '-0.02em', fontFamily: 'var(--font-heading)', color: 'var(--text)', marginBottom: '0.5rem' }}>
+            <h2 style={{ fontSize: 'clamp(1.3rem,3vw,1.75rem)', fontWeight: 700, letterSpacing: '-0.02em', fontFamily: 'var(--font-heading)', color: 'var(--text)', marginBottom: '0.5rem' }}>
               What will you create?
             </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
               Click any prompt to open it in the studio
             </p>
           </div>
@@ -346,15 +315,23 @@ export default function HomePage() {
                 style={{
                   display: 'block',
                   padding: '0.875rem 1rem',
-                  borderRadius: '0.625rem',
+                  borderRadius: '0.375rem',
                   border: '1px solid var(--border)',
                   background: 'var(--bg-elevated)',
                   color: 'var(--text-muted)',
                   fontSize: '0.8rem',
                   lineHeight: 1.5,
                   transition: 'all 0.15s',
+                  textDecoration: 'none',
                 }}
-                className="example-prompt-card"
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(167,139,250,.35)';
+                  (e.currentTarget as HTMLElement).style.color = 'var(--text)';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
+                  (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+                }}
               >
                 <span style={{ color: '#a78bfa', marginRight: '0.375rem' }}>✦</span>
                 {p}
@@ -367,3 +344,4 @@ export default function HomePage() {
     </div>
   );
 }
+

@@ -27,7 +27,7 @@ export const uiuxMode: ModeContract = {
   licenseKey: 'code_ownership',
   routes: { landing: '/uiux', studio: '/uiux/studio', gallery: '/uiux/gallery', docs: '/docs/uiux' },
   servicePairing: { label: 'WokSpec Product Engineering', description: 'Need this in production? WokSpec builds products.', href: 'https://wokspec.org' },
-  status: 'coming_soon',
+  status: 'live',
   targetUsers: ['Startup founders', 'Front-end developers', 'Product designers', 'Indie hackers'],
   notFor: ['Pixel art', 'Image generation', 'SVG icons'],
   examplePrompts: [

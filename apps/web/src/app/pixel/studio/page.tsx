@@ -707,6 +707,8 @@ function OutputPanel({
   bgMode,
   tool,
   onFillPrompt,
+  showPixelGrid,
+  setShowPixelGrid,
 }: {
   status: JobStatus;
   result: GenerationResult | null;
@@ -722,8 +724,10 @@ function OutputPanel({
   bgMode?: string;
   tool?: string;
   onFillPrompt?: (p: string) => void;
+  showPixelGrid?: boolean;
+  setShowPixelGrid?: (v: boolean) => void;
 }) {
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState<1|2|4>(1);
   const [activeUrl, setActiveUrl] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
 
@@ -908,36 +912,38 @@ function OutputPanel({
     <div className="flex flex-col h-full overflow-hidden animate-fade-in">
       {/* Toolbar */}
       <div
-        className="flex items-center gap-2 px-4 py-2 flex-shrink-0"
+        className="flex items-center gap-2 px-4 py-2 flex-shrink-0 flex-wrap"
         style={{ borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-raised)' }}
       >
-        {/* Zoom */}
+        {/* Zoom — snap buttons */}
         <div className="flex items-center gap-1">
-          <button
-            className="btn-ghost btn-icon"
-            onClick={() => setZoom((z) => Math.max(0.5, z - 0.5))}
-            title="Zoom out"
-            aria-label="Zoom out"
-          >
-            −
-          </button>
-          <button
-            className="text-xs font-mono px-2 py-1 rounded transition-colors"
-            style={{ color: 'var(--text-muted)', minWidth: 44, textAlign: 'center' }}
-            onClick={() => setZoom(1)}
-            title="Reset zoom"
-          >
-            {Math.round(zoom * 100)}%
-          </button>
-          <button
-            className="btn-ghost btn-icon"
-            onClick={() => setZoom((z) => Math.min(8, z + 0.5))}
-            title="Zoom in"
-            aria-label="Zoom in"
-          >
-            +
-          </button>
+          {([1, 2, 4] as const).map((z) => (
+            <button
+              key={z}
+              className="btn-ghost btn-xs"
+              style={{
+                fontWeight: zoom === z ? 700 : 400,
+                background: zoom === z ? 'var(--accent-dim)' : 'transparent',
+                color: zoom === z ? 'var(--accent)' : 'var(--text-muted)',
+                border: zoom === z ? '1px solid var(--accent-muted)' : '1px solid transparent',
+                minWidth: 28,
+              }}
+              onClick={() => setZoom(z)}
+            >{z}×</button>
+          ))}
         </div>
+
+        {/* Pixel grid toggle */}
+        <button
+          className="btn-ghost btn-xs"
+          style={{
+            background: showPixelGrid ? 'var(--accent-dim)' : 'transparent',
+            color: showPixelGrid ? 'var(--accent)' : 'var(--text-muted)',
+            border: showPixelGrid ? '1px solid var(--accent-muted)' : '1px solid transparent',
+          }}
+          onClick={() => setShowPixelGrid?.(!showPixelGrid)}
+          title="Toggle pixel grid overlay"
+        >Grid</button>
 
         <div className="flex-1" />
 
@@ -1024,8 +1030,10 @@ function OutputPanel({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              position: 'relative',
             }}
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={activeUrl}
               alt="Generated result"
@@ -1040,6 +1048,20 @@ function OutputPanel({
                 display: 'block',
               }}
             />
+            {/* Pixel grid overlay */}
+            {showPixelGrid && (
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'absolute', inset: '0.75rem',
+                  backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent calc(100%/var(--grid-cells) - 1px),rgba(255,255,255,0.08) calc(100%/var(--grid-cells))), repeating-linear-gradient(90deg,transparent,transparent calc(100%/var(--grid-cells) - 1px),rgba(255,255,255,0.08) calc(100%/var(--grid-cells)))',
+                  // @ts-expect-error CSS custom prop
+                  '--grid-cells': result?.width ?? 64,
+                  pointerEvents: 'none',
+                  borderRadius: 2,
+                }}
+              />
+            )}
           </div>
         ) : null}
 
@@ -1108,14 +1130,19 @@ function OutputPanel({
       {/* Seed / meta strip */}
       {result && (
         <div
-          className="flex items-center gap-4 px-4 py-2 flex-shrink-0 text-xs"
+          className="flex items-center gap-4 px-4 py-2 flex-shrink-0 text-xs flex-wrap"
           style={{
             borderTop: '1px solid var(--surface-border)',
             background: 'var(--surface-raised)',
             color: 'var(--text-disabled)',
           }}
         >
-          <span>Job: <code style={{ color: 'var(--text-muted)' }}>{result.jobId.slice(0, 12)}…</code></span>
+          {result.width && result.height && (
+            <span style={{ color: 'var(--text-muted)' }}>
+              {result.width}×{result.height} · PNG
+              {' · ~'}{Math.round((result.width * result.height * 4) / 1024)}KB
+            </span>
+          )}
           {result.resolvedSeed != null && (
             <button
               className="flex items-center gap-1"
@@ -1175,6 +1202,13 @@ function GenerateForm({
   setAnimFps,
   animLoop,
   setAnimLoop,
+  animOutputFormat,
+  setAnimOutputFormat,
+  directionCount,
+  setDirectionCount,
+  refImageUrl,
+  setRefImageUrl,
+  refImageInputRef,
   seed,
   setSeed,
   steps,
@@ -1224,6 +1258,14 @@ function GenerateForm({
   setAnimFps: (v: number) => void;
   animLoop: 'infinite' | 'pingpong' | 'once';
   setAnimLoop: (v: 'infinite' | 'pingpong' | 'once') => void;
+  animOutputFormat: 'gif' | 'png_sequence';
+  setAnimOutputFormat: (v: 'gif' | 'png_sequence') => void;
+  // Directions-specific
+  directionCount: 4 | 8;
+  setDirectionCount: (v: 4 | 8) => void;
+  refImageUrl: string | null;
+  setRefImageUrl: (v: string | null) => void;
+  refImageInputRef: React.RefObject<HTMLInputElement>;
   seed: string;
   setSeed: (v: string) => void;
   steps: number;
@@ -1635,6 +1677,87 @@ function GenerateForm({
               {animFrameCount} frames @ {animFps}fps = {(animFrameCount / animFps).toFixed(1)}s GIF
               {animLoop === 'pingpong' ? ` (×2 ping-pong = ${((animFrameCount * 2 - 2) / animFps).toFixed(1)}s)` : ''}
             </p>
+            <div>
+              <label className="label" style={{ marginBottom: 6 }}>Output Format</label>
+              <div className="flex gap-1.5">
+                {([
+                  { id: 'gif',          label: '🎞 GIF'         },
+                  { id: 'png_sequence', label: '🗂 PNG Sequence' },
+                ] as { id: 'gif' | 'png_sequence'; label: string }[]).map((fmt) => (
+                  <button key={fmt.id} onClick={() => setAnimOutputFormat(fmt.id)}
+                    className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
+                    style={{
+                      background: animOutputFormat === fmt.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
+                      border: `1px solid ${animOutputFormat === fmt.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
+                      color: animOutputFormat === fmt.id ? 'var(--accent)' : 'var(--text-muted)',
+                    }}
+                  >{fmt.label}</button>
+                ))}
+              </div>
+              <p className="form-hint mt-1">GIF = ready to use. PNG Sequence = for manual animation import.</p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Directions controls (showDirControls) */}
+      {toolControls.showDirControls && (
+        <>
+          <SectionHeader>Direction Count</SectionHeader>
+          <div className="p-4 flex flex-col gap-3">
+            <div className="flex gap-1.5">
+              {([4, 8] as (4|8)[]).map((n) => (
+                <button key={n} onClick={() => setDirectionCount(n)}
+                  className="flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150 flex flex-col items-center"
+                  style={{
+                    background: directionCount === n ? 'var(--accent-dim)' : 'var(--surface-overlay)',
+                    border: `1px solid ${directionCount === n ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
+                    color: directionCount === n ? 'var(--accent)' : 'var(--text-muted)',
+                  }}
+                >
+                  <span className="font-bold">{n}</span>
+                  <span style={{ fontSize: '0.58rem', marginTop: 2 }}>
+                    {n === 4 ? 'N/S/E/W' : 'N/NE/E/SE/S/SW/W/NW'}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p className="form-hint">4-dir: top-down RPG. 8-dir: isometric or fighting games.</p>
+            <div>
+              <label className="label" style={{ marginBottom: 6 }}>Reference Image</label>
+              <input
+                ref={refImageInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => setRefImageUrl((ev.target?.result as string) ?? null);
+                  reader.readAsDataURL(f);
+                }}
+              />
+              {refImageUrl ? (
+                <div className="flex flex-col gap-1.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={refImageUrl} alt="Reference" style={{ width: 64, height: 64, imageRendering: 'pixelated', borderRadius: 4, border: '1px solid var(--surface-border)', objectFit: 'contain', background: 'var(--surface-overlay)' }} />
+                  <div className="flex gap-1.5">
+                    <button className="btn-ghost btn-xs flex-1" onClick={() => refImageInputRef.current?.click()}>Change</button>
+                    <button className="btn-ghost btn-xs flex-1" onClick={() => setRefImageUrl(null)}>Remove</button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="w-full py-3 rounded-md text-xs text-center transition-all duration-150"
+                  style={{ border: '1px dashed var(--surface-border)', color: 'var(--text-muted)', background: 'var(--surface-overlay)' }}
+                  onClick={() => refImageInputRef.current?.click()}
+                >
+                  + Upload reference sprite
+                </button>
+              )}
+              <p className="form-hint mt-1">Upload a front-facing sprite to maintain consistency across {directionCount} views.</p>
+            </div>
           </div>
         </>
       )}
@@ -1935,6 +2058,16 @@ function StudioInner() {
   const [animFrameCount, setAnimFrameCount] = useState(6);
   const [animFps, setAnimFps]             = useState(8);
   const [animLoop, setAnimLoop]           = useState<'infinite' | 'pingpong' | 'once'>('infinite');
+  const [animOutputFormat, setAnimOutputFormat] = useState<'gif' | 'png_sequence'>('gif');
+
+  // Directions tool state
+  const [directionCount, setDirectionCount] = useState<4 | 8>(4);
+  const [refImageUrl, setRefImageUrl]     = useState<string | null>(null);
+  const refImageInputRef                  = useRef<HTMLInputElement>(null);
+
+  // Output panel state
+  const [outputZoom, setOutputZoom]       = useState<1 | 2 | 4>(1);
+  const [showPixelGrid, setShowPixelGrid] = useState(false);
 
   // Job state
   const [jobStatus, setJobStatus]     = useState<JobStatus>('idle');
@@ -2140,6 +2273,10 @@ function StudioInner() {
         ...(activeWorkspaceId ? { projectId: activeWorkspaceId } : {}),
         ...(apiKeys[provider] ? { apiKey: apiKeys[provider] } : {}),
         ...(provider === 'comfyui' ? { comfyuiHost } : {}),
+        extra: {
+          ...((activeTool as string) === 'animate' ? { animationType, animFrameCount, animFps, animLoop, animOutputFormat } : {}),
+          ...((activeTool as string) === 'rotate'  ? { directionCount, refImageUrl: refImageUrl ?? undefined } : {}),
+        },
       });
 
       const seeds = Array.from({ length: batchCount }, (_, i) =>
@@ -2219,21 +2356,20 @@ function StudioInner() {
       result?.resultUrls?.[0];
     if (!url) return;
 
-    // Build a descriptive filename
-    const promptSlug = prompt.trim().slice(0, 40).replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
+    // Smart filename: wokgen-{preset}-{slug}-{seed}.ext
+    const promptSlug = prompt.trim().slice(0, 30).replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
     const ext = url.startsWith('data:image/gif') || url.includes('.gif') ? 'gif' : 'png';
-    const w = result?.width ?? size;
-    const h = result?.height ?? size;
-    const sizeStr = `${w}x${h}`;
-    const seedStr = (result?.resolvedSeed ?? result?.seed) != null ? `-s${result?.resolvedSeed ?? result?.seed}` : '';
-    const filename = `wokgen-${activeTool}-${sizeStr}-${promptSlug || 'asset'}${seedStr}.${ext}`;
+    const seedStr = (result?.resolvedSeed ?? (result as GenerationResult & { seed?: number })?.seed) != null
+      ? `-s${(result?.resolvedSeed ?? (result as GenerationResult & { seed?: number })?.seed)}`
+      : '';
+    const filename = `wokgen-${stylePreset}-${promptSlug || 'asset'}${seedStr}.${ext}`;
 
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.click();
     toastSuccess('Image downloaded');
-  }, [result, activeTool, prompt, size, toastSuccess]);
+  }, [result, stylePreset, prompt, toastSuccess]);
 
   // ── Save to gallery ────────────────────────────────────────────────────────
   const handleSaveToGallery = useCallback(async () => {
@@ -2483,6 +2619,13 @@ function StudioInner() {
           setAnimFps={setAnimFps}
           animLoop={animLoop}
           setAnimLoop={setAnimLoop}
+          animOutputFormat={animOutputFormat}
+          setAnimOutputFormat={setAnimOutputFormat}
+          directionCount={directionCount}
+          setDirectionCount={setDirectionCount}
+          refImageUrl={refImageUrl}
+          setRefImageUrl={setRefImageUrl}
+          refImageInputRef={refImageInputRef}
           seed={seed}
           setSeed={setSeed}
           steps={steps}
@@ -2665,6 +2808,8 @@ function StudioInner() {
           bgMode={bgMode}
           tool={activeTool}
           onFillPrompt={setPrompt}
+          showPixelGrid={showPixelGrid}
+          setShowPixelGrid={setShowPixelGrid}
           onSelectBatch={(i) => {
             setSelectedBatch(i);
             setResult(batchResults[i] ?? null);

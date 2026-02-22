@@ -41,11 +41,11 @@ type JobStatus = 'idle' | 'running' | 'succeeded' | 'failed';
 // Constants
 // ---------------------------------------------------------------------------
 const TOOLS: { id: BusinessTool; label: string; icon: string; desc: string }[] = [
-  { id: 'logo',       label: 'Logo',         icon: '⬛', desc: 'Brand logo marks and symbols' },
-  { id: 'brand-kit',  label: 'Brand Kit',    icon: '🎨', desc: 'Cohesive 4-image brand set' },
-  { id: 'slide',      label: 'Slide Asset',  icon: '📊', desc: 'Presentation backgrounds' },
-  { id: 'social',     label: 'Social Banner',icon: '📱', desc: 'Platform-optimised images' },
-  { id: 'web-hero',   label: 'Web Hero',     icon: '🌐', desc: 'Website hero backgrounds' },
+  { id: 'logo',       label: 'Logo Mark',        icon: '⬛', desc: 'Brand symbols and marks' },
+  { id: 'brand-kit',  label: 'Brand Kit (4×)',   icon: '🎨', desc: 'Full 4-image brand set' },
+  { id: 'slide',      label: 'Slide Visual',     icon: '📊', desc: '16:9 presentation backgrounds' },
+  { id: 'social',     label: 'Social Banner',    icon: '📱', desc: 'Platform-optimised sizes' },
+  { id: 'web-hero',   label: 'Hero Image',       icon: '🌐', desc: 'Website hero backgrounds' },
 ];
 
 const STYLES: { id: BusinessStyle; label: string }[] = [
@@ -68,14 +68,14 @@ const MOODS: { id: BusinessMood; label: string }[] = [
   { id: 'technical',    label: 'Technical' },
 ];
 
-const PLATFORMS: { id: BusinessPlatform; label: string; size: string }[] = [
-  { id: 'og_image',         label: 'OG / Meta',         size: '1200×630' },
-  { id: 'twitter_header',   label: 'Twitter Header',    size: '1500×500' },
-  { id: 'twitter_post',     label: 'Twitter Post',      size: '1080×1080' },
-  { id: 'instagram_square', label: 'Instagram Post',    size: '1080×1080' },
-  { id: 'instagram_story',  label: 'Instagram Story',   size: '1080×1920' },
-  { id: 'linkedin_banner',  label: 'LinkedIn Banner',   size: '1584×396' },
-  { id: 'youtube_art',      label: 'YouTube Art',       size: '2560×1440' },
+const PLATFORMS: { id: BusinessPlatform; label: string; size: string; icon: string }[] = [
+  { id: 'og_image',         label: 'OG / Meta',         size: '1200×630',  icon: '🔗' },
+  { id: 'twitter_header',   label: 'X/Twitter Header',  size: '1500×500',  icon: '𝕏' },
+  { id: 'twitter_post',     label: 'X/Twitter Post',    size: '1080×1080', icon: '𝕏' },
+  { id: 'instagram_square', label: 'Instagram Post',    size: '1080×1080', icon: '📸' },
+  { id: 'instagram_story',  label: 'Instagram Story',   size: '1080×1920', icon: '📲' },
+  { id: 'linkedin_banner',  label: 'LinkedIn Banner',   size: '1584×396',  icon: '💼' },
+  { id: 'youtube_art',      label: 'YouTube Art',       size: '2560×1440', icon: '▶' },
 ];
 
 const SLIDE_FORMATS = [
@@ -116,6 +116,7 @@ function BusinessStudioInner() {
   const [colorDirection, setColorDir]   = useState('');
   const [platform, setPlatform]         = useState<BusinessPlatform>('og_image');
   const [slideFormat, setSlideFormat]   = useState(SLIDE_FORMATS[0]);
+  const [logoBg, setLogoBg]             = useState<'white' | 'dark' | 'transparent'>('white');
   const [useHD, setUseHD]               = useState(false);
   const [isPublic, setIsPublic]         = useState(false);
 
@@ -218,6 +219,7 @@ function BusinessStudioInner() {
         businessStyle: style,
         businessMood: mood,
         businessPlatform: activeTool === 'social' ? platform : undefined,
+        logoBg: activeTool === 'logo' ? logoBg : undefined,
       },
     };
 
@@ -458,6 +460,28 @@ function BusinessStudioInner() {
           />
         </div>
 
+        {/* Logo background toggle */}
+        {activeTool === 'logo' && (
+          <div className="studio-control-section">
+            <label className="studio-label">Logo Background</label>
+            <div className="studio-preset-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+              {([
+                { id: 'white',       label: '⬜ White'       },
+                { id: 'dark',        label: '⬛ Dark'         },
+                { id: 'transparent', label: '🔲 Transparent' },
+              ] as { id: typeof logoBg; label: string }[]).map(opt => (
+                <button
+                  key={opt.id}
+                  className={`studio-preset-btn${logoBg === opt.id ? ' active' : ''}`}
+                  onClick={() => setLogoBg(opt.id)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Platform selector (social only) */}
         {activeTool === 'social' && (
           <div className="studio-control-section">
@@ -469,6 +493,7 @@ function BusinessStudioInner() {
                   className={`biz-platform-btn${platform === p.id ? ' active' : ''}`}
                   onClick={() => setPlatform(p.id)}
                 >
+                  <span className="biz-platform-icon">{p.icon}</span>
                   <span className="biz-platform-label">{p.label}</span>
                   <span className="biz-platform-size">{p.size}</span>
                 </button>

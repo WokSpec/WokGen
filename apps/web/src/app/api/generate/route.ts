@@ -139,13 +139,14 @@ export async function POST(req: NextRequest) {
   const resolvedByokKey  = isSelfHosted ? (typeof byokKey  === 'string' ? byokKey  : null) : null;
   const resolvedByokHost = isSelfHosted ? (typeof byokHost === 'string' ? byokHost : null) : null;
   // In hosted mode: use Replicate for HD requests.
-  // For standard: prefer Together.ai → HuggingFace (works with/without token) → Pollinations.
+  // For standard: prefer Together → fal → HuggingFace → Pollinations (free fallback).
   const resolvedProvider: ProviderName = isSelfHosted
     ? (provider as ProviderName)
     : useHD ? 'replicate'
     : process.env.TOGETHER_API_KEY ? 'together'
     : process.env.FAL_KEY ? 'fal'
-    : 'huggingface'; // works with HF_TOKEN (FLUX) or anonymously (SDXL-Turbo)
+    : process.env.HF_TOKEN ? 'huggingface'
+    : 'pollinations'; // last resort — no key needed but may have downtime
 
   // Guard: HD requires REPLICATE_API_TOKEN on server
   if (useHD && !process.env.REPLICATE_API_TOKEN) {
@@ -251,22 +252,31 @@ export async function POST(req: NextRequest) {
     let actualProvider: ProviderName = resolvedProvider;
     const result = await generate(resolvedProvider, genParams, config).catch(async (err: unknown) => {
       if (!isSelfHosted) {
-        // HuggingFace/Pollinations failed → try the other free one, then Replicate
-        if (resolvedProvider === 'huggingface') {
-          if (process.env.REPLICATE_API_TOKEN) {
-            console.warn('[generate] HuggingFace failed, falling back to Replicate:', (err as Error).message);
-            actualProvider = 'replicate';
-            return generate('replicate', genParams, resolveProviderConfig('replicate', null, null));
-          }
-        }
+        // Pollinations down → try HuggingFace (if key set) or Replicate as last resort
         if (resolvedProvider === 'pollinations') {
-          if (process.env.HF_TOKEN || true) { // HF works without token too
+          if (process.env.HF_TOKEN) {
             console.warn('[generate] Pollinations failed, falling back to HuggingFace:', (err as Error).message);
             actualProvider = 'huggingface';
             return generate('huggingface', genParams, resolveProviderConfig('huggingface', null, null));
           }
           if (process.env.REPLICATE_API_TOKEN) {
             console.warn('[generate] Pollinations failed, falling back to Replicate:', (err as Error).message);
+            actualProvider = 'replicate';
+            return generate('replicate', genParams, resolveProviderConfig('replicate', null, null));
+          }
+          // All fallbacks exhausted — return actionable error
+          throw Object.assign(
+            new Error(
+              'Generation unavailable: Pollinations is temporarily down and no backup provider is configured. ' +
+              'To fix this, set HF_TOKEN (free at huggingface.co/settings/tokens) or TOGETHER_API_KEY (free at api.together.ai) in your environment variables.'
+            ),
+            { statusCode: 503 }
+          );
+        }
+        // HuggingFace failed → fall back to Pollinations or Replicate
+        if (resolvedProvider === 'huggingface') {
+          if (process.env.REPLICATE_API_TOKEN) {
+            console.warn('[generate] HuggingFace failed, falling back to Replicate:', (err as Error).message);
             actualProvider = 'replicate';
             return generate('replicate', genParams, resolveProviderConfig('replicate', null, null));
           }

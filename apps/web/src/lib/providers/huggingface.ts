@@ -4,23 +4,18 @@
  * Requires a free HF account token (Read access):
  *   https://huggingface.co/settings/tokens
  *
+ * Uses the HF Inference Router: https://router.huggingface.co
  * Primary model: black-forest-labs/FLUX.1-schnell (fast, high quality)
- * Fallback model: stabilityai/stable-diffusion-xl-base-1.0
- *
- * API: POST https://api-inference.huggingface.co/models/{model}
- *      Authorization: Bearer {HF_TOKEN}
- *      Returns: binary PNG image
  */
 
 import type { ProviderConfig, GenerateParams, GenerateResult, ProviderError } from './types';
 import { STYLE_PRESET_TOKENS } from './types';
 
-const HF_BASE = 'https://api-inference.huggingface.co/models';
+// New HF Inference Router (replaces deprecated api-inference.huggingface.co)
+const HF_ROUTER = 'https://router.huggingface.co/hf-inference/models';
 
-/** With token: FLUX.1-schnell — fast, high quality (gated, requires free HF account) */
-const AUTHED_MODEL    = 'black-forest-labs/FLUX.1-schnell';
-/** Without token: SDXL-Turbo — public, no auth needed, works anonymously */
-const ANON_MODEL      = 'stabilityai/sdxl-turbo';
+/** FLUX.1-schnell via HF Inference Router (free with HF account token) */
+const DEFAULT_MODEL = 'black-forest-labs/FLUX.1-schnell';
 
 export async function huggingfaceGenerate(
   params: GenerateParams,
@@ -28,11 +23,18 @@ export async function huggingfaceGenerate(
 ): Promise<GenerateResult> {
   const t0 = Date.now();
 
-  // Use FLUX.1-schnell when authenticated, sdxl-turbo for anonymous access
-  const hasToken = Boolean(config.apiKey);
-  const model    = (params.modelOverride as string | undefined)
-    ?? (hasToken ? AUTHED_MODEL : ANON_MODEL);
+  if (!config.apiKey) {
+    const err = new Error(
+      'HuggingFace requires a free access token. ' +
+      'Get one at https://huggingface.co/settings/tokens (free account, no billing needed). ' +
+      'Set HF_TOKEN in your environment variables.'
+    ) as ProviderError;
+    err.provider   = 'huggingface';
+    err.statusCode = 401;
+    throw err;
+  }
 
+  const model  = (params.modelOverride as string | undefined) ?? DEFAULT_MODEL;
   const prompt = buildPrompt(params);
   const seed   = params.seed != null && params.seed > 0
     ? params.seed
@@ -41,29 +43,23 @@ export async function huggingfaceGenerate(
   const width  = snapSize(params.width  ?? 512);
   const height = snapSize(params.height ?? 512);
 
-  const steps = model.includes('schnell') ? 4
-    : model.includes('turbo') ? 1
-    : 20;
-
   const body: Record<string, unknown> = {
     inputs: prompt,
     parameters: {
-      num_inference_steps: steps,
+      num_inference_steps: model.includes('schnell') ? 4 : 20,
       width,
       height,
       seed,
-      ...(params.negPrompt && hasToken ? { negative_prompt: params.negPrompt } : {}),
+      ...(params.negPrompt ? { negative_prompt: params.negPrompt } : {}),
     },
     options: { wait_for_model: true },
   };
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    Accept: 'image/png,image/jpeg,*/*',
+    Authorization:  `Bearer ${config.apiKey}`,
+    Accept:         'image/png,image/jpeg,*/*',
   };
-  if (hasToken) {
-    headers['Authorization'] = `Bearer ${config.apiKey}`;
-  }
 
   const timeoutMs  = config.timeoutMs ?? 120_000;
   const controller = new AbortController();
@@ -71,7 +67,7 @@ export async function huggingfaceGenerate(
 
   let res: Response;
   try {
-    res = await fetch(`${HF_BASE}/${model}`, {
+    res = await fetch(`${HF_ROUTER}/${model}`, {
       method:  'POST',
       headers,
       body:    JSON.stringify(body),
@@ -81,31 +77,12 @@ export async function huggingfaceGenerate(
     clearTimeout(tid);
   }
 
-  // If FLUX.1-schnell fails (gated auth issue or cold start), fall back to ANON_MODEL
-  if (!res.ok && model === AUTHED_MODEL) {
-    const fallbackController = new AbortController();
-    const fallbackTid = setTimeout(() => fallbackController.abort(), timeoutMs);
-    try {
-      res = await fetch(`${HF_BASE}/${ANON_MODEL}`, {
-        method:  'POST',
-        headers,
-        body:    JSON.stringify({
-          ...body,
-          parameters: { ...body.parameters as object, num_inference_steps: 1 },
-        }),
-        signal:  fallbackController.signal,
-      });
-    } finally {
-      clearTimeout(fallbackTid);
-    }
-  }
-
   if (!res.ok) {
     let detail = `HTTP ${res.status}`;
     try {
       const txt = await res.text();
-      const j = JSON.parse(txt);
-      detail = j?.error ?? txt.slice(0, 200);
+      const j   = JSON.parse(txt);
+      detail    = j?.error ?? txt.slice(0, 200);
     } catch { /* ignore */ }
     const err = new Error(`HuggingFace API error: ${detail}`) as ProviderError;
     err.provider   = 'huggingface';
@@ -113,7 +90,6 @@ export async function huggingfaceGenerate(
     throw err;
   }
 
-  // Response is raw binary image bytes
   const contentType = res.headers.get('content-type') ?? 'image/png';
   const buffer      = await res.arrayBuffer();
   const base64      = Buffer.from(buffer).toString('base64');

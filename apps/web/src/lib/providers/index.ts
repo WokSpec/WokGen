@@ -68,15 +68,16 @@ export function assertKeyPresent(
   provider: ProviderName,
   config: ProviderConfig,
 ): void {
-  if (provider === 'comfyui' || provider === 'pollinations' || provider === 'huggingface') return; // no key needed (huggingface works with or without token)
+  if (provider === 'comfyui' || provider === 'pollinations') return; // no key needed
 
   if (!config.apiKey) {
-    const envVarNames: Record<Exclude<ProviderName, 'comfyui' | 'pollinations' | 'huggingface'>, string> = {
-      replicate: 'REPLICATE_API_TOKEN',
-      fal:       'FAL_KEY',
-      together:  'TOGETHER_API_KEY',
+    const envVarNames: Record<Exclude<ProviderName, 'comfyui' | 'pollinations'>, string> = {
+      replicate:   'REPLICATE_API_TOKEN',
+      fal:         'FAL_KEY',
+      together:    'TOGETHER_API_KEY',
+      huggingface: 'HF_TOKEN',
     };
-    const envVar = envVarNames[provider as Exclude<ProviderName, 'comfyui' | 'pollinations' | 'huggingface'>];
+    const envVar = envVarNames[provider as Exclude<ProviderName, 'comfyui' | 'pollinations'>];
     throw new Error(
       `No API key configured for provider "${provider}". ` +
         `Set ${envVar} in your .env.local file, or supply your key in the ` +

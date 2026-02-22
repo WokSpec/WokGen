@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'WokGen — Multi-Vertical AI Asset Generation Platform',
   description:
-    'WokGen is a multi-vertical generative asset platform. Pixel art for game devs, brand assets for businesses, vectors for designers, and more.',
+    'WokGen is a multi-engine AI asset factory — specialized pipelines for pixel art, brand systems, vectors, UI components, and more.',
   keywords: [
     'AI asset generator', 'pixel art AI', 'brand asset generator',
     'sprite generator', 'AI logo maker', 'WokGen', 'WokSpec',
@@ -146,10 +146,10 @@ export default function PlatformLanding() {
           </div>
           <h1 className="platform-h1">
             One platform.<br />
-            <span className="platform-h1-accent">Five asset engines.</span>
+            <span className="platform-h1-accent">Multiple asset engines.</span>
           </h1>
           <p className="platform-desc">
-            WokGen generates production-ready assets across every creative category.
+            WokGen is a multi-engine AI asset factory — specialized pipelines for every kind of digital asset. Pixel sprites, brand systems, UI components, vectors, and beyond.
             Game sprites, brand kits, social banners, icon sets, and code components —
             each with its own professional pipeline.
           </p>

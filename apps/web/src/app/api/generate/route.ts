@@ -17,6 +17,11 @@ import {
   type BusinessMood,
   type BusinessPlatform,
 } from '@/lib/prompt-builder-business';
+import { resolveOptimalProvider } from '@/lib/provider-router';
+import { assembleNegativePrompt, encodeNegativesIntoPositive } from '@/lib/negative-banks';
+import { validateAndSanitize } from '@/lib/prompt-validator';
+import { resolveQualityProfile } from '@/lib/quality-profiles';
+import { buildVariantPrompt } from '@/lib/variant-builder';
 
 // ---------------------------------------------------------------------------
 // POST /api/generate
@@ -158,14 +163,14 @@ export async function POST(req: NextRequest) {
   // In hosted mode: ignore any client-supplied provider keys
   const resolvedByokKey  = isSelfHosted ? (typeof byokKey  === 'string' ? byokKey  : null) : null;
   const resolvedByokHost = isSelfHosted ? (typeof byokHost === 'string' ? byokHost : null) : null;
-  // In hosted mode: use mode-specific HD model; standard falls back through chain.
+  // In hosted mode: use quality-aware provider matrix; self-hosted uses client-supplied provider
   const resolvedProvider: ProviderName = isSelfHosted
     ? (provider as ProviderName)
-    : useHD ? (modeContract.models.hdProvider as ProviderName)
-    : process.env.TOGETHER_API_KEY ? 'together'
-    : process.env.FAL_KEY ? 'fal'
-    : process.env.HF_TOKEN ? 'huggingface'
-    : 'pollinations';
+    : resolveOptimalProvider(
+        isSupportedMode(mode) ? String(mode) : 'pixel',
+        typeof tool === 'string' ? tool : 'generate',
+        useHD,
+      );
 
   // Override model for HD if mode specifies a specific model
   const effectiveModelOverride = useHD && modeContract.models.hdModelId && !modelOverride
@@ -189,6 +194,17 @@ export async function POST(req: NextRequest) {
   let effectiveNeg: string | undefined = typeof negPrompt === 'string' ? negPrompt.trim() || undefined : undefined;
   let effectiveWidth: number  = clampSize(Number(width)  || 512);
   let effectiveHeight: number = clampSize(Number(height) || 512);
+
+  // Apply batch variant mutation (sent by pixel studio as variantIndex in body)
+  const variantIndex = typeof body.variantIndex === 'number' ? body.variantIndex : 0;
+  if (variantIndex > 0 && effectivePrompt) {
+    effectivePrompt = buildVariantPrompt(
+      effectivePrompt,
+      variantIndex,
+      effectiveTool,
+      typeof stylePreset === 'string' ? stylePreset : undefined,
+    );
+  }
 
   if (resolvedMode === 'business') {
     // All business tools map to the standard 'generate' pipeline
@@ -234,6 +250,54 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
+
+  // --------------------------------------------------------------------------
+  // Prompt pipeline: validate + sanitize → negative bank assembly
+  // --------------------------------------------------------------------------
+  const validation = validateAndSanitize(
+    effectivePrompt,
+    effectiveNeg,
+    resolvedMode,
+    typeof stylePreset === 'string' ? stylePreset : undefined,
+    resolvedProvider,
+  );
+
+  if (validation.invalid) {
+    return NextResponse.json(
+      { error: validation.invalidReason ?? 'Prompt is too short or contains no meaningful content.' },
+      { status: 400 },
+    );
+  }
+
+  effectivePrompt = validation.sanitized;
+  effectiveNeg    = validation.sanitizedNeg || undefined;
+
+  // Assemble rich negative prompt (merges user neg + automatic banks)
+  // For business mode the route already built a neg above — augment it
+  const richNeg = assembleNegativePrompt(
+    effectiveTool,
+    typeof stylePreset === 'string' ? stylePreset : undefined,
+    effectiveNeg,
+    resolvedMode,
+  );
+
+  // Providers without native negative prompt support get negatives injected
+  // into the positive prompt via CLIP avoidance tokens
+  const { PROVIDER_CAPABILITIES } = await import('@/lib/providers/types');
+  const providerCaps = PROVIDER_CAPABILITIES[resolvedProvider];
+  if (providerCaps && !providerCaps.supportsNegativePrompt && richNeg) {
+    effectivePrompt = encodeNegativesIntoPositive(effectivePrompt, richNeg);
+    effectiveNeg    = undefined; // don't send neg to provider that ignores it
+  } else if (richNeg) {
+    effectiveNeg = richNeg;
+  }
+
+  // Resolve quality profile if client didn't supply steps/guidance
+  const qualityProfile = resolveQualityProfile(
+    typeof stylePreset === 'string' ? stylePreset : undefined,
+  );
+  const resolvedSteps    = typeof steps    === 'number' ? steps    : qualityProfile.steps;
+  const resolvedGuidance = typeof guidance === 'number' ? guidance : qualityProfile.guidance;
 
   if (!isValidTool(effectiveTool)) {
     return NextResponse.json(
@@ -314,8 +378,8 @@ export async function POST(req: NextRequest) {
     width:          effectiveWidth,
     height:         effectiveHeight,
     seed:           typeof seed === 'number' && seed > 0 ? seed : undefined,
-    steps:          typeof steps === 'number' ? steps : undefined,
-    guidance:       typeof guidance === 'number' ? guidance : undefined,
+    steps:          resolvedSteps,
+    guidance:       resolvedGuidance,
     stylePreset:    isValidStylePreset(stylePreset) ? stylePreset : undefined,
     assetCategory:  typeof assetCategory === 'string' ? assetCategory as GenerateParams['assetCategory'] : undefined,
     pixelEra:       typeof pixelEra === 'string' ? pixelEra as GenerateParams['pixelEra'] : undefined,

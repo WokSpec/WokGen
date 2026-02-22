@@ -2251,7 +2251,7 @@ function StudioInner() {
         return;
       }
 
-      const makeBody = (seedValue: number): Record<string, unknown> => ({
+      const makeBody = (seedValue: number, variantIndex: number = 0): Record<string, unknown> => ({
         tool:           activeTool,
         provider,
         mode:           'pixel',
@@ -2270,6 +2270,7 @@ function StudioInner() {
         isPublic,
         quality:        useHD ? 'hd' : 'standard',
         seed:           seedValue,
+        variantIndex,
         ...(activeWorkspaceId ? { projectId: activeWorkspaceId } : {}),
         ...(apiKeys[provider] ? { apiKey: apiKeys[provider] } : {}),
         ...(provider === 'comfyui' ? { comfyuiHost } : {}),
@@ -2283,11 +2284,11 @@ function StudioInner() {
         i === 0 ? baseSeed : baseSeed + i * 137
       );
 
-      const fetchOne = async (s: number) => {
+      const fetchOne = async (s: number, idx: number = 0) => {
         const res = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(makeBody(s)),
+          body: JSON.stringify(makeBody(s, idx)),
         });
         let data: Record<string, unknown> = {};
         try { data = await res.json(); } catch { throw new Error(`Server error (HTTP ${res.status})`); }
@@ -2314,7 +2315,7 @@ function StudioInner() {
           ]);
         }
       } else {
-        const results = await Promise.allSettled(seeds.map(fetchOne));
+        const results = await Promise.allSettled(seeds.map((s, idx) => fetchOne(s, idx)));
         const fulfilled = results
           .filter((r): r is PromiseFulfilledResult<GenerationResult> => r.status === 'fulfilled')
           .map(r => r.value);

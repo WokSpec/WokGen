@@ -192,8 +192,9 @@ export async function POST(req: NextRequest) {
 
   if (resolvedMode === 'business') {
     // All business tools map to the standard 'generate' pipeline
+    const originalTool = effectiveTool; // capture before override
     effectiveTool = 'generate';
-    const bizTool     = ((extraRecord.businessTool ?? effectiveTool) as BusinessTool) || 'logo';
+    const bizTool     = ((extraRecord.businessTool ?? originalTool) as BusinessTool) || 'logo';
     const bizStyle    = (extraRecord.businessStyle  ?? body.style)  as BusinessStyle  | undefined;
     const bizMood     = (extraRecord.businessMood   ?? body.mood)   as BusinessMood   | undefined;
     const bizPlatform = (extraRecord.businessPlatform ?? body.platform) as BusinessPlatform | undefined;

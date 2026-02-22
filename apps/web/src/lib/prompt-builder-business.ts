@@ -240,6 +240,19 @@ export function buildBusinessPrompt(params: BusinessPromptParams): BuiltBusiness
       height = 1080;
       break;
     }
+    default: {
+      // Fallback for unknown/unmapped tools — generic professional visual
+      prompt = [
+        `${concept}${industryStr} professional visual`,
+        styleStr,
+        moodStr,
+        'clean composition, high quality business design',
+        colorStr,
+      ].filter(Boolean).join(', ');
+      width  = 1024;
+      height = 1024;
+      break;
+    }
   }
 
   const negExtra = TOOL_NEGATIVE_EXTRA[tool] ?? '';

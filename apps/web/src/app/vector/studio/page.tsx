@@ -209,6 +209,7 @@ function VectorStudioInner() {
 
     const body = {
       prompt: enhancedPrompt,
+      _promptBuilt: true,
       tool: activeTool,
       mode: 'vector',
       width: size,

@@ -56,22 +56,18 @@ export async function GET(req: NextRequest) {
   // for SQLite we rely on the default LIKE behaviour which is case-insensitive
   // for ASCII characters — good enough for self-hosted usage).
   if (search && search.trim().length > 0) {
-    where.OR = [
+    const searchClause = [
       { prompt: { contains: search.trim() } },
       { title:  { contains: search.trim() } },
     ];
-    // Remove the top-level isPublic so it doesn't conflict with OR
-    delete where.isPublic;
+    // For mine queries keep the userId filter; for public queries keep isPublic filter
     where.AND = [
-      { isPublic: true },
-      {
-        OR: [
-          { prompt: { contains: search.trim() } },
-          { title:  { contains: search.trim() } },
-        ],
-      },
+      mine && authedUserId ? { job: { userId: authedUserId } } : { isPublic: true },
+      { OR: searchClause },
     ];
-    delete where.OR;
+    // Remove top-level keys that conflict with AND
+    delete where.isPublic;
+    if (mine) delete where.job;
   }
 
   const orderBy =

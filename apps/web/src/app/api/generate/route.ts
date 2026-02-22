@@ -158,6 +158,7 @@ export async function POST(req: NextRequest) {
     paletteSize,
     projectId,
     isPublic   = false,
+    _promptBuilt = false, // studio already built prompt — skip server-side enrichment
     // BYOK fields — only used in self-hosted mode; stripped in hosted mode
     apiKey: byokKey,
     comfyuiHost: byokHost,
@@ -261,7 +262,7 @@ export async function POST(req: NextRequest) {
   // --------------------------------------------------------------------------
   // Vector mode: enrich prompt via buildVectorPrompt
   // --------------------------------------------------------------------------
-  if (resolvedMode === 'vector' && effectivePrompt) {
+  if (resolvedMode === 'vector' && effectivePrompt && !_promptBuilt) {
     const vTool    = (extraRecord.vectorTool   ?? 'icon')    as VectorTool;
     const vStyle   = (extraRecord.vectorStyle  ?? 'outline') as VectorStyle;
     const vWeight  = (extraRecord.strokeWeight ?? 'regular') as VectorWeight;
@@ -285,7 +286,7 @@ export async function POST(req: NextRequest) {
   // --------------------------------------------------------------------------
   // Emoji mode: enrich prompt via buildEmojiPrompt
   // --------------------------------------------------------------------------
-  if (resolvedMode === 'emoji' && effectivePrompt) {
+  if (resolvedMode === 'emoji' && effectivePrompt && !_promptBuilt) {
     const eStyle    = (extraRecord.emojiStyle    ?? 'expressive')  as EmojiStyle;
     const ePlatform = (extraRecord.emojiPlatform ?? 'universal')   as EmojiPlatform;
     const eSize     = typeof body.targetSize === 'number' ? body.targetSize : 64;

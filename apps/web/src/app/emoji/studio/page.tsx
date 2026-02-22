@@ -176,6 +176,7 @@ function EmojiStudioInner() {
       tool:        'generate',
       mode:        'emoji',
       prompt:      buildPrompt(userPrompt, stylePreset, effectiveSize),
+      _promptBuilt: true,
       negPrompt:   NEG_PROMPT,
       width:       effectiveSize,
       height:      effectiveSize,

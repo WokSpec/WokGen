@@ -8751,3 +8751,90 @@ body {
   color: var(--text-disabled);
   margin-top: 32px;
 }
+
+/* ── Segment error boundaries ─────────────────────────────────────────────── */
+
+.seg-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+  background: #0d0d14;
+  padding: 32px;
+  text-align: center;
+}
+
+.seg-error-msg {
+  color: #f87171;
+  font-size: 0.95rem;
+  max-width: 480px;
+  margin: 0;
+}
+
+.seg-error-btn {
+  background: #4f8ef7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.seg-error-btn:hover {
+  background: #6ba0f9;
+}
+
+/* ── EmptyState ───────────────────────────────────────────────────────────── */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 12px;
+  text-align: center;
+  background: #0d0d14;
+}
+
+.empty-state-icon {
+  font-size: 2.5rem;
+  color: var(--text-muted, #6b7280);
+  margin-bottom: 4px;
+}
+
+.empty-state-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.empty-state-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  max-width: 400px;
+  margin: 0;
+}
+
+.empty-state-action {
+  display: inline-block;
+  margin-top: 4px;
+  background: #4f8ef7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.empty-state-action:hover {
+  background: #6ba0f9;
+}

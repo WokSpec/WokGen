@@ -1,23 +1,6 @@
 'use client';
 
-import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Pixel Studio — WokGen',
-  description: 'Generate pixel art sprites, icons, and game assets with AI.',
-  openGraph: {
-    title: 'Pixel Studio — WokGen',
-    description: 'Generate pixel art sprites, icons, and game assets with AI.',
-    images: [{ url: 'https://wokgen.wokspec.org/og.png', width: 1200, height: 630 }],
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Pixel Studio — WokGen',
-    description: 'Generate pixel art sprites, icons, and game assets with AI.',
-    images: ['https://wokgen.wokspec.org/og.png'],
-  },
-};
 
 
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
@@ -1012,6 +995,19 @@ function OutputPanel({
         <button className="btn-ghost btn-sm" onClick={onCopyImage} title="Copy image to clipboard">
           ⎘ Copy
         </button>
+        {result?.jobId && (
+          <button
+            className="btn-ghost btn-sm"
+            title="Copy share link"
+            onClick={() => {
+              const url = `${window.location.origin}/assets/${result.jobId}`;
+              navigator.clipboard.writeText(url).catch(() => {});
+              // toast handled by parent caller if wired; silent fallback here
+            }}
+          >
+            ⇧ Share
+          </button>
+        )}
         {result?.guestDownloadGated ? (
           <a
             href="/api/auth/signin"
@@ -1103,7 +1099,7 @@ function OutputPanel({
             <img
               src={displayUrl ?? activeUrl}
               alt="Generated result"
-              className="pixel-art"
+              className="pixel-art result-reveal"
               style={{
                 imageRendering: 'pixelated',
                 transform: `scale(${zoom})`,

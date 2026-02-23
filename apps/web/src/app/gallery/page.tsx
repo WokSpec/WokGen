@@ -17,5 +17,5 @@ export const metadata: Metadata = {
   },
 };
 
-import { redirect } from 'next/navigation';
-export default function GalleryRedirect() { redirect('/community'); }
+import GalleryClient from './_client';
+export default function GalleryPage() { return <GalleryClient />; }

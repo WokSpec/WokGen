@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { EmptyState } from '@/app/_components/EmptyState';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -240,9 +241,11 @@ export default function AutomationsClient() {
       {loading ? (
         <div className="automations-page__loading">Loading…</div>
       ) : automations.length === 0 ? (
-        <div className="automations-page__empty">
-          <p>No automations yet. Create your first to get started.</p>
-        </div>
+        <EmptyState
+          title="No automations yet"
+          description="Create your first automation to schedule messages, webhooks, and alerts."
+          action={{ label: 'New automation', onClick: () => setShowForm(true) }}
+        />
       ) : (
         <div className="automations-list">
           {automations.map(auto => (

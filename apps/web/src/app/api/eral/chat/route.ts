@@ -98,13 +98,13 @@ const PERSONALITY_MODIFIERS: Record<string, string> = {
 interface ChatRequest {
   message: string;
   conversationId?: string;
-  modelVariant?: 'eral-7c' | 'eral-mini' | 'eral-code' | 'eral-creative';
+  modelVariant?: 'eral-7c' | 'eral-mini' | 'eral-code' | 'eral-creative' | 'eral-gemini' | 'eral-fast';
   context?: {
     mode?: string;
     tool?: string;
     prompt?: string;
     studioContext?: string;
-    projectId?: string; // inject project asset context
+    projectId?: string;
   };
   stream?: boolean;
 }

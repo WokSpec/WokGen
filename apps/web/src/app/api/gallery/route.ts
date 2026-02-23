@@ -130,10 +130,17 @@ export async function GET(req: NextRequest) {
 
   if (cacheKey) await cache.set(cacheKey, responseBody, 30);
 
+  // Generate a simple ETag from the first asset ID + count for conditional GET support
+  const etag = `"${trimmed.length}-${trimmed[0]?.id ?? '0'}-${trimmed[trimmed.length - 1]?.id ?? '0'}"`;
+  const ifNoneMatch = req.headers.get('if-none-match');
+  if (!mine && ifNoneMatch === etag) {
+    return new NextResponse(null, { status: 304, headers: { 'ETag': etag, 'Cache-Control': 's-maxage=30, stale-while-revalidate=60' } });
+  }
+
   return NextResponse.json(responseBody, {
     headers: mine
       ? {}
-      : { 'Cache-Control': 's-maxage=30, stale-while-revalidate=60', 'X-Cache': 'MISS' },
+      : { 'Cache-Control': 's-maxage=30, stale-while-revalidate=60', 'X-Cache': 'MISS', 'ETag': etag },
   });
 }
 

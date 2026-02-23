@@ -1,6 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+
+
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -119,16 +122,7 @@ function capitalize(s: string): string {
 function Spinner() {
   return (
     <span
-      style={{
-        display: 'inline-block',
-        width: 20,
-        height: 20,
-        borderRadius: '50%',
-        border: '2px solid var(--surface-border)',
-        borderTopColor: 'var(--accent)',
-        animation: 'spin 0.7s linear infinite',
-        flexShrink: 0,
-      }}
+      className="community-spinner"
       aria-hidden="true"
     />
   );
@@ -139,20 +133,8 @@ function ModeBadge({ mode }: { mode: string }) {
   const label = MODE_LABELS[mode] ?? capitalize(mode);
   return (
     <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        padding: '2px 6px',
-        borderRadius: 4,
-        fontSize: '0.58rem',
-        fontWeight: 700,
-        letterSpacing: '0.05em',
-        textTransform: 'uppercase',
-        background: `${color}18`,
-        color,
-        border: `1px solid ${color}40`,
-        lineHeight: 1,
-      }}
+      className="community-mode-badge"
+      style={{ '--bc': color, '--bc-bg': `${color}18`, '--bc-border': `${color}40` } as React.CSSProperties}
     >
       {label}
     </span>
@@ -209,72 +191,49 @@ function AssetModal({
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 60,
-        background: 'rgba(0,0,0,0.85)',
-        backdropFilter: 'blur(6px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-      }}
+      className="community-modal-overlay"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       {hasPrev && (
         <button
           onClick={onPrev}
-          style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', background: 'var(--surface-overlay)', border: '1px solid var(--surface-border)', color: 'var(--text-secondary)', borderRadius: 8, width: 40, height: 40, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+          className="community-modal-nav-btn community-modal-nav-btn--prev"
           aria-label="Previous"
         >←</button>
       )}
       {hasNext && (
         <button
           onClick={onNext}
-          style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', background: 'var(--surface-overlay)', border: '1px solid var(--surface-border)', color: 'var(--text-secondary)', borderRadius: 8, width: 40, height: 40, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+          className="community-modal-nav-btn community-modal-nav-btn--next"
           aria-label="Next"
         >→</button>
       )}
 
-      <div
-        style={{
-          background: 'var(--surface-raised)',
-          border: '1px solid var(--surface-border)',
-          borderRadius: 12,
-          width: '100%',
-          maxWidth: 760,
-          maxHeight: 'calc(100dvh - 64px)',
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 0,
-        }}
-      >
+      <div className="community-modal-content">
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid var(--surface-border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="community-modal-header">
+          <div className="community-modal-header-left">
             {asset.mode && <ModeBadge mode={asset.mode} />}
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+            <span className="community-modal-tool-name">
               {capitalize(asset.tool)}
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className="community-modal-header-right">
             <button
               onClick={() => setZoom(nextZoom)}
-              style={{ fontSize: '0.7rem', padding: '4px 8px', borderRadius: 5, background: 'var(--surface-overlay)', border: '1px solid var(--surface-border)', color: 'var(--text-secondary)', cursor: 'pointer' }}
+              className="community-modal-btn"
             >
               {zoom}× zoom
             </button>
             <button
               onClick={download}
-              style={{ fontSize: '0.7rem', padding: '4px 8px', borderRadius: 5, background: 'var(--surface-overlay)', border: '1px solid var(--surface-border)', color: 'var(--text-secondary)', cursor: 'pointer' }}
+              className="community-modal-btn"
             >
               ↓ Download
             </button>
             <button
               onClick={onClose}
-              style={{ width: 28, height: 28, borderRadius: 6, background: 'transparent', border: '1px solid var(--surface-border)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              className="community-modal-close-btn"
               aria-label="Close"
             >
               ✕
@@ -283,46 +242,30 @@ function AssetModal({
         </div>
 
         {/* Image */}
-        <div
-          style={{
-            background: 'repeating-conic-gradient(#1a1a24 0% 25%, #13131b 0% 50%) 0 0 / 16px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 24,
-            minHeight: 260,
-          }}
-        >
+        <div className="community-modal-img-container">
           <img
             src={asset.imageUrl}
             alt={asset.title ?? asset.prompt}
-            style={{
-              maxWidth: '100%',
-              maxHeight: 480,
-              objectFit: 'contain',
-              imageRendering: asset.mode === 'pixel' ? 'pixelated' : 'auto',
-              transform: `scale(${zoom})`,
-              transformOrigin: 'center',
-              transition: 'transform 0.15s ease',
-            }}
+            className={`community-modal-img${asset.mode === 'pixel' ? ' community-modal-img--pixel' : ''}`}
+            style={{ transform: `scale(${zoom})` }}
           />
         </div>
 
         {/* Details */}
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="community-modal-details">
           {/* Prompt */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-disabled)' }}>Prompt</span>
+            <div className="community-modal-prompt-header">
+              <span className="community-modal-label">Prompt</span>
               <button
                 onClick={copyPrompt}
-                style={{ fontSize: '0.65rem', color: copied ? 'var(--success)' : 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                className={`community-modal-copy-btn${copied ? ' community-modal-copy-btn--copied' : ''}`}
               >
                 {copied ? '✓ Copied' : '⊕ Copy'}
               </button>
             </div>
             <p
-              style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0, padding: '8px 10px', background: 'var(--surface-overlay)', borderRadius: 6, border: '1px solid var(--surface-border)', cursor: 'pointer' }}
+              className="community-modal-prompt-text"
               onClick={copyPrompt}
               title="Click to copy"
             >
@@ -332,9 +275,9 @@ function AssetModal({
 
           {/* Tags */}
           {asset.tags?.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            <div className="community-modal-tags">
               {asset.tags.slice(0, 10).map((tag) => (
-                <span key={tag} style={{ fontSize: '0.65rem', padding: '2px 7px', borderRadius: 99, background: 'var(--surface-overlay)', border: '1px solid var(--surface-border)', color: 'var(--text-muted)' }}>
+                <span key={tag} className="community-modal-tag">
                   {tag}
                 </span>
               ))}
@@ -342,19 +285,19 @@ function AssetModal({
           )}
 
           {/* Meta row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', paddingTop: 4, borderTop: '1px solid var(--surface-border)' }}>
+          <div className="community-modal-meta">
             {asset.rarity && (
-              <span style={{ fontSize: '0.65rem', color: RARITY_COLORS[asset.rarity] ?? 'var(--text-muted)', fontWeight: 600 }}>
+              <span className="community-modal-rarity" style={{ color: RARITY_COLORS[asset.rarity] ?? 'var(--text-muted)' }}>
                 {capitalize(asset.rarity)}
               </span>
             )}
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-disabled)' }}>{asset.size}px</span>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-disabled)' }}>{timeAgo(asset.createdAt)}</span>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', color: 'var(--text-disabled)' }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: PROVIDER_COLORS[asset.provider] ?? '#666' }} />
+            <span className="community-modal-meta-item">{asset.size}px</span>
+            <span className="community-modal-meta-item">{timeAgo(asset.createdAt)}</span>
+            <span className="community-modal-provider">
+              <span className="community-modal-provider-dot" style={{ background: PROVIDER_COLORS[asset.provider] ?? '#666' }} />
               {PROVIDER_LABELS[asset.provider] ?? asset.provider}
             </span>
-            <span style={{ marginLeft: 'auto', fontSize: '0.65rem', fontFamily: 'monospace', color: 'var(--text-disabled)' }}>
+            <span className="community-modal-id">
               {asset.id.slice(0, 12)}…
             </span>
           </div>
@@ -375,14 +318,10 @@ function CommunityCard({ asset, index, onClick }: { asset: CommunityAsset; index
   return (
     <button
       onClick={onClick}
-      className="gallery-card animate-fade-in"
+      className="gallery-card animate-fade-in community-card-btn"
       style={{
         animationDelay: `${Math.min(index * 0.025, 0.5)}s`,
         boxShadow: rarityColor ? `0 0 0 1px ${rarityColor}25` : undefined,
-        textAlign: 'left',
-        width: '100%',
-        padding: 0,
-        position: 'relative',
       }}
       aria-label={asset.title ?? asset.prompt}
     >
@@ -396,35 +335,14 @@ function CommunityCard({ asset, index, onClick }: { asset: CommunityAsset; index
           unoptimized
           placeholder="blur"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-          style={{
-            imageRendering: asset.mode === 'pixel' ? 'pixelated' : 'auto',
-            maxWidth: '100%',
-            maxHeight: '100%',
-            objectFit: 'contain',
-            width: '100%',
-            height: 'auto',
-          }}
+          className={`community-card-img${asset.mode === 'pixel' ? ' community-card-img--pixel' : ''}`}
         />
 
         {/* Mode badge top-left */}
         {asset.mode && modeColor && (
           <span
-            style={{
-              position: 'absolute',
-              top: 5,
-              left: 5,
-              fontSize: '0.52rem',
-              fontWeight: 700,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              padding: '2px 5px',
-              borderRadius: 3,
-              background: `${modeColor}28`,
-              color: modeColor,
-              border: `1px solid ${modeColor}45`,
-              lineHeight: 1,
-              backdropFilter: 'blur(4px)',
-            }}
+            className="community-card-mode-badge"
+            style={{ '--mc': modeColor, '--mc-bg': `${modeColor}28`, '--mc-border': `${modeColor}45` } as React.CSSProperties}
           >
             {MODE_LABELS[asset.mode] ?? capitalize(asset.mode)}
           </span>
@@ -433,16 +351,8 @@ function CommunityCard({ asset, index, onClick }: { asset: CommunityAsset; index
         {/* Rarity corner */}
         {rarityColor && (
           <span
-            style={{
-              position: 'absolute',
-              top: 5,
-              right: 5,
-              width: 8,
-              height: 8,
-              borderRadius: 2,
-              background: rarityColor,
-              boxShadow: `0 0 6px 1px ${rarityColor}60`,
-            }}
+            className="community-card-rarity-dot"
+            style={{ background: rarityColor, boxShadow: `0 0 6px 1px ${rarityColor}60` }}
             title={capitalize(asset.rarity!)}
           />
         )}
@@ -464,26 +374,18 @@ function CommunityCard({ asset, index, onClick }: { asset: CommunityAsset; index
 
       {/* Hover overlay */}
       <div className="gallery-card-overlay">
-        <p
-          className="line-clamp-2"
-          style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', lineHeight: 1.4, marginBottom: 4 }}
-        >
+        <p className="line-clamp-2 community-card-overlay-text">
           {asset.prompt}
         </p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: '0.6rem', color: 'var(--text-disabled)', fontFamily: 'monospace' }}>
+        <div className="community-card-overlay-meta">
+          <span className="community-card-overlay-size">
             {asset.size}px
           </span>
           <span
-            style={{
-              width: 4,
-              height: 4,
-              borderRadius: '50%',
-              background: PROVIDER_COLORS[asset.provider] ?? '#666',
-              flexShrink: 0,
-            }}
+            className="community-card-overlay-dot"
+            style={{ background: PROVIDER_COLORS[asset.provider] ?? '#666' }}
           />
-          <span style={{ fontSize: '0.6rem', color: 'var(--text-disabled)' }}>
+          <span className="community-card-overlay-time">
             {timeAgo(asset.createdAt)}
           </span>
         </div>
@@ -499,28 +401,28 @@ function CommunityCard({ asset, index, onClick }: { asset: CommunityAsset; index
 function EmptyState({ search }: { search: string }) {
   if (search) {
     return (
-      <div className="empty-state" style={{ gridColumn: '1 / -1', padding: '80px 20px' }}>
-        <div className="empty-state-icon" style={{ fontSize: '2rem' }}>🔍</div>
+      <div className="empty-state community-empty-wrap">
+        <div className="empty-state-icon community-empty-icon">🔍</div>
         <h3 className="empty-state-title">No results for &ldquo;{search}&rdquo;</h3>
         <p className="empty-state-body">Try a different search term or clear filters.</p>
       </div>
     );
   }
   return (
-    <div className="empty-state" style={{ gridColumn: '1 / -1', padding: '80px 20px' }}>
-      <div className="empty-state-icon" style={{ fontSize: '2.5rem' }}>✦</div>
+    <div className="empty-state community-empty-wrap">
+      <div className="empty-state-icon community-empty-icon community-empty-icon--lg">✦</div>
       <h3 className="empty-state-title">Community is just getting started</h3>
       <p className="empty-state-body">
         Be the first to share. Generate something in a studio and enable &ldquo;Share to Gallery&rdquo;.
       </p>
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
-        <Link href="/pixel/studio" style={{ padding: '8px 16px', borderRadius: 6, background: 'rgba(167,139,250,.15)', border: '1px solid rgba(167,139,250,.3)', color: '#a78bfa', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none' }}>
+      <div className="community-empty-cta-row">
+        <Link href="/pixel/studio" className="community-empty-link community-empty-link--pixel">
           🕹️ Pixel Studio
         </Link>
-        <Link href="/business/studio" style={{ padding: '8px 16px', borderRadius: 6, background: 'rgba(56,183,100,.1)', border: '1px solid rgba(56,183,100,.25)', color: '#38B764', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none' }}>
+        <Link href="/business/studio" className="community-empty-link community-empty-link--business">
           📊 Business Studio
         </Link>
-        <Link href="/uiux/studio" style={{ padding: '8px 16px', borderRadius: 6, background: 'rgba(65,166,246,.1)', border: '1px solid rgba(65,166,246,.25)', color: '#41A6F6', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none' }}>
+        <Link href="/uiux/studio" className="community-empty-link community-empty-link--uiux">
           🖥️ UI/UX Studio
         </Link>
       </div>
@@ -675,7 +577,7 @@ export default function CommunityPage() {
   const selectedAsset = selectedIndex !== null ? assets[selectedIndex] : null;
 
   return (
-    <div style={{ minHeight: 'calc(100dvh - 56px)', background: 'var(--surface-base)' }}>
+    <div className="community-page">
       {/* Modal */}
       {selectedAsset && (
         <AssetModal
@@ -689,74 +591,30 @@ export default function CommunityPage() {
       )}
 
       {/* ── Page header ─────────────────────────────────────────────────── */}
-      <div
-        style={{
-          background: 'var(--surface-raised)',
-          borderBottom: '1px solid var(--surface-border)',
-          padding: '20px 24px 0',
-          position: 'sticky',
-          top: 56,
-          zIndex: 40,
-        }}
-      >
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+      <div className="community-page-header">
+        <div className="community-header-inner">
           {/* Title row */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0, lineHeight: 1.2 }}>
+          <div className="community-title-row">
+            <div className="community-title-left">
+              <h1 className="community-heading">
                 Community
               </h1>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 3, marginBottom: 0 }}>
+              <p className="community-subtitle">
                 Public generations from all engines — shared by WokGen users
               </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+            <div className="community-actions-row">
               {/* Public-by-default toggle (only for signed-in users) */}
               {session?.user && (
                 <button
                   onClick={togglePublicDefault}
                   disabled={savingDefault}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    padding: '6px 12px',
-                    borderRadius: 6,
-                    border: '1px solid var(--surface-border)',
-                    background: publicDefault ? 'rgba(167,139,250,.12)' : 'var(--surface-overlay)',
-                    color: publicDefault ? 'var(--accent)' : 'var(--text-muted)',
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    cursor: savingDefault ? 'wait' : 'pointer',
-                    transition: 'all 0.15s ease',
-                    whiteSpace: 'nowrap',
-                  }}
+                  className={`community-toggle-btn${publicDefault ? ' community-toggle-btn--active' : ''}${savingDefault ? ' community-toggle-btn--saving' : ''}`}
                   title={publicDefault ? 'Your new generations default to public' : 'Your new generations default to private'}
                 >
-                  <span
-                    style={{
-                      width: 28,
-                      height: 16,
-                      borderRadius: 8,
-                      background: publicDefault ? 'var(--accent)' : 'var(--surface-border)',
-                      position: 'relative',
-                      transition: 'background 0.2s ease',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span
-                      style={{
-                        position: 'absolute',
-                        top: 2,
-                        left: publicDefault ? 14 : 2,
-                        width: 12,
-                        height: 12,
-                        borderRadius: '50%',
-                        background: '#fff',
-                        transition: 'left 0.2s ease',
-                      }}
-                    />
+                  <span className={`community-toggle-track${publicDefault ? ' community-toggle-track--active' : ''}`}>
+                    <span className={`community-toggle-thumb${publicDefault ? ' community-toggle-thumb--active' : ''}`} />
                   </span>
                   Public by default
                 </button>
@@ -765,19 +623,7 @@ export default function CommunityPage() {
               {/* Studio CTA */}
               <Link
                 href="/pixel/studio"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '7px 14px',
-                  borderRadius: 6,
-                  background: 'var(--accent)',
-                  color: '#0d0d14',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  whiteSpace: 'nowrap',
-                }}
+                className="community-create-link"
               >
                 ✦ Create
               </Link>
@@ -785,20 +631,7 @@ export default function CommunityPage() {
           </div>
 
           {/* Mode tabs + search row */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0,
-              overflowX: 'auto',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              borderTop: '1px solid var(--surface-border)',
-              marginLeft: -24,
-              marginRight: -24,
-              paddingLeft: 24,
-            }}
-          >
+          <div className="community-tabs-row">
             {/* Community/Mine tabs */}
             {session?.user && (
               <>
@@ -806,24 +639,12 @@ export default function CommunityPage() {
                   <button
                     key={tab}
                     onClick={() => setGalleryTab(tab)}
-                    style={{
-                      padding: '10px 16px',
-                      fontSize: '0.8rem',
-                      fontWeight: 600,
-                      background: 'transparent',
-                      border: 'none',
-                      borderBottom: galleryTab === tab ? '2px solid var(--accent)' : '2px solid transparent',
-                      color: galleryTab === tab ? 'var(--text-primary)' : 'var(--text-muted)',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      transition: 'color 0.15s ease',
-                      marginBottom: -1,
-                    }}
+                    className={`community-gallery-tab${galleryTab === tab ? ' community-gallery-tab--active' : ''}`}
                   >
                     {tab === 'community' ? '🌐 Community' : '🔒 My Generations'}
                   </button>
                 ))}
-                <div style={{ width: 1, height: 20, background: 'var(--surface-border)', margin: '0 8px', flexShrink: 0 }} />
+                <div className="community-tab-separator" />
               </>
             )}
 
@@ -832,59 +653,26 @@ export default function CommunityPage() {
               <button
                 key={m.id}
                 onClick={() => setModeFilter(m.id)}
-                style={{
-                  padding: '10px 14px',
-                  fontSize: '0.78rem',
-                  fontWeight: modeFilter === m.id ? 600 : 400,
-                  background: 'transparent',
-                  border: 'none',
-                  borderBottom: modeFilter === m.id ? '2px solid var(--accent)' : '2px solid transparent',
-                  color: modeFilter === m.id ? 'var(--text-primary)' : 'var(--text-muted)',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  transition: 'color 0.15s ease',
-                  marginBottom: -1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                }}
+                className={`community-mode-tab${modeFilter === m.id ? ' community-mode-tab--active' : ''}`}
               >
-                <span style={{ fontSize: '0.9em' }}>{m.icon}</span>
+                <span className="community-mode-tab-icon">{m.icon}</span>
                 {m.label}
               </button>
             ))}
 
             {/* Spacer + search + sort */}
-            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, paddingRight: 24, paddingBottom: 2, paddingTop: 2, flexShrink: 0 }}>
+            <div className="community-search-row">
               <input
                 type="search"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search prompts…"
-                style={{
-                  padding: '5px 10px',
-                  borderRadius: 6,
-                  border: '1px solid var(--surface-border)',
-                  background: 'var(--surface-overlay)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.78rem',
-                  width: 180,
-                  outline: 'none',
-                }}
+                className="community-search-input"
               />
               <select
                 value={sort}
                 onChange={e => setSort(e.target.value as 'newest' | 'oldest')}
-                style={{
-                  padding: '5px 8px',
-                  borderRadius: 6,
-                  border: '1px solid var(--surface-border)',
-                  background: 'var(--surface-overlay)',
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.78rem',
-                  cursor: 'pointer',
-                  outline: 'none',
-                }}
+                className="community-sort-select"
               >
                 {SORT_OPTIONS.map(o => (
                   <option key={o.id} value={o.id}>{o.label}</option>
@@ -896,20 +684,13 @@ export default function CommunityPage() {
       </div>
 
       {/* ── Main content ───────────────────────────────────────────────────── */}
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px 24px 80px' }}>
+      <div className="community-main">
         {error && (
-          <div style={{
-            padding: '12px 16px', borderRadius: 8, background: 'rgba(239,68,68,.1)',
-            border: '1px solid rgba(239,68,68,.25)', color: '#f87171', fontSize: '0.85rem',
-            marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12,
-          }}>
-            <span style={{ flex: 1 }}>⚠️ Failed to load: {error}</span>
+          <div className="community-error-banner">
+            <span className="community-error-message">⚠️ Failed to load: {error}</span>
             <button
               onClick={() => fetchAssets(null, true)}
-              style={{
-                fontSize: 12, color: '#818cf8', background: 'none',
-                border: '1px solid #818cf8', borderRadius: 6, padding: '3px 10px', cursor: 'pointer',
-              }}
+              className="community-retry-btn"
             >
               Retry
             </button>
@@ -917,20 +698,14 @@ export default function CommunityPage() {
         )}
 
         {loading ? (
-          <div
-            className="gallery-grid"
-            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', padding: '24px' }}
-          >
+          <div className="gallery-grid community-gallery-grid community-gallery-grid-loading">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="gallery-card gallery-card--skeleton" style={{ animationDelay: `${i * 0.07}s` }} />
             ))}
           </div>
         ) : (
           <>
-            <div
-              className="gallery-grid"
-              style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))' }}
-            >
+            <div className="gallery-grid community-gallery-grid">
               {assets.length === 0 ? (
                 <EmptyState search={debouncedSearch} />
               ) : (
@@ -946,19 +721,19 @@ export default function CommunityPage() {
             </div>
 
             {/* Infinite scroll sentinel */}
-            <div ref={sentinelRef} style={{ height: 1 }} />
+            <div ref={sentinelRef} className="community-sentinel" />
 
             {/* Load more indicator */}
             {loadingMore && (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '24px 0', gap: 8, alignItems: 'center' }}>
+              <div className="community-load-more">
                 <Spinner />
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Loading more…</span>
+                <span className="community-load-more-text">Loading more…</span>
               </div>
             )}
 
             {/* Stats footer */}
             {assets.length > 0 && !hasMore && (
-              <p style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-disabled)', marginTop: 32 }}>
+              <p className="community-stats-footer">
                 {assets.length} asset{assets.length !== 1 ? 's' : ''} loaded
                 {modeFilter ? ` · ${MODE_FILTERS.find(m => m.id === modeFilter)?.label ?? modeFilter}` : ''}
               </p>

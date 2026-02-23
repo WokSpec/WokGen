@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { z } from 'zod';
+import { checkRateLimit } from '@/lib/rate-limit';
 import { WAP_CAPABILITIES, parseWAPFromResponse } from '@/lib/wap';
 
 // ---------------------------------------------------------------------------
@@ -18,43 +20,27 @@ export const maxDuration = 60;
 
 const GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions';
 const TOGETHER_URL = 'https://api.together.xyz/v1/chat/completions';
+const GEMINI_URL   = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const MISTRAL_URL  = 'https://api.mistral.ai/v1/chat/completions';
+const COHERE_URL   = 'https://api.cohere.ai/v2/chat';
 
-const MODEL_MAP: Record<string, { model: string; provider: 'groq' | 'together' }> = {
-  'eral-7c':       { model: 'llama-3.3-70b-versatile',                    provider: 'groq'    },
-  'eral-mini':     { model: 'llama3-8b-8192',                             provider: 'groq'    },
-  'eral-code':     { model: 'deepseek-ai/DeepSeek-V3',                    provider: 'together' },
-  'eral-creative': { model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',       provider: 'together' },
+const MODEL_MAP: Record<string, { model: string; provider: 'groq' | 'together' | 'gemini' | 'mistral' | 'anthropic' | 'cohere' }> = {
+  'eral-7c':       { model: 'llama-3.3-70b-versatile',              provider: 'groq'      },
+  'eral-mini':     { model: 'llama3-8b-8192',                       provider: 'groq'      },
+  'eral-code':     { model: 'deepseek-ai/DeepSeek-V3',              provider: 'together'  },
+  'eral-creative': { model: 'mistralai/Mixtral-8x7B-Instruct-v0.1', provider: 'together'  },
+  'eral-gemini':   { model: 'gemini-1.5-flash',                     provider: 'gemini'    },
+  'eral-fast':     { model: 'mistral-small-latest',                  provider: 'mistral'   },
+  'eral-haiku':    { model: 'claude-haiku-4-5',                      provider: 'anthropic' },
+  'eral-cohere':   { model: 'command-r-plus-08-2024',                provider: 'cohere'    },
 };
 
 // Fallback for eral-7c when Groq key is absent
 const ERAL_7C_TOGETHER_FALLBACK = 'meta-llama/Llama-3.1-70B-Instruct-Turbo';
 
-// ─── Rate limiting (in-memory, keyed by userId or IP) ───────────────────────
+// ─── Rate limiting (Redis → Postgres → in-memory, shared across all instances) ─
 
-interface RateBucket { count: number; resetAt: number }
-const rlStore = new Map<string, RateBucket>();
-
-setInterval(() => {
-  const now = Date.now();
-  for (const [k, v] of rlStore.entries()) {
-    if (v.resetAt < now) rlStore.delete(k);
-  }
-}, 5 * 60 * 1000);
-
-function checkEralRateLimit(key: string, max: number): { allowed: boolean; retryAfter?: number } {
-  const now = Date.now();
-  const windowMs = 60 * 60 * 1000; // 1 hour
-  const bucket = rlStore.get(key);
-  if (!bucket || bucket.resetAt < now) {
-    rlStore.set(key, { count: 1, resetAt: now + windowMs });
-    return { allowed: true };
-  }
-  if (bucket.count >= max) {
-    return { allowed: false, retryAfter: Math.ceil((bucket.resetAt - now) / 1000) };
-  }
-  bucket.count++;
-  return { allowed: true };
-}
+const ERAL_RL_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
 // ─── System prompt ──────────────────────────────────────────────────────────
 
@@ -115,12 +101,13 @@ const PERSONALITY_MODIFIERS: Record<string, string> = {
 interface ChatRequest {
   message: string;
   conversationId?: string;
-  modelVariant?: 'eral-7c' | 'eral-mini' | 'eral-code' | 'eral-creative';
+  modelVariant?: 'eral-7c' | 'eral-mini' | 'eral-code' | 'eral-creative' | 'eral-gemini' | 'eral-fast' | 'eral-haiku' | 'eral-cohere';
   context?: {
     mode?: string;
     tool?: string;
     prompt?: string;
     studioContext?: string;
+    projectId?: string;
   };
   stream?: boolean;
 }
@@ -136,10 +123,43 @@ function resolveEndpointAndKey(variant: string): {
   url: string;
   apiKey: string;
   model: string;
+  provider?: string;
 } {
   const mapping = MODEL_MAP[variant] ?? MODEL_MAP['eral-7c'];
-  const groqKey = process.env.GROQ_API_KEY;
-  const togetherKey = process.env.TOGETHER_API_KEY;
+  const groqKey      = process.env.GROQ_API_KEY;
+  const togetherKey  = process.env.TOGETHER_API_KEY;
+  const geminiKey    = process.env.GOOGLE_AI_API_KEY;
+  const mistralKey   = process.env.MISTRAL_API_KEY;
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const cohereKey    = process.env.COHERE_API_KEY;
+
+  if (mapping.provider === 'anthropic') {
+    if (anthropicKey) {
+      return { url: 'anthropic', apiKey: anthropicKey, model: mapping.model, provider: 'anthropic' };
+    }
+    // Fall through to groq fallback
+  }
+
+  if (mapping.provider === 'cohere') {
+    if (cohereKey) {
+      return { url: COHERE_URL, apiKey: cohereKey, model: mapping.model, provider: 'cohere' };
+    }
+    // Fall through to groq fallback
+  }
+
+  if (mapping.provider === 'gemini') {
+    if (geminiKey) {
+      return { url: `${GEMINI_URL}?key=${geminiKey}`, apiKey: geminiKey, model: mapping.model, provider: 'gemini' };
+    }
+    // Fall through to groq fallback
+  }
+
+  if (mapping.provider === 'mistral') {
+    if (mistralKey) {
+      return { url: MISTRAL_URL, apiKey: mistralKey, model: mapping.model, provider: 'mistral' };
+    }
+    // Fall through to groq fallback
+  }
 
   if (mapping.provider === 'groq') {
     if (groqKey) {
@@ -212,13 +232,80 @@ async function fetchHistory(conversationId: string): Promise<OpenAIMessage[]> {
 
 // ─── Non-streaming handler ───────────────────────────────────────────────────
 
-async function handleNonStreaming(
+async function handleAnthropicNonStreaming(
+  messages: OpenAIMessage[],
+  apiKey: string,
+  model: string,
+): Promise<{ reply: string; durationMs: number }> {
+  const start = Date.now();
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const Anthropic = require('@anthropic-ai/sdk').default as typeof import('@anthropic-ai/sdk').default;
+  const client = new Anthropic({ apiKey });
+
+  // Extract system message
+  const system = messages.find(m => m.role === 'system')?.content ?? '';
+  const userMessages = messages.filter(m => m.role !== 'system').map(m => ({
+    role: m.role as 'user' | 'assistant',
+    content: m.content,
+  }));
+
+  const response = await client.messages.create({
+    model,
+    max_tokens: 2048,
+    system,
+    messages: userMessages,
+  });
+
+  const reply = response.content[0]?.type === 'text' ? response.content[0].text : '';
+  return { reply, durationMs: Date.now() - start };
+}
+
+async function handleCohereNonStreaming(
   messages: OpenAIMessage[],
   url: string,
   apiKey: string,
   model: string,
 ): Promise<{ reply: string; durationMs: number }> {
   const start = Date.now();
+  const system = messages.find(m => m.role === 'system')?.content ?? '';
+  const chatHistory = messages
+    .filter(m => m.role !== 'system')
+    .slice(0, -1)
+    .map(m => ({ role: m.role === 'user' ? 'USER' : 'CHATBOT', message: m.content }));
+  const lastMessage = messages.filter(m => m.role === 'user').at(-1)?.content ?? '';
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, message: lastMessage, chat_history: chatHistory, preamble: system, max_tokens: 2048 }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => res.statusText);
+    throw new Error(`Cohere error ${res.status}: ${errText}`);
+  }
+
+  const data = await res.json() as { text?: string; message?: { content?: Array<{ text?: string }> } };
+  const reply = data.text ?? data.message?.content?.[0]?.text ?? '';
+  return { reply, durationMs: Date.now() - start };
+}
+
+async function handleNonStreaming(
+  messages: OpenAIMessage[],
+  url: string,
+  apiKey: string,
+  model: string,
+  provider?: string,
+): Promise<{ reply: string; durationMs: number }> {
+  const start = Date.now();
+
+  if (provider === 'anthropic') {
+    return handleAnthropicNonStreaming(messages, apiKey, model);
+  }
+
+  if (provider === 'cohere') {
+    return handleCohereNonStreaming(messages, url, apiKey, model);
+  }
 
   const res = await fetch(url, {
     method: 'POST',
@@ -245,21 +332,42 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   const userId = session?.user?.id;
 
-  // Rate limiting
+  // Rate limiting — Redis → Postgres → in-memory (correct at scale on Vercel multi-instance)
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  const rlKey = userId ?? ip;
+  const rlKey = `eral:${userId ?? ip}`;
   const rlMax = userId ? 50 : 10;
-  const rl = checkEralRateLimit(`eral:${rlKey}`, rlMax);
+  const rl = await checkRateLimit(rlKey, rlMax, ERAL_RL_WINDOW_MS);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: 'Rate limit exceeded', retryAfter: rl.retryAfter },
-      { status: 429, headers: { 'Retry-After': String(rl.retryAfter ?? 60) } },
+      { status: 429, headers: {
+        'Retry-After':           String(rl.retryAfter ?? 60),
+        'X-RateLimit-Limit':     String(rlMax),
+        'X-RateLimit-Remaining': '0',
+        'X-RateLimit-Reset':     String(Math.floor(Date.now() / 1000) + (rl.retryAfter ?? 60)),
+      } },
     );
   }
 
   let body: ChatRequest;
   try {
-    body = await req.json();
+    const raw = await req.json();
+    const Schema = z.object({
+      message:       z.string().min(1).max(4000),
+      conversationId: z.string().cuid().optional(),
+      modelVariant:  z.enum(['eral-7c','eral-mini','eral-code','eral-creative','eral-gemini','eral-fast','eral-haiku','eral-cohere']).optional(),
+      stream:        z.boolean().optional(),
+      context:       z.object({
+        mode:      z.string().optional(),
+        projectId: z.string().optional(),
+        prompt:    z.string().max(2000).optional(),
+      }).optional(),
+    });
+    const parsed = Schema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
+    }
+    body = parsed.data as ChatRequest;
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
@@ -271,7 +379,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Resolve provider config
-  let providerConfig: { url: string; apiKey: string; model: string };
+  let providerConfig: { url: string; apiKey: string; model: string; provider?: string };
   try {
     providerConfig = resolveEndpointAndKey(modelVariant);
   } catch (err) {
@@ -310,11 +418,41 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Inject project context: last 20 generated assets for this project
+  let projectContext = '';
+  if (context?.projectId && userId) {
+    try {
+      const projectJobs = await prisma.job.findMany({
+        where:   { projectId: context.projectId, userId, status: 'completed' },
+        orderBy: { createdAt: 'desc' },
+        take:    20,
+        select:  { tool: true, prompt: true, createdAt: true },
+      });
+      if (projectJobs.length > 0) {
+        const assetList = projectJobs
+          .map(j => `- [${j.tool}] "${j.prompt.slice(0, 80)}"`)
+          .join('\n');
+        projectContext = `\n\n[Project Context — last ${projectJobs.length} assets generated in this project:\n${assetList}\nUse this context to give consistent, project-aware suggestions.]`;
+      }
+      // Also inject brand kit if available
+      const kit = await prisma.brandKit.findFirst({
+        where:  { projectId: context.projectId },
+        select: { name: true, industry: true, mood: true, styleGuide: true, paletteJson: true },
+      });
+      if (kit) {
+        const palette = JSON.parse(kit.paletteJson || '[]') as { hex?: string; role?: string; name?: string }[];
+        const palStr = palette.slice(0, 5).map(c => `${c.role ?? 'color'}: ${c.hex ?? '?'}`).join(', ');
+        projectContext += `\n[Brand Kit: "${kit.name}" | Industry: ${kit.industry ?? 'unknown'} | Mood: ${kit.mood ?? 'unknown'} | Palette: ${palStr}]`;
+      }
+    } catch { /* non-fatal */ }
+  }
+
   const systemContent = [
     ERAL_SYSTEM_PROMPT,
     personalityModifier,
     contextNote ? `\n\n${contextNote}` : '',
     userPrefsContext,
+    projectContext,
   ].join('').trim();
 
   const history = conv.isNew ? [] : await fetchHistory(conv.id);
@@ -455,6 +593,7 @@ export async function POST(req: NextRequest) {
       providerConfig.url,
       providerConfig.apiKey,
       providerConfig.model,
+      providerConfig.provider,
     ));
   } catch (err) {
     return NextResponse.json(

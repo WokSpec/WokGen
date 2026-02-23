@@ -2,20 +2,29 @@
 
 <!-- Short description of what this PR does -->
 
-## Which mode / engine does it affect?
+## Which area does it affect?
 
-- [ ] Pixel
-- [ ] Business
-- [ ] UI/UX
-- [ ] Vector
-- [ ] Emoji
-- [ ] Platform-wide (API, auth, database, etc.)
+- [ ] Pixel mode
+- [ ] Business mode
+- [ ] UI/UX mode
+- [ ] Vector mode
+- [ ] Emoji mode
+- [ ] Voice mode
+- [ ] Text mode
+- [ ] Generation pipeline / provider routing
+- [ ] Prompt engine / quality profiles / negative banks
+- [ ] Data / asset pipeline (scripts)
+- [ ] Database schema (Prisma)
+- [ ] Auth / billing / rate limiting
+- [ ] Platform-wide (API, middleware, etc.)
+- [ ] CI/CD / deployment
 
 ## Type of change
 
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Refactor
+- [ ] Tuning (quality profiles, prompt chains, negative banks)
 - [ ] Documentation
 - [ ] Chore
 
@@ -23,10 +32,9 @@
 
 - [ ] TypeScript passes clean (`cd apps/web && npx tsc --noEmit`)
 - [ ] No secrets, API keys, or credentials in the diff
-- [ ] No changes to proprietary token chains (`STYLE_PRESET_TOKENS`, `ASSET_CATEGORY_TOKENS`, `QUALITY_PROFILES`)
+- [ ] Mode README updated if mode behavior changed (`modes/{mode}/README.md`)
+- [ ] Prisma migration included if schema changed (`npx prisma migrate dev`)
 - [ ] Documentation updated if behavior changed
-- [ ] No TODO comments left in the code
-- [ ] I've read CONTRIBUTING.md
 
 ## Related issue
 

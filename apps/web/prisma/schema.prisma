@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ---------------------------------------------------------------------------
@@ -46,6 +47,9 @@ model User {
   eralConversations  EralConversation[]
   preference         UserPreference?
   sfxJobs            SfxJob[]
+  automations        Automation[]
+  apiKeys            ApiKey[]
+  onboarding         OnboardingState?
 }
 
 model Account {
@@ -201,11 +205,20 @@ model Job {
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
+  /// Extracted dominant palette (JSON: [{hex, name, ratio}])
+  paletteJson String? @db.Text
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // A job can optionally produce a persisted gallery asset
   asset       GalleryAsset?
+
+  // Asset relationships where this job is the source or target
+  assetRelFrom AssetRelationship[] @relation("RelFrom")
+  assetRelTo   AssetRelationship[] @relation("RelTo")
+  assetTags    AssetTag[]
+  comments     AssetComment[]
 
   @@index([userId])
   @@index([status])
@@ -214,6 +227,9 @@ model Job {
   @@index([isPublic, createdAt])
   @@index([createdAt])
   @@index([projectId])
+  @@index([userId, createdAt])
+  @@index([userId, mode, status])
+  @@index([status, createdAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -293,11 +309,17 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobs Job[]
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs         Job[]
+  brief        ProjectBrief?
+  brandKit     BrandKit[]
+  members      ProjectMember[]
+  relationships AssetRelationship[]
+  activity     ActivityEvent[]
 
   @@index([userId, mode])
   @@index([userId, isArchived])
+  @@index([userId, updatedAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -354,6 +376,16 @@ model UserPreference {
   // Favorite prompts (JSON array)
   favoritePrompts String?  @db.Text
 
+  // Notification settings (booleans as JSON or individual flags)
+  notifyEmailJobDone  Boolean @default(true)
+  notifyEmailComment  Boolean @default(true)
+  notifyEmailDigest   Boolean @default(false)
+  notifyInAppQuota    Boolean @default(true)
+  notifyInAppLevelUp  Boolean @default(true)
+  // Admin: notification routing channel — 'email' | 'webhook' | 'both' | 'none'
+  notifyAdminChannel  String? @default("email")
+  notifyWebhookUrl    String?  @db.Text
+
   // Usage stats (JSON: { totalGenerations, successRate, lastActive })
   stats           String?  @db.Text
 
@@ -398,4 +430,212 @@ model SfxJob {
   createdAt       DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// ---------------------------------------------------------------------------
+// Depth features — asset relationships, project briefs, brand kits, team
+// ---------------------------------------------------------------------------
+
+/// Links two jobs together within a project (e.g. character → matching enemy)
+model AssetRelationship {
+  id        String   @id @default(cuid())
+  projectId String
+  fromJobId String
+  toJobId   String
+  /// variation | animation_of | enemy_of | tileset_for | same_palette | brand_use
+  type      String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fromJob Job     @relation("RelFrom", fields: [fromJobId], references: [id], onDelete: Cascade)
+  toJob   Job     @relation("RelTo",   fields: [toJobId],   references: [id], onDelete: Cascade)
+
+  @@unique([fromJobId, toJobId, type])
+  @@index([projectId])
+}
+
+/// Project-level creative brief — drives Eral asset director suggestions
+model ProjectBrief {
+  id          String   @id @default(cuid())
+  projectId   String   @unique
+
+  // Game project fields
+  genre       String?  // dungeon_crawler | platformer | top_down_rpg | city_builder
+  artStyle    String?  // nes_16color | snes_32color | gb_monochrome | modern_pixel
+  paletteJson String?  @db.Text  // JSON: [{hex, name}]
+  moodBoard   String?  @db.Text  // JSON: [imageUrl]
+
+  // Brand project fields
+  brandName   String?
+  industry    String?
+  colorHex    String?  // primary brand color
+  styleGuide  String?  @db.Text
+
+  // Pinned style snapshot (JSON: full preset config)
+  pinnedStyle String?  @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+/// Persistent brand kit — palette, typography direction, style guide
+model BrandKit {
+  id          String   @id @default(cuid())
+  userId      String
+  projectId   String?
+
+  name        String
+  /// JSON: [{hex, name, role}]
+  paletteJson String   @db.Text
+  /// JSON: {primary, secondary, scale}
+  typography  String?  @db.Text
+  styleGuide  String?  @db.Text
+  industry    String?
+  mood        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+/// Team membership for a project
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  /// owner | editor | viewer
+  role      String   @default("viewer")
+  invitedBy String?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+/// Freeform tags on individual jobs (for gallery search and project organization)
+model AssetTag {
+  id     String  @id @default(cuid())
+  jobId  String
+  tag    String
+  userId String?
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, tag])
+  @@index([jobId])
+  @@index([tag])
+}
+
+/// Activity feed event for a project
+model ActivityEvent {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String?
+  /// generate | comment | like | export | member_join | brief_update | batch
+  type      String
+  /// Human-readable summary: "Generated 'dragon sprite' with pixel/generate"
+  message   String
+  /// Optional reference: jobId, commentId, etc.
+  refId     String?
+
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+}
+
+/// Comment on a generated asset
+model AssetComment {
+  id        String   @id @default(cuid())
+  jobId     String
+  userId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId, createdAt])
+}
+
+
+/// Scheduled automation — send a message or trigger an action on a cron schedule
+model Automation {
+  id        String  @id @default(cuid())
+  userId    String
+
+  name      String
+  enabled   Boolean @default(true)
+
+  /// cron expression: "0 9 * * 1" = every Monday 9am UTC
+  schedule  String
+
+  /// Target type: 'email' | 'webhook' | 'in_app'
+  targetType  String @default("email")
+
+  /// Webhook URL or email address depending on targetType
+  targetValue String? @db.Text
+
+  /// Template message (supports {{date}}, {{user_name}}, {{quota_used}})
+  messageTemplate String @db.Text
+
+  /// Last time this automation ran
+  lastRunAt   DateTime?
+
+  /// Last run result: 'ok' | 'error'
+  lastRunStatus String?
+  lastRunError  String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([enabled, schedule])
+}
+
+model ApiKey {
+  id           String    @id @default(cuid())
+  userId       String
+  name         String
+  /// SHA-256 hex hash of the raw key — stored, never the key itself
+  keyHash      String    @unique
+  /// First 8 chars of key for display, e.g. "wk_live_a1b2c3d4"
+  keyPrefix    String
+  /// Comma-separated scopes: "generate,read" etc.
+  scopes       String    @default("generate,read")
+  lastUsedAt   DateTime?
+  expiresAt    DateTime?
+  isActive     Boolean   @default(true)
+  requestCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([keyHash])
+}
+
+model OnboardingState {
+  id     String @id @default(cuid())
+  userId String @unique
+  step   Int    @default(0)
+  useCase String?
+  completedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

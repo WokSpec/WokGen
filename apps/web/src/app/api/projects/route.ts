@@ -2,11 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
 import { isSupportedMode } from '@/lib/modes';
+import { z } from 'zod';
 
 // ---------------------------------------------------------------------------
 // GET /api/projects — list user's projects
 // POST /api/projects — create a new project
 // ---------------------------------------------------------------------------
+
+const CreateProjectSchema = z.object({
+  name:        z.string().min(1).max(100),
+  mode:        z.string().optional(),
+  description: z.string().max(500).optional(),
+  settings:    z.record(z.unknown()).optional(),
+});
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -17,6 +25,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const mode       = searchParams.get('mode') ?? undefined;
   const archived   = searchParams.get('archived') === 'true';
+  const limit      = Math.min(Number(searchParams.get('limit') ?? '20'), 50);
 
   const projects = await prisma.project.findMany({
     where: {
@@ -25,6 +34,7 @@ export async function GET(req: NextRequest) {
       ...(mode ? { mode } : {}),
     },
     orderBy: { updatedAt: 'desc' },
+    take: limit,
     include: {
       _count: { select: { jobs: true } },
     },
@@ -39,29 +49,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
   }
 
-  let body: Record<string, unknown>;
+  let rawBody: unknown;
   try {
-    body = await req.json();
+    rawBody = await req.json();
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
   }
 
-  const { name, mode, description, settings } = body;
-
-  if (typeof name !== 'string' || name.trim().length === 0) {
-    return NextResponse.json({ error: 'name is required.' }, { status: 400 });
+  const parsed = CreateProjectSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid request body.' }, { status: 400 });
   }
 
-  if (!isSupportedMode(mode)) {
+  const { name, mode, description, settings } = parsed.data;
+
+  if (mode && !isSupportedMode(mode)) {
     return NextResponse.json({ error: `Invalid mode "${mode}".` }, { status: 400 });
   }
 
   const project = await prisma.project.create({
     data: {
       userId:      session.user.id,
-      mode:        mode as string,
-      name:        String(name).trim(),
-      description: typeof description === 'string' ? description.trim() || null : null,
+      mode:        mode as string ?? 'pixel',
+      name:        name.trim(),
+      description: description?.trim() || null,
       settings:    settings ? JSON.stringify(settings) : null,
     },
   });

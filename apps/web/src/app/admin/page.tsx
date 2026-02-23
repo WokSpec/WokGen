@@ -1,7 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+
+
+
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import AdminCharts from './_charts';
+
+/* ── Types ───────────────────────────────────────────────────────────────── */
 
 interface Stats {
   users: { total: number; activeThisMonth: number; byPlan: Record<string, number> };
@@ -10,25 +16,260 @@ interface Stats {
   generatedAt: string;
 }
 
+interface UserRow {
+  id: string;
+  email: string;
+  name?: string;
+  planId: string;
+  jobCount: number;
+  lastActive: string | null;
+  createdAt: string;
+}
+
+interface Revenue {
+  mrr: number;
+  activeSubscriptions: number;
+  byPlan: Record<string, { count: number; revenue: number }>;
+}
+
+/* ── StatCard ────────────────────────────────────────────────────────────── */
+
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div style={{
-      background: 'var(--bg-surface)', border: '1px solid var(--border)',
-      borderRadius: 4, padding: '1.25rem 1.5rem',
-    }}>
-      <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 .5rem', fontFamily: 'var(--font-heading)' }}>{label}</p>
-      <p style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--text)', margin: 0, fontFamily: 'var(--font-heading)' }}>{value}</p>
-      {sub && <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '.25rem 0 0' }}>{sub}</p>}
+    <div className="admin-stat-card">
+      <p className="admin-stat-card__label">{label}</p>
+      <p className="admin-stat-card__value">{value}</p>
+      {sub && <p className="admin-stat-card__sub">{sub}</p>}
     </div>
   );
 }
+
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+
+type Tab = 'overview' | 'users' | 'jobs' | 'revenue' | 'system' | 'charts';
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'users',    label: 'Users'    },
+  { id: 'jobs',     label: 'Jobs'     },
+  { id: 'revenue',  label: 'Revenue'  },
+  { id: 'charts',   label: 'Charts'   },
+  { id: 'system',   label: 'System'   },
+];
+
+/* ── Overview tab ────────────────────────────────────────────────────────── */
+
+function OverviewTab({ stats }: { stats: Stats }) {
+  return (
+    <>
+      <section style={{ marginBottom: '2rem' }}>
+        <p className="admin-section-label">Users</p>
+        <div className="admin-grid">
+          <StatCard label="Total users" value={stats.users.total} />
+          <StatCard label="Active this month" value={stats.users.activeThisMonth} sub="≥1 generation" />
+          {Object.entries(stats.users.byPlan).map(([plan, count]) => (
+            <StatCard key={plan} label={`Plan: ${plan}`} value={count} />
+          ))}
+        </div>
+      </section>
+
+      <section style={{ marginBottom: '2rem' }}>
+        <p className="admin-section-label">Generations</p>
+        <div className="admin-grid">
+          <StatCard label="Total jobs" value={stats.jobs.total.toLocaleString()} />
+          <StatCard label="Today" value={stats.jobs.today.toLocaleString()} />
+          <StatCard label="HD (Replicate)" value={stats.jobs.hd.toLocaleString()} />
+          <StatCard label="Standard" value={stats.jobs.standard.toLocaleString()} />
+        </div>
+      </section>
+
+      <section>
+        <p className="admin-section-label">Recent generations</p>
+        <div className="admin-table-wrap">
+          <div className="admin-table-row admin-table-row--header" style={{ gridTemplateColumns: '1fr auto auto auto' }}>
+            <span className="admin-table-cell admin-table-cell--head">Prompt / User</span>
+            <span className="admin-table-cell admin-table-cell--head">Provider</span>
+            <span className="admin-table-cell admin-table-cell--head">Status</span>
+            <span className="admin-table-cell admin-table-cell--head">Date</span>
+          </div>
+          {stats.recentJobs.map((job, i) => (
+            <div key={job.id} className={`admin-table-row ${i % 2 === 0 ? 'admin-table-row--odd' : 'admin-table-row--even'}`} style={{ gridTemplateColumns: '1fr auto auto auto' }}>
+              <div>
+                <p className="admin-table-cell" style={{ margin: 0 }}>{job.prompt}</p>
+                <p className="admin-table-cell admin-table-cell--faint" style={{ margin: '0.1rem 0 0', fontSize: '0.7rem' }}>{job.user?.email ?? 'guest'}</p>
+              </div>
+              <span className={`admin-table-cell ${job.provider === 'replicate' ? 'admin-table-cell--hd' : 'admin-table-cell--std'}`}>
+                {job.provider === 'replicate' ? 'HD' : 'std'}
+              </span>
+              <span className={`admin-table-cell ${job.status === 'completed' ? 'admin-table-cell--ok' : job.status === 'failed' ? 'admin-table-cell--fail' : 'admin-table-cell--run'}`}>
+                {job.status}
+              </span>
+              <span className="admin-table-cell admin-table-cell--faint">{new Date(job.createdAt).toLocaleDateString()}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* ── Users tab ───────────────────────────────────────────────────────────── */
+
+function UsersTab() {
+  const [users, setUsers]   = useState<UserRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]   = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/users?limit=50')
+      .then(r => r.ok ? r.json() : r.json().then((d: {error?:string}) => Promise.reject(d.error ?? `HTTP ${r.status}`)))
+      .then((d: { users: UserRow[] }) => setUsers(d.users))
+      .catch((e: string) => setError(String(e)))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p className="admin-loading">Loading users…</p>;
+  if (error)   return <div className="admin-error">{error}</div>;
+
+  return (
+    <div className="admin-table-wrap">
+      <div className="admin-table-row admin-table-row--header" style={{ gridTemplateColumns: '2fr 1fr 1fr 1fr auto' }}>
+        <span className="admin-table-cell admin-table-cell--head">User</span>
+        <span className="admin-table-cell admin-table-cell--head">Plan</span>
+        <span className="admin-table-cell admin-table-cell--head">Jobs</span>
+        <span className="admin-table-cell admin-table-cell--head">Last active</span>
+        <span className="admin-table-cell admin-table-cell--head">Joined</span>
+      </div>
+      {users.map((u, i) => (
+        <div key={u.id} className={`admin-table-row ${i % 2 === 0 ? 'admin-table-row--odd' : 'admin-table-row--even'}`} style={{ gridTemplateColumns: '2fr 1fr 1fr 1fr auto' }}>
+          <div>
+            <p className="admin-table-cell" style={{ margin: 0 }}>{u.name ?? '—'}</p>
+            <p className="admin-table-cell admin-table-cell--faint" style={{ margin: '0.1rem 0 0', fontSize: '0.7rem' }}>{u.email}</p>
+          </div>
+          <span><span className={`admin-badge admin-badge--${u.planId}`}>{u.planId}</span></span>
+          <span className="admin-table-cell">{u.jobCount.toLocaleString()}</span>
+          <span className="admin-table-cell admin-table-cell--muted">{u.lastActive ? new Date(u.lastActive).toLocaleDateString() : 'Never'}</span>
+          <span className="admin-table-cell admin-table-cell--faint">{new Date(u.createdAt).toLocaleDateString()}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Jobs tab ────────────────────────────────────────────────────────────── */
+
+function JobsTab({ stats }: { stats: Stats }) {
+  return (
+    <>
+      <div className="admin-grid" style={{ marginBottom: '2rem' }}>
+        <StatCard label="Total" value={stats.jobs.total.toLocaleString()} />
+        <StatCard label="Today" value={stats.jobs.today.toLocaleString()} />
+        <StatCard label="HD jobs" value={stats.jobs.hd.toLocaleString()} sub="Replicate provider" />
+        <StatCard label="Standard" value={stats.jobs.standard.toLocaleString()} sub="Pollinations + others" />
+      </div>
+      <p className="admin-section-label">Recent (last 10)</p>
+      <div className="admin-table-wrap">
+        <div className="admin-table-row admin-table-row--header" style={{ gridTemplateColumns: '1fr 1fr auto auto auto' }}>
+          <span className="admin-table-cell admin-table-cell--head">Prompt</span>
+          <span className="admin-table-cell admin-table-cell--head">User</span>
+          <span className="admin-table-cell admin-table-cell--head">Provider</span>
+          <span className="admin-table-cell admin-table-cell--head">Status</span>
+          <span className="admin-table-cell admin-table-cell--head">Date</span>
+        </div>
+        {stats.recentJobs.map((job, i) => (
+          <div key={job.id} className={`admin-table-row ${i % 2 === 0 ? 'admin-table-row--odd' : 'admin-table-row--even'}`} style={{ gridTemplateColumns: '1fr 1fr auto auto auto' }}>
+            <span className="admin-table-cell">{job.prompt}</span>
+            <span className="admin-table-cell admin-table-cell--muted">{job.user?.email ?? 'guest'}</span>
+            <span className={`admin-table-cell ${job.provider === 'replicate' ? 'admin-table-cell--hd' : 'admin-table-cell--std'}`}>{job.provider}</span>
+            <span className={`admin-table-cell ${job.status === 'completed' ? 'admin-table-cell--ok' : job.status === 'failed' ? 'admin-table-cell--fail' : 'admin-table-cell--run'}`}>{job.status}</span>
+            <span className="admin-table-cell admin-table-cell--faint">{new Date(job.createdAt).toLocaleDateString()}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/* ── Revenue tab ─────────────────────────────────────────────────────────── */
+
+function RevenueTab() {
+  const [rev, setRev]       = useState<Revenue | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]   = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/revenue')
+      .then(r => r.ok ? r.json() : r.json().then((d: {error?:string}) => Promise.reject(d.error ?? `HTTP ${r.status}`)))
+      .then(setRev)
+      .catch((e: string) => setError(String(e)))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p className="admin-loading">Loading revenue…</p>;
+  if (error)   return <div className="admin-error">{error}</div>;
+  if (!rev)    return null;
+
+  return (
+    <>
+      <div className="admin-grid" style={{ marginBottom: '2rem' }}>
+        <StatCard label="MRR (est.)" value={`$${(rev.mrr / 100).toFixed(2)}`} sub="active subscriptions × price" />
+        <StatCard label="Active subs" value={rev.activeSubscriptions} />
+      </div>
+      <p className="admin-section-label">By plan</p>
+      <div className="admin-table-wrap">
+        <div className="admin-table-row admin-table-row--header" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+          <span className="admin-table-cell admin-table-cell--head">Plan</span>
+          <span className="admin-table-cell admin-table-cell--head">Subscribers</span>
+          <span className="admin-table-cell admin-table-cell--head">Revenue/mo</span>
+        </div>
+        {Object.entries(rev.byPlan).map(([plan, d], i) => (
+          <div key={plan} className={`admin-table-row ${i % 2 === 0 ? 'admin-table-row--odd' : 'admin-table-row--even'}`} style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+            <span><span className={`admin-badge admin-badge--${plan}`}>{plan}</span></span>
+            <span className="admin-table-cell">{d.count}</span>
+            <span className="admin-table-cell admin-table-cell--hd">${(d.revenue / 100).toFixed(2)}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/* ── System tab ──────────────────────────────────────────────────────────── */
+
+function SystemTab() {
+  const stripeOk  = !!process.env.NEXT_PUBLIC_STRIPE_ENABLED;
+  const checks = [
+    { label: 'Database',    sub: 'Prisma + PostgreSQL', ok: true  },
+    { label: 'Stripe',      sub: stripeOk ? 'Configured' : 'Not configured', ok: stripeOk },
+    { label: 'Upstash Redis', sub: 'Rate limiting layer', ok: true },
+    { label: 'Pollinations', sub: 'Standard gen provider', ok: true },
+  ];
+
+  return (
+    <div className="admin-system-grid">
+      {checks.map(c => (
+        <div key={c.label} className="admin-system-card">
+          <div className={`admin-system-card__dot ${c.ok ? 'admin-system-card__dot--ok' : 'admin-system-card__dot--warn'}`} />
+          <div>
+            <p className="admin-system-card__label">{c.label}</p>
+            <p className="admin-system-card__sub">{c.sub}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Main ────────────────────────────────────────────────────────────────── */
 
 export default function AdminPage() {
   const [stats, setStats]   = useState<Stats | null>(null);
   const [error, setError]   = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab]       = useState<Tab>('overview');
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setLoading(true);
     fetch('/api/admin/stats')
       .then(r => r.ok ? r.json() : r.json().then((d: { error?: string }) => Promise.reject(d.error ?? `HTTP ${r.status}`)))
       .then(setStats)
@@ -36,82 +277,45 @@ export default function AdminPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => { load(); }, [load]);
+
   return (
-    <main style={{ maxWidth: 960, margin: '0 auto', padding: '3rem 1.5rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+    <main className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.02em', margin: 0, fontFamily: 'var(--font-heading)', color: 'var(--text)' }}>
-            Admin
-          </h1>
+          <h1 className="admin-header__title">Admin</h1>
           {stats && (
-            <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)', margin: '.25rem 0 0' }}>
+            <p className="admin-header__sub">
               Last updated {new Date(stats.generatedAt).toLocaleTimeString()}
             </p>
           )}
         </div>
-        <Link href="/pixel/studio" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'none' }}>
-          ← Studio
-        </Link>
+        <Link href="/pixel/studio" className="admin-header__back">← Studio</Link>
       </div>
 
-      {loading && <p style={{ color: 'var(--text-muted)' }}>Loading…</p>}
-      {error && (
-        <div style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.3)', borderRadius: 4, padding: '1rem', color: '#fca5a5' }}>
-          {error}
-        </div>
-      )}
+      {loading && <p className="admin-loading">Loading…</p>}
+      {error && <div className="admin-error">{error}</div>}
 
-      {stats && (
+      {stats && !loading && (
         <>
-          {/* Users */}
-          <section style={{ marginBottom: '2rem' }}>
-            <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-faint)', margin: '0 0 .875rem', fontFamily: 'var(--font-heading)' }}>Users</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1px', background: 'var(--border)' }}>
-              <StatCard label="Total users" value={stats.users.total} />
-              <StatCard label="Active this month" value={stats.users.activeThisMonth} sub="with at least 1 generation" />
-              {Object.entries(stats.users.byPlan).map(([plan, count]) => (
-                <StatCard key={plan} label={`Plan: ${plan}`} value={count} />
-              ))}
-            </div>
-          </section>
+          <div className="admin-tabs">
+            {TABS.map(t => (
+              <button
+                key={t.id}
+                className={`admin-tab ${tab === t.id ? 'admin-tab--active' : ''}`}
+                onClick={() => setTab(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
 
-          {/* Jobs */}
-          <section style={{ marginBottom: '2rem' }}>
-            <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-faint)', margin: '0 0 .875rem', fontFamily: 'var(--font-heading)' }}>Generations</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1px', background: 'var(--border)' }}>
-              <StatCard label="Total jobs" value={stats.jobs.total.toLocaleString()} />
-              <StatCard label="Today" value={stats.jobs.today.toLocaleString()} />
-              <StatCard label="HD (Replicate)" value={stats.jobs.hd.toLocaleString()} />
-              <StatCard label="Standard (Pollinations)" value={stats.jobs.standard.toLocaleString()} />
-            </div>
-          </section>
-
-          {/* Recent jobs */}
-          <section>
-            <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-faint)', margin: '0 0 .875rem', fontFamily: 'var(--font-heading)' }}>Recent generations</p>
-            <div style={{ border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
-              {stats.recentJobs.map((job, i) => (
-                <div key={job.id} style={{
-                  display: 'grid', gridTemplateColumns: '1fr auto auto',
-                  alignItems: 'center', gap: '1rem',
-                  padding: '.75rem 1rem',
-                  borderTop: i > 0 ? '1px solid var(--border)' : 'none',
-                  background: i % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg)',
-                }}>
-                  <div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{job.prompt}</p>
-                    <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', margin: '.15rem 0 0' }}>{job.user?.email ?? 'guest'}</p>
-                  </div>
-                  <span style={{ fontSize: '0.7rem', color: job.provider === 'replicate' ? '#c4b5fd' : 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                    {job.provider === 'replicate' ? 'HD' : 'std'}
-                  </span>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-faint)', whiteSpace: 'nowrap' }}>
-                    {new Date(job.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
+          {tab === 'overview' && <OverviewTab stats={stats} />}
+          {tab === 'users'    && <UsersTab />}
+          {tab === 'jobs'     && <JobsTab stats={stats} />}
+          {tab === 'revenue'  && <RevenueTab />}
+          {tab === 'charts'   && <AdminCharts />}
+          {tab === 'system'   && <SystemTab />}
         </>
       )}
     </main>

@@ -1,0 +1,54 @@
+# CODEOWNERS — WokGen (private)
+# Defines required reviewers per directory/file area.
+# Syntax: <pattern>  @WokSpec/<team>  @individual
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ── Default: platform team reviews anything not matched below ───────────────
+*                           @WokSpec/platform
+
+# ── Web application ─────────────────────────────────────────────────────────
+apps/web/src/app/           @WokSpec/frontend
+apps/web/src/components/    @WokSpec/frontend
+apps/web/src/hooks/         @WokSpec/frontend
+apps/web/public/            @WokSpec/frontend
+
+# ── Internal engine (quality-sensitive) ─────────────────────────────────────
+apps/web/src/lib/           @WokSpec/platform
+apps/web/src/lib/quality-profiles.ts     @WokSpec/platform
+apps/web/src/lib/provider-router.ts      @WokSpec/platform
+apps/web/src/lib/negative-banks.ts       @WokSpec/platform
+apps/web/src/lib/prompt-builder-*.ts     @WokSpec/platform
+apps/web/src/lib/prompt-engine.ts        @WokSpec/platform
+
+# ── Billing and auth (high sensitivity) ─────────────────────────────────────
+apps/web/src/lib/stripe.ts              @WokSpec/platform
+apps/web/src/lib/quota.ts               @WokSpec/platform
+apps/web/src/lib/rate-limit.ts          @WokSpec/platform
+apps/web/src/lib/plan-limits.ts         @WokSpec/platform
+apps/web/src/app/(auth)/                @WokSpec/platform
+apps/web/src/app/billing/               @WokSpec/platform
+
+# ── Database schema ──────────────────────────────────────────────────────────
+apps/web/prisma/                        @WokSpec/platform
+
+# ── Packages (shared contracts) ─────────────────────────────────────────────
+packages/                               @WokSpec/platform
+
+# ── Modes (mode owners) ─────────────────────────────────────────────────────
+modes/pixel/                            @WokSpec/platform
+modes/business/                         @WokSpec/platform
+modes/uiux/                             @WokSpec/platform
+modes/vector/                           @WokSpec/platform
+modes/emoji/                            @WokSpec/platform
+
+# ── Generation and asset pipeline scripts ───────────────────────────────────
+scripts/                                @WokSpec/platform
+
+# ── ComfyUI workflows ───────────────────────────────────────────────────────
+comfyui/                                @WokSpec/platform
+
+# ── CI/CD and repo config ───────────────────────────────────────────────────
+.github/                                @WokSpec/platform
+Dockerfile                              @WokSpec/platform
+docker-compose*.yml                     @WokSpec/platform
+render.yaml                             @WokSpec/platform

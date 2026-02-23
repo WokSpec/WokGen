@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 // ---------------------------------------------------------------------------
 // GET /api/jobs/[id]
@@ -17,14 +18,19 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
   const { id } = params;
 
   if (!id || typeof id !== 'string') {
     return NextResponse.json({ error: 'Job ID is required' }, { status: 400 });
   }
 
-  const job = await prisma.job.findUnique({
-    where: { id },
+  const job = await prisma.job.findFirst({
+    where: { id, userId: session.user.id },
     select: {
       id:            true,
       tool:          true,
@@ -52,6 +58,25 @@ export async function GET(
     );
   }
 
+  // Auto-timeout stuck jobs: if status is "running" and it's been >10 minutes, mark failed.
+  if (job.status === 'running') {
+    const ageMs = Date.now() - job.updatedAt.getTime();
+    if (ageMs > 10 * 60 * 1000) {
+      await prisma.job.update({
+        where: { id },
+        data:  { status: 'failed', error: 'Generation timed out after 10 minutes.' },
+      }).catch(() => {});
+      return NextResponse.json({
+        ...job,
+        status:     'failed',
+        error:      'Generation timed out after 10 minutes.',
+        resultUrls: job.resultUrls ? JSON.parse(job.resultUrls) : null,
+        createdAt:  job.createdAt.toISOString(),
+        updatedAt:  new Date().toISOString(),
+      });
+    }
+  }
+
   return NextResponse.json({
     ...job,
     resultUrls: job.resultUrls ? JSON.parse(job.resultUrls) : null,
@@ -61,7 +86,10 @@ export async function GET(
 }
 
 // ---------------------------------------------------------------------------
-// PATCH /api/jobs/[id]
+// POST /api/jobs/[id]/timeout  (internal — called by cron or client timeout)
+//
+// Mark a stuck "running" job as "failed" if it has been running for >10min.
+// ---------------------------------------------------------------------------
 //
 // Update mutable job fields: title, isPublic, tags.
 // Used by the studio UI for "Save to Gallery" and visibility toggling.
@@ -77,6 +105,11 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
   const { id } = params;
 
   let body: Record<string, unknown>;
@@ -86,8 +119,8 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const existing = await prisma.job.findUnique({
-    where: { id },
+  const existing = await prisma.job.findFirst({
+    where: { id, userId: session.user.id },
     select: { id: true, status: true, resultUrl: true },
   });
 
@@ -175,10 +208,15 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
   const { id } = params;
 
-  const existing = await prisma.job.findUnique({
-    where: { id },
+  const existing = await prisma.job.findFirst({
+    where: { id, userId: session.user.id },
     select: { id: true },
   });
 

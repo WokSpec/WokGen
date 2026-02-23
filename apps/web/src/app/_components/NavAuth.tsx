@@ -4,6 +4,35 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 
+// ─── Compact usage meter shown in nav ────────────────────────────────────────
+
+function NavUsageMeter() {
+  const [quota, setQuota] = useState<{
+    planId: string; dailyLimit: number; todayUsed: number;
+  } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/usage?page=1&limit=1')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.quota) setQuota(d.quota); })
+      .catch(() => null);
+  }, []);
+
+  if (!quota || quota.dailyLimit < 0) return null;
+
+  const p = Math.min(100, Math.round((quota.todayUsed / quota.dailyLimit) * 100));
+  const fillClass = p >= 90 ? 'nav-usage-meter__fill--danger' : p >= 70 ? 'nav-usage-meter__fill--warn' : '';
+
+  return (
+    <Link href="/account/usage" className="nav-usage-meter" title={`${quota.todayUsed}/${quota.dailyLimit} generations today`}>
+      <div className="nav-usage-meter__track">
+        <div className={`nav-usage-meter__fill ${fillClass}`} style={{ width: `${p}%` }} />
+      </div>
+      <span className="nav-usage-meter__label">{quota.todayUsed}/{quota.dailyLimit}</span>
+    </Link>
+  );
+}
+
 export function NavAuth() {
   const { data: session, status } = useSession();
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === 'true';
@@ -101,6 +130,7 @@ export function NavAuth() {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      <NavUsageMeter />
       <button
         className="nav-user-trigger"
         onClick={() => setOpen(v => !v)}
@@ -145,6 +175,9 @@ export function NavAuth() {
           </Link>
           <Link href="/account" className="nav-user-item" role="menuitem" onClick={() => setOpen(false)}>
             Account
+          </Link>
+          <Link href="/account/usage" className="nav-user-item" role="menuitem" onClick={() => setOpen(false)}>
+            Usage &amp; limits
           </Link>
           <Link href="/billing" className="nav-user-item" role="menuitem" onClick={() => setOpen(false)}>
             Billing & Plans

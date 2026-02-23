@@ -1,0 +1,225 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+
+interface ApiKey {
+  id:           string;
+  name:         string;
+  keyPrefix:    string;
+  scopes:       string;
+  lastUsedAt:   string | null;
+  expiresAt:    string | null;
+  requestCount: number;
+  createdAt:    string;
+}
+
+function timeAgo(iso: string) {
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60)   return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+const SCOPE_OPTIONS = ['generate', 'read', 'projects', 'brand', 'eral'];
+const EXPIRY_OPTIONS = [
+  { value: 'never', label: 'No expiry'  },
+  { value: '30d',   label: '30 days'    },
+  { value: '90d',   label: '90 days'    },
+  { value: '1y',    label: '1 year'     },
+];
+
+export default function ApiKeysClient() {
+  const [keys,      setKeys]      = useState<ApiKey[]>([]);
+  const [loading,   setLoading]   = useState(true);
+  const [creating,  setCreating]  = useState(false);
+  const [showForm,  setShowForm]  = useState(false);
+  const [rawKey,    setRawKey]    = useState<string | null>(null);
+  const [copied,    setCopied]    = useState(false);
+  const [error,     setError]     = useState('');
+
+  const [formName,   setFormName]   = useState('');
+  const [formScopes, setFormScopes] = useState<string[]>(['generate', 'read']);
+  const [formExpiry, setFormExpiry] = useState<string>('never');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const res = await fetch('/api/keys');
+    const data = await res.json().catch(() => ({}));
+    setKeys(data.keys ?? []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleCreate = async () => {
+    if (!formName.trim()) { setError('Name is required.'); return; }
+    if (!formScopes.length) { setError('Select at least one scope.'); return; }
+    setError('');
+    setCreating(true);
+    const res = await fetch('/api/keys', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ name: formName, scopes: formScopes, expiresIn: formExpiry }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setCreating(false);
+    if (!res.ok) { setError(data.error ?? 'Failed to create key.'); return; }
+    setRawKey(data.rawKey);
+    setShowForm(false);
+    setFormName('');
+    setFormScopes(['generate', 'read']);
+    load();
+  };
+
+  const handleRevoke = async (id: string) => {
+    if (!confirm('Revoke this key? All requests using it will stop working immediately.')) return;
+    await fetch(`/api/keys/${id}`, { method: 'DELETE' });
+    load();
+  };
+
+  const copyKey = () => {
+    if (!rawKey) return;
+    navigator.clipboard.writeText(rawKey);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const toggleScope = (s: string) => {
+    setFormScopes(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+  };
+
+  return (
+    <main className="apikeys-page">
+      <div className="apikeys-header">
+        <div>
+          <h1 className="apikeys-title">API Keys</h1>
+          <p className="apikeys-subtitle">
+            Authenticate programmatic access to WokGen. Keys are hashed — we never store the raw value.
+          </p>
+        </div>
+        <button className="btn-primary" onClick={() => { setShowForm(true); setRawKey(null); }}>
+          New key
+        </button>
+      </div>
+
+      {/* Raw key reveal — shown exactly once after creation */}
+      {rawKey && (
+        <div className="apikeys-reveal">
+          <p className="apikeys-reveal-label">
+            Copy this key now. It will not be shown again.
+          </p>
+          <div className="apikeys-reveal-row">
+            <code className="apikeys-reveal-value">{rawKey}</code>
+            <button className="btn-ghost btn-sm" onClick={copyKey}>
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+          </div>
+          <button className="apikeys-reveal-dismiss" onClick={() => setRawKey(null)}>
+            I have saved this key
+          </button>
+        </div>
+      )}
+
+      {/* Create form */}
+      {showForm && (
+        <div className="apikeys-form-card">
+          <h2 className="apikeys-form-title">Create API key</h2>
+          {error && <p className="apikeys-form-error">{error}</p>}
+
+          <label className="apikeys-form-label">
+            Name
+            <input
+              className="apikeys-form-input"
+              placeholder="e.g. Production app"
+              value={formName}
+              onChange={e => setFormName(e.target.value)}
+              maxLength={60}
+            />
+          </label>
+
+          <fieldset className="apikeys-form-scopes">
+            <legend className="apikeys-form-label">Scopes</legend>
+            {SCOPE_OPTIONS.map(s => (
+              <label key={s} className="apikeys-scope-item">
+                <input
+                  type="checkbox"
+                  checked={formScopes.includes(s)}
+                  onChange={() => toggleScope(s)}
+                />
+                <span>{s}</span>
+              </label>
+            ))}
+          </fieldset>
+
+          <label className="apikeys-form-label">
+            Expiry
+            <select className="apikeys-form-select" value={formExpiry} onChange={e => setFormExpiry(e.target.value)}>
+              {EXPIRY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </label>
+
+          <div className="apikeys-form-actions">
+            <button className="btn-primary" onClick={handleCreate} disabled={creating}>
+              {creating ? 'Creating…' : 'Create key'}
+            </button>
+            <button className="btn-ghost" onClick={() => { setShowForm(false); setError(''); }}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Keys table */}
+      {loading ? (
+        <div className="apikeys-loading">Loading keys…</div>
+      ) : keys.length === 0 ? (
+        <div className="apikeys-empty">
+          <p>No API keys yet.</p>
+          <p className="apikeys-empty-sub">Create a key to start using the WokGen API programmatically.</p>
+        </div>
+      ) : (
+        <div className="apikeys-table-wrap">
+          <table className="apikeys-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Prefix</th>
+                <th>Scopes</th>
+                <th>Requests</th>
+                <th>Last used</th>
+                <th>Expires</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {keys.map(k => (
+                <tr key={k.id} className="apikeys-row">
+                  <td className="apikeys-cell-name">{k.name}</td>
+                  <td><code className="apikeys-prefix">{k.keyPrefix}…</code></td>
+                  <td className="apikeys-cell-scopes">
+                    {k.scopes.split(',').map(s => (
+                      <span key={s} className="apikeys-scope-badge">{s}</span>
+                    ))}
+                  </td>
+                  <td>{k.requestCount.toLocaleString()}</td>
+                  <td>{k.lastUsedAt ? timeAgo(k.lastUsedAt) : 'Never'}</td>
+                  <td>{k.expiresAt ? new Date(k.expiresAt).toLocaleDateString() : 'Never'}</td>
+                  <td>
+                    <button className="apikeys-revoke" onClick={() => handleRevoke(k.id)}>
+                      Revoke
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className="apikeys-docs-link">
+        <a href="/docs/platform/api" className="text-link">Read the API reference →</a>
+      </div>
+    </main>
+  );
+}

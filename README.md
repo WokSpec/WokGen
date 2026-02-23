@@ -1,18 +1,31 @@
-# WokGen
+# WokGen — Private
 
-**A multi-engine AI asset factory.** Specialized pipelines for every kind of digital asset — pixel sprites, brand systems, UI components, vectors, and more.
+> **Internal repository** for the WokSpec engineering team. Contains the full production codebase including all internal systems, quality layer, and pipeline tooling.
+>
+> Live platform: **[wokgen.wokspec.org](https://wokgen.wokspec.org)**
 
-Live platform: **[wokgen.wokspec.org](https://wokgen.wokspec.org)** — part of the [WokSpec](https://wokspec.org) platform.
-
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)
 
 ---
 
+## Internal Documentation
+
+| Doc | What it covers |
+|-----|----------------|
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Dev setup, adding modes/providers, PR rules |
+| [docs/PIPELINES.md](./docs/PIPELINES.md) | Every pipeline — CI/CD, generation, data/asset, deployment, web app — with contribution guides |
+| [docs/INTERNALS.md](./docs/INTERNALS.md) | All internal systems: prompt engine, quality profiles, provider router, negative banks, billing, rate limiting |
+| [docs/ENV.md](./docs/ENV.md) | Complete env var reference organized by system |
+| [docs/architecture.md](./docs/architecture.md) | System architecture and data flow |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | Vercel, Render, Docker, Prisma migration flow |
+| [COMMANDS.md](./COMMANDS.md) | All `npm run` commands with flags |
+
+---
+
 ## What WokGen is
 
-WokGen is a multi-mode generative asset platform. Each mode is a specialized pipeline with its own prompt schema, model routing, quality constraints, output formats, and tooling.
+WokGen is a multi-mode generative asset platform. Each mode is a sealed pipeline with its own prompt schema, model routing, quality constraints, output formats, and tooling.
 
 It is **not** a generic image generator. It is a purpose-built factory.
 
@@ -25,192 +38,104 @@ It is **not** a generic image generator. It is a purpose-built factory.
 | **UI/UX** | React/HTML components, landing pages, dashboards | ✅ Live |
 | **Vector** | SVG icons, illustration sets, design systems | 🔜 Soon |
 | **Emoji** | Emoji packs, sticker sets, platform reactions | 🔜 Soon |
+| **Voice** | AI voice generation | 🔜 Soon |
+| **Text** | LLM-powered text generation | 🔜 Soon |
 
-More engines are in development. Each engine is isolated — no cross-mode bleed.
-
-## Architecture Overview
+## Repository Layout
 
 ```
 apps/
   web/               Next.js 14 app (frontend + API routes)
-    src/lib/         Server-side engine (providers, prompt builders, routing)
+    src/lib/         Server-side engine — all internal systems live here
     src/app/         Pages and API routes
+    prisma/          Database schema and seed
 
 packages/
-  core/              Domain interfaces (public TypeScript contracts)
-  prompts/           OSS stub prompt builders
+  core/              Domain interfaces and TypeScript contracts
+  prompts/           OSS-compatible stub prompt builders
   schemas/           API request/response schemas
 
 modes/
-  pixel/             Pixel mode plugin interface
-  business/          Business mode plugin interface
-  vector/            Vector mode plugin interface
-  emoji/             Emoji mode plugin interface
-  uiux/              UI/UX mode plugin interface
+  pixel/             Pixel mode schema, exporters, prompts
+  business/          Business mode schema, exporters, prompts
+  vector/            Vector mode schema
+  emoji/             Emoji mode schema
+  uiux/              UI/UX mode schema
 
-docs/               Architecture and contributor documentation
-examples/           Workflow examples per engine
+scripts/             All generation, data, and asset pipeline scripts
+comfyui/             ComfyUI workflow JSON files
+dataset/             Dataset intake workspace
+docs/                Architecture, internals, env, pipeline docs
+examples/            Workflow examples per engine
+.github/workflows/   CI/CD pipelines
 ```
 
-## Quickstart (Self-Hosted)
+## Local Dev Setup
 
-**Prerequisites:** Node.js 18+, pnpm, PostgreSQL (or Neon)
+**Prerequisites:** Node.js 20+, PostgreSQL (or [Neon](https://neon.tech) free tier)
 
 ```bash
-git clone https://github.com/WokSpec/WokGen
-cd WokGen
-pnpm install
+# 1. Clone
+git clone git@github.com:WokSpec/WokGen-private.git
+cd WokGen-private
 
-# Configure environment
+# 2. Install dependencies
+npm install --legacy-peer-deps
+
+# 3. Configure environment
 cp apps/web/.env.example apps/web/.env.local
-# Edit .env.local — see Environment Setup below
+# Edit apps/web/.env.local — see docs/ENV.md for all variables
 
-# Initialize database
-cd apps/web && pnpm prisma db push
+# 4. Initialize database
+cd apps/web && npx prisma db push && cd ../..
 
-# Start dev server
-pnpm dev
+# 5. Start dev server
+npm run web:dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+App runs at http://localhost:3000. See [docs/ENV.md](./docs/ENV.md) for full variable reference.
 
-## Environment Setup
+## Generation Pipeline (Quick Reference)
 
-Minimum required for self-hosted operation:
-
-```env
-# Database (Postgres or Neon)
-DATABASE_URL=postgresql://...
-
-# At least one image generation API (all free tiers available)
-TOGETHER_API_KEY=      # together.ai — FLUX.1-schnell-Free (recommended)
-HF_TOKEN=             # huggingface.co — free inference
-# Pollinations works without any key
-
-# Auth (NextAuth)
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret-here
-
-# Self-hosted mode (disables billing and auth requirements)
-SELF_HOSTED=true
+```bash
+npm run cycle              # Full 5-item quality cycle (default)
+npm run cycle:fresh        # Clean then cycle
+npm run cycle -- --category world/food   # Cycle a specific category
+npm run gen                # Cloud generation only
+npm run gen:hq             # High-quality one-shot
+npm run gen:cpu            # CPU/procedural fallback
 ```
 
-Optional (for HD generation):
-```env
-FAL_KEY=              # fal.ai
-REPLICATE_API_TOKEN=  # replicate.com
-```
+See [COMMANDS.md](./COMMANDS.md) for all flags and [docs/PIPELINES.md](./docs/PIPELINES.md) for how each pipeline works internally.
 
-See [docs/development.md](./docs/development.md) for the full environment reference.
-
-## Provider Support
-
-WokGen supports multiple inference providers with automatic fallback routing:
-
-| Provider | Models | Free? |
-|----------|--------|-------|
-| Together.ai | FLUX.1-schnell-Free | ✅ Yes |
-| Hugging Face | FLUX.1-schnell | ✅ Yes (free token) |
-| Pollinations | FLUX | ✅ Yes (no key) |
-| fal.ai | FLUX.1-dev | Credits |
-| Replicate | SDXL, FLUX | Credits |
-| ComfyUI | Any local model | ✅ Local |
-
-## Mode Isolation Model
-
-Each mode is a sealed pipeline:
+## Generation Flow
 
 ```
-User Request
-    ↓
-Mode Router (mode field in request body)
-    ↓
-Mode-specific prompt schema validation
-    ↓
-Variant builder (batch slot mutation)
-    ↓
-Prompt validator (sanitize, length, conflict resolution)
-    ↓
-Negative bank assembly (global + tool + preset)
-    ↓
-Provider quality matrix (optimal provider for mode+tool+tier)
-    ↓
-Provider dispatch → fallback chain
-    ↓
-Job persistence (Postgres)
-    ↓
-Response
+Request → Auth/Rate limit → Mode router → Prompt validation
+       → Negative bank assembly → Provider quality matrix
+       → Provider dispatch → Fallback chain → Job persistence → Response
 ```
 
-No mode shares prompt logic, gallery, templates, or output format with another mode.
+Full details: [docs/INTERNALS.md](./docs/INTERNALS.md)
 
 ## WokSpec Relationship
 
-WokGen is the generation engine. [WokSpec](https://wokspec.org) is the services layer above it.
+WokGen is the generation engine. WokSpec is the services layer above it.
 
-WokSpec provides professional implementation, production polish, and scale on top of WokGen outputs:
-
-- Pixel → game art pipelines, engine integration, atlas packing
-- Business → brand system finalization, multi-channel rollout
-- UI/UX → production-ready frontend scaffolding, design systems
-
-The SaaS generates. WokSpec delivers.
-
-## What's Open vs. Closed
-
-This repository is Apache-2.0 licensed. The following are open:
-
-- Frontend application code
-- API route structure and scaffolding
-- Mode schema type definitions
-- OSS stub prompt builders (functional, generic quality)
-- Provider capability types
-- Export pipeline interfaces
-- UI components
-
-The following are **not** included in this repository:
-
-- Production prompt token chains (WokSpec proprietary quality layer)
-- Model fine-tuning parameters
-- Billing and rate-limit implementation
-- Abuse detection heuristics
-- Provider-specific model IDs and inference credentials
-
-Self-hosted deployments use the OSS stub prompt builders and produce good results.
-The hosted platform at wokgen.wokspec.org uses a private quality layer on top.
-
-See [docs/licensing.md](./docs/licensing.md) for the full boundary definition.
+| WokGen Output | WokSpec Service |
+|---------------|-----------------|
+| Pixel sprites | Game art pipelines, engine integration, atlas packing |
+| Business assets | Brand system finalization, multi-channel rollout |
+| UI/UX mockups | Production frontend scaffolding, design systems |
+| Vector icons | Design system build-out |
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to:
-
-- Set up your local environment
-- Add a new asset engine mode
-- Add a new provider adapter
-- Submit a pull request
-
-Please read [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) before contributing.
-
-## Security
-
-To report a vulnerability, see [SECURITY.md](./SECURITY.md). Do not open public issues for security reports.
-
-## Roadmap
-
-- [ ] Vector engine (SVG generation pipeline)
-- [ ] Emoji engine (platform-aware export)
-- [ ] Batch export and ZIP packing UI
-- [ ] API key management dashboard
-- [ ] Public gallery curation tools
-- [ ] Mode plugin registry
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Internal team members have full access to all systems — quality profiles, negative banks, provider router, billing logic, and prompt chains are all editable.
 
 ## License
 
-Apache-2.0. See [LICENSE](./LICENSE) for details.
-
-Assets generated by the platform are subject to the terms of the underlying model providers.
-See [docs/licensing.md](./docs/licensing.md) for asset usage rights.
+Apache-2.0 for the codebase. See [docs/licensing.md](./docs/licensing.md) for the full boundary definition (applies to public releases; all systems are visible in this private repo).
 
 ---
 

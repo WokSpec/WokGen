@@ -32,25 +32,25 @@ import { prisma } from '@/lib/db';
 // ---------------------------------------------------------------------------
 
 export const DAILY_STD_LIMIT: Record<string, number> = {
-  guest: 3,
-  free:  10,
-  plus:  -1,   // -1 = unlimited
-  pro:   -1,
-  max:   -1,
+  guest: 5,
+  free:  50,   // generous free tier — a real working session
+  plus:  200,
+  pro:   500,
+  max:   -1,   // -1 = unlimited
 };
 
 export const SFX_DAILY_LIMIT: Record<string, number> = {
-  guest: 2,
-  free:  3,
-  plus:  20,
+  guest: 3,
+  free:  10,
+  plus:  50,
   pro:   -1,
   max:   -1,
 };
 
 export const TTS_DAILY_LIMIT: Record<string, number> = {
   guest: 3,
-  free:  5,
-  plus:  20,
+  free:  10,
+  plus:  50,
   pro:   -1,
   max:   -1,
 };

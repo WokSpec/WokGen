@@ -1,6 +1,12 @@
 'use client';
 
+
+
+
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { motion, AnimatePresence } from 'framer-motion';
+import { fireConfetti } from '@/lib/confetti';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -992,6 +998,19 @@ function OutputPanel({
         <button className="btn-ghost btn-sm" onClick={onCopyImage} title="Copy image to clipboard">
           ⎘ Copy
         </button>
+        {result?.jobId && (
+          <button
+            className="btn-ghost btn-sm"
+            title="Copy share link"
+            onClick={() => {
+              const url = `${window.location.origin}/assets/${result.jobId}`;
+              navigator.clipboard.writeText(url).catch(() => {});
+              // toast handled by parent caller if wired; silent fallback here
+            }}
+          >
+            ⇧ Share
+          </button>
+        )}
         {result?.guestDownloadGated ? (
           <a
             href="/api/auth/signin"
@@ -1063,9 +1082,16 @@ function OutputPanel({
               ))}
             </div>
           </div>
-        ) : activeUrl ? (
-          <div
+        ) : (
+          <AnimatePresence mode="wait">
+            {activeUrl && (
+          <motion.div
+            key={activeUrl}
             className="output-image-frame"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
             style={{
               background: 'transparent',
               border: '1px solid rgba(167,139,250,.15)',
@@ -1083,7 +1109,7 @@ function OutputPanel({
             <img
               src={displayUrl ?? activeUrl}
               alt="Generated result"
-              className="pixel-art"
+              className="pixel-art result-reveal"
               style={{
                 imageRendering: 'pixelated',
                 transform: `scale(${zoom})`,
@@ -1126,8 +1152,10 @@ function OutputPanel({
                 }}
               />
             )}
-          </div>
-        ) : null}
+          </motion.div>
+            )}
+          </AnimatePresence>
+        )}
 
         {/* Color palette — shown below canvas when result is ready */}
         {result && activeUrl && (
@@ -1364,6 +1392,19 @@ function GenerateForm({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Derived control visibility for the active tool
   const toolControls = TOOL_CONTROLS[tool];
+
+  // react-dropzone for reference image upload
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp'] },
+    maxFiles: 1,
+    maxSize: 10 * 1024 * 1024,
+    onDrop: (accepted) => {
+      if (accepted[0]) {
+        const url = URL.createObjectURL(accepted[0]);
+        setRefImageUrl(url);
+      }
+    },
+  });
   // Prompt length color — yellow at 160, red at 190+
   const promptLen = prompt.length;
   const promptLenColor = promptLen >= 190 ? '#ef4444' : promptLen >= 160 ? '#eab308' : 'var(--text-disabled)';
@@ -1407,6 +1448,7 @@ function GenerateForm({
               {/* Save as Favorite */}
               <button
                 title={favSaved ? 'Saved!' : 'Save prompt as favorite'}
+                aria-label={favSaved ? 'Saved!' : 'Save prompt as favorite'}
                 onClick={savePromptAsFavorite}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', lineHeight: 1, color: favSaved ? '#f59e0b' : 'var(--text-disabled)', transition: 'color 0.15s' }}
               >
@@ -1891,9 +1933,8 @@ function GenerateForm({
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (!f) return;
-                  const reader = new FileReader();
-                  reader.onload = (ev) => setRefImageUrl((ev.target?.result as string) ?? null);
-                  reader.readAsDataURL(f);
+                  const url = URL.createObjectURL(f);
+                  setRefImageUrl(url);
                 }}
               />
               {refImageUrl ? (
@@ -1906,13 +1947,27 @@ function GenerateForm({
                   </div>
                 </div>
               ) : (
-                <button
-                  className="w-full py-3 rounded-md text-xs text-center transition-all duration-150"
-                  style={{ border: '1px dashed var(--surface-border)', color: 'var(--text-muted)', background: 'var(--surface-overlay)' }}
-                  onClick={() => refImageInputRef.current?.click()}
+                <div
+                  {...getRootProps()}
+                  className={`studio-dropzone${isDragActive ? ' studio-dropzone--active' : ''}`}
+                  style={{
+                    border: `1px dashed ${isDragActive ? 'var(--accent)' : 'var(--surface-border)'}`,
+                    borderRadius: 6,
+                    padding: '12px 8px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    background: isDragActive ? 'var(--accent-dim)' : 'var(--surface-overlay)',
+                    color: isDragActive ? 'var(--accent)' : 'var(--text-muted)',
+                    fontSize: '0.75rem',
+                    transition: 'all 0.15s',
+                  }}
                 >
-                  + Upload reference sprite
-                </button>
+                  <input {...getInputProps()} />
+                  {isDragActive
+                    ? <span>Drop image here</span>
+                    : <span>Drag reference image or click to browse</span>
+                  }
+                </div>
               )}
               <p className="form-hint mt-1">Upload a front-facing sprite to maintain consistency across {directionCount} views.</p>
             </div>
@@ -2485,6 +2540,7 @@ function StudioInner() {
           resolvedSeed: baseSeed,
         };
         setResult(gen);
+        fireConfetti('generation');
         setSelectedBatch(0);
         setBatchResults([gen]);
         setJobStatus('succeeded');
@@ -2552,6 +2608,7 @@ function StudioInner() {
       if (batchCount === 1) {
         const gen = await fetchOne(baseSeed);
         setResult(gen);
+        fireConfetti('generation');
         setSelectedBatch(0);
         setBatchResults([gen]);
         setJobStatus('succeeded');
@@ -2573,6 +2630,7 @@ function StudioInner() {
         setBatchResults(fulfilled);
         setSelectedBatch(0);
         setResult(fulfilled[0]);
+        fireConfetti('generation');
         setJobStatus('succeeded');
         fulfilled.forEach(gen => {
           if (gen.resultUrl) {

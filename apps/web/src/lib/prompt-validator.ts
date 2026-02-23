@@ -78,8 +78,32 @@ const STRIP_PATTERNS = [
 ];
 
 // ---------------------------------------------------------------------------
-// Validation result
+// Adversarial / jailbreak pattern detection (prompt injection hardening)
 // ---------------------------------------------------------------------------
+
+const INJECTION_PATTERNS: RegExp[] = [
+  // System prompt override attempts
+  /ignore (all )?(previous|prior|above) (instructions?|prompts?|context)/gi,
+  /you are now|forget (your|all) (instructions?|constraints?|rules?)/gi,
+  /new (system |role |persona )?instructions?:/gi,
+  /\[system\]|\[assistant\]|\[user\]|\[inst\]/gi,
+  // DAN / jailbreak personas
+  /\bDAN\b/g,
+  /do anything now/gi,
+  /developer mode/gi,
+  /jailbreak/gi,
+  /bypass (safety|filter|moderation)/gi,
+  // Prompt leakage attempts
+  /print (your|the) (system |original )?prompt/gi,
+  /reveal (your|the) (system |internal )?instructions?/gi,
+  /what (are|were) your instructions?/gi,
+  // Encoded injection (base64 / unicode tricks)
+  /\beval\s*\(/gi,
+  /javascript:/gi,
+  /data:text\/html/gi,
+];
+
+
 
 export interface ValidationResult {
   /** Sanitized positive prompt — safe to send to provider */
@@ -121,6 +145,20 @@ export function validateAndSanitize(
   const warnings: string[] = [];
   let p = prompt ?? '';
   let n = negPrompt ?? '';
+
+  // ── Step 0: Injection detection ─────────────────────────────────────────
+  for (const re of INJECTION_PATTERNS) {
+    if (re.test(p)) {
+      return {
+        sanitized:    '',
+        sanitizedNeg: '',
+        warnings:     [],
+        invalid:      true,
+        invalidReason: 'Prompt contains disallowed patterns and cannot be processed.',
+      };
+    }
+    re.lastIndex = 0;
+  }
 
   // ── Step 1: Strip dangerous / useless patterns ──────────────────────────
   for (const re of STRIP_PATTERNS) {

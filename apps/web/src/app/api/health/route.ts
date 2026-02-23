@@ -54,7 +54,25 @@ export async function GET() {
   }
 
   // --------------------------------------------------------------------------
-  // 2. Environment check — warn if no provider is configured
+  // 2. Redis ping (Upstash — non-fatal if not configured)
+  // --------------------------------------------------------------------------
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+  if (redisUrl) {
+    const redisStart = Date.now();
+    try {
+      const res = await fetch(`${redisUrl}/ping`, {
+        headers: { Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN ?? ''}` },
+        signal: AbortSignal.timeout(2000),
+      });
+      const ok = res.ok;
+      checks.redis = { ok, latencyMs: Date.now() - redisStart };
+    } catch (err) {
+      checks.redis = { ok: false, latencyMs: Date.now() - redisStart, error: err instanceof Error ? err.message : String(err) };
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. Environment check — warn if no provider is configured
   // --------------------------------------------------------------------------
   const anyProviderKey = Boolean(
     process.env.REPLICATE_API_TOKEN ||
@@ -65,11 +83,10 @@ export async function GET() {
 
   checks.providers = {
     ok: anyProviderKey || Boolean(comfyuiHost),
-    // Not a hard failure — ComfyUI is always "configured"
   };
 
   // --------------------------------------------------------------------------
-  // 3. Overall status
+  // 4. Overall status
   // --------------------------------------------------------------------------
   const allOk = dbOk;
   const status = allOk ? 'ok' : 'degraded';

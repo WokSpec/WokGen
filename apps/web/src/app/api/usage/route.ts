@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { DAILY_STD_LIMIT } from '@/lib/quota';
 
 /**
  * GET /api/usage
@@ -8,9 +9,12 @@ import { prisma } from '@/lib/db';
  * Returns generation stats for the authenticated user:
  *  - allTime / thisMonth / today counts (total / hd / standard)
  *  - daily breakdown for the last 30 days (for spark-chart)
+ *  - per-mode breakdown for today and all-time
+ *  - quota limits for the user's tier
+ *  - paginated request log (?page=1&limit=20)
  *  - last 12 jobs with resultUrl for history strip
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -18,6 +22,9 @@ export async function GET() {
 
   const userId = session.user.id;
   const now    = new Date();
+  const url    = new URL(req.url);
+  const page   = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10));
+  const limit  = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') ?? '20', 10)));
 
   // Period boundaries
   const startOfToday = new Date(now);
@@ -29,15 +36,17 @@ export async function GET() {
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
   thirtyDaysAgo.setHours(0, 0, 0, 0);
 
-  // Fetch all succeeded jobs in the last 30 days (for stats + chart)
-  const [recentJobs, allTimeTotal, allTimeHd] = await Promise.all([
+  const [recentJobs, allTimeTotal, allTimeHd, user, subscription, requestLogTotal] = await Promise.all([
     prisma.job.findMany({
       where:   { userId, status: 'succeeded', createdAt: { gte: thirtyDaysAgo } },
       orderBy: { createdAt: 'desc' },
-      select:  { id: true, provider: true, createdAt: true, resultUrl: true, prompt: true, tool: true },
+      select:  { id: true, provider: true, mode: true, createdAt: true, resultUrl: true, prompt: true, tool: true },
     }),
     prisma.job.count({ where: { userId, status: 'succeeded' } }),
     prisma.job.count({ where: { userId, status: 'succeeded', provider: 'replicate' } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { stdGenToday: true, stdGenDate: true, hdMonthlyUsed: true, hdTopUpCredits: true } }),
+    prisma.subscription.findUnique({ where: { userId }, include: { plan: true } }),
+    prisma.job.count({ where: { userId }, }),
   ]);
 
   // Partition into HD vs standard (replicate = HD, everything else = standard)
@@ -64,8 +73,33 @@ export async function GET() {
       else bucket.standard++;
     }
   }
-
   const daily = Array.from(dailyMap.entries()).map(([date, counts]) => ({ date, ...counts }));
+
+  // Per-mode breakdown (today + all-time from recentJobs for today slice)
+  const modes = ['pixel', 'business', 'vector', 'emoji', 'uiux', 'voice', 'text'] as const;
+  const modeBreakdownToday: Record<string, number> = {};
+  const modeBreakdownMonth: Record<string, number> = {};
+  for (const m of modes) {
+    modeBreakdownToday[m]  = todayJobs.filter(j => j.mode === m).length;
+    modeBreakdownMonth[m]  = thisMonthJobs.filter(j => j.mode === m).length;
+  }
+
+  // Quota info
+  const planId = subscription?.plan?.id ?? 'free';
+  const dailyLimit = DAILY_STD_LIMIT[planId] ?? DAILY_STD_LIMIT['free'];
+  const todayUsed  = user?.stdGenToday ?? 0;
+  const hdAlloc    = subscription?.plan?.creditsPerMonth ?? 0;
+  const hdUsed     = user?.hdMonthlyUsed ?? 0;
+  const hdTopUp    = user?.hdTopUpCredits ?? 0;
+
+  // Paginated request log
+  const logJobs = await prisma.job.findMany({
+    where:   { userId },
+    orderBy: { createdAt: 'desc' },
+    skip:    (page - 1) * limit,
+    take:    limit,
+    select:  { id: true, mode: true, tool: true, provider: true, status: true, prompt: true, createdAt: true, resultUrl: true },
+  });
 
   return NextResponse.json({
     allTime: {
@@ -83,12 +117,42 @@ export async function GET() {
       hd:       todayJobs.filter(j => isHd(j.provider)).length,
       standard: todayJobs.filter(j => !isHd(j.provider)).length,
     },
+    quota: {
+      planId,
+      dailyLimit,   // -1 = unlimited
+      todayUsed,
+      hdAlloc,
+      hdUsed,
+      hdTopUp,
+      hdAvailable: Math.max(0, hdAlloc - hdUsed) + hdTopUp,
+    },
+    modeToday:  modeBreakdownToday,
+    modeMonth:  modeBreakdownMonth,
     daily,
+    // Paginated request log
+    log: {
+      items: logJobs.map(j => ({
+        id:        j.id,
+        mode:      j.mode,
+        tool:      j.tool,
+        provider:  j.provider,
+        status:    j.status,
+        prompt:    j.prompt.slice(0, 120),
+        resultUrl: j.resultUrl,
+        createdAt: j.createdAt.toISOString(),
+        hd:        isHd(j.provider),
+      })),
+      total: requestLogTotal,
+      page,
+      limit,
+      pages: Math.ceil(requestLogTotal / limit),
+    },
     // Most recent 12 jobs with images for history strip
     recent: recentJobs.slice(0, 12).map(j => ({
       id:        j.id,
       prompt:    j.prompt,
       tool:      j.tool,
+      mode:      j.mode,
       provider:  j.provider,
       resultUrl: j.resultUrl,
       createdAt: j.createdAt.toISOString(),

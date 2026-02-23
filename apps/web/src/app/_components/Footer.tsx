@@ -3,77 +3,113 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const LEFT_LINKS = [
-  { label: 'Pixel Studio',     href: '/pixel/studio',                        external: false },
-  { label: 'Gallery',          href: '/pixel/gallery',                       external: false },
-  { label: 'Billing',          href: '/billing',                             external: false },
-  { label: 'Docs',             href: '/docs',                                external: false },
-  { label: 'Terms',            href: '/terms',                               external: false },
-  { label: 'Privacy',          href: '/privacy',                             external: false },
+const PRODUCT_LINKS = [
+  { label: 'Pixel Studio',      href: '/pixel/studio'    },
+  { label: 'Business Studio',   href: '/business/studio' },
+  { label: 'Vector Studio',     href: '/vector/studio'   },
+  { label: 'UI/UX Studio',      href: '/uiux/studio'     },
+  { label: 'Voice Studio',      href: '/voice/studio'    },
+  { label: 'SFX Studio',        href: '/sfx/studio'      },
+  { label: 'Text Studio',       href: '/text/studio'     },
+  { label: 'Emoji Studio',      href: '/emoji/studio'    },
 ];
 
-const RIGHT_LINKS = [
-  { label: 'wokspec.org', href: 'https://wokspec.org',                  external: true },
-  { label: 'GitHub',      href: 'https://github.com/WokSpec/WokGen',   external: true },
+const PLATFORM_LINKS = [
+  { label: 'Eral AI',           href: '/eral'            },
+  { label: 'Eral Director',     href: '/eral/director'   },
+  { label: 'Eral Simulate',     href: '/eral/simulate'   },
+  { label: 'Brand Kits',        href: '/brand'           },
+  { label: 'Projects',          href: '/projects'        },
+  { label: 'Community',         href: '/community'       },
+  { label: 'Usage & Limits',    href: '/account/usage'   },
+  { label: 'Notifications',     href: '/settings'        },
+  { label: 'Automations',       href: '/automations'     },
+  { label: 'Pricing',           href: '/pricing'         },
+  { label: 'Billing',           href: '/billing'         },
 ];
 
-function NavItem({ label, href, external }: { label: string; href: string; external: boolean }) {
-  const style: React.CSSProperties = { fontSize: '0.78rem', color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' };
-  const props = {
-    style,
-    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.color = 'var(--text)'; },
-    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; },
-  };
-  return external
-    ? <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{label}</a>
-    : <Link href={href} {...props}>{label}</Link>;
-}
+const COMPANY_LINKS = [
+  { label: 'Docs',              href: '/docs',                                  ext: false },
+  { label: 'GitHub',            href: 'https://github.com/WokSpec/WokGen',      ext: true  },
+  { label: 'WokSpec',           href: 'https://wokspec.org',                   ext: true  },
+  { label: 'Terms',             href: '/terms',                                 ext: false },
+  { label: 'Privacy',           href: '/privacy',                               ext: false },
+  { label: 'Security',          href: '/security',                              ext: false },
+];
 
 export function Footer() {
   const pathname = usePathname();
-  if (pathname === '/studio' || pathname.endsWith('/studio')) return null;
+  // Studios get a minimal footer strip, not the full footer
+  if (pathname.endsWith('/studio')) return null;
 
   return (
-    <footer>
-      <div className="divider-gradient" />
-      <div style={{ background: 'var(--bg-surface)' }}>
-        <div style={{ maxWidth: '72rem', margin: '0 auto', padding: '2rem 1.5rem' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
+    <footer className="site-footer">
+      <div className="site-footer__inner">
+        <div className="site-footer__cols">
 
-            {/* Brand */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Wok</span>
-                <span style={{ color: '#a78bfa' }}>Gen</span>
-              </span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-faint)' }}>
-                by{' '}
-                <a href="https://wokspec.org" style={{ color: 'var(--text-faint)', textDecoration: 'none', transition: 'color 0.15s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--text-faint)'; }}>
-                  Wok Specialists
-                </a>
-              </span>
-            </div>
-
-            {/* Links */}
-            <nav style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1.5rem' }} aria-label="Footer navigation">
-              {LEFT_LINKS.map(l => <NavItem key={l.label} {...l} />)}
-              <span style={{ color: 'var(--border)', fontSize: '0.7rem' }}>·</span>
-              {RIGHT_LINKS.map(l => <NavItem key={l.label} {...l} />)}
-            </nav>
-
+          {/* Brand */}
+          <div className="site-footer__brand">
+            <Link href="/" className="site-footer__wordmark">
+              <span>Wok</span><span>Gen</span>
+            </Link>
+            <p className="site-footer__brand-sub">
+              Open-source multi-engine AI asset generator.
+              Free to use, free to fork.{' '}
+              <a href="https://github.com/WokSpec/WokGen" target="_blank" rel="noopener noreferrer">
+                MIT license.
+              </a>
+            </p>
           </div>
 
-          <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
-            <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)' }}>
-              © {new Date().getFullYear()} Wok Specialists LLC. Released under the{' '}
-              <a href="/license" style={{ color: 'var(--text-faint)', textDecoration: 'none' }}>MIT license</a>.
-            </p>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <span className="tag tag-gray" style={{ fontSize: '0.58rem' }}>Next.js</span>
-              <span className="tag tag-gray" style={{ fontSize: '0.58rem' }}>Vercel</span>
-            </div>
+          {/* Product */}
+          <div>
+            <p className="site-footer__col-title">Studios</p>
+            <ul className="site-footer__col-links">
+              {PRODUCT_LINKS.map(l => (
+                <li key={l.label}>
+                  <Link href={l.href} className="site-footer__link">{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Platform */}
+          <div>
+            <p className="site-footer__col-title">Platform</p>
+            <ul className="site-footer__col-links">
+              {PLATFORM_LINKS.map(l => (
+                <li key={l.label}>
+                  <Link href={l.href} className="site-footer__link">{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <p className="site-footer__col-title">WokSpec</p>
+            <ul className="site-footer__col-links">
+              {COMPANY_LINKS.map(l => (
+                <li key={l.label}>
+                  {l.ext
+                    ? <a href={l.href} target="_blank" rel="noopener noreferrer" className="site-footer__link">{l.label}</a>
+                    : <Link href={l.href} className="site-footer__link">{l.label}</Link>}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+        </div>
+
+        <div className="site-footer__bottom">
+          <p className="site-footer__copy">
+            © {new Date().getFullYear()} Wok Specialists LLC.{' '}
+            Released under the <a href="/license">MIT license</a>.
+          </p>
+          <div className="site-footer__tech-tags">
+            <span className="site-footer__tech-tag">Next.js</span>
+            <span className="site-footer__tech-tag">Vercel</span>
+            <span className="site-footer__tech-tag">Open Source</span>
           </div>
         </div>
       </div>

@@ -1,12 +1,13 @@
 # Contributing to WokGen
 
-Thank you for your interest in contributing. This document explains how to get started,
-what kinds of contributions are accepted, and how to submit work.
+Internal contribution guide for the WokSpec engineering team. All internal systems — quality profiles, negative banks, provider router, prompt chains, billing, rate limiting — are fully visible and editable in this repo.
+
+See [docs/INTERNALS.md](./docs/INTERNALS.md) for a deep-dive on each system and [docs/PIPELINES.md](./docs/PIPELINES.md) for pipeline-specific contribution guides.
 
 ## Prerequisites
 
-- Node.js 18+
-- pnpm 8+
+- Node.js 20+
+- npm (the repo uses npm workspaces — **not** pnpm or yarn)
 - PostgreSQL 14+ (or a free [Neon](https://neon.tech) instance)
 - Git
 
@@ -14,26 +15,44 @@ what kinds of contributions are accepted, and how to submit work.
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/WokSpec/WokGen
-cd WokGen
+git clone git@github.com:WokSpec/WokGen-private.git
+cd WokGen-private
 
 # 2. Install dependencies
-pnpm install
+npm install --legacy-peer-deps
 
 # 3. Configure environment
 cp apps/web/.env.example apps/web/.env.local
-# Edit apps/web/.env.local — see Environment Setup in README.md
+# Edit apps/web/.env.local — see docs/ENV.md for all variables
 
 # 4. Initialize database
-cd apps/web && pnpm prisma db push
+cd apps/web && npx prisma db push && cd ../..
 
 # 5. Start development server
-cd ../.. && pnpm dev
+npm run web:dev
 ```
 
 The app runs at http://localhost:3000. API routes are at `/api/*`.
 
-## How to Add a New Asset Engine Mode
+## Internal Systems You Can Edit
+
+All of the following were previously marked `@private` in the OSS release. In this repo they are fully open for team contribution:
+
+| System | File(s) | What you can change |
+|--------|---------|---------------------|
+| Quality Profiles | `apps/web/src/lib/quality-profiles.ts` | steps, guidance, width, height per preset/mode |
+| Provider Router | `apps/web/src/lib/provider-router.ts` | Standard and HD routing matrices, add/reorder providers |
+| Negative Banks | `apps/web/src/lib/negative-banks.ts` | Token lists, per-tool and per-preset negatives |
+| Prompt Builders | `apps/web/src/lib/prompt-builder-*.ts` | Per-mode prompt scaffolding, token chains |
+| Prompt Engine | `apps/web/src/lib/prompt-engine.ts` | Engine adapter (`PROMPT_ENGINE=wokspec\|oss`) |
+| Plan Limits | `apps/web/src/lib/plan-limits.ts` | Workspace counts per plan tier |
+| Rate Limits | `apps/web/src/lib/rate-limit.ts` | Sliding window limits, Redis/Postgres/fallback logic |
+| Billing | `apps/web/src/lib/stripe.ts` | Stripe integration, credit deduction logic |
+| Feature Flags | `apps/web/src/lib/feature-flags.ts` | `MAINTENANCE_MODE`, `DISABLE_SIGNUPS`, etc. |
+
+See [docs/INTERNALS.md](./docs/INTERNALS.md) for how each system works and how to tune it.
+
+
 
 A new mode requires:
 
@@ -60,20 +79,11 @@ Mode naming convention: lowercase, no hyphens (e.g. `pixel`, `business`, `uiux`)
 
 All pull requests must:
 
-- Pass `pnpm tsc --noEmit` with zero errors
-- Pass `pnpm eslint` with no new warnings
+- Pass `cd apps/web && npx tsc --noEmit` with zero errors
+- Pass `cd apps/web && npx eslint` with no new warnings
 - Not introduce any secrets, API keys, or credentials
-- Not modify files in `apps/web/src/lib/` that are marked `@private` (prompt token chains, quality profiles)
 - Include a description of what changed and why
 - Reference an issue if one exists
-
-## What Will NOT Be Accepted
-
-- Changes to `STYLE_PRESET_TOKENS` or `ASSET_CATEGORY_TOKENS` (these are proprietary)
-- Changes to `QUALITY_PROFILES` step/CFG values (these are tuned for production)
-- Changes to billing or rate-limiting logic
-- Adding new dependencies without discussion in an issue first
-- Style changes (formatting) without a corresponding logic change
 
 ## Commit Message Format
 

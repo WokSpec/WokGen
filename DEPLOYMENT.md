@@ -30,7 +30,8 @@ In **Project → Settings → Environment Variables**, add:
 
 | Variable | Value |
 |---|---|
-| `DATABASE_URL` | Your Neon connection string |
+| `DATABASE_URL` | Your Neon **pooled** connection string (PgBouncer port 6432) — append `?statement_timeout=10000` for 10s query timeout |
+| `DIRECT_URL` | Your Neon **direct** connection string (port 5432) — used for migrations |
 | `NEXT_PUBLIC_BASE_URL` | `https://wokgen.wokspec.org` |
 | `NEXT_TELEMETRY_DISABLED` | `1` |
 | `AUTH_SECRET` | Run `openssl rand -base64 32` and paste output |
@@ -41,6 +42,27 @@ In **Project → Settings → Environment Variables**, add:
 | `TOGETHER_API_KEY` | *(optional)* your Together key |
 | `REPLICATE_API_TOKEN` | *(optional)* your Replicate token |
 | `FAL_API_KEY` | *(optional)* your fal.ai key |
+| `GROQ_API_KEY` | *(optional, free)* Groq API key — powers Eral 7c and prompt enhance |
+| `GOOGLE_AI_API_KEY` | *(optional, free)* Google AI Studio key — powers Eral Gemini variant |
+| `MISTRAL_API_KEY` | *(optional, free)* Mistral key — powers Eral Fast variant |
+| `UPSTASH_REDIS_REST_URL` | *(optional)* Upstash Redis URL — enables rate limit cache + gallery cache |
+| `UPSTASH_REDIS_REST_TOKEN` | *(optional)* Upstash Redis token |
+| `NEXT_PUBLIC_SENTRY_DSN` | *(optional)* Sentry DSN for error tracking (free tier) |
+| `MAINTENANCE_MODE` | *(optional)* Set to `true` to return 503 on all routes (except `/api/health`) |
+| `METRICS_SECRET` | *(optional)* Secret header for `/api/metrics` (Prometheus endpoint) |
+| `GENERATION_CONCURRENCY` | *(optional)* Max simultaneous AI calls per serverless instance. Default: `10` |
+| `ENABLE_QUALITY_GATE` | *(optional)* Set to `false` to disable image entropy check. Default: `true` |
+| `MAX_BATCH_SIZE` | *(optional)* Max images per batch generation request. Default: `8` |
+| `DISABLE_SIGNUPS` | *(optional)* Set to `true` to prevent new account creation |
+| `DISABLE_GUEST_GENERATION` | *(optional)* Set to `true` to require auth for all generations |
+| `HF_TOKEN` | *(optional)* HuggingFace access token — improves free rate limits on FLUX.1-schnell |
+
+> **CONNECTION POOLING (important for serverless)**
+>
+> Neon provides two connection strings. Use the **pooled** (PgBouncer) URL as `DATABASE_URL`
+> and the **direct** URL as `DIRECT_URL`. This is required for Prisma on serverless (Vercel/Edge)
+> to avoid connection exhaustion under load. In Neon dashboard: "Connection Details" → toggle
+> "Connection pooling" to get the pooled URL.
 
 **GitHub OAuth App setup:**
 1. Go to https://github.com/settings/developers → OAuth Apps → New OAuth App
@@ -61,9 +83,9 @@ Run this **once** from your local machine after setting up Neon:
 ```bash
 cd apps/web
 # If you have a migrations folder:
-DATABASE_URL="<your-neon-url>" npx prisma migrate deploy
+DIRECT_URL="<your-neon-direct-url>" DATABASE_URL="<your-neon-pooled-url>" npx prisma migrate deploy
 # If not (first time, no migrations yet):
-DATABASE_URL="<your-neon-url>" npx prisma db push
+DIRECT_URL="<your-neon-direct-url>" DATABASE_URL="<your-neon-pooled-url>" npx prisma db push
 ```
 
 Or use Vercel's CLI to pull env vars first:
@@ -124,3 +146,41 @@ To use them, re-enable `output: 'standalone'` in `apps/web/next.config.js` (see 
 
 WokGen supports BYOK (Bring Your Own Key) — users paste their key in the Studio UI.
 Server-side keys (`TOGETHER_API_KEY`, etc.) are optional fallbacks set in Vercel dashboard.
+
+---
+
+## Scaling to 200k DAU
+
+### Database (Neon)
+- Use the **pooled** connection string as `DATABASE_URL` (PgBouncer — handles ~10k concurrent connections)
+- Set `DIRECT_URL` to the direct connection (Prisma uses this for migrations only)
+- Neon's serverless driver auto-scales — no manual instance sizing needed
+
+### Redis (Upstash)
+- Upstash Redis handles rate limiting and gallery cache
+- Free tier: 10k commands/day. For 200k DAU, use Upstash Pro (~$0.20/100k commands)
+- Set `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`
+
+### Vercel
+- Vercel serverless functions auto-scale to demand (no config needed)
+- Functions with heavy computation (generation) have `maxDuration = 60` set
+- Set `VERCEL_MAX_LAMBDAS` in dashboard if you hit concurrency limits on Pro plan
+
+### Monitoring
+- `/api/health` — health check for uptime monitors (UptimeRobot, Betterstack)
+- `/api/metrics` — Prometheus-format metrics (set `METRICS_SECRET` env var, then scrape)
+- Sentry error tracking: set `NEXT_PUBLIC_SENTRY_DSN` (free 5k errors/month)
+
+### Load testing
+Run against staging before each major release:
+```bash
+# Install k6: https://k6.io/docs/get-started/installation/
+k6 run scripts/load-test.js --env BASE_URL=https://staging.wokgen.wokspec.org
+```
+
+### Post-deploy checks
+```bash
+./scripts/smoke-test.sh https://wokgen.wokspec.org
+./scripts/chaos-test.sh https://wokgen.wokspec.org
+./scripts/security-probe.sh https://wokgen.wokspec.org
+```

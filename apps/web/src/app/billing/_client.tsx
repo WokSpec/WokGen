@@ -19,7 +19,7 @@ interface Props {
   creditPacks: unknown[];
 }
 
-// ─── Plan display config ──────────────────────────────────────────────────────
+/* ── Plan meta ───────────────────────────────────────────────────────────── */
 
 const PLAN_META: Record<string, {
   tagline: string;
@@ -30,30 +30,35 @@ const PLAN_META: Record<string, {
   free: {
     tagline: 'Start creating. No card needed.',
     features: [
-      '10 image generations/day',
+      '50 image generations/day',
       '3 sound effects/day',
       '5 voice generations/day (1,000 char limit)',
       '5 Eral voice conversations/day',
       '30 Eral messages/day',
-      '3 workspaces',
+      '3 projects',
       'Community gallery access',
       'Color palette extraction',
       'QR code generator',
       'Background remover (3/day)',
+      'Eral Director (1 plan/day)',
+      'Brand kit (1)',
     ],
   },
   plus: {
-    tagline: 'For regular creators.',
+    tagline: 'For regular creators who mean it.',
     features: [
-      'Unlimited standard generations',
+      '200 standard generations/day',
       '50 HD credits/month',
       '20 sound effects/day',
-      '20 voice generations/day (3,000 char limit)',
-      'Unlimited Eral voice conversations',
-      'Priority provider routing (faster generations)',
-      '10 workspaces',
-      'Batch generation (5 variants)',
-      'ElevenLabs HD voices (eleven_multilingual_v2)',
+      '20 voice generations/day (3,000 char)',
+      'Unlimited Eral voice',
+      'Priority provider routing',
+      'Unlimited projects',
+      'Batch ×4 variants',
+      'ElevenLabs HD voices',
+      'Style snapshots',
+      'Eral Director (20 plans/day)',
+      'Brand kits (5)',
     ],
     perCredit: '$0.02',
   },
@@ -62,50 +67,56 @@ const PLAN_META: Record<string, {
     badge: 'Most Popular',
     features: [
       'Everything in Plus',
-      '200 HD credits/month',
+      '500 standard generations/day',
+      '150 HD credits/month',
       'Unlimited sound effects',
-      'Unlimited voice (10,000 char limit)',
+      'Unlimited voice (10,000 char)',
       'Voice cloning (1 custom voice)',
-      '50 workspaces',
-      'Batch generation (10 variants)',
+      'Batch ×16 variants',
       'API access',
+      'Team (3 seats)',
+      'Sprite atlas builder',
+      'Eral Director (100 plans/day)',
+      'Unlimited brand kits',
     ],
     perCredit: '$0.012',
   },
   max: {
-    tagline: 'Maximum output, lowest cost.',
+    tagline: 'Maximum output, minimum friction.',
     features: [
       'Everything in Pro',
-      'Unlimited HD credits',
-      '5 custom voices (voice cloning)',
-      'Unlimited workspaces',
+      'Unlimited standard generations',
+      '500 HD credits/month',
+      '5 custom voices (cloning)',
+      'Unlimited team seats',
       'Highest API rate limits',
       'Early access to new features',
+      'Eral Director (unlimited)',
     ],
     perCredit: '$0.0075',
   },
 };
 
-// ─── Credit packs ─────────────────────────────────────────────────────────────
+/* ── Credit packs ────────────────────────────────────────────────────────── */
 
 const PACKS = [
-  { id: 'micro',  label: 'Micro',  price: '$1',  credits: 30,    perCredit: '$0.033', note: '' },
-  { id: 'small',  label: 'Small',  price: '$3',  credits: 100,   perCredit: '$0.03',  note: '' },
-  { id: 'medium', label: 'Medium', price: '$8',  credits: 400,   perCredit: '$0.02',  note: '' },
-  { id: 'large',  label: 'Large',  price: '$20', credits: 1200,  perCredit: '$0.017', note: 'Best value' },
+  { id: 'micro',  label: 'Micro',  price: '$1',  credits: 30,   perCredit: '$0.033', note: '' },
+  { id: 'small',  label: 'Small',  price: '$3',  credits: 100,  perCredit: '$0.030', note: '' },
+  { id: 'medium', label: 'Medium', price: '$8',  credits: 400,  perCredit: '$0.020', note: '' },
+  { id: 'large',  label: 'Large',  price: '$20', credits: 1200, perCredit: '$0.017', note: 'Best value' },
 ] as const;
 
-// ─── Component ────────────────────────────────────────────────────────────────
+/* ── Component ───────────────────────────────────────────────────────────── */
 
 export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdCredits }: Props) {
   const [loading, setLoading] = useState<string | null>(null);
   const [toast, setToast]     = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router       = useRouter();
   const highlightPlan = searchParams.get('plan') ?? null;
 
   useEffect(() => {
-    const success = searchParams.get('success');
+    const success        = searchParams.get('success');
     const creditsSuccess = searchParams.get('credits_success');
     if (success === '1') {
       setToast({ msg: 'Subscription activated! Your credits are ready.', type: 'success' });
@@ -156,174 +167,120 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
     finally { setLoading(null); }
   };
 
-  const totalHd = hdCredits.monthly + hdCredits.topUp;
-
-  // Sort plans by price
+  const totalHd     = hdCredits.monthly + hdCredits.topUp;
   const sortedPlans = [...plans].sort((a, b) => a.priceUsdCents - b.priceUsdCents);
 
   return (
-    <main style={{ maxWidth: 1040, margin: '0 auto', padding: '3rem 1.5rem' }}>
+    <main className="billing-page">
 
-      {/* ── Toast ─────────────────────────────────────────────── */}
+      {/* Toast */}
       {toast && (
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: toast.type === 'error' ? 'rgba(239,68,68,.1)' : 'rgba(167,139,250,.12)',
-          border: `1px solid ${toast.type === 'error' ? 'rgba(239,68,68,.3)' : 'rgba(167,139,250,.3)'}`,
-          borderRadius: 4, padding: '0.75rem 1rem', marginBottom: '1.5rem',
-          fontSize: '0.875rem',
-          color: toast.type === 'error' ? '#fca5a5' : '#c4b5fd',
-        }}>
+        <div className={`billing-toast billing-toast--${toast.type}`}>
           <span>{toast.type === 'error' ? '⚠ ' : '✓ '}{toast.msg}</span>
-          <button
-            onClick={() => setToast(null)}
-            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '1rem', lineHeight: 1, marginLeft: '1rem' }}
-            aria-label="Dismiss"
-          >×</button>
+          <button className="billing-toast__dismiss" onClick={() => setToast(null)} aria-label="Dismiss">×</button>
         </div>
       )}
 
-      {/* ── Stripe unavailable banner ────────────────────────────── */}
+      {/* Stripe unavailable */}
       {!stripeEnabled && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '0.75rem',
-          background: 'rgba(245,158,11,.07)', border: '1px solid rgba(245,158,11,.25)',
-          borderRadius: 4, padding: '0.75rem 1rem', marginBottom: '1.5rem',
-          fontSize: '0.83rem', color: '#fcd34d',
-        }}>
-          <span style={{ fontSize: '1rem' }}>⚠</span>
+        <div className="billing-banner--warn">
+          <span>⚠</span>
           <span>Billing is not configured on this deployment. Standard generation is still free and unlimited.</span>
         </div>
       )}
 
-
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)', color: 'var(--text)' }}>
-          Plans & Credits
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: 540 }}>
+      {/* Header */}
+      <div className="billing-header">
+        <h1 className="billing-header__title">Plans &amp; Credits</h1>
+        <p className="billing-header__sub">
           Standard quality (Pollinations) is always free — no account needed.
           HD uses Replicate — subscribe for monthly credits, or buy a one-time pack.
         </p>
       </div>
 
-      {/* ── HD Credit balance ────────────────────────────────────────── */}
+      {/* HD credit bar */}
       {totalHd > 0 && (
-        <div style={{
-          display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap',
-          background: 'rgba(167,139,250,.07)', border: '1px solid rgba(167,139,250,.2)',
-          borderRadius: 4, padding: '0.85rem 1.25rem', marginBottom: '2rem',
-        }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#a78bfa' }}>HD Credits</span>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            <strong style={{ color: 'var(--text)' }}>{hdCredits.monthly}</strong> monthly remaining
+        <div className="billing-hd-bar">
+          <span className="billing-hd-bar__label">HD Credits</span>
+          <span className="billing-hd-bar__stat">
+            <strong>{hdCredits.monthly}</strong> monthly remaining
           </span>
           {hdCredits.topUp > 0 && (
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              <strong style={{ color: 'var(--text)' }}>{hdCredits.topUp}</strong> top-up bank
+            <span className="billing-hd-bar__stat">
+              <strong>{hdCredits.topUp}</strong> top-up bank
             </span>
           )}
         </div>
       )}
 
-      {/* ── Plans grid ──────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '3rem' }}>
+      {/* Plans */}
+      <div className="billing-plans-grid">
         {sortedPlans.map((plan) => {
-          const meta      = PLAN_META[plan.id] ?? { tagline: '', features: [] };
+          const meta        = PLAN_META[plan.id] ?? { tagline: '', features: [] };
           const isCurrent   = plan.id === currentPlanId;
           const isPopular   = meta.badge === 'Most Popular';
           const isHighlight = plan.id === highlightPlan && !isCurrent;
-          const isPaid    = plan.priceUsdCents > 0;
+          const isPaid      = plan.priceUsdCents > 0;
           const isDowngrade = isPaid && (plans.find(p => p.id === currentPlanId)?.priceUsdCents ?? 0) > plan.priceUsdCents;
 
+          let cardClass = 'billing-plan-card';
+          if (isCurrent)   cardClass += ' billing-plan-card--current';
+          else if (isHighlight) cardClass += ' billing-plan-card--highlight';
+          else if (isPopular)   cardClass += ' billing-plan-card--popular';
+
           return (
-            <div key={plan.id} style={{
-              background: 'var(--bg-surface)',
-              border: `1px solid ${isCurrent ? 'rgba(167,139,250,.5)' : isHighlight ? 'rgba(167,139,250,.6)' : isPopular ? 'rgba(167,139,250,.25)' : 'var(--border)'}`,
-              boxShadow: isHighlight ? '0 0 0 2px rgba(167,139,250,.25)' : undefined,
-              borderRadius: 4,
-              padding: '1.5rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.85rem',
-              position: 'relative',
-            }}>
+            <div key={plan.id} className={cardClass}>
 
               {/* Badges */}
-              {isCurrent && (
-                <span style={{
-                  position: 'absolute', top: '1rem', right: '1rem',
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
-                  color: '#a78bfa', background: 'rgba(167,139,250,.15)',
-                  border: '1px solid rgba(167,139,250,.3)', borderRadius: 2, padding: '2px 7px',
-                }}>Current</span>
-              )}
-              {isPopular && !isCurrent && (
-                <span style={{
-                  position: 'absolute', top: '1rem', right: '1rem',
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
-                  color: '#a78bfa', background: 'rgba(167,139,250,.12)',
-                  border: '1px solid rgba(167,139,250,.25)', borderRadius: 2, padding: '2px 7px',
-                }}>Popular</span>
-              )}
+              {isCurrent && <span className="billing-plan-badge">Current</span>}
+              {isPopular && !isCurrent && <span className="billing-plan-badge">Popular</span>}
 
-              {/* Plan name */}
+              {/* Pricing */}
               <div>
-                <p style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-faint)', fontFamily: 'var(--font-heading)', marginBottom: '0.3rem' }}>
-                  {plan.name}
-                </p>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
-                  <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text)', fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
+                <p className="billing-plan-name">{plan.name}</p>
+                <div className="billing-plan-price-row">
+                  <span className="billing-plan-price">
                     {plan.priceUsdCents === 0 ? '$0' : `$${plan.priceUsdCents / 100}`}
                   </span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-faint)' }}>
+                  <span className="billing-plan-period">
                     {plan.priceUsdCents === 0 ? 'forever' : '/month'}
                   </span>
                 </div>
                 {meta.perCredit && (
-                  <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', marginTop: '0.2rem' }}>
-                    {meta.perCredit}/HD credit
-                  </p>
+                  <p className="billing-plan-per-credit">{meta.perCredit}/HD credit</p>
                 )}
               </div>
 
               {/* Tagline */}
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
-                {meta.tagline}
-              </p>
+              <p className="billing-plan-tagline">{meta.tagline}</p>
 
               {/* Features */}
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1 }}>
+              <ul className="billing-plan-features">
                 {meta.features.map(f => (
-                  <li key={f} style={{ display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <span style={{ color: '#a78bfa', flexShrink: 0, marginTop: '0.05rem' }}>✓</span>
+                  <li key={f} className="billing-plan-feature">
+                    <span className="billing-plan-feature__check">✓</span>
                     {f}
                   </li>
                 ))}
               </ul>
 
               {/* CTA */}
-              <div style={{ marginTop: 'auto', paddingTop: '0.5rem' }}>
+              <div className="billing-plan-cta">
                 {isCurrent ? (
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-faint)', textAlign: 'center', padding: '0.55rem 0' }}>
-                    Your current plan
-                  </div>
+                  <p className="billing-plan-current-text">Your current plan</p>
                 ) : (
                   <button
+                    className={`billing-plan-btn ${isPopular ? 'billing-plan-btn--popular' : 'billing-plan-btn--default'}`}
                     onClick={() => handleUpgrade(plan.id)}
                     disabled={!stripeEnabled || !!loading}
-                    style={{
-                      width: '100%', padding: '0.6rem 1rem',
-                      borderRadius: 4,
-                      background: isPopular ? 'linear-gradient(135deg, #6d28d9, #7c3aed)' : 'transparent',
-                      border: isPopular ? 'none' : '1px solid var(--border)',
-                      color: isPopular ? '#fff' : 'var(--text-muted)',
-                      fontSize: '0.83rem', fontWeight: 600, cursor: 'pointer',
-                      opacity: (!stripeEnabled || !!loading) ? 0.5 : 1,
-                      transition: 'opacity 0.15s, background 0.15s',
-                    }}
                   >
-                    {loading === plan.id ? 'Redirecting…' : isDowngrade ? 'Downgrade' : plan.id === 'free' ? 'Downgrade to Free' : `Upgrade to ${plan.name}`}
+                    {loading === plan.id
+                      ? 'Redirecting…'
+                      : isDowngrade
+                        ? 'Downgrade'
+                        : plan.id === 'free'
+                          ? 'Downgrade to Free'
+                          : `Upgrade to ${plan.name}`}
                   </button>
                 )}
               </div>
@@ -332,58 +289,27 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
         })}
       </div>
 
-      {/* ── Credit packs ────────────────────────────────────────────── */}
-      <div style={{ marginBottom: '2.5rem' }}>
-        <div style={{ marginBottom: '1.25rem' }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '-0.01em', marginBottom: '0.35rem', fontFamily: 'var(--font-heading)', color: 'var(--text)' }}>
-            HD Credit Top-Ups
-          </h2>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+      {/* Credit packs */}
+      <div className="billing-packs-section">
+        <div className="billing-packs-header">
+          <h2 className="billing-packs-title">HD Credit Top-Ups</h2>
+          <p className="billing-packs-sub">
             One-time purchase. Credits never expire. Used after your monthly allocation runs out.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
+        <div className="billing-packs-grid">
           {PACKS.map(pack => (
-            <div key={pack.id} style={{
-              background: 'var(--bg-surface)',
-              border: `1px solid ${pack.note ? 'rgba(167,139,250,.25)' : 'var(--border)'}`,
-              borderRadius: 4, padding: '1.25rem',
-              display: 'flex', flexDirection: 'column', gap: '0.6rem', position: 'relative',
-            }}>
-              {pack.note && (
-                <span style={{
-                  position: 'absolute', top: '0.75rem', right: '0.75rem',
-                  fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
-                  color: '#a78bfa', background: 'rgba(167,139,250,.12)',
-                  border: '1px solid rgba(167,139,250,.25)', borderRadius: 2, padding: '1px 5px',
-                }}>{pack.note}</span>
-              )}
-              <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-faint)', fontFamily: 'var(--font-heading)', margin: 0 }}>
-                {pack.label}
-              </p>
-              <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text)', fontFamily: 'var(--font-heading)', margin: 0, lineHeight: 1 }}>
-                {pack.price}
-              </p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
-                {pack.credits.toLocaleString()} HD credits
-              </p>
-              <p style={{ fontSize: '0.7rem', color: 'var(--text-faint)', margin: 0 }}>
-                {pack.perCredit}/credit
-              </p>
+            <div key={pack.id} className={`billing-pack-card ${pack.note ? 'billing-pack-card--featured' : ''}`}>
+              {pack.note && <span className="billing-pack-badge">{pack.note}</span>}
+              <p className="billing-pack-name">{pack.label}</p>
+              <p className="billing-pack-price">{pack.price}</p>
+              <p className="billing-pack-credits">{pack.credits.toLocaleString()} HD credits</p>
+              <p className="billing-pack-per">{pack.perCredit}/credit</p>
               <button
+                className="billing-pack-btn"
                 onClick={() => handleBuyPack(pack.id)}
                 disabled={!stripeEnabled || !!loading}
-                style={{
-                  marginTop: '0.25rem', width: '100%', padding: '0.5rem 0.75rem',
-                  borderRadius: 4, background: 'transparent',
-                  border: '1px solid var(--border)', color: 'var(--text-muted)',
-                  fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer',
-                  opacity: (!stripeEnabled || !!loading) ? 0.5 : 1,
-                  transition: 'border-color 0.15s, color 0.15s',
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(167,139,250,.4)'; (e.currentTarget as HTMLButtonElement).style.color = '#a78bfa'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'; }}
               >
                 {loading === `pack-${pack.id}` ? 'Redirecting…' : 'Buy'}
               </button>
@@ -392,29 +318,19 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
         </div>
       </div>
 
-      {/* ── Manage / notes ──────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-        <p style={{ fontSize: '0.78rem', color: 'var(--text-faint)', margin: 0 }}>
+      {/* Footer */}
+      <div className="billing-footer">
+        <p className="billing-footer__note">
           Prices in USD. Subscriptions renew monthly. Cancel anytime.{' '}
-          <Link href="/docs#pricing" style={{ color: '#a78bfa', textDecoration: 'none' }}>Learn more →</Link>
+          <Link href="/docs#pricing">Learn more →</Link>
         </p>
         {stripeEnabled && currentPlanId !== 'free' && (
-          <button
-            onClick={handleManage}
-            disabled={loading === 'portal'}
-            style={{
-              background: 'none', border: '1px solid var(--border)', borderRadius: 4,
-              color: 'var(--text-muted)', padding: '0.45rem 0.9rem', fontSize: '0.8rem',
-              cursor: 'pointer',
-            }}
-          >
+          <button className="billing-manage-btn" onClick={handleManage} disabled={loading === 'portal'}>
             {loading === 'portal' ? 'Opening…' : 'Manage billing →'}
           </button>
         )}
         {!stripeEnabled && (
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-faint)' }}>
-            Billing not configured — contact admin.
-          </span>
+          <span className="billing-footer__note">Billing not configured — contact admin.</span>
         )}
       </div>
 

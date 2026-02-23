@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { log as logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   let email: string | undefined;
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
     }
   } catch {
     // Table may not exist yet — log and continue (non-fatal)
-    console.info(`[waitlist] ${email} signed up for ${mode}`);
+    logger.info({ email, mode }, '[waitlist] signup');
   }
 
   return NextResponse.json({ ok: true });

@@ -41,6 +41,8 @@
   },
   "dependencies": {
     "figlet": "^1.10.0",
-    "inquirer": "^13.2.2"
+    "inquirer": "^13.2.2",
+    "lru-cache": "^11.2.6",
+    "rate-limiter-flexible": "^9.1.1"
   }
 }

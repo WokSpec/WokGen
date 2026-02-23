@@ -15,7 +15,11 @@ that cover the code. This is particularly important for generative AI systems.
 
 ## What Is and Isn't Included
 
-### Open (included in this repository)
+### Private Repository Note
+
+This is the **private team repository**. All systems listed below as "Not Included" in public releases **are visible and editable** in this repo. The table below describes the public/OSS release boundary only — it does not restrict what WokSpec team members can access or modify here.
+
+### Open (included in public releases)
 
 | Component | Location | License |
 |-----------|----------|---------|
@@ -27,7 +31,7 @@ that cover the code. This is particularly important for generative AI systems.
 | UI components | `apps/web/src/app/_components/` | Apache-2.0 |
 | Database schema | `apps/web/prisma/schema.prisma` | Apache-2.0 |
 
-### Not Included (WokSpec proprietary)
+### Not Included in Public Releases (visible in this private repo)
 
 | Component | Why Not Included |
 |-----------|-----------------|

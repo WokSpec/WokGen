@@ -2,15 +2,28 @@ import type { Metadata, Viewport } from 'next';
 import { DM_Sans, Space_Grotesk } from 'next/font/google';
 import Link from 'next/link';
 import nextDynamic from 'next/dynamic';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { NavLink } from './_components/NavLink';
 import { Footer } from './_components/Footer';
 import { NavAuth } from './_components/NavAuth';
 import { Providers } from './_components/Providers';
 import { ModeSwitcher } from './_components/ModeSwitcher';
+import { Toaster } from 'sonner';
 
 const EralVoiceButton = nextDynamic(
   () => import('@/components/eral-voice-button').then((m) => ({ default: m.EralVoiceButton })),
+  { ssr: false },
+);
+
+const CommandPalette = nextDynamic(
+  () => import('./_components/CommandPalette'),
+  { ssr: false },
+);
+
+const OnboardingGate = nextDynamic(
+  () => import('./_components/OnboardingGate'),
   { ssr: false },
 );
 
@@ -104,14 +117,19 @@ function NavBar() {
       </Link>
 
       {/* Nav links */}
-      <div className="flex items-center gap-1 flex-1">
-        <NavLink href="/pixel/studio">Studio</NavLink>
-        <NavLink href="/community">Community</NavLink>
-        <NavLink href="/docs">Docs</NavLink>
-        <NavLink href="/eral">
-          <span className="nav-eral-badge">🧠 Eral</span>
-        </NavLink>
-      </div>
+        <div className="flex items-center gap-1 flex-1">
+          <NavLink href="/pixel/studio">Studio</NavLink>
+          <NavLink href="/community">Community</NavLink>
+          <NavLink href="/eral">
+            <span className="nav-eral-badge">🧠 Eral</span>
+          </NavLink>
+          <NavLink href="/eral/director">Director</NavLink>
+          <NavLink href="/eral/simulate">Simulate</NavLink>
+          <NavLink href="/brand">Brand</NavLink>
+          <NavLink href="/automations">Automate</NavLink>
+          <NavLink href="/pricing">Pricing</NavLink>
+          <NavLink href="/docs">Docs</NavLink>
+        </div>
 
       {/* Right side */}
       <div className="flex items-center gap-2 ml-auto">
@@ -150,12 +168,24 @@ export default function RootLayout({
       </head>
       <body className={dmSans.className} style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <Providers>
+          <a href="#main-content" className="skip-link">Skip to content</a>
           <NavBar />
           <ModeSwitcher />
           <main id="main-content" style={{ flex: 1 }}>{children}</main>
           <Footer />
           <EralVoiceButton />
+          <CommandPalette />
+          <OnboardingGate />
+          <Toaster
+            theme="dark"
+            position="bottom-right"
+            toastOptions={{
+              style: { background: '#0d0d14', border: '1px solid #252538', color: '#f4f4f4', fontFamily: 'var(--font-sans)' },
+            }}
+          />
         </Providers>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

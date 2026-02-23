@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { log as logger } from '@/lib/logger';
 import { prisma } from '@/lib/db';
 import {
   preprocessTextForTTS,
@@ -83,7 +84,7 @@ async function generateElevenLabsStream(
   }
 
   const err = await response.text().catch(() => '');
-  console.error('[TTS/ElevenLabs] Streaming error:', response.status, err);
+  logger.error({ status: response.status, err }, '[TTS/ElevenLabs] Streaming error');
   return null;
 }
 
@@ -119,7 +120,7 @@ async function generateOpenAI(
   });
 
   if (!response.ok) {
-    console.error('[TTS/OpenAI] Error:', response.status);
+    logger.error({ status: response.status }, '[TTS/OpenAI] Error');
     return null;
   }
 
@@ -256,7 +257,7 @@ export async function POST(req: NextRequest) {
         }
       }
     } catch (reserveErr) {
-      console.error('[TTS] Credit reservation error:', reserveErr);
+      logger.error({ err: reserveErr }, '[TTS] Credit reservation error');
       return NextResponse.json({ error: 'Could not reserve credits' }, { status: 500 });
     }
   }
@@ -268,7 +269,7 @@ export async function POST(req: NextRequest) {
     ? { id: customVoiceId, name: 'Custom' }
     : selectOptimalVoice(style, contentType);
 
-  console.log(
+  logger.info(
     `[TTS] style=${style}, contentType=${contentType}, voice=${selectedVoice.name}, hd=${hd}, chars=${estimateCharCount(processedText)}`,
   );
 
@@ -283,7 +284,7 @@ export async function POST(req: NextRequest) {
     );
     if (streamResponse) return streamResponse;
   } catch (e) {
-    console.warn('[TTS] ElevenLabs streaming failed:', e);
+    logger.warn({ err: e }, '[TTS] ElevenLabs streaming failed');
   }
 
   // 2. OpenAI TTS (secondary)
@@ -295,7 +296,7 @@ export async function POST(req: NextRequest) {
     audioBuffer = await generateOpenAI(processedText, style, hd);
     if (audioBuffer) { provider = 'openai'; format = 'mp3'; }
   } catch (e) {
-    console.warn('[TTS] OpenAI failed:', e);
+    logger.warn({ err: e }, '[TTS] OpenAI failed');
   }
 
   // 3. HuggingFace Kokoro (fallback)
@@ -304,7 +305,7 @@ export async function POST(req: NextRequest) {
       audioBuffer = await generateHuggingFace(processedText);
       if (audioBuffer) { provider = 'huggingface'; format = 'wav'; }
     } catch (e) {
-      console.warn('[TTS] HuggingFace failed:', e);
+      logger.warn({ err: e }, '[TTS] HuggingFace failed');
     }
   }
 
@@ -318,7 +319,7 @@ export async function POST(req: NextRequest) {
           await prisma.user.update({ where: { id: authedUserId }, data: { hdTopUpCredits: { increment: 1 } } });
         }
       } catch (refundErr) {
-        console.error('[TTS] Credit refund failed:', refundErr);
+        logger.error({ err: refundErr }, '[TTS] Credit refund failed');
       }
     }
     return NextResponse.json({ error: 'All TTS providers unavailable. Please try again.' }, { status: 503 });

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
+import { toast } from 'sonner';
 import Link from 'next/link';
 
 interface Props {
@@ -56,7 +57,7 @@ export default function ProfileClient({ user, plan, hdCredits, stats, recentJobs
       if (res.ok) {
         await signOut({ callbackUrl: '/' });
       } else {
-        alert('Failed to delete account. Please contact support.');
+        toast.error('Failed to delete account. Please contact support.');
       }
     } finally {
       setDeleting(false);
@@ -82,7 +83,7 @@ export default function ProfileClient({ user, plan, hdCredits, stats, recentJobs
             <div className="profile-meta">
               <span
                 className="profile-plan-badge"
-                style={{ background: `${planColor}22`, color: planColor, borderColor: `${planColor}44` }}
+                style={{ ['--plan-color' as string]: planColor, background: `${planColor}22`, color: planColor, borderColor: `${planColor}44` }}
               >
                 {plan?.name ?? 'Free'}
               </span>
@@ -111,12 +112,12 @@ export default function ProfileClient({ user, plan, hdCredits, stats, recentJobs
               <span className="profile-stat-label">Standard (Free)</span>
             </div>
             <div className="profile-stat-card">
-              <span className="profile-stat-value" style={{ color: '#a78bfa' }}>{fmt(stats.hd)}</span>
+              <span className="profile-stat-value profile-stat-value--hd">{fmt(stats.hd)}</span>
               <span className="profile-stat-label">HD Generations</span>
             </div>
             {hdCredits.monthlyAlloc > 0 && (
               <div className="profile-stat-card">
-                <span className="profile-stat-value" style={{ color: '#60a5fa' }}>{hdCredits.monthlyRemaining}</span>
+                <span className="profile-stat-value profile-stat-value--credits">{hdCredits.monthlyRemaining}</span>
                 <span className="profile-stat-label">HD Credits Left</span>
               </div>
             )}
@@ -148,27 +149,25 @@ export default function ProfileClient({ user, plan, hdCredits, stats, recentJobs
 
         {/* ── Danger zone ───────────────────────────────────────────── */}
         <section className="profile-section profile-danger-zone">
-          <h2 className="profile-section-title" style={{ color: '#ef4444' }}>Danger Zone</h2>
+          <h2 className="profile-section-title profile-section-title--danger">Danger Zone</h2>
           <p className="profile-danger-desc">
             Permanently delete your account and all generation history. This cannot be undone.
           </p>
           {!deleteConfirm ? (
             <button
-              className="btn-outline btn-sm"
-              style={{ borderColor: 'rgba(239,68,68,.3)', color: '#ef4444' }}
+              className="btn-outline btn-sm btn-outline--danger"
               onClick={() => setDeleteConfirm(true)}
             >
               Delete my account
             </button>
           ) : (
             <div className="profile-danger-confirm">
-              <p style={{ fontSize: '0.85rem', color: '#fca5a5', marginBottom: '0.75rem' }}>
-                ⚠ Are you absolutely sure? This will delete all your data permanently.
+              <p className="profile-danger-warning">
+                Are you absolutely sure? This will delete all your data permanently.
               </p>
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <div className="profile-danger-actions">
                 <button
-                  className="btn-sm"
-                  style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 4, padding: '0.5rem 1rem', cursor: deleting ? 'wait' : 'pointer', opacity: deleting ? 0.7 : 1, fontSize: '0.82rem', fontWeight: 600 }}
+                  className="btn-danger btn-sm"
                   onClick={handleDelete}
                   disabled={deleting}
                 >

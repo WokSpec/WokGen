@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
+import { cache } from '@/lib/cache';
 
 // ---------------------------------------------------------------------------
 // GET /api/gallery
@@ -20,7 +21,7 @@ import { auth } from '@/lib/auth';
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
 
-  const limit  = Math.min(Number(searchParams.get('limit')  ?? 24), 100);
+  const limit  = Math.min(Number(searchParams.get('limit')  ?? '24'), 50);
   const cursor = searchParams.get('cursor')  ?? undefined;
   const tool   = searchParams.get('tool')    ?? undefined;
   const rarity = searchParams.get('rarity')  ?? undefined;
@@ -39,6 +40,16 @@ export async function GET(req: NextRequest) {
     if (!authedUserId) {
       return NextResponse.json({ error: 'Authentication required for personal gallery.' }, { status: 401 });
     }
+  }
+
+  // Cache public gallery pages in Redis (skip for 'mine' or search queries)
+  const cacheKey = (!mine && !search && !authedUserId)
+    ? `gallery:${mode ?? 'all'}:${tool ?? 'all'}:${sort}:${cursor ?? 'first'}:${limit}`
+    : null;
+
+  if (cacheKey) {
+    const hit = await cache.get<object>(cacheKey);
+    if (hit) return NextResponse.json(hit, { headers: { 'Cache-Control': 's-maxage=30, stale-while-revalidate=60', 'X-Cache': 'HIT' } });
   }
 
   // Build the where clause
@@ -110,11 +121,26 @@ export async function GET(req: NextRequest) {
     createdAt: a.createdAt.toISOString(),
   }));
 
-  return NextResponse.json({
+  const responseBody = {
     assets:     serialized,
     nextCursor,
     hasMore,
     total:      trimmed.length,
+  };
+
+  if (cacheKey) await cache.set(cacheKey, responseBody, 30);
+
+  // Generate a simple ETag from the first asset ID + count for conditional GET support
+  const etag = `"${trimmed.length}-${trimmed[0]?.id ?? '0'}-${trimmed[trimmed.length - 1]?.id ?? '0'}"`;
+  const ifNoneMatch = req.headers.get('if-none-match');
+  if (!mine && ifNoneMatch === etag) {
+    return new NextResponse(null, { status: 304, headers: { 'ETag': etag, 'Cache-Control': 's-maxage=30, stale-while-revalidate=60' } });
+  }
+
+  return NextResponse.json(responseBody, {
+    headers: mine
+      ? {}
+      : { 'Cache-Control': 's-maxage=30, stale-while-revalidate=60', 'X-Cache': 'MISS', 'ETag': etag },
   });
 }
 

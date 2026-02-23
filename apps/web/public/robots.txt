@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin
+Disallow: /account
+Disallow: /billing
+Disallow: /api/
+Disallow: /invite/
+Disallow: /_next/
+
+Sitemap: https://wokgen.io/sitemap.xml

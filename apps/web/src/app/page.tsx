@@ -183,13 +183,13 @@ export default function PlatformLanding() {
             <span>Multi-vertical AI generation</span>
           </div>
           <h1 className="platform-h1">
-            One platform.<br />
-            <span className="platform-h1-accent">Multiple asset engines.</span>
+            The AI generator that<br />
+            <span className="platform-h1-accent">knows your project.</span>
           </h1>
           <p className="platform-desc">
-            WokGen is a multi-engine AI asset factory — specialized pipelines for every kind of digital asset. Pixel sprites, brand systems, UI components, vectors, and beyond.
-            Game sprites, brand kits, social banners, icon sets, and code components —
-            each with its own professional pipeline.
+            WokGen is the only multi-engine AI asset platform built around context, not just prompts.
+            8 specialized studios. An AI Director that plans entire asset packs.
+            Brand kits that enforce visual consistency across every generation.
           </p>
           <div className="platform-cta-row">
             <Link href="/pixel/studio" className="btn-primary btn-lg">
@@ -202,6 +202,62 @@ export default function PlatformLanding() {
           <p className="platform-hero-note">
             No account needed to start. Standard generation is always free.
           </p>
+        </div>
+      </section>
+
+      {/* ── How it works ─────────────────────────────────────────────── */}
+      <section className="landing-howitworks">
+        <div className="platform-section-inner">
+          <p className="platform-section-label">How it works</p>
+          <div className="landing-steps">
+            <div className="landing-step">
+              <span className="landing-step__num">01</span>
+              <h3 className="landing-step__title">Describe what you need</h3>
+              <p className="landing-step__desc">Write a prompt or use Eral AI to plan an entire asset pack. WokGen understands project context, not just isolated prompts.</p>
+            </div>
+            <div className="landing-step__arrow">→</div>
+            <div className="landing-step">
+              <span className="landing-step__num">02</span>
+              <h3 className="landing-step__title">Choose your engine</h3>
+              <p className="landing-step__desc">8 specialized studios. Pixel sprites behave differently from brand logos. Each pipeline is tuned for its asset type.</p>
+            </div>
+            <div className="landing-step__arrow">→</div>
+            <div className="landing-step">
+              <span className="landing-step__num">03</span>
+              <h3 className="landing-step__title">Export production-ready</h3>
+              <p className="landing-step__desc">ZIP downloads, sprite atlases, brand kit packs. Assets organized by project, with relationships tracked across generations.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Differentiator ───────────────────────────────────────────── */}
+      <section className="landing-diff">
+        <div className="platform-section-inner">
+          <div className="landing-diff-grid">
+            <div className="landing-diff-card landing-diff-card--others">
+              <p className="landing-diff-card__label">Other AI generators</p>
+              <ul className="landing-diff-list landing-diff-list--bad">
+                <li>Every prompt is isolated — no memory</li>
+                <li>One-size-fits-all image model</li>
+                <li>No project organization</li>
+                <li>No brand consistency enforcement</li>
+                <li>Feature-gated by tier</li>
+                <li>Closed source</li>
+              </ul>
+            </div>
+            <div className="landing-diff-card landing-diff-card--wokgen">
+              <p className="landing-diff-card__label">WokGen</p>
+              <ul className="landing-diff-list landing-diff-list--good">
+                <li>Project-aware — Eral knows your assets</li>
+                <li>8 specialized engines per asset type</li>
+                <li>Asset relationship graph per project</li>
+                <li>Brand kit locks palette + style globally</li>
+                <li>All features free — limits are quantity only</li>
+                <li>Open source, MIT licensed</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 

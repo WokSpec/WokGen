@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { z } from 'zod';
+import { pollinationsChat } from '@/lib/providers/pollinations-text';
 
 // ---------------------------------------------------------------------------
 // POST /api/prompt/enhance
@@ -59,7 +60,14 @@ export async function POST(req: NextRequest) {
 
   const groqKey = process.env.GROQ_API_KEY;
   if (!groqKey) {
-    return NextResponse.json({ error: 'LLM provider not configured.' }, { status: 503 });
+    // Pollinations fallback when no Groq key configured
+    try {
+      const pollinationsSystem = 'You are a prompt engineer. Enhance this image generation prompt to be more vivid and detailed. Return only the enhanced prompt.';
+      const enhanced = await pollinationsChat(pollinationsSystem, prompt);
+      return NextResponse.json({ variations: [enhanced.trim()] });
+    } catch {
+      return NextResponse.json({ error: 'LLM provider not configured.' }, { status: 503 });
+    }
   }
 
   const systemPrompt = `You are a prompt engineer specializing in ${modeCtx}.
@@ -91,11 +99,25 @@ Rules:
       }),
     });
   } catch {
-    return NextResponse.json({ error: 'LLM request failed.' }, { status: 502 });
+    // Primary LLM failed — try Pollinations fallback
+    try {
+      const pollinationsSystem = 'You are a prompt engineer. Enhance this image generation prompt to be more vivid and detailed. Return only the enhanced prompt.';
+      const enhanced = await pollinationsChat(pollinationsSystem, prompt);
+      return NextResponse.json({ variations: [enhanced.trim()] });
+    } catch {
+      return NextResponse.json({ error: 'LLM request failed.' }, { status: 502 });
+    }
   }
 
   if (!llmResponse.ok) {
-    return NextResponse.json({ error: 'LLM provider error.' }, { status: 502 });
+    // Primary LLM error — try Pollinations fallback
+    try {
+      const pollinationsSystem = 'You are a prompt engineer. Enhance this image generation prompt to be more vivid and detailed. Return only the enhanced prompt.';
+      const enhanced = await pollinationsChat(pollinationsSystem, prompt);
+      return NextResponse.json({ variations: [enhanced.trim()] });
+    } catch {
+      return NextResponse.json({ error: 'LLM provider error.' }, { status: 502 });
+    }
   }
 
   const llmJson = await llmResponse.json().catch(() => null);

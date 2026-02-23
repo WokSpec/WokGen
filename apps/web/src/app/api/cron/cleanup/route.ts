@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cleanupOldGuestUsage } from '@/lib/quota';
+import { prisma } from '@/lib/db';
 
 // ---------------------------------------------------------------------------
 // GET /api/cron/cleanup
@@ -23,8 +24,15 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Reset stuck running jobs (older than 5 minutes) to failed
+    const stuckCutoff = new Date(Date.now() - 5 * 60_000);
+    const { count: resetCount } = await prisma.job.updateMany({
+      where: { status: 'running', createdAt: { lt: stuckCutoff } },
+      data:  { status: 'failed', error: 'Generation timed out' },
+    });
+
     const deleted = await cleanupOldGuestUsage();
-    return NextResponse.json({ ok: true, deleted });
+    return NextResponse.json({ ok: true, deleted, resetStuck: resetCount });
   } catch (err) {
     console.error('[cron/cleanup] error:', err);
     return NextResponse.json({ error: 'Cleanup failed' }, { status: 500 });

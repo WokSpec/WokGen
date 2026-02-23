@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { pollinationsChat } from '@/lib/providers/pollinations-text';
 
 // ---------------------------------------------------------------------------
 // POST /api/text/generate
@@ -145,10 +146,17 @@ export async function POST(req: NextRequest) {
   const togetherKey = process.env.TOGETHER_API_KEY;
 
   if (!groqKey && !togetherKey) {
-    return NextResponse.json(
-      { error: 'No LLM provider configured. Set GROQ_API_KEY or TOGETHER_API_KEY.' },
-      { status: 503 },
-    );
+    // Pollinations fallback when no LLM provider configured
+    try {
+      const pollinationsContent = await pollinationsChat(systemPrompt, prompt, { maxLen: maxTokens * 4 });
+      const wordCount = pollinationsContent.trim().split(/\s+/).filter(Boolean).length;
+      return NextResponse.json({ content: pollinationsContent, wordCount, charCount: pollinationsContent.length, model: 'pollinations-openai', creditsUsed: 0 });
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : 'No LLM provider configured. Set GROQ_API_KEY or TOGETHER_API_KEY.' },
+        { status: 503 },
+      );
+    }
   }
 
   let content = '';

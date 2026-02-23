@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { z } from 'zod';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { WAP_CAPABILITIES, parseWAPFromResponse } from '@/lib/wap';
+import { pollinationsChat } from '@/lib/providers/pollinations-text';
 
 // ---------------------------------------------------------------------------
 // POST /api/eral/chat
@@ -175,7 +176,7 @@ function resolveEndpointAndKey(variant: string): {
           : ERAL_7C_TOGETHER_FALLBACK,
       };
     }
-    throw new Error('No API key configured. Set GROQ_API_KEY or TOGETHER_API_KEY.');
+    return { url: 'pollinations', apiKey: '', model: 'openai' };
   }
 
   // Together models
@@ -184,7 +185,7 @@ function resolveEndpointAndKey(variant: string): {
     if (groqKey) {
       return { url: GROQ_URL, apiKey: groqKey, model: 'llama-3.3-70b-versatile' };
     }
-    throw new Error('No API key configured. Set TOGETHER_API_KEY.');
+    return { url: 'pollinations', apiKey: '', model: 'openai' };
   }
   return { url: TOGETHER_URL, apiKey: togetherKey, model: mapping.model };
 }
@@ -478,6 +479,37 @@ export async function POST(req: NextRequest) {
       where: { id: conv.id },
       data: { title },
     }).catch(() => {});
+  }
+
+  // ── Pollinations fallback (no API key configured) ─────────────────────────
+  if (providerConfig.url === 'pollinations') {
+    const lastUserMessage = message.trim();
+    try {
+      const text = await pollinationsChat(systemContent, lastUserMessage);
+      const { cleanReply, wap } = parseWAPFromResponse(text);
+      await prisma.eralMessage.create({
+        data: {
+          conversationId: conv.id,
+          role: 'assistant',
+          content: cleanReply,
+          modelUsed: 'pollinations-openai',
+          durationMs: 0,
+        },
+      }).catch(() => {});
+      return NextResponse.json({
+        reply: cleanReply,
+        wap: wap ?? null,
+        conversationId: conv.id,
+        messageId: userMsg.id,
+        model: 'pollinations-openai',
+        variant: modelVariant,
+      });
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : 'Generation failed' },
+        { status: 502 },
+      );
+    }
   }
 
   // ── Streaming path ────────────────────────────────────────────────────────

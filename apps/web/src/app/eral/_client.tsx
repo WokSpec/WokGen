@@ -6,12 +6,41 @@ import { safeMarkdown } from '@/lib/safe-markdown';
 import { parseWAPFromResponse, executeWAP, type WAPResponse } from '@/lib/wap';
 
 // ── SpeechRecognition type shim (not in all TS libs) ─────────────────────────
+
+interface ISpeechRecognitionAlternative {
+  readonly transcript: string;
+  readonly confidence: number;
+}
+
+interface ISpeechRecognitionResult {
+  readonly length: number;
+  readonly isFinal: boolean;
+  item(index: number): ISpeechRecognitionAlternative;
+  [index: number]: ISpeechRecognitionAlternative;
+}
+
+interface ISpeechRecognitionResultList {
+  readonly length: number;
+  item(index: number): ISpeechRecognitionResult;
+  [index: number]: ISpeechRecognitionResult;
+}
+
+interface ISpeechRecognitionEvent extends Event {
+  readonly results: ISpeechRecognitionResultList;
+  readonly resultIndex: number;
+}
+
+interface ISpeechRecognitionErrorEvent extends Event {
+  readonly error: string;
+  readonly message: string;
+}
+
 interface ISpeechRecognition {
   lang: string;
   interimResults: boolean;
   maxAlternatives: number;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onresult: ((event: ISpeechRecognitionEvent) => void) | null;
+  onerror: ((event: ISpeechRecognitionErrorEvent) => void) | null;
   onend: (() => void) | null;
   start(): void;
   stop(): void;
@@ -600,7 +629,7 @@ export function EralPage() {
     recognition.lang = 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: ISpeechRecognitionEvent) => {
       const transcript = event.results[0]?.[0]?.transcript ?? '';
       if (transcript.trim()) sendCallMessage(transcript.trim());
       else setCallState('idle');

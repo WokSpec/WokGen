@@ -1,5 +1,5 @@
 import type { GenerateParams, GenerateResult, ProviderError } from './types';
-import { STYLE_PRESET_TOKENS } from './types';
+import { buildPrompt, buildNegativePrompt } from '../prompt-builder';
 
 // ---------------------------------------------------------------------------
 // Together.ai provider
@@ -74,7 +74,18 @@ export async function togetherGenerate(
   const startMs = Date.now();
 
   const model = resolveModel(params);
-  const prompt = buildPrompt(params);
+  const prompt = buildPrompt({
+    tool:           params.tool,
+    userPrompt:     params.prompt,
+    stylePreset:    params.stylePreset,
+    assetCategory:  params.assetCategory,
+    pixelEra:       params.pixelEra,
+    backgroundMode: params.backgroundMode,
+    outlineStyle:   params.outlineStyle,
+    paletteSize:    params.paletteSize,
+    width:          params.width,
+    height:         params.height,
+  });
   const { width, height } = resolveSize(params);
   const steps = resolveSteps(params, model);
   const seed =
@@ -161,32 +172,6 @@ function resolveModel(params: GenerateParams): string {
   return TOGETHER_MODELS.flux_schnell_free;
 }
 
-function buildPrompt(params: GenerateParams): string {
-  const parts: string[] = [];
-
-  // Pixel art preamble — keeps Together's FLUX outputs looking like game assets
-  parts.push(
-    'pixel art, game icon, limited color palette, crisp hard edges, no anti-aliasing, ' +
-      'transparent background, centered single object, clean silhouette',
-  );
-
-  // Style preset tokens
-  const preset = params.stylePreset;
-  if (preset && preset !== 'raw') {
-    const tokens = STYLE_PRESET_TOKENS[preset];
-    if (tokens) parts.push(tokens);
-  }
-
-  // User prompt
-  parts.push(params.prompt);
-
-  return parts.filter(Boolean).join(', ');
-}
-
-/**
- * Together's FLUX models accept arbitrary sizes but work best at multiples of 32.
- * Cap at 1024 since the free model is optimised for standard sizes.
- */
 function resolveSize(params: GenerateParams): { width: number; height: number } {
   const snap = (n: number) => Math.max(64, Math.min(1024, Math.round(n / 32) * 32));
   return {

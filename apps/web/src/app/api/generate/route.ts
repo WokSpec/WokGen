@@ -34,6 +34,7 @@ import {
   type EmojiPlatform,
 } from '@/lib/prompt-builder-vector';
 import { buildPixelPrompt } from '@/lib/prompt-builder-pixel';
+import { removeBackground } from '@/lib/bg-remove';
 import { resolveOptimalProvider } from '@/lib/provider-router';
 import { assembleNegativePrompt, encodeNegativesIntoPositive } from '@/lib/negative-banks';
 import { validateAndSanitize } from '@/lib/prompt-validator';
@@ -716,6 +717,15 @@ export async function POST(req: NextRequest) {
     }
 
     // actual provider used (may differ from resolvedProvider if fallback occurred)
+
+    // ------------------------------------------------------------------------
+    // 5a-pre. Background removal — when transparentBackground is requested,
+    //         post-process the image to strip the background via RMBG-1.4.
+    // ------------------------------------------------------------------------
+    if (backgroundMode === 'transparent' && result.resultUrl) {
+      const stripped = await removeBackground(result.resultUrl);
+      if (stripped) result = { ...result, resultUrl: stripped };
+    }
 
     // ------------------------------------------------------------------------
     // 5a. Update Job as succeeded

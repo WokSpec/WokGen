@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { callLLMWithFallback } from '@/lib/llm';
 
 // ---------------------------------------------------------------------------
 // POST /api/text/generate
@@ -17,11 +18,6 @@ type ContentType =
   | 'social' | 'code-snippet' | 'story' | 'essay' | 'ad-copy';
 type Tone   = 'professional' | 'casual' | 'creative' | 'technical' | 'persuasive' | 'playful';
 type Length = 'micro' | 'short' | 'medium' | 'long';
-
-const GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions';
-const TOGETHER_URL = 'https://api.together.xyz/v1/chat/completions';
-const GROQ_MODEL  = 'llama-3.3-70b-versatile';
-const TOGETHER_MODEL = 'meta-llama/Llama-3.1-70B-Instruct-Turbo';
 
 const MAX_TOKENS: Record<Length, number> = {
   micro:  80,
@@ -46,39 +42,6 @@ const SYSTEM_PROMPTS: Record<ContentType, string> = {
 interface ChatMessage {
   role: 'system' | 'user';
   content: string;
-}
-
-async function callLLM(
-  url: string,
-  apiKey: string,
-  model: string,
-  messages: ChatMessage[],
-  maxTokens: number,
-): Promise<string> {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model,
-      messages,
-      max_tokens: maxTokens,
-      temperature: 0.8,
-      stream: false,
-    }),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`LLM error ${res.status}: ${errText}`);
-  }
-
-  const data = await res.json() as {
-    choices: Array<{ message: { content: string } }>;
-  };
-  return data.choices?.[0]?.message?.content?.trim() ?? '';
 }
 
 export async function POST(req: NextRequest) {
@@ -141,46 +104,20 @@ export async function POST(req: NextRequest) {
   ];
 
   // ── Provider routing ─────────────────────────────────────────────────────
-  const groqKey     = process.env.GROQ_API_KEY;
-  const togetherKey = process.env.TOGETHER_API_KEY;
-
-  if (!groqKey && !togetherKey) {
-    return NextResponse.json(
-      { error: 'No LLM provider configured. Set GROQ_API_KEY or TOGETHER_API_KEY.' },
-      { status: 503 },
-    );
-  }
-
   let content = '';
   let modelUsed = '';
-
-  // Try Groq first
-  if (groqKey) {
-    try {
-      content   = await callLLM(GROQ_URL, groqKey, GROQ_MODEL, messages, maxTokens);
-      modelUsed = GROQ_MODEL;
-    } catch (err) {
-      // Fall through to Together if Groq fails
-      if (!togetherKey) {
-        return NextResponse.json(
-          { error: err instanceof Error ? err.message : 'Generation failed' },
-          { status: 502 },
-        );
-      }
-    }
-  }
-
-  // Fallback to Together
-  if (!content && togetherKey) {
-    try {
-      content   = await callLLM(TOGETHER_URL, togetherKey, TOGETHER_MODEL, messages, maxTokens);
-      modelUsed = TOGETHER_MODEL;
-    } catch (err) {
-      return NextResponse.json(
-        { error: err instanceof Error ? err.message : 'Generation failed' },
-        { status: 502 },
-      );
-    }
+  try {
+    const result = await callLLMWithFallback(messages as import('@/lib/llm').ChatMessage[], {
+      maxTokens,
+      temperature: 0.8,
+    });
+    content  = result.content;
+    modelUsed = result.model;
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Generation failed' },
+      { status: 503 },
+    );
   }
 
   if (!content) {

@@ -121,6 +121,7 @@ export async function POST(req: NextRequest) {
           data: {
             planId:             resolvedPlanId,
             status:             sub.status,
+            cancelAtPeriodEnd:  sub.cancel_at_period_end ?? false,
             currentPeriodStart: new Date(sub.current_period_start * 1000),
             currentPeriodEnd:   new Date(sub.current_period_end   * 1000),
           },

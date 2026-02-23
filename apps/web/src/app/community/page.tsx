@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
@@ -387,15 +388,21 @@ function CommunityCard({ asset, index, onClick }: { asset: CommunityAsset; index
     >
       {/* Image */}
       <div className="gallery-card-image">
-        <img
+        <Image
           src={asset.thumbUrl ?? asset.imageUrl}
           alt={asset.title ?? asset.prompt}
-          loading="lazy"
+          width={256}
+          height={256}
+          unoptimized
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
           style={{
             imageRendering: asset.mode === 'pixel' ? 'pixelated' : 'auto',
             maxWidth: '100%',
             maxHeight: '100%',
             objectFit: 'contain',
+            width: '100%',
+            height: 'auto',
           }}
         />
 

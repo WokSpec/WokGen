@@ -299,11 +299,7 @@ export default function VoiceStudioPage() {
 
       {/* Main layout */}
       <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '380px 1fr',
-          minHeight: 'calc(100vh - 60px)',
-        }}
+        style={{ minHeight: 'calc(100vh - 60px)' }}
         className="studio-grid-2col"
       >
         {/* ── Left panel ─────────────────────────────────────────────── */}

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { EralSidebar } from '@/app/_components/EralSidebar';
 import { QuotaBadge } from '@/components/quota-badge';
+import { ColorPalette } from '@/components/color-palette';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -139,6 +140,10 @@ function EmojiStudioInner() {
 
   const toastSuccess = (msg: string) => { setToast({ msg, type: 'success' }); setTimeout(() => setToast(null), 3500); };
   const toastError   = (msg: string) => { setToast({ msg, type: 'error' });   setTimeout(() => setToast(null), 4000); };
+
+  // ── Bg remove state ──────────────────────────────────────────────────────
+  const [bgRemoving, setBgRemoving] = useState(false);
+  const [displayUrl, setDisplayUrl] = useState<string | null>(null);
 
   const switchTool = useCallback((tool: EmojiTool) => {
     setActiveTool(tool);
@@ -312,8 +317,25 @@ function EmojiStudioInner() {
   const displayResult = result ?? (history[selectedHistory ?? -1] ?? null);
   const isPack = activeTool === 'pack';
   const PACK_LABELS = ['Happy / Positive', 'Neutral / Calm', 'Surprised / Excited', 'Sad / Negative'];
-
   const imgRendering = stylePreset === 'pixel_emoji' ? 'pixelated' : 'auto';
+
+  // Keep displayUrl in sync
+  useEffect(() => { setDisplayUrl(displayResult?.resultUrl ?? null); }, [displayResult?.resultUrl]);
+
+  const handleBgRemove = useCallback(async (url: string) => {
+    setBgRemoving(true);
+    try {
+      const res = await fetch('/api/tools/bg-remove', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: url }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toastError(data.error ?? 'BG removal failed'); return; }
+      setDisplayUrl(`data:image/png;base64,${data.resultBase64}`);
+      toastSuccess('Background removed');
+    } catch { toastError('BG removal failed'); }
+    finally { setBgRemoving(false); }
+  }, [toastError, toastSuccess]);
 
   return (
     <div className="studio-layout">
@@ -618,12 +640,10 @@ function EmojiStudioInner() {
             {displayResult?.resultUrl && jobStatus !== 'running' && (
               <>
                 <div style={{
+                  position: 'relative',
                   background: bgMode === 'white' ? '#fff' : 'var(--surface-base)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 32,
-                  minHeight: 240,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: 32, minHeight: 240,
                   backgroundImage: bgMode === 'transparent'
                     ? 'linear-gradient(45deg, #1a1a2e 25%, transparent 25%), linear-gradient(-45deg, #1a1a2e 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1a1a2e 75%), linear-gradient(-45deg, transparent 75%, #1a1a2e 75%)'
                     : 'none',
@@ -632,34 +652,45 @@ function EmojiStudioInner() {
                 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={displayResult.resultUrl}
+                    src={displayUrl ?? displayResult.resultUrl}
                     alt="Generated emoji"
-                    style={{
-                      imageRendering: imgRendering,
-                      maxWidth: 256,
-                      maxHeight: 256,
-                    }}
+                    style={{ imageRendering: imgRendering, maxWidth: 256, maxHeight: 256 }}
                   />
+                  <button
+                    onClick={() => handleBgRemove(displayUrl ?? displayResult.resultUrl!)}
+                    disabled={bgRemoving}
+                    style={{
+                      position: 'absolute', top: 8, right: 8, opacity: 0,
+                      transition: 'opacity 0.15s', fontSize: '0.72rem', padding: '3px 8px',
+                      background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: 4, color: '#fff', cursor: bgRemoving ? 'wait' : 'pointer',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '0'; }}
+                    title="Remove background"
+                  >
+                    {bgRemoving ? '⏳ Removing…' : '✂ Remove BG'}
+                  </button>
                 </div>
+                {/* Color palette */}
+                {(displayUrl ?? displayResult.resultUrl) && (
+                  <ColorPalette imageUrl={displayUrl ?? displayResult.resultUrl!} />
+                )}
                 <div className="studio-output-toolbar">
                   {result?.width && (
-                    <span className="studio-output-size">
-                      {result.width} × {result.height}
-                    </span>
+                    <span className="studio-output-size">{result.width} × {result.height}</span>
                   )}
                   <button
                     className="btn-ghost btn-sm"
-                    onClick={() => displayResult.resultUrl && handleDownload(displayResult.resultUrl)}
+                    onClick={() => handleDownload(displayUrl ?? displayResult.resultUrl!)}
                   >
                     ↓ Download
                   </button>
                   <button
                     className="btn-ghost btn-sm"
                     onClick={() => {
-                      if (displayResult.resultUrl) {
-                        navigator.clipboard.writeText(displayResult.resultUrl);
-                        toastSuccess('URL copied');
-                      }
+                      const u = displayUrl ?? displayResult.resultUrl;
+                      if (u) { navigator.clipboard.writeText(u); toastSuccess('URL copied'); }
                     }}
                   >
                     Copy URL

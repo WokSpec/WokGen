@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import WorkspaceSelector from '@/app/_components/WorkspaceSelector';
 import { EralSidebar } from '@/app/_components/EralSidebar';
 import { QuotaBadge } from '@/components/quota-badge';
+import { ColorPalette } from '@/components/color-palette';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -168,6 +169,10 @@ function VectorStudioInner() {
 
   const toastSuccess = (msg: string) => { setToast({ msg, type: 'success' }); setTimeout(() => setToast(null), 3500); };
   const toastError   = (msg: string) => { setToast({ msg, type: 'error' });   setTimeout(() => setToast(null), 4000); };
+
+  // ── Bg remove state ──────────────────────────────────────────────────────
+  const [bgRemoving, setBgRemoving]   = useState(false);
+  const [displayUrl, setDisplayUrl]   = useState<string | null>(null);
 
   // ── Tool switch ───────────────────────────────────────────────────────────
   const switchTool = useCallback((tool: VectorTool) => {
@@ -338,6 +343,24 @@ function VectorStudioInner() {
   const primaryResult  = results[0] ?? null;
   const historyDisplay = selectedHistory !== null ? history[selectedHistory] ?? null : null;
   const displayResult  = primaryResult ?? (historyDisplay ? { jobId: historyDisplay.id, resultUrl: historyDisplay.resultUrl, width: historyDisplay.size, height: historyDisplay.size } : null);
+
+  // Keep displayUrl in sync (allows bg-remove override)
+  useEffect(() => { setDisplayUrl(displayResult?.resultUrl ?? null); }, [displayResult?.resultUrl]);
+
+  const handleBgRemove = useCallback(async (url: string) => {
+    setBgRemoving(true);
+    try {
+      const res = await fetch('/api/tools/bg-remove', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: url }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toastError(data.error ?? 'BG removal failed'); return; }
+      setDisplayUrl(`data:image/png;base64,${data.resultBase64}`);
+      toastSuccess('Background removed');
+    } catch { toastError('BG removal failed'); }
+    finally { setBgRemoving(false); }
+  }, [toastError, toastSuccess]);
 
   const ACCENT = '#34d399';
 
@@ -626,6 +649,7 @@ function VectorStudioInner() {
               <>
                 <div
                   style={{
+                    position: 'relative',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -637,16 +661,30 @@ function VectorStudioInner() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={displayResult.resultUrl}
+                    src={displayUrl ?? displayResult.resultUrl}
                     alt="Generated vector asset"
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: 400,
-                      objectFit: 'contain',
-                      imageRendering: 'auto',
-                    }}
+                    style={{ maxWidth: '100%', maxHeight: 400, objectFit: 'contain', imageRendering: 'auto' }}
                   />
+                  <button
+                    onClick={() => handleBgRemove(displayUrl ?? displayResult.resultUrl!)}
+                    disabled={bgRemoving}
+                    style={{
+                      position: 'absolute', top: 8, right: 8, opacity: 0,
+                      transition: 'opacity 0.15s', fontSize: '0.72rem', padding: '3px 8px',
+                      background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: 4, color: '#fff', cursor: bgRemoving ? 'wait' : 'pointer',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '0'; }}
+                    title="Remove background"
+                  >
+                    {bgRemoving ? '⏳ Removing…' : '✂ Remove BG'}
+                  </button>
                 </div>
+                {/* Color palette */}
+                {(displayUrl ?? displayResult.resultUrl) && (
+                  <ColorPalette imageUrl={displayUrl ?? displayResult.resultUrl!} />
+                )}
                 <div className="studio-output-toolbar">
                   {displayResult.width && (
                     <span className="studio-output-size">
@@ -655,27 +693,22 @@ function VectorStudioInner() {
                   )}
                   <button
                     className="btn-ghost btn-sm"
-                    onClick={() => displayResult.resultUrl && handleDownload(displayResult.resultUrl)}
+                    onClick={() => handleDownload(displayUrl ?? displayResult.resultUrl!)}
                   >
                     ↓ Download
                   </button>
                   <button
                     className="btn-ghost btn-sm"
                     onClick={() => {
-                      if (displayResult.resultUrl) {
-                        navigator.clipboard.writeText(displayResult.resultUrl).catch(() => null);
-                        toastSuccess('URL copied');
-                      }
+                      const u = displayUrl ?? displayResult.resultUrl;
+                      if (u) { navigator.clipboard.writeText(u).catch(() => null); toastSuccess('URL copied'); }
                     }}
                   >
                     Copy URL
                   </button>
                   <button
                     className="btn-ghost btn-sm"
-                    onClick={() => {
-                      navigator.clipboard.writeText(prompt).catch(() => null);
-                      toastSuccess('Prompt copied');
-                    }}
+                    onClick={() => { navigator.clipboard.writeText(prompt).catch(() => null); toastSuccess('Prompt copied'); }}
                   >
                     Copy Prompt
                   </button>

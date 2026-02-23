@@ -1,12 +1,18 @@
 import type { Metadata, Viewport } from 'next';
 import { DM_Sans, Space_Grotesk } from 'next/font/google';
 import Link from 'next/link';
+import nextDynamic from 'next/dynamic';
 import './globals.css';
 import { NavLink } from './_components/NavLink';
 import { Footer } from './_components/Footer';
 import { NavAuth } from './_components/NavAuth';
 import { Providers } from './_components/Providers';
 import { ModeSwitcher } from './_components/ModeSwitcher';
+
+const EralVoiceButton = nextDynamic(
+  () => import('@/components/eral-voice-button').then((m) => ({ default: m.EralVoiceButton })),
+  { ssr: false },
+);
 
 export const dynamic = 'force-dynamic';
 
@@ -167,6 +173,7 @@ export default function RootLayout({
           <ModeSwitcher />
           <main id="main-content" style={{ flex: 1 }}>{children}</main>
           <Footer />
+          <EralVoiceButton />
         </Providers>
       </body>
     </html>

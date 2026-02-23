@@ -16,6 +16,9 @@ import { QuotaBadge } from '@/components/quota-badge';
 import { parseApiError, type StudioError } from '@/lib/studio-errors';
 import { StudioErrorBanner } from '@/app/_components/StudioErrorBanner';
 import { usePreferenceSync } from '@/hooks/usePreferenceSync';
+import { ColorPalette } from '@/components/color-palette';
+import { QrGenerator } from '@/components/qr-generator';
+import { FontPairing } from '@/components/font-pairing';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -166,6 +169,12 @@ function BusinessStudioInner() {
 
   // Timer ref
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Free integrations state ───────────────────────────────────────────────
+  const [showQrPanel, setShowQrPanel]         = useState(false);
+  const [showFontPanel, setShowFontPanel]     = useState(false);
+  const [bgRemoving, setBgRemoving]           = useState(false);
+  const [displayUrl, setDisplayUrl]           = useState<string | null>(null);
 
   // ── SFX / Audio panel ────────────────────────────────────────────────────
   const [showAudioPanel, setShowAudioPanel] = useState(false);
@@ -415,6 +424,28 @@ function BusinessStudioInner() {
   // ── Displayed output image ────────────────────────────────────────────────
   const displayResult = result ?? (history[selectedHistory ?? -1] ?? null);
   const isBrandKit    = activeTool === 'brand-kit';
+
+  // Keep displayUrl in sync with latest result (allows bg-remove to override)
+  useEffect(() => {
+    setDisplayUrl(displayResult?.resultUrl ?? null);
+  }, [displayResult?.resultUrl]);
+
+  // ── Background remove ─────────────────────────────────────────────────────
+  const handleBgRemove = useCallback(async (url: string) => {
+    setBgRemoving(true);
+    try {
+      const res = await fetch('/api/tools/bg-remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: url }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toastError(data.error ?? 'BG removal failed'); return; }
+      setDisplayUrl(`data:image/png;base64,${data.resultBase64}`);
+      toastSuccess('Background removed');
+    } catch { toastError('BG removal failed'); }
+    finally { setBgRemoving(false); }
+  }, [toastError, toastSuccess]);
 
   return (
     <div className="studio-layout">
@@ -840,6 +871,44 @@ function BusinessStudioInner() {
           )}
         </div>
 
+        {/* ── 🔗 QR Code panel ────────────────────────────────────────────── */}
+        <div className="studio-control-section" style={{ padding: 0, borderTop: '1px solid var(--surface-border)' }}>
+          <div
+            className="px-4 py-3 flex items-center justify-between cursor-pointer"
+            onClick={() => setShowQrPanel(v => !v)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && setShowQrPanel(v => !v)}
+          >
+            <span className="studio-control-label" style={{ fontWeight: 600 }}>🔗 QR Code</span>
+            <span style={{ color: 'var(--text-disabled)', fontSize: 12 }}>{showQrPanel ? '▾' : '▸'}</span>
+          </div>
+          {showQrPanel && (
+            <div className="px-4 pb-4">
+              <QrGenerator resultUrl={displayResult?.resultUrl} />
+            </div>
+          )}
+        </div>
+
+        {/* ── 🔤 Font Pairing panel ────────────────────────────────────────── */}
+        <div className="studio-control-section" style={{ padding: 0, borderTop: '1px solid var(--surface-border)' }}>
+          <div
+            className="px-4 py-3 flex items-center justify-between cursor-pointer"
+            onClick={() => setShowFontPanel(v => !v)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && setShowFontPanel(v => !v)}
+          >
+            <span className="studio-control-label" style={{ fontWeight: 600 }}>🔤 Font Pairing</span>
+            <span style={{ color: 'var(--text-disabled)', fontSize: 12 }}>{showFontPanel ? '▾' : '▸'}</span>
+          </div>
+          {showFontPanel && (
+            <div className="px-4 pb-4">
+              <FontPairing brandStyle={style} />
+            </div>
+          )}
+        </div>
+
         {/* Generate button */}
         <div className="studio-control-section">
           <button
@@ -907,12 +976,42 @@ function BusinessStudioInner() {
             )}
             {displayResult?.resultUrl && jobStatus !== 'running' && (
               <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={displayResult.resultUrl}
-                  alt="Generated business asset"
-                  className="studio-output-img biz-output-img"
-                />
+                <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={displayUrl ?? displayResult.resultUrl}
+                    alt="Generated business asset"
+                    className="studio-output-img biz-output-img"
+                  />
+                  {/* Remove BG button on hover */}
+                  <button
+                    onClick={() => displayResult.resultUrl && handleBgRemove(displayUrl ?? displayResult.resultUrl)}
+                    disabled={bgRemoving}
+                    style={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      opacity: 0,
+                      transition: 'opacity 0.15s',
+                      fontSize: '0.72rem',
+                      padding: '3px 8px',
+                      background: 'rgba(0,0,0,0.7)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: 4,
+                      color: '#fff',
+                      cursor: bgRemoving ? 'wait' : 'pointer',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '0'; }}
+                    title="Remove background"
+                  >
+                    {bgRemoving ? '⏳ Removing…' : '✂ Remove BG'}
+                  </button>
+                </div>
+                {/* Color palette */}
+                {(displayUrl ?? displayResult.resultUrl) && (
+                  <ColorPalette imageUrl={displayUrl ?? displayResult.resultUrl!} />
+                )}
                 <div className="studio-output-toolbar">
                   {displayResult.width && displayResult.height && (
                     <span className="studio-output-size">
@@ -921,13 +1020,13 @@ function BusinessStudioInner() {
                   )}
                   <button
                     className="btn-ghost btn-sm"
-                    onClick={() => displayResult.resultUrl && handleDownload(displayResult.resultUrl)}
+                    onClick={() => handleDownload(displayUrl ?? displayResult.resultUrl!)}
                   >
                     ↓ Download
                   </button>
                   <button
                     className="btn-ghost btn-sm"
-                    onClick={() => { if (displayResult.resultUrl) { navigator.clipboard.writeText(displayResult.resultUrl); toastSuccess('URL copied'); } }}
+                    onClick={() => { const u = displayUrl ?? displayResult.resultUrl; if (u) { navigator.clipboard.writeText(u); toastSuccess('URL copied'); } }}
                   >
                     Copy URL
                   </button>

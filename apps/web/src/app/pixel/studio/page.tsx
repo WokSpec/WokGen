@@ -11,6 +11,7 @@ import { parseApiError, type StudioError } from '@/lib/studio-errors';
 import { usePreferenceSync } from '@/hooks/usePreferenceSync';
 import { useWAPListener } from '@/hooks/useWAPListener';
 import { QuotaBadge } from '@/components/quota-badge';
+import { ColorPalette } from '@/components/color-palette';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -722,6 +723,9 @@ function OutputPanel({
   onFillPrompt,
   showPixelGrid,
   setShowPixelGrid,
+  displayUrl,
+  onBgRemove,
+  bgRemoving,
 }: {
   status: JobStatus;
   result: GenerationResult | null;
@@ -739,6 +743,9 @@ function OutputPanel({
   onFillPrompt?: (p: string) => void;
   showPixelGrid?: boolean;
   setShowPixelGrid?: (v: boolean) => void;
+  displayUrl?: string | null;
+  onBgRemove?: (url: string) => void;
+  bgRemoving?: boolean;
 }) {
   const [zoom, setZoom] = useState<1|2|4>(1);
   const [activeUrl, setActiveUrl] = useState<string | null>(null);
@@ -1053,7 +1060,7 @@ function OutputPanel({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={activeUrl}
+              src={displayUrl ?? activeUrl}
               alt="Generated result"
               className="pixel-art"
               style={{
@@ -1066,6 +1073,24 @@ function OutputPanel({
                 display: 'block',
               }}
             />
+            {/* Remove BG button on hover */}
+            {onBgRemove && (
+              <button
+                onClick={() => onBgRemove(displayUrl ?? activeUrl)}
+                disabled={bgRemoving}
+                style={{
+                  position: 'absolute', top: 4, right: 4, opacity: 0,
+                  transition: 'opacity 0.15s', fontSize: '0.68rem', padding: '2px 6px',
+                  background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 3, color: '#fff', cursor: bgRemoving ? 'wait' : 'pointer',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '0'; }}
+                title="Remove background"
+              >
+                {bgRemoving ? '⏳' : '✂ BG'}
+              </button>
+            )}
             {/* Pixel grid overlay */}
             {showPixelGrid && (
               <div
@@ -1082,6 +1107,13 @@ function OutputPanel({
             )}
           </div>
         ) : null}
+
+        {/* Color palette — shown below canvas when result is ready */}
+        {result && activeUrl && (
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+            <ColorPalette imageUrl={displayUrl ?? activeUrl} />
+          </div>
+        )}
 
         {/* Size + provider readout */}
         {result && activeUrl && (
@@ -2170,6 +2202,10 @@ function StudioInner() {
   const [outputZoom, setOutputZoom]       = useState<1 | 2 | 4>(1);
   const [showPixelGrid, setShowPixelGrid] = useState(false);
 
+  // Bg remove state
+  const [bgRemoving, setBgRemoving]       = useState(false);
+  const [bgDisplayUrl, setBgDisplayUrl]   = useState<string | null>(null);
+
   // Job state
   const [jobStatus, setJobStatus]     = useState<JobStatus>('idle');
   const [result, setResult]           = useState<GenerationResult | null>(null);
@@ -2588,7 +2624,24 @@ function StudioInner() {
     setJobStatus('idle');
     setResult(null);
     setStudioError(null);
+    setBgDisplayUrl(null);
   }, []);
+
+  // ── Background remove ─────────────────────────────────────────────────────
+  const handleBgRemove = useCallback(async (url: string) => {
+    setBgRemoving(true);
+    try {
+      const res = await fetch('/api/tools/bg-remove', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: url }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toastError(data.error ?? 'BG removal failed'); return; }
+      setBgDisplayUrl(`data:image/png;base64,${data.resultBase64}`);
+      toastSuccess('Background removed');
+    } catch { toastError('BG removal failed'); }
+    finally { setBgRemoving(false); }
+  }, [toastError, toastSuccess]);
 
   // ── History select ─────────────────────────────────────────────────────────
   const handleHistorySelect = useCallback((item: HistoryItem) => {
@@ -3162,9 +3215,13 @@ function StudioInner() {
           onFillPrompt={setPrompt}
           showPixelGrid={showPixelGrid}
           setShowPixelGrid={setShowPixelGrid}
+          displayUrl={bgDisplayUrl}
+          onBgRemove={handleBgRemove}
+          bgRemoving={bgRemoving}
           onSelectBatch={(i) => {
             setSelectedBatch(i);
             setResult(batchResults[i] ?? null);
+            setBgDisplayUrl(null);
           }}
         />
 

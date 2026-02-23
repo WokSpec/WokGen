@@ -149,10 +149,10 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Per-minute rate limit ──────────────────────────────────────────────────
-  const minuteMax: Record<typeof tier, number> = {
+  const minuteMax: Record<string, number> = {
     guest: 2, free: 5, plus: 15, pro: 15, max: 15,
   };
-  const rl = checkMinuteRateLimit(`voice:min:${rlKey}`, minuteMax[tier]);
+  const rl = checkMinuteRateLimit(`voice:min:${rlKey}`, minuteMax[tier] ?? 5);
   if (!rl.allowed) {
     return NextResponse.json({ error: 'Rate limit exceeded', code: 'RATE_LIMIT' }, { status: 429 });
   }

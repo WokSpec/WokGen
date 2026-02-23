@@ -5,6 +5,26 @@ import { useRouter } from 'next/navigation';
 import { safeMarkdown } from '@/lib/safe-markdown';
 import { parseWAPFromResponse, executeWAP, type WAPResponse } from '@/lib/wap';
 
+// ── SpeechRecognition type shim (not in all TS libs) ─────────────────────────
+interface ISpeechRecognition {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => ISpeechRecognition;
+    webkitSpeechRecognition?: new () => ISpeechRecognition;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -288,6 +308,15 @@ export function EralPage() {
   const [conversationsLoaded, setConversationsLoaded] = useState(false);
   const [actionConfirmation, setActionConfirmation] = useState<string | null>(null);
 
+  // ── Call Mode state ────────────────────────────────────────────────────────
+  const [callActive, setCallActive] = useState(false);
+  const [callState, setCallState] = useState<'idle' | 'listening' | 'processing' | 'speaking'>('idle');
+  const [callTranscript, setCallTranscript] = useState<{ user: string; eral: string } | null>(null);
+  const [callVoiceId, setCallVoiceId] = useState('21m00Tcm4TlvDq8ikWAM');
+  const [callConvId, setCallConvId] = useState<string | undefined>();
+  const callAudioRef = useRef<HTMLAudioElement | null>(null);
+  const callRecognitionRef = useRef<ISpeechRecognition | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -507,6 +536,95 @@ export function EralPage() {
     abortRef.current?.abort();
   };
 
+  // ── Call Mode: send voice message to /api/eral/speak ──────────────────────
+
+  const sendCallMessage = useCallback(async (transcript: string) => {
+    setCallState('processing');
+    setCallTranscript((prev) => ({ user: transcript, eral: prev?.eral ?? '' }));
+
+    try {
+      const res = await fetch('/api/eral/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: transcript,
+          conversationId: callConvId,
+          context: { mode: 'eral' },
+          voiceId: callVoiceId,
+        }),
+      });
+
+      if (!res.ok) {
+        setCallState('idle');
+        return;
+      }
+
+      const newConvId = res.headers.get('X-Eral-Conversation-Id');
+      if (newConvId) setCallConvId(newConvId);
+      const respText = res.headers.get('X-Eral-Response-Text');
+      const eralText = respText ? decodeURIComponent(respText) : '';
+      if (eralText) setCallTranscript({ user: transcript, eral: eralText });
+
+      const contentType = res.headers.get('Content-Type') ?? '';
+
+      if (contentType.includes('audio/mpeg')) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        callAudioRef.current = audio;
+        setCallState('speaking');
+        audio.onended = () => { URL.revokeObjectURL(url); callAudioRef.current = null; setCallState('idle'); };
+        audio.onerror = () => { URL.revokeObjectURL(url); callAudioRef.current = null; setCallState('idle'); };
+        await audio.play();
+      } else {
+        const data = await res.json() as { text?: string };
+        const text = data.text ?? eralText;
+        if (!text) { setCallState('idle'); return; }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.onend = () => setCallState('idle');
+        utterance.onerror = () => setCallState('idle');
+        setCallState('speaking');
+        window.speechSynthesis.speak(utterance);
+      }
+    } catch {
+      setCallState('idle');
+    }
+  }, [callConvId, callVoiceId]);
+
+  const startCallListening = useCallback(() => {
+    const SpeechRecognitionCtor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor) return;
+
+    const recognition = new SpeechRecognitionCtor();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[0]?.[0]?.transcript ?? '';
+      if (transcript.trim()) sendCallMessage(transcript.trim());
+      else setCallState('idle');
+    };
+    recognition.onerror = () => setCallState('idle');
+    recognition.onend = () => {
+      setCallState((s) => s === 'listening' ? 'idle' : s);
+    };
+    callRecognitionRef.current = recognition;
+    recognition.start();
+    setCallState('listening');
+  }, [sendCallMessage]);
+
+  const endCall = useCallback(() => {
+    callAudioRef.current?.pause();
+    callAudioRef.current = null;
+    callRecognitionRef.current?.stop();
+    callRecognitionRef.current = null;
+    window.speechSynthesis?.cancel();
+    setCallActive(false);
+    setCallState('idle');
+    setCallTranscript(null);
+  }, []);
+
   const activeModel = MODEL_OPTIONS.find((m) => m.value === model)!;
   const isEmpty = !activeConv || activeConv.messages.length === 0;
 
@@ -622,6 +740,15 @@ export function EralPage() {
           <button className="eral-share-btn" disabled title="Share (coming soon)">
             Share
           </button>
+
+          {/* Call Mode toggle */}
+          <button
+            className={`eral-call-btn${callActive ? ' eral-call-btn-active' : ''}`}
+            onClick={() => callActive ? endCall() : setCallActive(true)}
+            title={callActive ? 'Exit Call Mode' : 'Call Mode — talk to Eral'}
+          >
+            📞 {callActive ? 'End Call' : 'Call'}
+          </button>
         </div>
 
         {/* Messages */}
@@ -721,6 +848,132 @@ export function EralPage() {
           </p>
         </div>
       </div>
+
+      {/* ── Call Mode overlay ──────────────────────────────────────── */}
+      {callActive && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 100,
+          background: 'rgba(10,10,20,0.96)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          gap: 24, backdropFilter: 'blur(12px)',
+        }}>
+          {/* Avatar */}
+          <div style={{ position: 'relative' }}>
+            {callState === 'speaking' && (
+              <span style={{
+                position: 'absolute', inset: -12, borderRadius: '50%',
+                border: '2px solid rgba(129,140,248,0.4)',
+                animation: 'call-ring 1.2s ease-out infinite',
+              }} />
+            )}
+            <div style={{
+              width: 120, height: 120, borderRadius: '50%',
+              background: 'linear-gradient(135deg,#312e81,#4c1d95)',
+              border: '3px solid rgba(129,140,248,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 52, boxShadow: '0 0 40px rgba(129,140,248,0.2)',
+            }}>
+              🧠
+            </div>
+          </div>
+
+          {/* Status */}
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#c7d2fe', fontSize: 18, fontWeight: 600, margin: 0 }}>
+              {callState === 'idle'       ? 'Ready to talk'  :
+               callState === 'listening'  ? 'Listening…'     :
+               callState === 'processing' ? 'Thinking…'      : 'Speaking…'}
+            </p>
+            <p style={{ color: 'rgba(167,139,250,0.6)', fontSize: 13, marginTop: 4 }}>
+              Eral 7c · Voice Mode
+            </p>
+          </div>
+
+          {/* Transcript */}
+          {callTranscript && (
+            <div style={{
+              background: 'rgba(30,27,75,0.7)', borderRadius: 12,
+              padding: '14px 20px', maxWidth: 420, width: '90%',
+              border: '1px solid rgba(129,140,248,0.2)',
+            }}>
+              {callTranscript.user && (
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, margin: '0 0 8px' }}>
+                  <span style={{ color: '#818cf8', fontWeight: 600 }}>You: </span>
+                  {callTranscript.user}
+                </p>
+              )}
+              {callTranscript.eral && (
+                <p style={{ color: '#e0e7ff', fontSize: 13, margin: 0 }}>
+                  <span style={{ color: '#a78bfa', fontWeight: 600 }}>Eral: </span>
+                  {callTranscript.eral}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Voice selector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ color: 'rgba(167,139,250,0.7)', fontSize: 12 }}>Voice:</span>
+            <select
+              value={callVoiceId}
+              onChange={(e) => setCallVoiceId(e.target.value)}
+              style={{
+                background: 'rgba(30,27,75,0.8)', border: '1px solid rgba(129,140,248,0.25)',
+                borderRadius: 6, color: '#c7d2fe', fontSize: 12, padding: '4px 8px', cursor: 'pointer',
+              }}
+            >
+              <option value="21m00Tcm4TlvDq8ikWAM">Rachel</option>
+              <option value="pNInz6obpgDQGcFmaJgB">Adam</option>
+              <option value="EXAVITQu4vr4xnSDxMaL">Bella</option>
+              <option value="TxGEqnHWrfWFTfGW9XjX">Josh</option>
+            </select>
+          </div>
+
+          {/* Mic button */}
+          <button
+            onClick={() => {
+              if (callState === 'idle') startCallListening();
+              else if (callState === 'listening') { callRecognitionRef.current?.stop(); setCallState('idle'); }
+              else if (callState === 'speaking') {
+                callAudioRef.current?.pause();
+                callAudioRef.current = null;
+                window.speechSynthesis?.cancel();
+                setCallState('idle');
+              }
+            }}
+            disabled={callState === 'processing'}
+            style={{
+              width: 72, height: 72, borderRadius: '50%',
+              background: callState === 'listening' ? '#dc2626' :
+                          callState === 'speaking'  ? '#7c3aed' : '#312e81',
+              border: '2px solid rgba(129,140,248,0.4)',
+              cursor: callState === 'processing' ? 'default' : 'pointer',
+              fontSize: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 20px rgba(129,140,248,0.3)',
+              transition: 'background 0.2s',
+            }}
+            title={callState === 'idle' ? 'Tap to speak' : 'Tap to stop'}
+          >
+            {callState === 'processing' ? '⏳' :
+             callState === 'listening'  ? '🎤' :
+             callState === 'speaking'   ? '🔊' : '🎙️'}
+          </button>
+
+          {/* End Call */}
+          <button
+            onClick={endCall}
+            style={{
+              padding: '8px 24px', borderRadius: 999,
+              background: '#991b1b', border: '1px solid #dc2626',
+              color: 'white', fontSize: 14, cursor: 'pointer',
+              fontWeight: 600,
+            }}
+          >
+            End Call
+          </button>
+        </div>
+      )}
 
       {/* ── Action confirmation toast ─────────────────────────────── */}
       {actionConfirmation && (
@@ -963,6 +1216,34 @@ export function EralPage() {
           font-size: 12px;
           cursor: not-allowed;
           opacity: 0.5;
+        }
+
+        .eral-call-btn {
+          padding: 4px 12px;
+          background: rgba(129,140,248,0.1);
+          border: 1px solid rgba(129,140,248,0.25);
+          border-radius: 4px;
+          color: #818cf8;
+          font-size: 12px;
+          cursor: pointer;
+          transition: background 0.15s, border-color 0.15s;
+        }
+        .eral-call-btn:hover {
+          background: rgba(129,140,248,0.18);
+          border-color: rgba(129,140,248,0.4);
+        }
+        .eral-call-btn-active {
+          background: rgba(220,38,38,0.15);
+          border-color: rgba(220,38,38,0.4);
+          color: #f87171;
+        }
+        .eral-call-btn-active:hover {
+          background: rgba(220,38,38,0.22);
+        }
+
+        @keyframes call-ring {
+          0%   { transform: scale(1); opacity: 0.8; }
+          100% { transform: scale(1.5); opacity: 0; }
         }
 
         /* Messages area */

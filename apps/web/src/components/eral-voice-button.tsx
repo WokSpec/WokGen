@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Mic, MicOff, Loader2, Volume2, X } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // EralVoiceButton
@@ -29,6 +28,98 @@ function detectMode(): string | undefined {
   return undefined;
 }
 
+// ── Inline SVG icons ──────────────────────────────────────────────────────────
+
+function MicIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="22"/>
+    </svg>
+  );
+}
+
+function MicOffIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="2" y1="2" x2="22" y2="22"/>
+      <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/>
+      <path d="M5 10v2a7 7 0 0 0 12 5"/>
+      <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/>
+      <path d="M9 9v3a3 3 0 0 0 5.12 2.12"/>
+      <line x1="12" y1="19" x2="12" y2="22"/>
+    </svg>
+  );
+}
+
+function SpinnerIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"
+      style={{ animation: 'spin 1s linear infinite' }}>
+      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  );
+}
+
+// ── SpeechRecognition type shim ───────────────────────────────────────────────
+
+interface SpeechRecognitionAlternative {
+  readonly transcript: string;
+  readonly confidence: number;
+}
+
+interface SpeechRecognitionResult {
+  readonly length: number;
+  readonly isFinal: boolean;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionResultList {
+  readonly length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface ISpeechRecognitionEvent extends Event {
+  readonly results: SpeechRecognitionResultList;
+  readonly resultIndex: number;
+}
+
+interface ISpeechRecognitionErrorEvent extends Event {
+  readonly error: string;
+  readonly message: string;
+}
+
+interface ISpeechRecognition {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  onresult: ((event: ISpeechRecognitionEvent) => void) | null;
+  onerror: ((event: ISpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => ISpeechRecognition;
+    webkitSpeechRecognition?: new () => ISpeechRecognition;
+  }
+}
+
 export function EralVoiceButton() {
   const [state, setState] = useState<VoiceState>('idle');
   const [errorText, setErrorText] = useState('');
@@ -37,7 +128,7 @@ export function EralVoiceButton() {
   const [conversationId, setConversationId] = useState<string | undefined>();
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
   const overlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -91,7 +182,6 @@ export function EralVoiceButton() {
         return;
       }
 
-      // Capture headers before consuming body
       const respText = res.headers.get('X-Eral-Response-Text');
       const newConvId = res.headers.get('X-Eral-Conversation-Id');
       if (newConvId) setConversationId(newConvId);
@@ -102,7 +192,6 @@ export function EralVoiceButton() {
       const contentType = res.headers.get('Content-Type') ?? '';
 
       if (contentType.includes('audio/mpeg')) {
-        // Play audio blob
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
@@ -120,7 +209,6 @@ export function EralVoiceButton() {
         };
         await audio.play();
       } else {
-        // Fallback: Web Speech API
         const data = await res.json() as { text?: string };
         const text = data.text ?? displayText;
         if (!text) { setState('idle'); return; }
@@ -141,27 +229,25 @@ export function EralVoiceButton() {
 
   // ── Start speech recognition ───────────────────────────────────────────────
   const startListening = useCallback(() => {
-    const SpeechRecognition =
-      (window as Window & typeof globalThis & { SpeechRecognition?: typeof window.SpeechRecognition; webkitSpeechRecognition?: typeof window.SpeechRecognition }).SpeechRecognition ??
-      (window as Window & typeof globalThis & { webkitSpeechRecognition?: typeof window.SpeechRecognition }).webkitSpeechRecognition;
+    const SpeechRecognitionCtor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
+    if (!SpeechRecognitionCtor) {
       showError('Voice not supported in this browser. Try Chrome.');
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognitionCtor();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: ISpeechRecognitionEvent) => {
       const transcript = event.results[0]?.[0]?.transcript ?? '';
       if (transcript.trim()) sendToEral(transcript.trim());
       else setState('idle');
     };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    recognition.onerror = (event: ISpeechRecognitionErrorEvent) => {
       if (event.error === 'aborted' || event.error === 'no-speech') {
         setState('idle');
       } else {
@@ -170,7 +256,6 @@ export function EralVoiceButton() {
     };
 
     recognition.onend = () => {
-      // If still in listening state (no result), go back to idle
       setState((s) => s === 'listening' ? 'idle' : s);
     };
 
@@ -281,7 +366,7 @@ export function EralVoiceButton() {
             }}
             aria-label="Dismiss"
           >
-            <X size={12} />
+            <CloseIcon />
           </button>
           <span style={{ paddingRight: 16 }}>{responseText}</span>
         </div>
@@ -364,13 +449,13 @@ export function EralVoiceButton() {
           }}
         >
           {state === 'processing' ? (
-            <Loader2 size={20} color="white" style={{ animation: 'spin 1s linear infinite' }} />
+            <SpinnerIcon />
           ) : state === 'speaking' ? (
             <SpeakingBars />
           ) : state === 'listening' ? (
-            <MicOff size={20} color="white" />
+            <MicOffIcon />
           ) : (
-            <Mic size={20} color="white" />
+            <MicIcon />
           )}
         </button>
       </div>
@@ -397,7 +482,7 @@ export function EralVoiceButton() {
 function SpeakingBars() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 3, height: 20 }}>
-      {[0, 0.2, 0.1].map((delay, i) => (
+      {([0, 0.2, 0.1] as number[]).map((delay, i) => (
         <div
           key={i}
           style={{

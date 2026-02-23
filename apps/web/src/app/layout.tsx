@@ -111,7 +111,9 @@ function NavBar() {
             <span className="nav-eral-badge">🧠 Eral</span>
           </NavLink>
           <NavLink href="/eral/director">Director</NavLink>
+          <NavLink href="/eral/simulate">Simulate</NavLink>
           <NavLink href="/brand">Brand</NavLink>
+          <NavLink href="/automations">Automate</NavLink>
           <NavLink href="/pricing">Pricing</NavLink>
           <NavLink href="/docs">Docs</NavLink>
         </div>

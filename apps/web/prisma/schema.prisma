@@ -46,6 +46,7 @@ model User {
   eralConversations  EralConversation[]
   preference         UserPreference?
   sfxJobs            SfxJob[]
+  automations        Automation[]
 }
 
 model Account {
@@ -200,6 +201,9 @@ model Job {
   /// Optional project this job belongs to
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  /// Extracted dominant palette (JSON: [{hex, name, ratio}])
+  paletteJson String? @db.Text
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -364,6 +368,16 @@ model UserPreference {
 
   // Favorite prompts (JSON array)
   favoritePrompts String?  @db.Text
+
+  // Notification settings (booleans as JSON or individual flags)
+  notifyEmailJobDone  Boolean @default(true)
+  notifyEmailComment  Boolean @default(true)
+  notifyEmailDigest   Boolean @default(false)
+  notifyInAppQuota    Boolean @default(true)
+  notifyInAppLevelUp  Boolean @default(true)
+  // Admin: notification routing channel — 'email' | 'webhook' | 'both' | 'none'
+  notifyAdminChannel  String? @default("email")
+  notifyWebhookUrl    String?  @db.Text
 
   // Usage stats (JSON: { totalGenerations, successRate, lastActive })
   stats           String?  @db.Text
@@ -547,3 +561,39 @@ model AssetComment {
   @@index([jobId, createdAt])
 }
 
+
+/// Scheduled automation — send a message or trigger an action on a cron schedule
+model Automation {
+  id        String  @id @default(cuid())
+  userId    String
+
+  name      String
+  enabled   Boolean @default(true)
+
+  /// cron expression: "0 9 * * 1" = every Monday 9am UTC
+  schedule  String
+
+  /// Target type: 'email' | 'webhook' | 'in_app'
+  targetType  String @default("email")
+
+  /// Webhook URL or email address depending on targetType
+  targetValue String? @db.Text
+
+  /// Template message (supports {{date}}, {{user_name}}, {{quota_used}})
+  messageTemplate String @db.Text
+
+  /// Last time this automation ran
+  lastRunAt   DateTime?
+
+  /// Last run result: 'ok' | 'error'
+  lastRunStatus String?
+  lastRunError  String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([enabled, schedule])
+}

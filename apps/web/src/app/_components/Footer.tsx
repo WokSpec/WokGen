@@ -17,10 +17,13 @@ const PRODUCT_LINKS = [
 const PLATFORM_LINKS = [
   { label: 'Eral AI',           href: '/eral'            },
   { label: 'Eral Director',     href: '/eral/director'   },
+  { label: 'Eral Simulate',     href: '/eral/simulate'   },
   { label: 'Brand Kits',        href: '/brand'           },
   { label: 'Projects',          href: '/projects'        },
   { label: 'Community',         href: '/community'       },
   { label: 'Usage & Limits',    href: '/account/usage'   },
+  { label: 'Notifications',     href: '/settings'        },
+  { label: 'Automations',       href: '/automations'     },
   { label: 'Pricing',           href: '/pricing'         },
   { label: 'Billing',           href: '/billing'         },
 ];

@@ -511,6 +511,22 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
     } finally { setExporting(false); }
   };
 
+  const handleExportPdf = async () => {
+    try {
+      const res = await fetch(`/api/projects/${projectId}/export/pdf`);
+      if (!res.ok) { toast.error('PDF export failed — check that the project has succeeded assets.'); return; }
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `${projectName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_brand_sheet.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('PDF export failed.');
+    }
+  };
+
   const studioUrl = MODE_STUDIOS[projectMode] ?? '/pixel/studio';
 
   // Relationships for selected asset
@@ -543,6 +559,14 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
             disabled={exporting || jobs.length === 0}
           >
             {exporting ? 'Exporting…' : '↓ Export ZIP'}
+          </button>
+          <button
+            className="btn btn--ghost btn--sm"
+            onClick={handleExportPdf}
+            disabled={jobs.length === 0}
+            title="Export as PDF brand sheet"
+          >
+            ↓ Brand PDF
           </button>
           <Link href={`${studioUrl}?project=${projectId}`} className="btn btn--primary btn--sm">
             + Generate

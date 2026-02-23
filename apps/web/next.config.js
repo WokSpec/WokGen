@@ -78,47 +78,21 @@ const nextConfig = {
     // Pixel art assets look best uncompressed — keep quality high
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
+    unoptimized: false, // Enable Next.js image optimization for production
   },
+
+  // ---------------------------------------------------------------------------
+  // Compression for gzip/brotli
+  // ---------------------------------------------------------------------------
+  compress: true,
 
   // ---------------------------------------------------------------------------
   // Prisma + heavy native modules must run in the Node.js runtime, not Edge
+  // Instrumentation hook for OpenTelemetry when OTEL_EXPORTER_OTLP_ENDPOINT is set
   // ---------------------------------------------------------------------------
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
-  },
-
-  // ---------------------------------------------------------------------------
-  // CORS headers for the API — allow cross-origin requests from Studio UI
-  // embedded in other apps or called directly (e.g. from CLI tools).
-  // ---------------------------------------------------------------------------
-  async headers() {
-    return [
-      {
-        source: '/api/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true'                                   },
-          { key: 'Access-Control-Allow-Origin',      value: process.env.CORS_ORIGIN ?? (process.env.NODE_ENV === 'production' ? (process.env.NEXT_PUBLIC_BASE_URL ?? 'https://wokgen.wokspec.org') : '*') },
-          { key: 'Access-Control-Allow-Methods',     value: 'GET,POST,PUT,PATCH,DELETE,OPTIONS'      },
-          {
-            key:   'Access-Control-Allow-Headers',
-            value: [
-              'X-CSRF-Token',
-              'X-Requested-With',
-              'Accept',
-              'Accept-Version',
-              'Content-Length',
-              'Content-MD5',
-              'Content-Type',
-              'Date',
-              'X-Api-Version',
-              'Authorization',
-              'X-Provider-Key',
-              'X-Provider',
-            ].join(', '),
-          },
-        ],
-      },
-    ];
+    instrumentationHook: true,
   },
 
   // ---------------------------------------------------------------------------

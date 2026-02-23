@@ -56,6 +56,8 @@ In **Project → Settings → Environment Variables**, add:
 | `DISABLE_SIGNUPS` | *(optional)* Set to `true` to prevent new account creation |
 | `DISABLE_GUEST_GENERATION` | *(optional)* Set to `true` to require auth for all generations |
 | `HF_TOKEN` | *(optional)* HuggingFace access token — improves free rate limits on FLUX.1-schnell |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | *(optional)* OpenTelemetry OTLP exporter URL (e.g. `https://api.honeycomb.io/v1/traces`) |
+| `OTEL_EXPORTER_OTLP_HEADERS` | *(optional)* OpenTelemetry headers as comma-separated key=value pairs (e.g. `x-honeycomb-team=YOUR_KEY`) |
 
 > **CONNECTION POOLING (important for serverless)**
 >

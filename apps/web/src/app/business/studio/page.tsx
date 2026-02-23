@@ -19,6 +19,7 @@ import { usePreferenceSync } from '@/hooks/usePreferenceSync';
 import { ColorPalette } from '@/components/color-palette';
 import { QrGenerator } from '@/components/qr-generator';
 import { FontPairing } from '@/components/font-pairing';
+import SfxBrowser from '@/components/sfx-browser';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -727,6 +728,9 @@ function BusinessStudioInner() {
 
           {showAudioPanel && (
             <div className="px-4 pb-4 flex flex-col gap-3">
+              {/* Freesound browser */}
+              <SfxBrowser onSelectPrompt={(p) => setSfxPrompt(p)} />
+              <div style={{ borderTop: '1px solid var(--surface-border)', margin: '2px 0' }} />
               {/* Prompt label + Auto-suggest */}
               <div className="flex items-center justify-between">
                 <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>

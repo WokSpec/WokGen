@@ -9,6 +9,7 @@ import {
   estimateCharCount,
   type VoiceStyle,
 } from '@/lib/tts-intelligence';
+import { getUserPlanId, TTS_MAX_CHARS } from '@/lib/quota';
 
 // ---------------------------------------------------------------------------
 // POST /api/voice/generate
@@ -27,19 +28,29 @@ type Language = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'pl' | 'ja' | 'ko' | '
 // ---------------------------------------------------------------------------
 // Provider calls
 // ---------------------------------------------------------------------------
-async function generateElevenLabs(
+
+/** Apply natural pauses via SSML break tags (ElevenLabs only). */
+function applyNaturalPauses(text: string): string {
+  return text
+    .replace(/,(\s)/g, ',<break time="200ms"/>$1')
+    .replace(/\.(\s)/g, '.<break time="400ms"/>$1');
+}
+
+async function generateElevenLabsStream(
   text: string,
   voiceId: string,
   style: VoiceStyle,
   hd: boolean,
-): Promise<Buffer | null> {
+  emotionIntensity?: number,
+  voiceClarity?: number,
+): Promise<Response | null> {
   const key = process.env.ELEVENLABS_API_KEY;
   if (!key) return null;
 
-  const settings = getVoiceSettings(style);
+  const baseSettings = getVoiceSettings(style);
   const modelId = hd ? 'eleven_multilingual_v2' : 'eleven_turbo_v2_5';
 
-  const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+  const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -49,18 +60,31 @@ async function generateElevenLabs(
     body: JSON.stringify({
       text,
       model_id: modelId,
-      voice_settings: settings,
+      voice_settings: {
+        ...baseSettings,
+        ...(emotionIntensity !== undefined ? { style: emotionIntensity } : {}),
+        ...(voiceClarity !== undefined ? { stability: voiceClarity } : {}),
+      },
     }),
     signal: AbortSignal.timeout(30000),
   });
 
-  if (!response.ok) {
-    const err = await response.text().catch(() => '');
-    console.error('[TTS/ElevenLabs] Error:', response.status, err);
-    return null;
+  if (response.ok && response.body) {
+    return new Response(response.body, {
+      status: 200,
+      headers: {
+        'Content-Type': 'audio/mpeg',
+        'Transfer-Encoding': 'chunked',
+        'Cache-Control': 'no-store',
+        'X-Provider': 'elevenlabs',
+        'X-Voice-Id': voiceId,
+      },
+    });
   }
 
-  return Buffer.from(await response.arrayBuffer());
+  const err = await response.text().catch(() => '');
+  console.error('[TTS/ElevenLabs] Streaming error:', response.status, err);
+  return null;
 }
 
 async function generateOpenAI(
@@ -158,6 +182,9 @@ export async function POST(req: NextRequest) {
     hd?: boolean;
     voiceId?: string;
     language?: Language;
+    emotionIntensity?: number;
+    voiceClarity?: number;
+    naturalPauses?: boolean;
   };
   try {
     body = await req.json();
@@ -169,16 +196,27 @@ export async function POST(req: NextRequest) {
   const style    = (body.style ?? 'natural') as VoiceStyle;
   const hd       = body.hd ?? false;
   const customVoiceId = body.voiceId;
+  const emotionIntensity = body.emotionIntensity;
+  const voiceClarity     = body.voiceClarity;
+  const naturalPauses    = body.naturalPauses ?? true;
 
   if (!text) {
     return NextResponse.json({ error: 'text is required' }, { status: 400 });
   }
 
-  const MAX_CHARS = 5000;
-  if (text.length > MAX_CHARS) {
+  // ── Tier-based char limit ─────────────────────────────────────────────────
+  const planId = authedUserId ? await getUserPlanId(authedUserId) : 'guest';
+  const maxChars = TTS_MAX_CHARS[planId] ?? TTS_MAX_CHARS.free;
+
+  if (text.length > maxChars) {
     return NextResponse.json(
-      { error: `Text too long. Maximum ${MAX_CHARS} characters.` },
-      { status: 400 },
+      {
+        error: `Text too long. ${planId === 'guest' ? 'Sign up for' : 'Upgrade to Plus for'} longer TTS (${maxChars} char limit on your current plan).`,
+        limit: maxChars,
+        current: text.length,
+        code: 'TTS_CHAR_LIMIT',
+      },
+      { status: 413 },
     );
   }
 
@@ -234,27 +272,33 @@ export async function POST(req: NextRequest) {
     `[TTS] style=${style}, contentType=${contentType}, voice=${selectedVoice.name}, hd=${hd}, chars=${estimateCharCount(processedText)}`,
   );
 
-  // ── Provider chain: ElevenLabs → OpenAI → HuggingFace ───────────────────
+  // ── Provider chain: ElevenLabs streaming → OpenAI → HuggingFace ──────────
+  // Apply natural pauses (SSML) for ElevenLabs only
+  const elevenLabsText = naturalPauses ? applyNaturalPauses(processedText) : processedText;
+
+  // 1. ElevenLabs streaming (primary — lowest latency)
+  try {
+    const streamResponse = await generateElevenLabsStream(
+      elevenLabsText, selectedVoice.id, style, hd, emotionIntensity, voiceClarity,
+    );
+    if (streamResponse) return streamResponse;
+  } catch (e) {
+    console.warn('[TTS] ElevenLabs streaming failed:', e);
+  }
+
+  // 2. OpenAI TTS (secondary)
   let audioBuffer: Buffer | null = null;
   let provider = 'none';
   let format: 'mp3' | 'wav' = 'mp3';
 
   try {
-    audioBuffer = await generateElevenLabs(processedText, selectedVoice.id, style, hd);
-    if (audioBuffer) { provider = 'elevenlabs'; format = 'mp3'; }
+    audioBuffer = await generateOpenAI(processedText, style, hd);
+    if (audioBuffer) { provider = 'openai'; format = 'mp3'; }
   } catch (e) {
-    console.warn('[TTS] ElevenLabs failed:', e);
+    console.warn('[TTS] OpenAI failed:', e);
   }
 
-  if (!audioBuffer) {
-    try {
-      audioBuffer = await generateOpenAI(processedText, style, hd);
-      if (audioBuffer) { provider = 'openai'; format = 'mp3'; }
-    } catch (e) {
-      console.warn('[TTS] OpenAI failed:', e);
-    }
-  }
-
+  // 3. HuggingFace Kokoro (fallback)
   if (!audioBuffer) {
     try {
       audioBuffer = await generateHuggingFace(processedText);

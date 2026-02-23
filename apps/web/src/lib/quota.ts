@@ -39,6 +39,38 @@ export const DAILY_STD_LIMIT: Record<string, number> = {
   max:   -1,
 };
 
+export const SFX_DAILY_LIMIT: Record<string, number> = {
+  guest: 2,
+  free:  3,
+  plus:  20,
+  pro:   -1,
+  max:   -1,
+};
+
+export const TTS_DAILY_LIMIT: Record<string, number> = {
+  guest: 3,
+  free:  5,
+  plus:  20,
+  pro:   -1,
+  max:   -1,
+};
+
+export const TTS_MAX_CHARS: Record<string, number> = {
+  guest: 500,
+  free:  1000,
+  plus:  3000,
+  pro:   10000,
+  max:   10000,
+};
+
+export const ERAL_VOICE_DAILY_LIMIT: Record<string, number> = {
+  guest: 2,
+  free:  5,
+  plus:  -1,
+  pro:   -1,
+  max:   -1,
+};
+
 export const PER_MIN_RATE: Record<string, number> = {
   guest:  2,
   free:   5,

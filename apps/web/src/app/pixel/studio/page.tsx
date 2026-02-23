@@ -12,6 +12,7 @@ import { usePreferenceSync } from '@/hooks/usePreferenceSync';
 import { useWAPListener } from '@/hooks/useWAPListener';
 import { QuotaBadge } from '@/components/quota-badge';
 import { ColorPalette } from '@/components/color-palette';
+import SfxBrowser from '@/components/sfx-browser';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -2895,6 +2896,9 @@ function StudioInner() {
 
           {showSoundsPanel && (
             <div className="px-4 pb-4 flex flex-col gap-3 animate-fade-in-fast">
+              {/* Freesound browser */}
+              <SfxBrowser onSelectPrompt={(p) => setSfxPrompt(p)} />
+              <div style={{ borderTop: '1px solid var(--surface-border)', margin: '2px 0' }} />
               {/* Prompt label + Auto-suggest */}
               <div className="flex items-center justify-between">
                 <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>

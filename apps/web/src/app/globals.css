@@ -514,7 +514,7 @@
   font-family: var(--font-heading, 'Space Grotesk'), system-ui, sans-serif;
 }
 .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-.nav-link-active { color: #a78bfa !important; background: rgba(124,58,237,0.1) !important; }
+.nav-link-active { color: #a78bfa !important; background: transparent !important; box-shadow: inset 0 -2px 0 0 #a78bfa; }
 
 /* ============================================================
    Studio — pixel-art canvas panel
@@ -780,6 +780,17 @@
 @media (max-width: 500px) {
   .nav-bar { padding: 0 0.75rem; gap: 0.5rem; }
   .nav-link { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+}
+/* Nav links scroll on small screens to prevent horizontal overflow */
+@media (max-width: 768px) {
+  .nav-bar .flex.items-center.gap-1.flex-1 {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  .nav-bar .flex.items-center.gap-1.flex-1::-webkit-scrollbar { display: none; }
 }
 
 /* ================================================================
@@ -1491,25 +1502,16 @@
   padding: 1.5rem;
   background: var(--surface-card, #111);
   border: 1px solid var(--surface-border, #1f1f1f);
-  border-radius: 12px;
+  border-left: 3px solid var(--mode-card-accent, #333);
+  border-radius: 8px;
   text-decoration: none;
-  transition: border-color 0.15s, background 0.15s, transform 0.2s;
+  transition: border-color 0.15s, background 0.15s;
   position: relative;
   overflow: hidden;
 }
-.platform-mode-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--mode-card-accent, #888);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.platform-mode-card:hover { border-color: var(--surface-raised, #2a2a2a); background: #131313; transform: translateY(-2px); }
-.platform-mode-card:hover::before { opacity: 1; }
+.platform-mode-card:hover { background: #131313; }
 .platform-mode-card--soon { opacity: 0.6; }
-.platform-mode-card--soon:hover { opacity: 0.8; transform: none; }
+.platform-mode-card--soon:hover { opacity: 0.8; }
 .platform-mode-card-header {
   display: flex;
   align-items: flex-start;
@@ -3018,7 +3020,7 @@
 .platform-hero-eyebrow {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.6rem;
   font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-muted);
@@ -3027,21 +3029,27 @@
   font-family: var(--font-heading, 'Space Grotesk'), system-ui, sans-serif;
   margin-bottom: 1rem;
 }
-.platform-hero-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.platform-hero-dot--pixel   { background: #a78bfa; }
-.platform-hero-dot--business { background: #60a5fa; }
-.platform-hero-dot--vector   { background: #34d399; }
 
 .platform-h1-accent {
-  background: linear-gradient(120deg, #a78bfa, #60a5fa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #a78bfa;
+}
+.platform-hero-rule {
+  display: inline-block;
+  width: 24px;
+  height: 2px;
+  background: #a78bfa;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.platform-mode-accent-bar {
+  display: block;
+  width: 3px;
+  height: 100%;
+  min-height: 36px;
+  background: var(--mode-card-accent, #888);
+  border-radius: 2px;
+  flex-shrink: 0;
+  align-self: stretch;
 }
 
 .platform-hero-note {

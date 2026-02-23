@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'WokGen — Multi-Vertical AI Asset Generation Platform',
+  title: 'WokGen — AI Asset Generation Platform',
   description:
-    'WokGen is a multi-engine AI asset factory — specialized pipelines for pixel art, brand systems, vectors, UI components, and more.',
+    'Every asset your project needs. 8 specialized AI studios for pixel art, brand systems, vectors, UI components, voice, and text.',
   keywords: [
     'AI asset generator', 'pixel art AI', 'brand asset generator',
     'sprite generator', 'AI logo maker', 'WokGen', 'WokSpec',
@@ -131,10 +131,10 @@ const QUICK_PROMPTS = [
 ] as const;
 
 const STATS = [
-  { value: '7',  label: 'Product Modes' },
-  { value: '6+', label: 'AI Providers' },
-  { value: '∞',  label: 'Standard Generations' },
-  { value: '0',  label: 'Setup Required' },
+  { value: '8',  label: 'Specialized studios' },
+  { value: '6+', label: 'AI providers, routed by quality' },
+  { value: 'Free', label: 'Standard generation, always' },
+  { value: 'Open', label: 'Source — MIT licensed' },
 ] as const;
 
 export default function PlatformLanding() {
@@ -145,30 +145,27 @@ export default function PlatformLanding() {
       <section className="platform-hero">
         <div className="platform-hero-inner">
           <div className="platform-hero-eyebrow">
-            <span className="platform-hero-dot platform-hero-dot--pixel" />
-            <span className="platform-hero-dot platform-hero-dot--business" />
-            <span className="platform-hero-dot platform-hero-dot--vector" />
-            <span>Multi-vertical AI generation</span>
+            <span className="platform-hero-rule" />
+            <span>AI asset generation platform</span>
           </div>
           <h1 className="platform-h1">
-            The AI generator that<br />
-            <span className="platform-h1-accent">knows your project.</span>
+            Every asset your project needs.<br />
+            <span className="platform-h1-accent">Generated from intent, not just prompts.</span>
           </h1>
           <p className="platform-desc">
-            WokGen is the only multi-engine AI asset platform built around context, not just prompts.
-            8 specialized studios. An AI Director that plans entire asset packs.
+            8 specialized studios. An AI director that plans entire asset packs.
             Brand kits that enforce visual consistency across every generation.
           </p>
           <div className="platform-cta-row">
             <Link href="/pixel/studio" className="btn-primary btn-lg">
-              Start Free — Pixel Studio →
+              Open Pixel Studio →
             </Link>
-            <Link href="/business/studio" className="btn-ghost btn-lg">
-              Business Studio →
+            <Link href="/pixel" className="btn-ghost btn-lg">
+              See all studios
             </Link>
           </div>
           <p className="platform-hero-note">
-            No account needed to start. Standard generation is always free.
+            No account needed. Standard generation is always free.
           </p>
         </div>
       </section>

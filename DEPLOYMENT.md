@@ -50,6 +50,12 @@ In **Project → Settings → Environment Variables**, add:
 | `NEXT_PUBLIC_SENTRY_DSN` | *(optional)* Sentry DSN for error tracking (free tier) |
 | `MAINTENANCE_MODE` | *(optional)* Set to `true` to return 503 on all routes (except `/api/health`) |
 | `METRICS_SECRET` | *(optional)* Secret header for `/api/metrics` (Prometheus endpoint) |
+| `GENERATION_CONCURRENCY` | *(optional)* Max simultaneous AI calls per serverless instance. Default: `10` |
+| `ENABLE_QUALITY_GATE` | *(optional)* Set to `false` to disable image entropy check. Default: `true` |
+| `MAX_BATCH_SIZE` | *(optional)* Max images per batch generation request. Default: `8` |
+| `DISABLE_SIGNUPS` | *(optional)* Set to `true` to prevent new account creation |
+| `DISABLE_GUEST_GENERATION` | *(optional)* Set to `true` to require auth for all generations |
+| `HF_TOKEN` | *(optional)* HuggingFace access token — improves free rate limits on FLUX.1-schnell |
 
 > **CONNECTION POOLING (important for serverless)**
 >

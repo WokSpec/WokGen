@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { requireAdmin, isAdminResponse } from '@/lib/admin';
+import { cache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +9,10 @@ export async function GET() {
   // Guard: must be authenticated and admin
   const adminResult = await requireAdmin();
   if (isAdminResponse(adminResult)) return adminResult;
+
+  const CACHE_KEY = 'wokgen:admin:stats';
+  const cached = await cache.get<object>(CACHE_KEY);
+  if (cached) return NextResponse.json(cached);
 
   const now   = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -51,7 +56,7 @@ export async function GET() {
     byPlan[row.planId] = row._count;
   }
 
-  return NextResponse.json({
+    const responseBody = {
     users: {
       total: totalUsers,
       activeThisMonth,
@@ -65,5 +70,7 @@ export async function GET() {
     },
     recentJobs,
     generatedAt: now.toISOString(),
-  });
+  };
+  await cache.set(CACHE_KEY, responseBody, 300); // 5 min TTL
+  return NextResponse.json(responseBody);
 }

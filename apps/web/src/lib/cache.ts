@@ -77,3 +77,15 @@ export const cache = {
     return fresh;
   },
 };
+
+// ---------------------------------------------------------------------------
+// Cache key constants (Cycle 11)
+// ---------------------------------------------------------------------------
+export const CK = {
+  quota:        (userId: string)  => `wokgen:quota:${userId}`,         // 30s
+  brand:        (userId: string)  => `wokgen:brand:${userId}`,         // 5min
+  galleryPage1: ()                => `wokgen:gallery:p1`,              // 30s
+  adminStats:   ()                => `wokgen:admin:stats`,             // 5min
+  providerHealth:(p: string)      => `wokgen:phk:${p}`,               // 60s
+  featureFlags: ()                => `wokgen:flags`,                   // 2min
+} as const;

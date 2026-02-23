@@ -529,7 +529,16 @@ function BusinessStudioInner() {
               </button>
               {/* My Prompts dropdown */}
               {favPrompts.length > 0 && (
-                <div style={{ position: 'relative' }}>
+                <div
+                  style={{ position: 'relative' }}
+                  ref={(el) => {
+                    if (!el) return;
+                    const handler = (e: MouseEvent) => {
+                      if (!el.contains(e.target as Node)) setShowFavMenu(false);
+                    };
+                    if (showFavMenu) document.addEventListener('mousedown', handler, { once: true });
+                  }}
+                >
                   <button
                     title="My saved prompts"
                     onClick={() => setShowFavMenu(v => !v)}
@@ -921,7 +930,7 @@ function BusinessStudioInner() {
         {/* Generate button */}
         <div className="studio-control-section">
           <button
-            className="btn-primary btn-generate"
+            className="btn btn-primary btn-generate"
             onClick={handleGenerate}
             disabled={jobStatus === 'running' || !prompt.trim()}
           >

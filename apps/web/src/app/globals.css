@@ -42,6 +42,7 @@
   --surface-card:    var(--bg-surface);
   --surface-overlay: #1c1c1c;
   --surface-hover:   #1e1e1e;
+  --surface-2:       #1c1c1c;
   --surface-border:  var(--border);
   --surface-muted:   #0a0a0a;
   --text-primary:    var(--text);

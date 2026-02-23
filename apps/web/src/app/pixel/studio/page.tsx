@@ -1404,7 +1404,16 @@ function GenerateForm({
               </button>
               {/* My Prompts dropdown */}
               {favPrompts.length > 0 && (
-                <div style={{ position: 'relative' }}>
+                <div
+                  style={{ position: 'relative' }}
+                  ref={(el) => {
+                    if (!el) return;
+                    const handler = (e: MouseEvent) => {
+                      if (!el.contains(e.target as Node)) setShowFavMenu(false);
+                    };
+                    if (showFavMenu) document.addEventListener('mousedown', handler, { once: true });
+                  }}
+                >
                   <button
                     title="My saved prompts"
                     onClick={() => setShowFavMenu(v => !v)}
@@ -2584,7 +2593,7 @@ function StudioInner() {
     activeTool, prompt, negPrompt, size, aspectRatio, stylePreset, assetCategory, pixelEra,
     bgMode, outlineStyle, paletteSize, steps, guidance,
     provider, seed, isPublic, apiKeys, comfyuiHost, useHD, refreshCredits, batchCount,
-    animationType, animFrameCount, animFps, animLoop,
+    animationType, animFrameCount, animFps, animLoop, animOutputFormat, directionCount, refImageUrl,
   ]);
 
   // ── Download ───────────────────────────────────────────────────────────────
@@ -3008,7 +3017,7 @@ function StudioInner() {
 
               {/* Generate button */}
               <button
-                className="btn-primary w-full"
+                className="btn btn-primary w-full"
                 style={{ height: 38, fontSize: '0.85rem', fontWeight: 600 }}
                 disabled={sfxLoading || !sfxPrompt.trim()}
                 onClick={async () => {
@@ -3122,7 +3131,7 @@ function StudioInner() {
 
           <button
             data-generate-btn
-            className="btn-primary w-full"
+            className="btn btn-primary w-full"
             style={{
               height: 44,
               fontSize: '0.9rem',

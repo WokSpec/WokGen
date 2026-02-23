@@ -17,9 +17,6 @@ const HF_ROUTER = 'https://router.huggingface.co/hf-inference/models';
 /** FLUX.1-schnell via HF Inference Router (free with HF account token) */
 const DEFAULT_MODEL = 'black-forest-labs/FLUX.1-schnell';
 
-/** pixel-art-xl: SDXL fine-tune for pixel art, much better quality than FLUX for this mode */
-const PIXEL_ART_MODEL = 'nerijs/pixel-art-xl';
-
 export async function huggingfaceGenerate(
   params: GenerateParams,
   config: ProviderConfig,
@@ -38,7 +35,7 @@ export async function huggingfaceGenerate(
   }
 
   const isPixelMode = params.mode === 'pixel';
-  const model  = (params.modelOverride as string | undefined) ?? (isPixelMode ? PIXEL_ART_MODEL : DEFAULT_MODEL);
+  const model  = (params.modelOverride as string | undefined) ?? DEFAULT_MODEL;
   const prompt = buildPrompt({
     tool: params.tool,
     userPrompt: params.prompt,
@@ -66,7 +63,7 @@ export async function huggingfaceGenerate(
   const body: Record<string, unknown> = {
     inputs: prompt,
     parameters: {
-      num_inference_steps: model === PIXEL_ART_MODEL ? 25 : model.includes('schnell') ? 4 : 20,
+      num_inference_steps: model.includes('schnell') ? 4 : 20,
       guidance_scale: isPixelMode ? 9.0 : 7.5,
       width,
       height,

@@ -81,9 +81,22 @@ export async function GET() {
   );
   const comfyuiHost = process.env.COMFYUI_HOST ?? 'http://127.0.0.1:8188';
 
-  checks.providers = {
+  const providersCheck: Record<string, unknown> = {
     ok: anyProviderKey || Boolean(comfyuiHost),
+    keys: {
+      replicate: !!process.env.REPLICATE_API_TOKEN,
+      fal: !!process.env.FAL_KEY,
+      together: !!process.env.TOGETHER_API_KEY,
+      openai: !!process.env.OPENAI_API_KEY,
+      anthropic: !!process.env.ANTHROPIC_API_KEY,
+      cohere: !!process.env.COHERE_API_KEY,
+      groq: !!process.env.GROQ_API_KEY,
+      gemini: !!process.env.GOOGLE_AI_API_KEY,
+      mistral: !!process.env.MISTRAL_API_KEY,
+      hf: !!process.env.HF_TOKEN,
+    },
   };
+  checks.providers = providersCheck as { ok: boolean; latencyMs?: number; error?: string };
 
   // --------------------------------------------------------------------------
   // 4. Overall status

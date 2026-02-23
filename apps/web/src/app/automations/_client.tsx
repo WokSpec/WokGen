@@ -143,11 +143,25 @@ function AutomationRow({
   onDelete,
 }: { auto: Automation; onToggle: () => void; onDelete: () => void }) {
   const [deleting, setDeleting] = useState(false);
+  const [testing, setTesting] = useState(false);
 
   const handleDelete = async () => {
     setDeleting(true);
     await fetch(`/api/automations/${auto.id}`, { method: 'DELETE' });
     onDelete();
+  };
+
+  const handleTest = async () => {
+    setTesting(true);
+    try {
+      const r = await fetch(`/api/automations/${auto.id}/test`, { method: 'POST' });
+      const d = (await r.json()) as { ok: boolean; status?: number; error?: string };
+      alert(d.ok ? `Test delivered — HTTP ${d.status}` : `Test failed: ${d.error ?? 'unknown'}`);
+    } catch {
+      alert('Test request failed');
+    } finally {
+      setTesting(false);
+    }
   };
 
   return (
@@ -179,6 +193,17 @@ function AutomationRow({
         >
           <span className="notify-toggle__thumb" />
         </button>
+        {auto.targetType === 'webhook' && (
+          <button 
+            className="btn btn--ghost btn--sm" 
+            onClick={handleTest} 
+            disabled={testing}
+            title="Send test event to webhook"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            {testing ? '…' : 'Test'}
+          </button>
+        )}
         <button className="btn btn--ghost btn--sm" onClick={handleDelete} disabled={deleting}>
           {deleting ? '…' : '🗑'}
         </button>

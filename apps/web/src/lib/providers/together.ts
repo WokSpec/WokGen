@@ -26,8 +26,11 @@ export const TOGETHER_MODELS = {
   /** FLUX.1-schnell — paid tier (higher rate limits) */
   flux_schnell: 'black-forest-labs/FLUX.1-schnell',
 
-  /** FLUX.1-dev — higher quality, paid */
+  /** FLUX.1-dev — higher quality, paid, 28-step */
   flux_dev: 'black-forest-labs/FLUX.1-dev',
+
+  /** SDXL Base 1.0 — Stability classic, good for pixel art with negative prompts */
+  sdxl_base: 'stabilityai/stable-diffusion-xl-base-1.0',
 } as const;
 
 export type TogetherModelKey = keyof typeof TOGETHER_MODELS;

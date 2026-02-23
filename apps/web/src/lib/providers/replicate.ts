@@ -6,7 +6,7 @@ import { buildPrompt, buildNegativePrompt } from '../prompt-builder';
 // ---------------------------------------------------------------------------
 export const REPLICATE_MODELS = {
   /** Stability SDXL — reliable, great for pixel art with LoRA prompting */
-  sdxl: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
+  sdxl: 'stability-ai/sdxl',
 
   /** FLUX.1-schnell — fast, high quality, 4-step generation */
   flux_schnell: 'black-forest-labs/flux-schnell',
@@ -15,10 +15,10 @@ export const REPLICATE_MODELS = {
   flux_dev: 'black-forest-labs/flux-dev',
 
   /** Zeroscope v2 XL — used for animation frames */
-  animate: 'anotherjesse/zeroscope-v2-xl:9f747673945c62801b13b84701c783929c0ee784e4748ec062204894dda1a351',
+  animate: 'anotherjesse/zeroscope-v2-xl',
 
   /** Controlnet tile — used for inpainting / upscaling pixel art */
-  controlnet_tile: 'andreasjansson/stable-diffusion-inpainting:e490d072a34a94a11e9711ed5a6ba621c3fab884eda1665d9d3a282d65a21180',
+  controlnet_tile: 'andreasjansson/stable-diffusion-inpainting',
 
   /** Recraft V3 SVG — high-quality vector/SVG generation */
   recraft_v3_svg: 'recraft-ai/recraft-v3-svg',

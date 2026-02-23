@@ -27,9 +27,9 @@ const USE_CASES: { id: UseCase; label: string; desc: string; prompt: string; mod
   {
     id:     'creative',
     label:  'Creative & Hobbyist',
-    desc:   'Illustrations, emoji packs, icons, and personal projects.',
-    prompt: 'cute cat emoji, expressive, round face, big eyes, flat color style',
-    mode:   'emoji',
+    desc:   'Illustrations, icons, and personal projects.',
+    prompt: 'cute cat icon, expressive, round face, big eyes, flat color style',
+    mode:   'vector',
   },
   {
     id:     'developer',
@@ -95,7 +95,7 @@ export default function OnboardingModal({ onComplete }: Props) {
         body:    JSON.stringify({
           prompt: selectedCase.prompt,
           mode:   selectedCase.mode,
-          tool:   selectedCase.mode === 'pixel' ? 'sprite' : selectedCase.mode === 'emoji' ? 'emoji' : selectedCase.mode === 'vector' ? 'icon' : 'logo',
+          tool:   selectedCase.mode === 'pixel' ? 'sprite' : selectedCase.mode === 'vector' ? 'icon' : 'logo',
         }),
       });
       const data = await res.json().catch(() => ({}));

@@ -1,20 +1,13 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { requireAdmin, isAdminResponse } from '@/lib/admin';
 
 export const dynamic = 'force-dynamic';
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-
 export async function GET() {
-  // Guard: must be authenticated AND email must match ADMIN_EMAIL
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!ADMIN_EMAIL || session.user.email !== ADMIN_EMAIL) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  // Guard: must be authenticated and admin
+  const adminResult = await requireAdmin();
+  if (isAdminResponse(adminResult)) return adminResult;
 
   const now   = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());

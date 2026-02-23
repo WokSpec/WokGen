@@ -54,18 +54,6 @@ const MODES = [
     studioCta: '/vector/studio',
   },
   {
-    id: 'emoji',
-    label: 'WokGen Emoji',
-    accent: '#fb923c',
-    status: 'beta' as const,
-    tagline: 'For platforms and apps',
-    desc: 'Custom emoji packs, reaction sets, Discord/Slack icons, and app icon sets. Platform-correct sizing.',
-    icon: '😄',
-    highlights: ['Emoji Packs', 'Reaction Sets', 'Sticker Packs', 'App Icons'],
-    href: '/emoji',
-    studioCta: '/emoji/studio',
-  },
-  {
     id: 'uiux',
     label: 'WokGen UI/UX',
     accent: '#f472b6',
@@ -138,13 +126,6 @@ const QUICK_PROMPTS = [
     label: 'Settings gear icon, outline style, rounded corners',
     href: '/vector/studio?preset=outline&prompt=Settings+gear+icon+outline+style+rounded+corners',
     accent: '#34d399',
-  },
-  {
-    mode: 'Emoji',
-    icon: '😄',
-    label: 'Happy blob emoji, Discord-style, expressive',
-    href: '/emoji/studio?preset=blob&prompt=Happy+laughing+blob+emoji+expressive',
-    accent: '#fb923c',
   },
   {
     mode: 'UI/UX',

@@ -11,7 +11,6 @@ const PRODUCT_LINKS = [
   { label: 'Voice Studio',      href: '/voice/studio'    },
   { label: 'SFX Studio',        href: '/sfx/studio'      },
   { label: 'Text Studio',       href: '/text/studio'     },
-  { label: 'Emoji Studio',      href: '/emoji/studio'    },
 ];
 
 const PLATFORM_LINKS = [

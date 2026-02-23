@@ -1,5 +1,5 @@
-// WokGen — Vector & Emoji Prompt Builder
-// Clean SVG icon / illustration / emoji vocabulary.
+// WokGen — Vector Prompt Builder
+// Clean SVG icon / illustration vocabulary.
 // Completely separate from pixel and business builders.
 
 // ---------------------------------------------------------------------------
@@ -24,31 +24,6 @@ export type VectorStyle =
   | 'monoline';
 
 export type VectorWeight = 'thin' | 'regular' | 'medium' | 'bold';
-
-// ---------------------------------------------------------------------------
-// Emoji types
-// ---------------------------------------------------------------------------
-
-export type EmojiStyle =
-  | 'expressive'
-  | 'minimal'
-  | 'blob'
-  | 'flat'
-  | 'pixel'
-  | 'skeuomorphic'
-  | 'noto'
-  | 'twitter';
-
-export type EmojiSize = 16 | 32 | 64 | 128 | 256;
-
-export type EmojiPlatform =
-  | 'universal'
-  | 'discord'
-  | 'slack'
-  | 'ios'
-  | 'android'
-  | 'web'
-  | 'telegram';
 
 // ---------------------------------------------------------------------------
 // Vector style tokens (internal — not exported to OSS packages)
@@ -78,31 +53,6 @@ const VECTOR_WEIGHT_TOKENS: Record<VectorWeight, string[]> = {
   regular: ['regular weight', '2pt stroke', 'balanced'],
   medium:  ['medium weight', '2.5pt stroke', 'slightly bold'],
   bold:    ['bold weight', '3pt stroke', 'heavy', 'strong presence'],
-};
-
-// ---------------------------------------------------------------------------
-// Emoji style tokens
-// ---------------------------------------------------------------------------
-
-const EMOJI_STYLE_TOKENS: Record<EmojiStyle, string[]> = {
-  expressive:   ['expressive emoji', 'exaggerated features', 'large eyes', 'vivid color', 'playful', 'emotive'],
-  minimal:      ['minimal emoji', 'simplified face', 'clean shapes', 'reduced detail', 'clear silhouette'],
-  blob:         ['blob emoji', 'amorphous shape', 'rounded blob body', 'no limbs', 'Google blob style'],
-  flat:         ['flat emoji', 'flat design', 'no gradients', 'solid fills', 'simple shapes'],
-  pixel:        ['pixel emoji', 'pixel art face', '32x32 pixels', 'low-res style', 'retro'],
-  skeuomorphic: ['skeuomorphic emoji', '3D shading', 'realistic lighting', 'depth', 'volume'],
-  noto:         ['Noto emoji style', 'clean outline', 'rounded', 'Google emoji', 'consistent weight'],
-  twitter:      ['Twemoji style', 'outlined', 'flat filled', 'yellow skin default', 'simple geometry'],
-};
-
-const EMOJI_PLATFORM_TOKENS: Record<EmojiPlatform, string[]> = {
-  universal: ['platform neutral', 'clear at any size', 'universal legibility'],
-  discord:   ['Discord emoji', '48x48px', 'vivid color', 'visible on dark background'],
-  slack:     ['Slack emoji', 'readable at small size', 'professional but fun'],
-  ios:       ['iOS emoji style', 'Apple emoji', 'glossy', 'polished', 'premium'],
-  android:   ['Android emoji', 'Material style', 'flat and bold', 'Google-like'],
-  web:       ['web emoji', 'SVG optimized', 'crisp at 32px', 'retina ready'],
-  telegram:  ['Telegram sticker', 'animated-ready', 'expressive', 'large format sticker'],
 };
 
 // ---------------------------------------------------------------------------
@@ -187,77 +137,5 @@ export function buildVectorPrompt(params: VectorPromptParams): BuiltPrompt {
     negPrompt: negParts.join(', '),
     width: 1024,
     height: 1024,
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Emoji prompt builder
-// ---------------------------------------------------------------------------
-
-export interface EmojiPromptParams {
-  concept: string;
-  style?: EmojiStyle;
-  targetSize?: EmojiSize;
-  platform?: EmojiPlatform;
-  category?: string;
-}
-
-export function buildEmojiPrompt(params: EmojiPromptParams): BuiltPrompt {
-  const {
-    concept,
-    style = 'expressive',
-    targetSize = 64,
-    platform = 'universal',
-    category,
-  } = params;
-
-  const parts: string[] = [];
-
-  // Emoji framing
-  parts.push('single emoji', `${targetSize}x${targetSize} pixels`, 'transparent background');
-
-  // Style tokens
-  parts.push(...EMOJI_STYLE_TOKENS[style]);
-
-  // Platform tokens
-  parts.push(...EMOJI_PLATFORM_TOKENS[platform]);
-
-  // Category
-  if (category) {
-    parts.push(`${category} emoji pack style`);
-  }
-
-  // Core concept
-  parts.push(concept.trim());
-
-  // Quality anchors
-  parts.push('high contrast', `readable at ${targetSize}px`, 'crisp edges', 'clean design');
-
-  const negParts = [
-    'complex background',
-    'multiple subjects',
-    'text',
-    'watermark',
-    'blurry',
-    'low contrast',
-    'tiny illegible detail',
-    'ugly',
-    'distorted',
-    'photorealistic',
-    'adult content',
-    'violence',
-  ];
-
-  // Size constraint for canvas
-  const dim = Math.max(targetSize, 512); // minimum 512 for generation quality
-  const snapped = [512, 768, 1024].reduce((prev, cur) =>
-    Math.abs(cur - dim) < Math.abs(prev - dim) ? cur : prev
-  );
-
-  return {
-    prompt: parts.join(', '),
-    negPrompt: negParts.join(', '),
-    width: snapped,
-    height: snapped,
   };
 }

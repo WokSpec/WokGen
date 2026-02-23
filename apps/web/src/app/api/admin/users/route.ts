@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { requireAdmin, isAdminResponse } from '@/lib/admin';
 
 export const dynamic = 'force-dynamic';
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-
-async function guardAdmin() {
-  const session = await auth();
-  if (!session?.user?.id) return 'Unauthorized';
-  if (!ADMIN_EMAIL || session.user.email !== ADMIN_EMAIL) return 'Forbidden';
-  return null;
-}
 
 // ---------------------------------------------------------------------------
 // GET /api/admin/users
@@ -23,8 +14,8 @@ async function guardAdmin() {
 //   search?  string  email prefix search
 // ---------------------------------------------------------------------------
 export async function GET(req: NextRequest) {
-  const deny = await guardAdmin();
-  if (deny) return NextResponse.json({ error: deny }, { status: deny === 'Unauthorized' ? 401 : 403 });
+  const adminResult = await requireAdmin();
+  if (isAdminResponse(adminResult)) return adminResult;
 
   const { searchParams } = req.nextUrl;
   const limit  = Math.min(Number(searchParams.get('limit')  ?? 50), 200);

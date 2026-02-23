@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { seedAdminUser } from '@/lib/admin-seed';
 
 // ---------------------------------------------------------------------------
 // GET /api/health
@@ -32,19 +33,29 @@ export const revalidate = 0;
 const VERSION = process.env.npm_package_version ?? '0.1.0';
 
 export async function GET() {
+  // Fire-and-forget admin seed on first health check
+  void seedAdminUser().catch(() => {});
+
   const startMs = Date.now();
   const checks: Record<string, { ok: boolean; latencyMs?: number; error?: string }> = {};
 
   // --------------------------------------------------------------------------
-  // 1. Database ping
+  // 1. Database ping (with 3s timeout)
   // --------------------------------------------------------------------------
   let dbOk = false;
   const dbStart = Date.now();
   try {
-    // Raw SELECT 1 — cheapest possible query that exercises the connection pool
-    await prisma.$queryRaw`SELECT 1`;
-    dbOk = true;
-    checks.database = { ok: true, latencyMs: Date.now() - dbStart };
+    const timeout = new Promise<{ ok: false; error: string }>(resolve =>
+      setTimeout(() => resolve({ ok: false, error: 'timeout' }), 3000)
+    );
+    const dbCheck = prisma.$queryRaw`SELECT 1`.then(() => ({ ok: true as const }));
+    const raceResult = await Promise.race([dbCheck, timeout]);
+    if (raceResult.ok) {
+      dbOk = true;
+      checks.database = { ok: true, latencyMs: Date.now() - dbStart };
+    } else {
+      checks.database = { ok: false, latencyMs: Date.now() - dbStart, error: raceResult.error };
+    }
   } catch (err) {
     checks.database = {
       ok: false,
@@ -110,6 +121,7 @@ export async function GET() {
     uptime:     Math.round(process.uptime()),
     db:         dbOk ? 'ok' : 'error',
     checks,
+    timestamp:  new Date().toISOString(),
     ts:         new Date().toISOString(),
     totalMs:    Date.now() - startMs,
   };

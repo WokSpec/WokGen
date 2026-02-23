@@ -23,10 +23,17 @@ export async function POST() {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://wokgen.wokspec.org';
 
-  const portalSession = await stripe.billingPortal.sessions.create({
-    customer:   subscription.stripeCustomerId,
-    return_url: `${baseUrl}/billing`,
-  });
+  try {
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer:   subscription.stripeCustomerId,
+      return_url: `${baseUrl}/billing`,
+    });
 
-  return NextResponse.json({ url: portalSession.url });
+    return NextResponse.json({ url: portalSession.url });
+  } catch (err) {
+    return NextResponse.json(
+      { error: 'Billing service error', details: err instanceof Error ? err.message : 'Unknown error' },
+      { status: 500 },
+    );
+  }
 }

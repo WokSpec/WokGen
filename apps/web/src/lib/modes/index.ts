@@ -1,7 +1,6 @@
 import { pixelMode } from './pixel';
 import { businessMode } from './business';
 import { vectorMode } from './vector';
-import { emojiMode } from './emoji';
 import { uiuxMode } from './uiux';
 import { voiceMode } from './voice';
 import { textMode } from './text';
@@ -14,7 +13,6 @@ export const MODES: Record<ModeId, ModeContract> = {
   pixel:    pixelMode,
   business: businessMode,
   vector:   vectorMode,
-  emoji:    emojiMode,
   uiux:     uiuxMode,
   voice:    voiceMode,
   text:     textMode,

@@ -22,7 +22,7 @@ const TOGETHER_URL = 'https://api.together.xyz/v1/chat/completions';
 interface PlanItem {
   id: string;
   label: string;        // human-readable: "Hero warrior sprite"
-  mode: string;         // pixel | business | vector | emoji | uiux | voice | text
+  mode: string;         // pixel | business | vector | uiux | voice | text
   tool: string;         // generate | animate | scene etc.
   prompt: string;       // ready-to-use generation prompt
   size: number;         // 64 | 128 | 256 | 512
@@ -52,9 +52,9 @@ Output format — respond with ONLY valid JSON, no markdown, no extra text:
 }
 
 Rules:
-- mode must be one of: pixel, business, vector, emoji, uiux, voice, text
+- mode must be one of: pixel, business, vector, uiux, voice, text
 - tool must be: generate (for most), animate (for animation sheets), scene (for multi-view)
-- size: 64 for icons/emoji, 128 for characters, 256 for tilesets, 512 for detailed art or business assets
+- size: 64 for icons, 128 for characters, 256 for tilesets, 512 for detailed art or business assets
 - prompt must be specific, production-ready, with art style keywords
 - Generate between 4 and 16 items depending on project scope
 - For game projects: include hero, enemies, tileset, items, UI elements

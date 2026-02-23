@@ -33,6 +33,9 @@ model User {
   /// Whether new generations default to public (community gallery opt-in)
   publicGenerationsDefault Boolean @default(false)
 
+  /// Admin flag — grants access to admin panel and APIs
+  isAdmin Boolean @default(false)
+
   /// Standard (free-tier) images generated today — atomic daily quota counter
   stdGenToday  Int     @default(0)
   /// UTC date YYYY-MM-DD of the current stdGenToday window (resets at midnight UTC)
@@ -202,7 +205,7 @@ model Job {
   /// ISO-8601 timestamp string of external provider prediction (for polling)
   providerJobId String?
 
-  /// Product line that created this job: pixel | business | vector | emoji | uiux
+  /// Product line that created this job: pixel | business | vector | uiux
   mode      String   @default("pixel")
 
   /// Optional project this job belongs to
@@ -281,7 +284,7 @@ model GalleryAsset {
   /// SHA-256 of the image bytes (for dedup)
   hash      String?
 
-  /// Product line: pixel | business | vector | emoji | uiux
+  /// Product line: pixel | business | vector | uiux
   mode      String   @default("pixel")
 
   createdAt DateTime @default(now())
@@ -302,7 +305,7 @@ model Project {
   id          String   @id @default(cuid())
   userId      String
 
-  /// Product line: pixel | business | vector | emoji | uiux (immutable after creation)
+  /// Product line: pixel | business | vector | uiux (immutable after creation)
   mode        String
 
   name        String
@@ -371,7 +374,6 @@ model UserPreference {
   pixelPrefs    String?  @db.Text
   businessPrefs String?  @db.Text
   vectorPrefs   String?  @db.Text
-  emojiPrefs    String?  @db.Text
   uiuxPrefs     String?  @db.Text
   voicePrefs    String?  @db.Text
   textPrefs     String?  @db.Text
@@ -395,6 +397,9 @@ model UserPreference {
 
   // Usage stats (JSON: { totalGenerations, successRate, lastActive })
   stats           String?  @db.Text
+
+  onboardingStep     Int     @default(0)
+  onboardingComplete Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

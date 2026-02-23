@@ -21,7 +21,6 @@ const NAV_COMMANDS = [
   { id: 'nav-pixel',    label: 'Pixel Studio',         href: '/pixel/studio',     group: 'Studios'  },
   { id: 'nav-business', label: 'Business Studio',      href: '/business/studio',  group: 'Studios'  },
   { id: 'nav-vector',   label: 'Vector Studio',        href: '/vector/studio',    group: 'Studios'  },
-  { id: 'nav-emoji',    label: 'Emoji Studio',         href: '/emoji/studio',     group: 'Studios'  },
   { id: 'nav-voice',    label: 'Voice Studio',         href: '/voice/studio',     group: 'Studios'  },
   { id: 'nav-uiux',     label: 'UI/UX Studio',         href: '/uiux/studio',      group: 'Studios'  },
   { id: 'nav-gallery',  label: 'Community Gallery',    href: '/gallery',          group: 'Platform' },

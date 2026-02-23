@@ -8907,3 +8907,21 @@ select:focus-visible {
   font-size: 12px; color: var(--text-disabled); border-top: 1px solid #252538; padding-top: 12px;
 }
 .asset-permalink__actions { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
+
+/* ── Pixel studio dropzone ──────────────────────────────────────────────── */
+.studio-dropzone {
+  border: 2px dashed #303050;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 13px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.studio-dropzone:hover,
+.studio-dropzone--active {
+  border-color: var(--accent, #a78bfa);
+  background: rgba(167,139,250,0.06);
+  color: var(--text);
+}

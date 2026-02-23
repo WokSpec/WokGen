@@ -4,6 +4,7 @@
 
 
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fireConfetti } from '@/lib/confetti';
 import { useSearchParams } from 'next/navigation';
@@ -1391,6 +1392,19 @@ function GenerateForm({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Derived control visibility for the active tool
   const toolControls = TOOL_CONTROLS[tool];
+
+  // react-dropzone for reference image upload
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp'] },
+    maxFiles: 1,
+    maxSize: 10 * 1024 * 1024,
+    onDrop: (accepted) => {
+      if (accepted[0]) {
+        const url = URL.createObjectURL(accepted[0]);
+        setRefImageUrl(url);
+      }
+    },
+  });
   // Prompt length color — yellow at 160, red at 190+
   const promptLen = prompt.length;
   const promptLenColor = promptLen >= 190 ? '#ef4444' : promptLen >= 160 ? '#eab308' : 'var(--text-disabled)';
@@ -1919,9 +1933,8 @@ function GenerateForm({
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (!f) return;
-                  const reader = new FileReader();
-                  reader.onload = (ev) => setRefImageUrl((ev.target?.result as string) ?? null);
-                  reader.readAsDataURL(f);
+                  const url = URL.createObjectURL(f);
+                  setRefImageUrl(url);
                 }}
               />
               {refImageUrl ? (
@@ -1934,13 +1947,27 @@ function GenerateForm({
                   </div>
                 </div>
               ) : (
-                <button
-                  className="w-full py-3 rounded-md text-xs text-center transition-all duration-150"
-                  style={{ border: '1px dashed var(--surface-border)', color: 'var(--text-muted)', background: 'var(--surface-overlay)' }}
-                  onClick={() => refImageInputRef.current?.click()}
+                <div
+                  {...getRootProps()}
+                  className={`studio-dropzone${isDragActive ? ' studio-dropzone--active' : ''}`}
+                  style={{
+                    border: `1px dashed ${isDragActive ? 'var(--accent)' : 'var(--surface-border)'}`,
+                    borderRadius: 6,
+                    padding: '12px 8px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    background: isDragActive ? 'var(--accent-dim)' : 'var(--surface-overlay)',
+                    color: isDragActive ? 'var(--accent)' : 'var(--text-muted)',
+                    fontSize: '0.75rem',
+                    transition: 'all 0.15s',
+                  }}
                 >
-                  + Upload reference sprite
-                </button>
+                  <input {...getInputProps()} />
+                  {isDragActive
+                    ? <span>Drop image here</span>
+                    : <span>Drag reference image or click to browse</span>
+                  }
+                </div>
               )}
               <p className="form-hint mt-1">Upload a front-facing sprite to maintain consistency across {directionCount} views.</p>
             </div>

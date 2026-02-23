@@ -257,6 +257,30 @@ export async function POST(req: NextRequest) {
 
       // Attach quota info to response headers for frontend to read
       (req as NextRequest & { _quotaRemaining?: number })._quotaRemaining = quota.remaining;
+
+      // Fire quota_warning notification at 80% usage (once per day, non-blocking)
+      if (authedUserId && quota.limit > 0 && quota.remaining > 0) {
+        const usedPct = quota.used / quota.limit;
+        if (usedPct >= 0.8) {
+          const warnKey = `wokgen:quota_warn:${authedUserId}:${new Date().toISOString().slice(0, 10)}`;
+          import('@/lib/cache').then(({ cache }) =>
+            cache.get<boolean>(warnKey).then(already => {
+              if (!already) {
+                cache.set(warnKey, true, 86400); // once per day
+                prisma.notification.create({
+                  data: {
+                    userId: authedUserId!,
+                    type:   'quota_warning',
+                    title:  'Approaching daily limit',
+                    body:   `You've used ${quota.used} of your ${quota.limit} daily generations (${Math.round(usedPct * 100)}%).`,
+                    link:   '/billing',
+                  },
+                }).catch(() => {});
+              }
+            })
+          ).catch(() => {});
+        }
+      }
     }
 
     // ── 0e. Concurrent request limit ─────────────────────────────────────

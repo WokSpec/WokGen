@@ -21,7 +21,7 @@ import { cache } from '@/lib/cache';
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
 
-  const limit  = Math.min(Number(searchParams.get('limit')  ?? 24), 100);
+  const limit  = Math.min(Number(searchParams.get('limit')  ?? '24'), 50);
   const cursor = searchParams.get('cursor')  ?? undefined;
   const tool   = searchParams.get('tool')    ?? undefined;
   const rarity = searchParams.get('rarity')  ?? undefined;

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { HexColorPicker } from 'react-colorful';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -16,6 +17,39 @@ interface BrandKit {
 
 const ROLES = ['primary', 'secondary', 'accent', 'background', 'text', 'border'];
 
+function ColorSwatch({ hex, onChange }: { hex: string; onChange: (h: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="color-swatch-wrap">
+      <button
+        className="color-swatch-btn"
+        style={{ background: hex, border: '2px solid rgba(255,255,255,0.15)', borderRadius: 6, width: 32, height: 32, cursor: 'pointer', flexShrink: 0 }}
+        onClick={() => setOpen(v => !v)}
+        title="Pick color"
+        aria-label={`Color picker: current color ${hex}`}
+        type="button"
+      />
+      {open && (
+        <div className="color-swatch-picker" style={{ position: 'absolute', zIndex: 200, top: 36, left: 0, background: '#1a1a2e', border: '1px solid #303050', borderRadius: 8, padding: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+          <HexColorPicker color={hex} onChange={onChange} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PaletteEditor({
   colors, onChange,
 }: { colors: PaletteColor[]; onChange: (c: PaletteColor[]) => void }) {
@@ -30,13 +64,8 @@ function PaletteEditor({
   return (
     <div className="palette-editor">
       {colors.map((c, i) => (
-        <div key={i} className="palette-editor__row">
-          <input
-            type="color"
-            value={c.hex}
-            onChange={e => update(i, 'hex', e.target.value)}
-            className="palette-editor__swatch"
-          />
+        <div key={i} className="palette-editor__row" style={{ position: 'relative' }}>
+          <ColorSwatch hex={c.hex} onChange={hex => update(i, 'hex', hex)} />
           <input
             className="input input--sm"
             value={c.hex}
@@ -54,7 +83,7 @@ function PaletteEditor({
           <select className="input input--sm" value={c.role} onChange={e => update(i, 'role', e.target.value)} style={{ width: 110 }}>
             {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
-          <button className="btn btn--ghost btn--sm btn--icon" onClick={() => remove(i)} title="Remove">✕</button>
+          <button className="btn btn--ghost btn--sm btn--icon" onClick={() => remove(i)} title="Remove" aria-label="Remove color">✕</button>
         </div>
       ))}
       <button className="btn btn--ghost btn--sm" onClick={add}>+ Add color</button>

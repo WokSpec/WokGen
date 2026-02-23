@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import AdminCharts from './_charts';
 
 /* ── Types ───────────────────────────────────────────────────────────────── */
 
@@ -45,13 +46,14 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
 
 /* ── Tabs ────────────────────────────────────────────────────────────────── */
 
-type Tab = 'overview' | 'users' | 'jobs' | 'revenue' | 'system';
+type Tab = 'overview' | 'users' | 'jobs' | 'revenue' | 'system' | 'charts';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'users',    label: 'Users'    },
   { id: 'jobs',     label: 'Jobs'     },
   { id: 'revenue',  label: 'Revenue'  },
+  { id: 'charts',   label: 'Charts'   },
   { id: 'system',   label: 'System'   },
 ];
 
@@ -312,6 +314,7 @@ export default function AdminPage() {
           {tab === 'users'    && <UsersTab />}
           {tab === 'jobs'     && <JobsTab stats={stats} />}
           {tab === 'revenue'  && <RevenueTab />}
+          {tab === 'charts'   && <AdminCharts />}
           {tab === 'system'   && <SystemTab />}
         </>
       )}

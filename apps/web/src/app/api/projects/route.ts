@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const mode       = searchParams.get('mode') ?? undefined;
   const archived   = searchParams.get('archived') === 'true';
+  const limit      = Math.min(Number(searchParams.get('limit') ?? '20'), 50);
 
   const projects = await prisma.project.findMany({
     where: {
@@ -33,6 +34,7 @@ export async function GET(req: NextRequest) {
       ...(mode ? { mode } : {}),
     },
     orderBy: { updatedAt: 'desc' },
+    take: limit,
     include: {
       _count: { select: { jobs: true } },
     },

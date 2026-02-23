@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
+import { cache } from '@/lib/cache';
 import { z } from 'zod';
 
 // ---------------------------------------------------------------------------
@@ -22,10 +23,16 @@ export async function GET() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
 
+  const cacheKey = `brand:${session.user.id}`;
+  const cached = await cache.get<object[]>(cacheKey);
+  if (cached) return NextResponse.json({ kits: cached });
+
   const kits = await prisma.brandKit.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: 'desc' },
   });
+
+  await cache.set(cacheKey, kits, 300);
   return NextResponse.json({ kits });
 }
 

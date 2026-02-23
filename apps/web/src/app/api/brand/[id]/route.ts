@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
+import { cache } from '@/lib/cache';
 
 // ---------------------------------------------------------------------------
 // GET    /api/brand/[id]   — get one kit
@@ -45,6 +46,7 @@ export async function PATCH(
   if (projectId   !== undefined) data.projectId   = projectId;
 
   const kit = await prisma.brandKit.update({ where: { id: params.id }, data });
+  await cache.del(`brand:${session.user.id}`);
   return NextResponse.json({ kit });
 }
 
@@ -57,5 +59,6 @@ export async function DELETE(
   const existing = await getKit(params.id, session.user.id);
   if (!existing) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
   await prisma.brandKit.delete({ where: { id: params.id } });
+  await cache.del(`brand:${session.user.id}`);
   return NextResponse.json({ ok: true });
 }

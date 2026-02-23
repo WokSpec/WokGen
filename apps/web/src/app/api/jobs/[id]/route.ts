@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 // ---------------------------------------------------------------------------
 // GET /api/jobs/[id]
@@ -17,14 +18,19 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
   const { id } = params;
 
   if (!id || typeof id !== 'string') {
     return NextResponse.json({ error: 'Job ID is required' }, { status: 400 });
   }
 
-  const job = await prisma.job.findUnique({
-    where: { id },
+  const job = await prisma.job.findFirst({
+    where: { id, userId: session.user.id },
     select: {
       id:            true,
       tool:          true,
@@ -99,6 +105,11 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
   const { id } = params;
 
   let body: Record<string, unknown>;
@@ -108,8 +119,8 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const existing = await prisma.job.findUnique({
-    where: { id },
+  const existing = await prisma.job.findFirst({
+    where: { id, userId: session.user.id },
     select: { id: true, status: true, resultUrl: true },
   });
 
@@ -197,10 +208,15 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
   const { id } = params;
 
-  const existing = await prisma.job.findUnique({
-    where: { id },
+  const existing = await prisma.job.findFirst({
+    where: { id, userId: session.user.id },
     select: { id: true },
   });
 

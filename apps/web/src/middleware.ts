@@ -72,7 +72,10 @@ export default auth((req) => {
     return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next();
+  // Add X-WokGen-Request-Id to all responses for traceability
+  const response = NextResponse.next();
+  response.headers.set('X-WokGen-Request-Id', crypto.randomUUID());
+  return response;
 });
 
 export const config = {
@@ -82,6 +85,7 @@ export const config = {
     '/billing/:path*',
     '/admin/:path*',
     '/admin',
+    '/api/:path*',
     '/api/generate/:path*',
     '/api/generate',
     '/api/eral/chat',

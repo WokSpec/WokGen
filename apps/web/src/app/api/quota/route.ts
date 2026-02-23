@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getQuotaStatus, getUserPlanId } from '@/lib/quota';
+import { cache } from '@/lib/cache';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,6 +26,13 @@ export async function GET(req: NextRequest) {
       'unknown';
 
     const planId = userId ? await getUserPlanId(userId) : 'guest';
+
+    if (userId) {
+      const cacheKey = `quota:${userId}`;
+      const cached = await cache.get(cacheKey);
+      if (cached) return NextResponse.json(cached, { headers: { 'Cache-Control': 'no-store' } });
+    }
+
     const status = await getQuotaStatus(userId, clientIP, planId);
 
     // Compute seconds until next UTC midnight
@@ -33,10 +41,11 @@ export async function GET(req: NextRequest) {
     midnight.setUTCHours(24, 0, 0, 0);
     const resetsIn = Math.ceil((midnight.getTime() - now) / 1000);
 
-    return NextResponse.json({
-      ...status,
-      resetsIn,
-    }, {
+    const quotaData = { ...status, resetsIn };
+
+    if (userId) await cache.set(`quota:${userId}`, quotaData, 30);
+
+    return NextResponse.json(quotaData, {
       headers: {
         'Cache-Control': 'no-store',
       },

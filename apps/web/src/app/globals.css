@@ -8867,3 +8867,43 @@ select:focus-visible {
 .skip-link:focus {
   top: 0;
 }
+
+/* ── Admin Charts ────────────────────────────────────────────────────────── */
+.recharts-surface { overflow: visible; }
+
+/* ── Asset permalink ────────────────────────────────────────────────────── */
+.asset-permalink { min-height: 100vh; padding: 40px 20px; }
+.asset-permalink__container {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;
+}
+@media (max-width: 768px) {
+  .asset-permalink__container { grid-template-columns: 1fr; gap: 24px; }
+}
+.asset-permalink__image-wrap { position: relative; border-radius: 8px; overflow: hidden; background: #1a1a2e; }
+.asset-permalink__image { width: 100%; height: auto; display: block; image-rendering: pixelated; }
+.asset-permalink__rarity {
+  position: absolute; top: 12px; right: 12px;
+  padding: 3px 10px; border-radius: 4px;
+  font-size: 11px; font-weight: 700; color: #fff; text-transform: capitalize;
+  letter-spacing: 0.05em;
+}
+.asset-permalink__info { display: flex; flex-direction: column; gap: 16px; }
+.asset-permalink__meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.asset-permalink__tool, .asset-permalink__provider {
+  padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;
+  background: #252538; color: var(--text-muted);
+  border: 1px solid #303050;
+}
+.asset-permalink__title { font-size: 1.5rem; font-weight: 700; margin: 0; line-height: 1.3; }
+.asset-permalink__prompt { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin: 0; }
+.asset-permalink__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.asset-permalink__tag {
+  font-size: 12px; color: var(--accent); background: #1e1e35;
+  padding: 2px 8px; border-radius: 3px; border: 1px solid #303060;
+}
+.asset-permalink__attrs {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  font-size: 12px; color: var(--text-disabled); border-top: 1px solid #252538; padding-top: 12px;
+}
+.asset-permalink__actions { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 4px; }

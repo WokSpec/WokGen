@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { DM_Sans, Space_Grotesk } from 'next/font/google';
 import Link from 'next/link';
 import nextDynamic from 'next/dynamic';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { NavLink } from './_components/NavLink';
 import { Footer } from './_components/Footer';
@@ -182,6 +184,8 @@ export default function RootLayout({
             }}
           />
         </Providers>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

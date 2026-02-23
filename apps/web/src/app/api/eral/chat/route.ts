@@ -22,14 +22,17 @@ const GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions';
 const TOGETHER_URL = 'https://api.together.xyz/v1/chat/completions';
 const GEMINI_URL   = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 const MISTRAL_URL  = 'https://api.mistral.ai/v1/chat/completions';
+const COHERE_URL   = 'https://api.cohere.ai/v2/chat';
 
-const MODEL_MAP: Record<string, { model: string; provider: 'groq' | 'together' | 'gemini' | 'mistral' }> = {
-  'eral-7c':       { model: 'llama-3.3-70b-versatile',              provider: 'groq'    },
-  'eral-mini':     { model: 'llama3-8b-8192',                       provider: 'groq'    },
-  'eral-code':     { model: 'deepseek-ai/DeepSeek-V3',              provider: 'together' },
-  'eral-creative': { model: 'mistralai/Mixtral-8x7B-Instruct-v0.1', provider: 'together' },
-  'eral-gemini':   { model: 'gemini-1.5-flash',                     provider: 'gemini'   },
-  'eral-fast':     { model: 'mistral-small-latest',                  provider: 'mistral'  },
+const MODEL_MAP: Record<string, { model: string; provider: 'groq' | 'together' | 'gemini' | 'mistral' | 'anthropic' | 'cohere' }> = {
+  'eral-7c':       { model: 'llama-3.3-70b-versatile',              provider: 'groq'      },
+  'eral-mini':     { model: 'llama3-8b-8192',                       provider: 'groq'      },
+  'eral-code':     { model: 'deepseek-ai/DeepSeek-V3',              provider: 'together'  },
+  'eral-creative': { model: 'mistralai/Mixtral-8x7B-Instruct-v0.1', provider: 'together'  },
+  'eral-gemini':   { model: 'gemini-1.5-flash',                     provider: 'gemini'    },
+  'eral-fast':     { model: 'mistral-small-latest',                  provider: 'mistral'   },
+  'eral-haiku':    { model: 'claude-haiku-4-5',                      provider: 'anthropic' },
+  'eral-cohere':   { model: 'command-r-plus-08-2024',                provider: 'cohere'    },
 };
 
 // Fallback for eral-7c when Groq key is absent
@@ -98,7 +101,7 @@ const PERSONALITY_MODIFIERS: Record<string, string> = {
 interface ChatRequest {
   message: string;
   conversationId?: string;
-  modelVariant?: 'eral-7c' | 'eral-mini' | 'eral-code' | 'eral-creative' | 'eral-gemini' | 'eral-fast';
+  modelVariant?: 'eral-7c' | 'eral-mini' | 'eral-code' | 'eral-creative' | 'eral-gemini' | 'eral-fast' | 'eral-haiku' | 'eral-cohere';
   context?: {
     mode?: string;
     tool?: string;
@@ -123,10 +126,26 @@ function resolveEndpointAndKey(variant: string): {
   provider?: string;
 } {
   const mapping = MODEL_MAP[variant] ?? MODEL_MAP['eral-7c'];
-  const groqKey    = process.env.GROQ_API_KEY;
-  const togetherKey = process.env.TOGETHER_API_KEY;
-  const geminiKey  = process.env.GOOGLE_AI_API_KEY;
-  const mistralKey = process.env.MISTRAL_API_KEY;
+  const groqKey      = process.env.GROQ_API_KEY;
+  const togetherKey  = process.env.TOGETHER_API_KEY;
+  const geminiKey    = process.env.GOOGLE_AI_API_KEY;
+  const mistralKey   = process.env.MISTRAL_API_KEY;
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const cohereKey    = process.env.COHERE_API_KEY;
+
+  if (mapping.provider === 'anthropic') {
+    if (anthropicKey) {
+      return { url: 'anthropic', apiKey: anthropicKey, model: mapping.model, provider: 'anthropic' };
+    }
+    // Fall through to groq fallback
+  }
+
+  if (mapping.provider === 'cohere') {
+    if (cohereKey) {
+      return { url: COHERE_URL, apiKey: cohereKey, model: mapping.model, provider: 'cohere' };
+    }
+    // Fall through to groq fallback
+  }
 
   if (mapping.provider === 'gemini') {
     if (geminiKey) {
@@ -213,13 +232,80 @@ async function fetchHistory(conversationId: string): Promise<OpenAIMessage[]> {
 
 // ─── Non-streaming handler ───────────────────────────────────────────────────
 
-async function handleNonStreaming(
+async function handleAnthropicNonStreaming(
+  messages: OpenAIMessage[],
+  apiKey: string,
+  model: string,
+): Promise<{ reply: string; durationMs: number }> {
+  const start = Date.now();
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const Anthropic = require('@anthropic-ai/sdk').default as typeof import('@anthropic-ai/sdk').default;
+  const client = new Anthropic({ apiKey });
+
+  // Extract system message
+  const system = messages.find(m => m.role === 'system')?.content ?? '';
+  const userMessages = messages.filter(m => m.role !== 'system').map(m => ({
+    role: m.role as 'user' | 'assistant',
+    content: m.content,
+  }));
+
+  const response = await client.messages.create({
+    model,
+    max_tokens: 2048,
+    system,
+    messages: userMessages,
+  });
+
+  const reply = response.content[0]?.type === 'text' ? response.content[0].text : '';
+  return { reply, durationMs: Date.now() - start };
+}
+
+async function handleCohereNonStreaming(
   messages: OpenAIMessage[],
   url: string,
   apiKey: string,
   model: string,
 ): Promise<{ reply: string; durationMs: number }> {
   const start = Date.now();
+  const system = messages.find(m => m.role === 'system')?.content ?? '';
+  const chatHistory = messages
+    .filter(m => m.role !== 'system')
+    .slice(0, -1)
+    .map(m => ({ role: m.role === 'user' ? 'USER' : 'CHATBOT', message: m.content }));
+  const lastMessage = messages.filter(m => m.role === 'user').at(-1)?.content ?? '';
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, message: lastMessage, chat_history: chatHistory, preamble: system, max_tokens: 2048 }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => res.statusText);
+    throw new Error(`Cohere error ${res.status}: ${errText}`);
+  }
+
+  const data = await res.json() as { text?: string; message?: { content?: Array<{ text?: string }> } };
+  const reply = data.text ?? data.message?.content?.[0]?.text ?? '';
+  return { reply, durationMs: Date.now() - start };
+}
+
+async function handleNonStreaming(
+  messages: OpenAIMessage[],
+  url: string,
+  apiKey: string,
+  model: string,
+  provider?: string,
+): Promise<{ reply: string; durationMs: number }> {
+  const start = Date.now();
+
+  if (provider === 'anthropic') {
+    return handleAnthropicNonStreaming(messages, apiKey, model);
+  }
+
+  if (provider === 'cohere') {
+    return handleCohereNonStreaming(messages, url, apiKey, model);
+  }
 
   const res = await fetch(url, {
     method: 'POST',
@@ -269,7 +355,7 @@ export async function POST(req: NextRequest) {
     const Schema = z.object({
       message:       z.string().min(1).max(4000),
       conversationId: z.string().cuid().optional(),
-      modelVariant:  z.enum(['eral-7c','eral-mini','eral-code','eral-creative','eral-gemini','eral-fast']).optional(),
+      modelVariant:  z.enum(['eral-7c','eral-mini','eral-code','eral-creative','eral-gemini','eral-fast','eral-haiku','eral-cohere']).optional(),
       stream:        z.boolean().optional(),
       context:       z.object({
         mode:      z.string().optional(),
@@ -293,7 +379,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Resolve provider config
-  let providerConfig: { url: string; apiKey: string; model: string };
+  let providerConfig: { url: string; apiKey: string; model: string; provider?: string };
   try {
     providerConfig = resolveEndpointAndKey(modelVariant);
   } catch (err) {
@@ -507,6 +593,7 @@ export async function POST(req: NextRequest) {
       providerConfig.url,
       providerConfig.apiKey,
       providerConfig.model,
+      providerConfig.provider,
     ));
   } catch (err) {
     return NextResponse.json(

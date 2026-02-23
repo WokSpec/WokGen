@@ -4,6 +4,8 @@
 
 
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { fireConfetti } from '@/lib/confetti';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -1079,9 +1081,16 @@ function OutputPanel({
               ))}
             </div>
           </div>
-        ) : activeUrl ? (
-          <div
+        ) : (
+          <AnimatePresence mode="wait">
+            {activeUrl && (
+          <motion.div
+            key={activeUrl}
             className="output-image-frame"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
             style={{
               background: 'transparent',
               border: '1px solid rgba(167,139,250,.15)',
@@ -1142,8 +1151,10 @@ function OutputPanel({
                 }}
               />
             )}
-          </div>
-        ) : null}
+          </motion.div>
+            )}
+          </AnimatePresence>
+        )}
 
         {/* Color palette — shown below canvas when result is ready */}
         {result && activeUrl && (
@@ -2502,6 +2513,7 @@ function StudioInner() {
           resolvedSeed: baseSeed,
         };
         setResult(gen);
+        fireConfetti('generation');
         setSelectedBatch(0);
         setBatchResults([gen]);
         setJobStatus('succeeded');
@@ -2569,6 +2581,7 @@ function StudioInner() {
       if (batchCount === 1) {
         const gen = await fetchOne(baseSeed);
         setResult(gen);
+        fireConfetti('generation');
         setSelectedBatch(0);
         setBatchResults([gen]);
         setJobStatus('succeeded');
@@ -2590,6 +2603,7 @@ function StudioInner() {
         setBatchResults(fulfilled);
         setSelectedBatch(0);
         setResult(fulfilled[0]);
+        fireConfetti('generation');
         setJobStatus('succeeded');
         fulfilled.forEach(gen => {
           if (gen.resultUrl) {

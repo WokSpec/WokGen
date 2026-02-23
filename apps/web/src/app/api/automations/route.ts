@@ -29,13 +29,16 @@ const CreateAutomationSchema = z.object({
   messageTemplate: z.string().min(1).max(2000),
 });
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const limit = Math.min(Number(req.nextUrl.searchParams.get('limit') ?? '20'), 50);
 
   const automations = await prisma.automation.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: 'desc' },
+    take: limit,
   });
 
   return NextResponse.json({ automations });

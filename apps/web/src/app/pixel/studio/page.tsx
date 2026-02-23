@@ -1239,6 +1239,11 @@ function GenerateForm({
   setIsPublic,
   onGenerate,
   isLoading,
+  favPrompts,
+  showFavMenu,
+  setShowFavMenu,
+  favSaved,
+  savePromptAsFavorite,
 }: {
   tool: Tool;
   prompt: string;
@@ -1296,6 +1301,11 @@ function GenerateForm({
   setIsPublic: (v: boolean) => void;
   onGenerate: () => void;
   isLoading: boolean;
+  favPrompts: { id: string; prompt: string; label?: string }[];
+  showFavMenu: boolean;
+  setShowFavMenu: (v: boolean | ((prev: boolean) => boolean)) => void;
+  favSaved: boolean;
+  savePromptAsFavorite: () => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Derived control visibility for the active tool
@@ -2796,6 +2806,11 @@ function StudioInner() {
           setIsPublic={setIsPublic}
           onGenerate={handleGenerate}
           isLoading={jobStatus === 'pending'}
+          favPrompts={favPrompts}
+          showFavMenu={showFavMenu}
+          setShowFavMenu={setShowFavMenu}
+          favSaved={favSaved}
+          savePromptAsFavorite={savePromptAsFavorite}
         />
 
         {/* Generate button */}

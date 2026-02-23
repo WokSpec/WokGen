@@ -39,6 +39,7 @@ model User {
   subscription       Subscription?
   usagePeriods       UsagePeriod[]
   eralConversations  EralConversation[]
+  preference         UserPreference?
 }
 
 model Account {
@@ -321,4 +322,40 @@ model EralMessage {
   conversation   EralConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Eral User Memory — preferences, stats, favorites
+// ---------------------------------------------------------------------------
+
+model UserPreference {
+  id        String   @id @default(cuid())
+  userId    String
+
+  // Per-mode style preferences (JSON: { stylePreset, size, tool, useHD, etc. })
+  pixelPrefs    String?  @db.Text
+  businessPrefs String?  @db.Text
+  vectorPrefs   String?  @db.Text
+  emojiPrefs    String?  @db.Text
+  uiuxPrefs     String?  @db.Text
+  voicePrefs    String?  @db.Text
+  textPrefs     String?  @db.Text
+
+  // Eral preferences
+  eralDefaultModel    String?  @default("eral-7c")
+  eralPersonality     String?  @default("balanced")  // balanced | technical | creative | concise
+
+  // Favorite prompts (JSON array)
+  favoritePrompts String?  @db.Text
+
+  // Usage stats (JSON: { totalGenerations, successRate, lastActive })
+  stats           String?  @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@index([userId])
 }

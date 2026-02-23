@@ -174,6 +174,25 @@ export default function TextGallery() {
     return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
   }, [search]);
 
+  // Initialize filters from URL on first mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('type'))   setTypeFilter(p.get('type')!);
+    if (p.get('search')) setSearch(p.get('search')!);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep URL in sync with active filters
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams();
+    if (typeFilter)      p.set('type', typeFilter);
+    if (debouncedSearch) p.set('search', debouncedSearch);
+    const qs = p.toString();
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+  }, [typeFilter, debouncedSearch]);
+
   const fetchAssets = useCallback(
     async (cursor: string | null, reset = false) => {
       if (reset) setLoading(true);
@@ -258,24 +277,34 @@ export default function TextGallery() {
 
       {/* Content */}
       {loading ? (
-        <div className="gallery-loading">
-          <div className="studio-spinner" />
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: 16,
+          padding: '24px',
+        }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="gallery-card--skeleton-tall" style={{ animationDelay: `${i * 0.07}s`, minHeight: 130 }} />
+          ))}
         </div>
       ) : error ? (
         <div className="gallery-error">
-          <p>{error}</p>
+          <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+          <p>Failed to load gallery</p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
           <button className="btn-ghost btn-sm" onClick={() => void fetchAssets(null, true)}>
             Retry
           </button>
         </div>
       ) : assets.length === 0 ? (
         <div className="gallery-empty">
+          <div className="gallery-empty-icon">✍️</div>
           <p className="gallery-empty-title">No text assets yet</p>
           <p className="gallery-empty-desc">
             Generate your first piece of content in the Text Studio.
           </p>
           <Link href="/text/studio" className="btn-primary btn-sm">
-            Open Text Studio
+            Go to Text Studio →
           </Link>
         </div>
       ) : (

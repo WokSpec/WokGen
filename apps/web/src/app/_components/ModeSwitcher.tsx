@@ -10,6 +10,9 @@ export function ModeSwitcher() {
   // Active mode = URL prefix match
   const activeMode = MODES_LIST.find(m => pathname.startsWith(m.routes.landing))?.id ?? null;
 
+  // Preserve the current sub-path (studio/gallery) when switching modes
+  const pathSegment = pathname.split('/').pop();
+
   return (
     <div className="mode-switcher" role="navigation" aria-label="Product mode">
       <div className="mode-switcher-inner">
@@ -17,8 +20,12 @@ export function ModeSwitcher() {
           const isActive = activeMode === mode.id;
           const isSoon   = mode.status === 'coming_soon';
           const isBeta   = mode.status === 'beta';
-          // All non-coming-soon modes go to studio
-          const href = isSoon ? mode.routes.landing : mode.routes.studio;
+          // Smart navigation: preserve studio/gallery sub-path when switching modes
+          const href = isSoon
+            ? mode.routes.landing
+            : pathSegment === 'gallery' && mode.routes.gallery
+              ? mode.routes.gallery
+              : mode.routes.studio;
 
           return (
             <div key={mode.id} className="mode-tab-wrapper">

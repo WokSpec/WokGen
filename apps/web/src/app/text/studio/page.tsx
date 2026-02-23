@@ -2,6 +2,8 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
+import { parseApiError, type StudioError } from '@/lib/studio-errors';
+import { StudioErrorBanner } from '@/app/_components/StudioErrorBanner';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -25,6 +27,12 @@ interface TextResult {
 // Constants
 // ---------------------------------------------------------------------------
 const ACCENT = '#10b981';
+
+const TEXT_STAGES = [
+  { delay: 0,     message: 'Connecting to Eral...' },
+  { delay: 2000,  message: 'Generating your content...' },
+  { delay: 10000, message: 'Finalizing...' },
+];
 
 const CONTENT_TYPES: { id: ContentType; label: string; emoji: string; desc: string }[] = [
   { id: 'headline',     label: 'Headline',     emoji: '✍️',  desc: 'Powerful single-line title' },
@@ -95,10 +103,12 @@ export default function TextStudio() {
   const [prompt, setPrompt]           = useState('');
   const [status, setStatus]           = useState<Status>('idle');
   const [result, setResult]           = useState<TextResult | null>(null);
-  const [error, setError]             = useState<string | null>(null);
+  const [studioError, setStudioError] = useState<StudioError | null>(null);
   const [elapsedMs, setElapsedMs]     = useState(0);
+  const [loadingMsg, setLoadingMsg]   = useState(TEXT_STAGES[0].message);
   const [copied, setCopied]           = useState(false);
   const [savedMsg, setSavedMsg]       = useState(false);
+  const [showRawMarkdown, setShowRawMarkdown] = useState(false);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -111,6 +121,18 @@ export default function TextStudio() {
   };
   useEffect(() => () => stopTimer(), []);
 
+  // Cycle through loading stage messages while generating
+  useEffect(() => {
+    if (status !== 'generating') {
+      setLoadingMsg(TEXT_STAGES[0].message);
+      return;
+    }
+    const timers = TEXT_STAGES.slice(1).map(s =>
+      setTimeout(() => setLoadingMsg(s.message), s.delay)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [status]);
+
   // Update placeholder when content type changes
   useEffect(() => {
     setPrompt(EXAMPLE_PROMPTS[contentType]);
@@ -121,7 +143,7 @@ export default function TextStudio() {
     if (!trimmed || status === 'generating') return;
 
     setStatus('generating');
-    setError(null);
+    setStudioError(null);
     setResult(null);
     setElapsedMs(0);
     startTimer();
@@ -133,13 +155,17 @@ export default function TextStudio() {
         body: JSON.stringify({ prompt: trimmed, contentType, tone, length }),
       });
 
-      const data = await res.json() as TextResult & { error?: string };
-      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+      const data = await res.json() as TextResult & { error?: string; code?: string; retryable?: boolean };
+      if (!res.ok) throw parseApiError({ status: res.status, ...data }, data.error);
 
       setResult(data);
       setStatus('done');
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      if (err && typeof err === 'object' && 'code' in err && 'retryable' in err) {
+        setStudioError(err as StudioError);
+      } else {
+        setStudioError(parseApiError({ status: 0 }, err instanceof Error ? err.message : String(err)));
+      }
       setStatus('error');
     } finally {
       stopTimer();
@@ -184,12 +210,7 @@ export default function TextStudio() {
       </div>
 
       {/* ── Main layout ────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(340px, 480px) 1fr',
-        gap: 0,
-        minHeight: 'calc(100vh - 57px)',
-      }}>
+      <div className="studio-grid-2col">
 
         {/* ── Left panel ─────────────────────────────────────────────── */}
         <div style={{
@@ -328,26 +349,22 @@ export default function TextStudio() {
                 border: `2px solid ${ACCENT}44`, borderTopColor: ACCENT,
                 animation: 'spin 0.7s linear infinite',
               }} />
-              Generating… {msToSecs(elapsedMs)}
+              {loadingMsg} {msToSecs(elapsedMs)}
             </div>
           )}
 
           {/* Error */}
-          {status === 'error' && error && (
-            <div style={{
-              padding: '12px 16px', borderRadius: 8,
-              background: '#ef444422', border: '1px solid #ef4444',
-              color: '#ef4444', fontSize: 13,
-            }}>
-              {error}
-            </div>
-          )}
+          <StudioErrorBanner
+            error={studioError}
+            onDismiss={() => setStudioError(null)}
+            onRetry={handleGenerate}
+          />
 
           {/* Result */}
           {result && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {/* Stats row */}
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                 <span style={{
                   padding: '3px 10px', borderRadius: 4, fontSize: 12,
                   background: `${ACCENT}18`, color: ACCENT, fontWeight: 600,
@@ -361,6 +378,13 @@ export default function TextStudio() {
                 }}>
                   {result.charCount} chars
                 </span>
+                <span style={{
+                  padding: '3px 10px', borderRadius: 4, fontSize: 12,
+                  background: 'var(--surface)', border: '1px solid var(--surface-border)',
+                  color: 'var(--text-muted)',
+                }}>
+                  ~{Math.max(1, Math.ceil(result.wordCount / 200))} min read
+                </span>
                 {result.model && (
                   <span style={{
                     padding: '3px 10px', borderRadius: 4, fontSize: 11,
@@ -370,6 +394,18 @@ export default function TextStudio() {
                     {result.model.split('/').pop()}
                   </span>
                 )}
+                <button
+                  onClick={() => setShowRawMarkdown(v => !v)}
+                  style={{
+                    marginLeft: 'auto', padding: '3px 10px', borderRadius: 4, fontSize: 12,
+                    background: showRawMarkdown ? `${ACCENT}22` : 'var(--surface)',
+                    border: `1px solid ${showRawMarkdown ? ACCENT : 'var(--surface-border)'}`,
+                    color: showRawMarkdown ? ACCENT : 'var(--text-muted)',
+                    cursor: 'pointer', fontWeight: showRawMarkdown ? 600 : 400,
+                  }}
+                >
+                  {showRawMarkdown ? '⬤ Raw MD' : '◎ Rendered'}
+                </button>
               </div>
 
               {/* Content area */}
@@ -378,7 +414,7 @@ export default function TextStudio() {
                 background: 'var(--surface)', border: '1px solid var(--surface-border)',
                 fontSize: 15, lineHeight: 1.7, color: 'var(--text)',
                 whiteSpace: 'pre-wrap', overflowY: 'auto', maxHeight: '50vh',
-                fontFamily: contentType === 'code-snippet' ? 'monospace' : 'inherit',
+                fontFamily: showRawMarkdown || contentType === 'code-snippet' ? 'monospace' : 'inherit',
               }}>
                 {result.content}
               </div>

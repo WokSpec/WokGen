@@ -657,6 +657,20 @@ function GalleryCard({
         )}
       </div>
 
+      {/* Hover download button */}
+      <div className="gallery-card-dl-wrap">
+        <a
+          href={asset.imageUrl}
+          download={`wokgen-${asset.id}.png`}
+          onClick={e => e.stopPropagation()}
+          className="gallery-card-download-btn"
+          title="Download"
+          aria-label="Download"
+        >
+          ↓
+        </a>
+      </div>
+
       {/* Overlay on hover */}
       <div className="gallery-card-overlay">
         <p
@@ -772,13 +786,20 @@ function EmptyState({ search }: { search: string }) {
   return (
     <>
       <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2.5rem 0 1.25rem' }}>
-        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-          No community assets yet — be the first to share!
+        <div className="gallery-empty-icon">🕹️</div>
+        <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.35rem' }}>
+          No pixel assets yet
         </p>
-        <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>
-          Generate something in the Studio and save it to the gallery.
-          Here are some prompt ideas to get you started:
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1rem', maxWidth: 300, margin: '0 auto 1rem' }}>
+          Generate your first pixel art in the Pixel Studio.
         </p>
+        <a href="/pixel/studio" style={{
+          display: 'inline-block', padding: '0.45rem 1.1rem',
+          background: '#a78bfa', color: 'white', borderRadius: 6,
+          fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none',
+        }}>
+          Go to Pixel Studio →
+        </a>
       </div>
       {SHOWCASE_PROMPTS.map((item, i) => (
         <ShowcaseCard key={i} item={item} index={i} />
@@ -816,6 +837,31 @@ export default function GalleryPage() {
     const t = setTimeout(() => setDebouncedSearch(search), 380);
     return () => clearTimeout(t);
   }, [search]);
+
+  // Initialize filters from URL on first mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('tool'))   setToolFilter(p.get('tool')!);
+    if (p.get('rarity')) setRarityFilter(p.get('rarity')!);
+    if (p.get('search')) setSearch(p.get('search')!);
+    if (p.get('sort') === 'oldest') setSort('oldest');
+    if (p.get('tab') === 'mine')    setGalleryTab('mine');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep URL in sync with active filters
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams();
+    if (toolFilter)        p.set('tool', toolFilter);
+    if (rarityFilter)      p.set('rarity', rarityFilter);
+    if (debouncedSearch)   p.set('search', debouncedSearch);
+    if (sort !== 'newest') p.set('sort', sort);
+    if (galleryTab === 'mine') p.set('tab', 'mine');
+    const qs = p.toString();
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+  }, [toolFilter, rarityFilter, debouncedSearch, sort, galleryTab]);
 
   // Fetch on filter change
   useEffect(() => {

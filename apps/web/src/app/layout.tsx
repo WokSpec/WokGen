@@ -103,7 +103,26 @@ function NavBar() {
         <NavLink href="/community">Community</NavLink>
         <NavLink href="/docs">Docs</NavLink>
         <NavLink href="/eral">
-          <span style={{ color: '#818cf8' }}>💬 Eral</span>
+          <span style={{
+            color: '#818cf8',
+            background: 'rgba(129,140,248,0.1)',
+            border: '1px solid rgba(129,140,248,0.25)',
+            borderRadius: '9999px',
+            padding: '2px 8px 2px 6px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            transition: 'background 0.15s, box-shadow 0.15s',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = 'rgba(129,140,248,0.18)';
+            (e.currentTarget as HTMLElement).style.boxShadow = '0 0 10px rgba(129,140,248,0.2)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = 'rgba(129,140,248,0.1)';
+            (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+          }}
+          >🧠 Eral</span>
         </NavLink>
       </div>
 

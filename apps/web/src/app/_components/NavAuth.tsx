@@ -9,6 +9,16 @@ export function NavAuth() {
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === 'true';
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleMouseEnter = () => {
+    clearTimeout(closeTimer.current);
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimer.current = setTimeout(() => setOpen(false), 150);
+  };
 
   // Public-by-default setting
   const [publicDefault, setPublicDefault]   = useState(false);
@@ -80,7 +90,12 @@ export function NavAuth() {
   const initial = displayName[0]?.toUpperCase() ?? 'U';
 
   return (
-    <div className="nav-user" ref={containerRef}>
+    <div
+      className="nav-user"
+      ref={containerRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <button
         className="nav-user-trigger"
         onClick={() => setOpen(v => !v)}
@@ -104,7 +119,12 @@ export function NavAuth() {
       </button>
 
       {open && (
-        <div className="nav-user-menu" role="menu">
+        <div
+          className="nav-user-menu"
+          role="menu"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
           <div className="nav-user-menu-header">
             <span className="nav-user-menu-name">{session.user?.name ?? session.user?.email}</span>
             {session.user?.email && session.user?.name && (
@@ -213,7 +233,7 @@ export function NavAuth() {
         .nav-user-chevron { font-size: 0.55rem; line-height: 1; opacity: 0.6; }
 
         .nav-user-menu {
-          position: absolute; top: calc(100% + 6px); right: 0;
+          position: absolute; top: 100%; right: 0;
           background: var(--bg-surface, #111); border: 1px solid var(--border, #2a2a2a);
           border-radius: 8px; overflow: hidden; min-width: 210px; z-index: 200;
           box-shadow: 0 12px 32px rgba(0,0,0,.6), 0 2px 8px rgba(0,0,0,.4);

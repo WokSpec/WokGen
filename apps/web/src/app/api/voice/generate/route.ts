@@ -1,38 +1,131 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { prisma } from '@/lib/db';
+import {
+  preprocessTextForTTS,
+  detectContentType,
+  selectOptimalVoice,
+  getVoiceSettings,
+  estimateCharCount,
+  type VoiceStyle,
+} from '@/lib/tts-intelligence';
 
 // ---------------------------------------------------------------------------
 // POST /api/voice/generate
 //
-// Converts text to speech using:
-//   Standard tier: HuggingFace hexgrad/Kokoro-82M (falls back to browser TTS hint)
-//   HD tier:       Replicate suno-ai/bark
+// Provider priority:
+//   1. ElevenLabs  (ELEVENLABS_API_KEY)  — primary, near-human quality
+//   2. OpenAI TTS  (OPENAI_API_KEY)      — secondary, excellent quality
+//   3. HuggingFace Kokoro (HF_TOKEN)     — fallback
 // ---------------------------------------------------------------------------
 
 export const runtime = 'nodejs';
-export const maxDuration = 120;
+export const maxDuration = 60;
 
-type VoiceType = 'natural' | 'character' | 'whisper' | 'energetic' | 'news' | 'deep';
-type Language  = 'en' | 'es' | 'fr' | 'de' | 'ja' | 'pt' | 'zh';
+type Language = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'pl' | 'ja' | 'ko' | 'zh' | 'hi';
 
-const HF_URL = 'https://api-inference.huggingface.co/models/hexgrad/Kokoro-82M';
-const REPLICATE_URL = 'https://api.replicate.com/v1/predictions';
-const REPLICATE_BARK_MODEL =
-  'suno-ai/bark:b76242b40d67c76ab6742e987628a2a9ac019e11d56ab96c4e91ce03b79b2787';
+// ---------------------------------------------------------------------------
+// Provider calls
+// ---------------------------------------------------------------------------
+async function generateElevenLabs(
+  text: string,
+  voiceId: string,
+  style: VoiceStyle,
+  hd: boolean,
+): Promise<Buffer | null> {
+  const key = process.env.ELEVENLABS_API_KEY;
+  if (!key) return null;
 
-// Maps WokGen voice types to Bark history_prompt values
-const VOICE_PROFILES: Record<VoiceType, string> = {
-  natural:   'announcer',
-  character: 'v2/en_speaker_3',
-  whisper:   'v2/en_speaker_6',
-  energetic: 'v2/en_speaker_9',
-  news:      'v2/en_speaker_1',
-  deep:      'v2/en_speaker_0',
-};
+  const settings = getVoiceSettings(style);
+  const modelId = hd ? 'eleven_multilingual_v2' : 'eleven_turbo_v2_5';
 
+  const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'xi-api-key': key,
+      'Accept': 'audio/mpeg',
+    },
+    body: JSON.stringify({
+      text,
+      model_id: modelId,
+      voice_settings: settings,
+    }),
+    signal: AbortSignal.timeout(30000),
+  });
+
+  if (!response.ok) {
+    const err = await response.text().catch(() => '');
+    console.error('[TTS/ElevenLabs] Error:', response.status, err);
+    return null;
+  }
+
+  return Buffer.from(await response.arrayBuffer());
+}
+
+async function generateOpenAI(
+  text: string,
+  voiceStyle: VoiceStyle,
+  hd: boolean,
+): Promise<Buffer | null> {
+  const key = process.env.OPENAI_API_KEY;
+  if (!key) return null;
+
+  const voiceMap: Record<VoiceStyle, string> = {
+    natural:   'nova',
+    character: 'fable',
+    whisper:   'shimmer',
+    energetic: 'alloy',
+    news:      'onyx',
+    asmr:      'shimmer',
+    narrative: 'nova',
+    deep:      'onyx',
+  };
+  const voice = voiceMap[voiceStyle] ?? 'nova';
+  const model = hd ? 'tts-1-hd' : 'tts-1';
+
+  const response = await fetch('https://api.openai.com/v1/audio/speech', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`,
+    },
+    body: JSON.stringify({ model, input: text, voice, response_format: 'mp3' }),
+    signal: AbortSignal.timeout(30000),
+  });
+
+  if (!response.ok) {
+    console.error('[TTS/OpenAI] Error:', response.status);
+    return null;
+  }
+
+  return Buffer.from(await response.arrayBuffer());
+}
+
+async function generateHuggingFace(text: string): Promise<Buffer | null> {
+  const key = process.env.HF_TOKEN;
+  if (!key) return null;
+
+  const response = await fetch('https://api-inference.huggingface.co/models/hexgrad/Kokoro-82M', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ inputs: text }),
+    signal: AbortSignal.timeout(45000),
+  });
+
+  if (!response.ok) return null;
+
+  return Buffer.from(await response.arrayBuffer());
+}
+
+// ---------------------------------------------------------------------------
+// Route handler
+// ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
-  // ── Auth & rate limit ────────────────────────────────────────────────────
+  // ── Auth ─────────────────────────────────────────────────────────────────
   let authedUserId: string | null = null;
   try {
     const { auth } = await import('@/lib/auth');
@@ -42,14 +135,14 @@ export async function POST(req: NextRequest) {
     // auth not available in self-hosted mode — continue as guest
   }
 
+  // ── Rate limit ───────────────────────────────────────────────────────────
   const rateLimitKey =
     authedUserId ??
     req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
     req.headers.get('x-real-ip') ??
     'unknown';
 
-  // Free: 5/hr  |  Paid: 20/hr (simple: use presence of userId as proxy for paid)
-  const maxReqs = authedUserId ? 20 : 5;
+  const maxReqs = authedUserId ? 20 : 10;
   const rl = await checkRateLimit(rateLimitKey, maxReqs, 3600 * 1000);
   if (!rl.allowed) {
     return NextResponse.json(
@@ -61,11 +154,10 @@ export async function POST(req: NextRequest) {
   // ── Parse body ───────────────────────────────────────────────────────────
   let body: {
     text?: string;
-    voice?: VoiceType;
+    style?: VoiceStyle;
+    hd?: boolean;
+    voiceId?: string;
     language?: Language;
-    speed?: number;
-    tier?: 'standard' | 'hd';
-    userId?: string;
   };
   try {
     body = await req.json();
@@ -74,58 +166,46 @@ export async function POST(req: NextRequest) {
   }
 
   const text     = (body.text ?? '').trim();
-  const voice    = (body.voice ?? 'natural') as VoiceType;
-  const speed    = Math.max(0.5, Math.min(2.0, body.speed ?? 1.0));
-  const tier     = body.tier ?? 'standard';
+  const style    = (body.style ?? 'natural') as VoiceStyle;
+  const hd       = body.hd ?? false;
+  const customVoiceId = body.voiceId;
 
   if (!text) {
     return NextResponse.json({ error: 'text is required' }, { status: 400 });
   }
-  if (text.length > 500) {
-    return NextResponse.json({ error: 'text must be 500 characters or fewer' }, { status: 400 });
+
+  const MAX_CHARS = 5000;
+  if (text.length > MAX_CHARS) {
+    return NextResponse.json(
+      { error: `Text too long. Maximum ${MAX_CHARS} characters.` },
+      { status: 400 },
+    );
   }
 
-  // ── HD tier — Replicate Bark ─────────────────────────────────────────────
-  if (tier === 'hd') {
-    // HD requires authentication
+  // ── HD tier — reserve credits ────────────────────────────────────────────
+  let usedMonthly = false;
+  if (hd) {
     if (!authedUserId) {
       return NextResponse.json(
-        { error: 'Sign in to use HD voice generation.' },
+        { error: 'Sign in required for HD voice generation.' },
         { status: 401 },
       );
     }
 
-    const replicateToken = process.env.REPLICATE_API_TOKEN;
-    if (!replicateToken) {
-      return NextResponse.json(
-        { error: 'HD tier is not configured on this server.' },
-        { status: 503 },
-      );
-    }
-
-    // ── Reserve 1 HD credit atomically (prevents parallel-request race) ──────
-    // Attempt to deduct from monthly allocation first, then top-up bank.
-    // If both are 0, reject immediately. If generation fails, we refund below.
-    let usedMonthly = false;
     try {
       const sub = await prisma.subscription.findUnique({
         where: { userId: authedUserId }, include: { plan: true },
       });
       const monthlyAlloc = sub?.plan?.creditsPerMonth ?? 0;
 
-      // Try to atomically increment hdMonthlyUsed only if still under allocation
       const updated = await prisma.user.updateMany({
-        where: {
-          id:            authedUserId,
-          hdMonthlyUsed: { lt: monthlyAlloc },
-        },
-        data: { hdMonthlyUsed: { increment: 1 } },
+        where: { id: authedUserId, hdMonthlyUsed: { lt: monthlyAlloc } },
+        data:  { hdMonthlyUsed: { increment: 1 } },
       });
 
       if (updated.count > 0) {
         usedMonthly = true;
       } else {
-        // Monthly exhausted — try top-up bank
         const topUpUpdated = await prisma.user.updateMany({
           where: { id: authedUserId, hdTopUpCredits: { gt: 0 } },
           data:  { hdTopUpCredits: { decrement: 1 } },
@@ -138,68 +218,55 @@ export async function POST(req: NextRequest) {
         }
       }
     } catch (reserveErr) {
-      console.error('[voice/generate] Credit reservation error:', reserveErr);
+      console.error('[TTS] Credit reservation error:', reserveErr);
       return NextResponse.json({ error: 'Could not reserve credits' }, { status: 500 });
     }
+  }
 
+  // ── Pre-process & select voice ───────────────────────────────────────────
+  const processedText = preprocessTextForTTS(text);
+  const contentType   = detectContentType(processedText);
+  const selectedVoice = customVoiceId
+    ? { id: customVoiceId, name: 'Custom' }
+    : selectOptimalVoice(style, contentType);
+
+  console.log(
+    `[TTS] style=${style}, contentType=${contentType}, voice=${selectedVoice.name}, hd=${hd}, chars=${estimateCharCount(processedText)}`,
+  );
+
+  // ── Provider chain: ElevenLabs → OpenAI → HuggingFace ───────────────────
+  let audioBuffer: Buffer | null = null;
+  let provider = 'none';
+  let format: 'mp3' | 'wav' = 'mp3';
+
+  try {
+    audioBuffer = await generateElevenLabs(processedText, selectedVoice.id, style, hd);
+    if (audioBuffer) { provider = 'elevenlabs'; format = 'mp3'; }
+  } catch (e) {
+    console.warn('[TTS] ElevenLabs failed:', e);
+  }
+
+  if (!audioBuffer) {
     try {
-      const voiceProfile = VOICE_PROFILES[voice] ?? 'announcer';
+      audioBuffer = await generateOpenAI(processedText, style, hd);
+      if (audioBuffer) { provider = 'openai'; format = 'mp3'; }
+    } catch (e) {
+      console.warn('[TTS] OpenAI failed:', e);
+    }
+  }
 
-      const createRes = await fetch(REPLICATE_URL, {
-        method: 'POST',
-        headers: {
-          Authorization: `Token ${replicateToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          version: REPLICATE_BARK_MODEL.split(':')[1],
-          input: {
-            prompt: text,
-            history_prompt: voiceProfile,
-            text_temp: 0.7,
-            waveform_temp: 0.7,
-          },
-        }),
-      });
+  if (!audioBuffer) {
+    try {
+      audioBuffer = await generateHuggingFace(processedText);
+      if (audioBuffer) { provider = 'huggingface'; format = 'wav'; }
+    } catch (e) {
+      console.warn('[TTS] HuggingFace failed:', e);
+    }
+  }
 
-      if (!createRes.ok) {
-        const errText = await createRes.text();
-        throw new Error(`Replicate error ${createRes.status}: ${errText}`);
-      }
-
-      const prediction = await createRes.json() as { id: string; status: string; output?: string; urls?: { get: string } };
-
-      // Poll until completion (max 90s)
-      const pollUrl = prediction.urls?.get ?? `${REPLICATE_URL}/${prediction.id}`;
-      let audioUrl: string | null = null;
-      for (let i = 0; i < 45; i++) {
-        await new Promise(r => setTimeout(r, 2000));
-        const pollRes  = await fetch(pollUrl, { headers: { Authorization: `Token ${replicateToken}` } });
-        const pollData = await pollRes.json() as { status: string; output?: string; error?: string };
-        if (pollData.status === 'succeeded') { audioUrl = pollData.output ?? null; break; }
-        if (pollData.status === 'failed')    { throw new Error(pollData.error ?? 'Bark generation failed'); }
-      }
-
-      if (!audioUrl) throw new Error('HD generation timed out');
-
-      // Fetch audio and convert to base64
-      const audioRes = await fetch(audioUrl);
-      const buffer   = await audioRes.arrayBuffer();
-      const base64   = Buffer.from(buffer).toString('base64');
-
-      // Credit was already reserved above — just return remaining balance info
-      const freshUser = await prisma.user.findUnique({ where: { id: authedUserId } }).catch(() => null);
-      const hdCreditsRemaining = (freshUser?.hdTopUpCredits ?? 0);
-
-      return NextResponse.json({
-        audioBase64:      base64,
-        format:           'wav',
-        durationEstimate: Math.ceil(text.split(/\s+/).length / 3),
-        creditsUsed:      1,
-        hdCreditsRemaining,
-      });
-    } catch (err) {
-      // Refund the reserved credit on failure
+  // ── Refund credits on failure ────────────────────────────────────────────
+  if (!audioBuffer) {
+    if (hd && authedUserId) {
       try {
         if (usedMonthly) {
           await prisma.user.update({ where: { id: authedUserId }, data: { hdMonthlyUsed: { decrement: 1 } } });
@@ -207,68 +274,22 @@ export async function POST(req: NextRequest) {
           await prisma.user.update({ where: { id: authedUserId }, data: { hdTopUpCredits: { increment: 1 } } });
         }
       } catch (refundErr) {
-        console.error('[voice/generate] Credit refund failed:', refundErr);
+        console.error('[TTS] Credit refund failed:', refundErr);
       }
-      return NextResponse.json(
-        { error: err instanceof Error ? err.message : 'HD generation failed' },
-        { status: 502 },
-      );
     }
+    return NextResponse.json({ error: 'All TTS providers unavailable. Please try again.' }, { status: 503 });
   }
 
-  // ── Standard tier — HuggingFace Kokoro ───────────────────────────────────
-  const hfToken = process.env.HF_TOKEN;
+  const mimeType  = format === 'mp3' ? 'audio/mpeg' : 'audio/wav';
+  const base64Audio = audioBuffer.toString('base64');
 
-  if (!hfToken) {
-    // No HF key — instruct client to use browser TTS
-    return NextResponse.json({
-      fallback: true,
-      text,
-      speed,
-      message: 'Use browser TTS for standard tier',
-    });
-  }
-
-  try {
-    const hfRes = await fetch(HF_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${hfToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ inputs: text }),
-    });
-
-    if (!hfRes.ok) {
-      const errText = await hfRes.text();
-      // Model loading (503) or other transient error — fall back to browser TTS
-      if (hfRes.status === 503 || hfRes.status === 429) {
-        return NextResponse.json({
-          fallback: true,
-          text,
-          speed,
-          message: 'Use browser TTS for standard tier',
-        });
-      }
-      throw new Error(`HuggingFace error ${hfRes.status}: ${errText}`);
-    }
-
-    const buffer = await hfRes.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString('base64');
-
-    return NextResponse.json({
-      audioBase64:     base64,
-      format:          'wav',
-      durationEstimate: Math.ceil(text.split(/\s+/).length / 3),
-      creditsUsed:     0,
-    });
-  } catch (err) {
-    // Fall back to browser TTS on any error
-    return NextResponse.json({
-      fallback: true,
-      text,
-      speed,
-      message: 'Use browser TTS for standard tier',
-    });
-  }
+  return NextResponse.json({
+    audio:       `data:${mimeType};base64,${base64Audio}`,
+    format,
+    provider,
+    voice:       selectedVoice.name,
+    contentType,
+    charCount:   estimateCharCount(processedText),
+    creditsUsed: hd ? 1 : 0,
+  });
 }

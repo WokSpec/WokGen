@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { safeMarkdown } from '@/lib/safe-markdown';
+import { parseWAPFromResponse, executeWAP, type WAPResponse } from '@/lib/wap';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -14,6 +17,7 @@ interface Message {
   content: string;
   modelUsed?: string;
   durationMs?: number;
+  wap?: WAPResponse | null;
   createdAt: number;
 }
 
@@ -79,68 +83,90 @@ function newConversation(): Conversation {
 }
 
 // ---------------------------------------------------------------------------
-// Markdown renderer (lightweight, no deps)
+// Helpers
 // ---------------------------------------------------------------------------
 
-function renderMarkdown(text: string): string {
-  // Code blocks
-  let out = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_m, lang, code) => {
-    const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return `<pre class="eral-code-block" data-lang="${lang || 'text'}"><code>${escaped.trimEnd()}</code></pre>`;
-  });
+function generateTitle(text: string): string {
+  const trimmed = text.trim();
+  if (trimmed.length <= 40) return trimmed;
+  const cut = trimmed.slice(0, 40);
+  const lastSpace = cut.lastIndexOf(' ');
+  return lastSpace > 0 ? cut.slice(0, lastSpace) : cut;
+}
 
-  // Inline code
-  out = out.replace(/`([^`\n]+)`/g, (_m, c) => {
-    const escaped = c.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return `<code class="eral-inline-code">${escaped}</code>`;
-  });
-
-  // Bold
-  out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // Italic
-  out = out.replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-  // Headers
-  out = out.replace(/^### (.+)$/gm, '<h3 class="eral-h3">$1</h3>');
-  out = out.replace(/^## (.+)$/gm, '<h2 class="eral-h2">$1</h2>');
-  out = out.replace(/^# (.+)$/gm, '<h1 class="eral-h1">$1</h1>');
-
-  // Unordered lists
-  out = out.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
-  out = out.replace(/(<li>[\s\S]*?<\/li>)(\n(?=<li>)|(?!\n))/g, '$1');
-  out = out.replace(/(<li>.*<\/li>)/gs, '<ul class="eral-ul">$1</ul>');
-
-  // Numbered lists
-  out = out.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-
-  // Paragraphs — wrap lines not already in block tags
-  const lines = out.split('\n');
-  const result: string[] = [];
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) {
-      result.push('');
-      continue;
+function addCopyButtons(html: string): string {
+  return html.replace(
+    /<pre class="eral-code-block" data-lang="([^"]*)"><code>([\s\S]*?)<\/code><\/pre>/g,
+    (_match: string, lang: string, code: string) => {
+      const langLabel = lang || 'text';
+      const rawCode = code
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+      const encoded = encodeURIComponent(rawCode);
+      return `<div class="eral-code-block"><div class="eral-code-header"><span class="eral-code-lang">${langLabel}</span><button class="eral-copy-btn" data-code="${encoded}">Copy</button></div><pre><code class="language-${langLabel}">${code}</code></pre></div>`;
     }
-    const isBlock = /^<(h[1-6]|pre|ul|ol|li|blockquote|div)/.test(trimmed);
-    result.push(isBlock ? trimmed : `<p>${trimmed}</p>`);
-  }
-  return result.join('\n');
+  );
+}
+
+function getFollowUpSuggestions(content: string): string[] {
+  if (/```|`[^`]/.test(content)) return ['Explain this code', 'Show an alternative approach'];
+  if (/wokgen|wokspec/i.test(content)) return ['Show me how to do this in the studio', 'What settings should I use?'];
+  if (/(?:^|\n)[-*] |\d+\. /.test(content)) return ['Tell me more about #1', 'Compare these options'];
+  return ['Tell me more', 'Give me an example', 'What else should I know?'];
 }
 
 // ---------------------------------------------------------------------------
 // Message bubble
 // ---------------------------------------------------------------------------
 
-function MessageBubble({ msg, isStreaming }: { msg: Message; isStreaming?: boolean }) {
+function MessageBubble({
+  msg,
+  isStreaming,
+  showSuggestions,
+  onFollowUp,
+}: {
+  msg: Message;
+  isStreaming?: boolean;
+  showSuggestions?: boolean;
+  onFollowUp?: (text: string) => void;
+}) {
   const isUser = msg.role === 'user';
   const [copied, setCopied] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Event delegation for code block copy buttons
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('eral-copy-btn') && target.dataset.code) {
+        const code = decodeURIComponent(target.dataset.code);
+        navigator.clipboard.writeText(code).catch(() => {});
+        target.textContent = 'Copied!';
+        target.classList.add('copied');
+        setTimeout(() => {
+          target.textContent = 'Copy';
+          target.classList.remove('copied');
+        }, 1500);
+      }
+    };
+    el.addEventListener('click', handler);
+    return () => el.removeEventListener('click', handler);
+  }, []);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(msg.content).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
+
+  const renderedHtml = isUser ? '' : addCopyButtons(safeMarkdown(msg.content));
+  const followUps =
+    showSuggestions && !isUser && onFollowUp ? getFollowUpSuggestions(msg.content) : [];
 
   return (
     <div className={`eral-msg-row ${isUser ? 'eral-msg-user' : 'eral-msg-assistant'}`}>
@@ -155,8 +181,9 @@ function MessageBubble({ msg, isStreaming }: { msg: Message; isStreaming?: boole
             <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{msg.content}</p>
           ) : (
             <div
-              className="eral-prose"
-              dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content) }}
+              ref={contentRef}
+              className="eral-message-content"
+              dangerouslySetInnerHTML={{ __html: renderedHtml }}
             />
           )}
           {isStreaming && (
@@ -171,9 +198,31 @@ function MessageBubble({ msg, isStreaming }: { msg: Message; isStreaming?: boole
             {msg.durationMs != null && (
               <span className="eral-time-tag">{(msg.durationMs / 1000).toFixed(1)}s</span>
             )}
-            <button className="eral-copy-btn" onClick={handleCopy} title="Copy message">
+            <button className="eral-copy-msg-btn" onClick={handleCopy} title="Copy message">
               {copied ? '✓ Copied' : 'Copy'}
             </button>
+          </div>
+        )}
+        {!isUser && !isStreaming && msg.wap && (
+          <div style={{
+            background: 'rgba(129,140,248,0.1)',
+            border: '1px solid rgba(129,140,248,0.2)',
+            borderRadius: 6,
+            padding: '6px 12px',
+            marginTop: 4,
+            fontSize: 12,
+            color: '#818cf8',
+          }}>
+            ⚡ {msg.wap.confirmation}
+          </div>
+        )}
+        {followUps.length > 0 && (
+          <div className="eral-followup-chips">
+            {followUps.map((s) => (
+              <button key={s} className="eral-followup-chip" onClick={() => onFollowUp!(s)}>
+                {s}
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -227,6 +276,7 @@ function ConvItem({
 // ---------------------------------------------------------------------------
 
 export function EralPage() {
+  const router = useRouter();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [model, setModel] = useState<ModelVariant>('eral-7c');
@@ -235,6 +285,8 @@ export function EralPage() {
   const [streamingContent, setStreamingContent] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
+  const [conversationsLoaded, setConversationsLoaded] = useState(false);
+  const [actionConfirmation, setActionConfirmation] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -251,6 +303,7 @@ export function EralPage() {
       setConversations([conv]);
       setActiveId(conv.id);
     }
+    setConversationsLoaded(true);
   }, []);
 
   // Persist to localStorage whenever conversations change
@@ -286,6 +339,18 @@ export function EralPage() {
     inputRef.current?.focus();
   }, []);
 
+  // Cmd+K / Ctrl+K → new chat
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        createNewConv();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [createNewConv]);
+
   const deleteConv = useCallback((id: string) => {
     setConversations((prev) => {
       const next = prev.filter((c) => c.id !== id);
@@ -320,7 +385,6 @@ export function EralPage() {
     updateConv(currentConvId, (c) => ({
       ...c,
       messages: [...c.messages, userMsg],
-      title: c.messages.length === 0 ? text.trim().slice(0, 60) : c.title,
       updatedAt: Date.now(),
     }));
 
@@ -379,20 +443,37 @@ export function EralPage() {
       }
 
       const durationMs = Date.now() - start;
+
+      // Parse WAP from collected content
+      const { cleanReply, wap } = parseWAPFromResponse(fullContent);
+
       const assistantMsg: Message = {
         id: `msg-${Date.now()}`,
         role: 'assistant',
-        content: fullContent,
+        content: cleanReply,
         modelUsed: model,
         durationMs,
+        wap,
         createdAt: Date.now(),
       };
 
-      updateConv(currentConvId, (c) => ({
-        ...c,
-        messages: [...c.messages, assistantMsg],
-        updatedAt: Date.now(),
-      }));
+      updateConv(currentConvId, (c) => {
+        const isFirstAssistant = !c.messages.some((m) => m.role === 'assistant');
+        const firstUserMsg = c.messages.find((m) => m.role === 'user');
+        const title = isFirstAssistant && firstUserMsg ? generateTitle(firstUserMsg.content) : c.title;
+        return {
+          ...c,
+          messages: [...c.messages, assistantMsg],
+          title,
+          updatedAt: Date.now(),
+        };
+      });
+
+      if (wap) {
+        setTimeout(() => executeWAP(wap, router), 500);
+        setActionConfirmation(wap.confirmation);
+        setTimeout(() => setActionConfirmation(null), 3000);
+      }
     } catch (err) {
       if ((err as Error).name === 'AbortError') return;
 
@@ -461,15 +542,23 @@ export function EralPage() {
             </button>
 
             <div className="eral-conv-list">
-              {conversations.map((conv) => (
-                <ConvItem
-                  key={conv.id}
-                  conv={conv}
-                  active={conv.id === activeId}
-                  onSelect={() => { setActiveId(conv.id); setStreamingContent(''); }}
-                  onDelete={() => deleteConv(conv.id)}
-                />
-              ))}
+              {!conversationsLoaded ? (
+                <>
+                  <div className="eral-conv-skeleton" />
+                  <div className="eral-conv-skeleton" />
+                  <div className="eral-conv-skeleton" />
+                </>
+              ) : (
+                conversations.map((conv) => (
+                  <ConvItem
+                    key={conv.id}
+                    conv={conv}
+                    active={conv.id === activeId}
+                    onSelect={() => { setActiveId(conv.id); setStreamingContent(''); }}
+                    onDelete={() => deleteConv(conv.id)}
+                  />
+                ))
+              )}
             </div>
 
             <div className="eral-sidebar-footer">
@@ -557,12 +646,40 @@ export function EralPage() {
                   </button>
                 ))}
               </div>
+
+              <div className="eral-commands-section">
+                <p className="eral-commands-label">⚡ Commands — Eral can actually do these</p>
+                <div className="eral-commands-grid">
+                  {[
+                    { icon: '🎮', text: '"Take me to Pixel Studio"' },
+                    { icon: '🔧', text: '"Set size to 64×64"' },
+                    { icon: '✍️', text: '"Write a prompt for a fire mage"' },
+                    { icon: '💼', text: '"Go to Business Studio"' },
+                    { icon: '📸', text: '"Open my gallery"' },
+                    { icon: '📖', text: '"Explain what HD mode does"' },
+                  ].map((c) => (
+                    <button key={c.text} className="eral-command-chip" onClick={() => sendMessage(c.text.replace(/"/g, ''))}>
+                      <span>{c.icon}</span> {c.text}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             <>
-              {activeConv.messages.map((msg) => (
-                <MessageBubble key={msg.id} msg={msg} />
-              ))}
+              {(() => {
+                const lastAssistantIdx = activeConv.messages.reduce(
+                  (acc, m, i) => (m.role === 'assistant' ? i : acc), -1
+                );
+                return activeConv.messages.map((msg, idx) => (
+                  <MessageBubble
+                    key={msg.id}
+                    msg={msg}
+                    showSuggestions={!loading && idx === lastAssistantIdx}
+                    onFollowUp={sendMessage}
+                  />
+                ));
+              })()}
               {streamingMsg && (
                 <MessageBubble msg={streamingMsg} isStreaming />
               )}
@@ -600,10 +717,24 @@ export function EralPage() {
             )}
           </div>
           <p className="eral-input-hint">
-            Enter to send · Shift+Enter for newline · Eral can make mistakes — verify important info
+            Enter to send · Shift+Enter for newline · ⌘K new chat · Eral can make mistakes
           </p>
         </div>
       </div>
+
+      {/* ── Action confirmation toast ─────────────────────────────── */}
+      {actionConfirmation && (
+        <div style={{
+          position: 'fixed', bottom: 24, right: 24, zIndex: 200,
+          background: '#1e1b4b', border: '1px solid #818cf8',
+          borderRadius: 8, padding: '10px 18px',
+          color: '#a5b4fc', fontSize: 13,
+          maxWidth: 320,
+          pointerEvents: 'none',
+        }}>
+          ⚡ {actionConfirmation}
+        </div>
+      )}
 
       {/* ── Styles ─────────────────────────────────────────────────── */}
       <style>{`
@@ -989,7 +1120,7 @@ export function EralPage() {
           border-radius: 3px;
           padding: 1px 5px;
         }
-        .eral-copy-btn {
+        .eral-copy-msg-btn {
           font-size: 10px;
           color: var(--text-faint);
           background: none;
@@ -997,44 +1128,18 @@ export function EralPage() {
           cursor: pointer;
           padding: 1px 5px;
           border-radius: 3px;
-          transition: color 0.1s, background 0.1s;
           opacity: 0;
           transition: opacity 0.15s;
         }
-        .eral-bubble-wrap:hover .eral-copy-btn { opacity: 1; }
-        .eral-copy-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+        .eral-bubble-wrap:hover .eral-copy-msg-btn { opacity: 1; }
+        .eral-copy-msg-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
 
-        /* Markdown prose */
+        /* Markdown prose — see globals.css .eral-message-content for code/heading/list styles */
         .eral-prose p        { margin: 0 0 8px; }
         .eral-prose p:last-child { margin-bottom: 0; }
-        .eral-prose h1.eral-h1 { font-size: 18px; font-weight: 600; margin: 14px 0 6px; color: #818cf8; }
-        .eral-prose h2.eral-h2 { font-size: 15px; font-weight: 600; margin: 12px 0 4px; }
-        .eral-prose h3.eral-h3 { font-size: 13px; font-weight: 600; margin: 10px 0 4px; color: var(--text-muted); }
-        .eral-prose ul.eral-ul { margin: 6px 0 6px 16px; padding: 0; }
-        .eral-prose li  { margin: 2px 0; list-style: disc; }
         .eral-prose strong { color: var(--text); font-weight: 600; }
         .eral-prose em { color: var(--text-muted); font-style: italic; }
 
-        pre.eral-code-block {
-          background: rgba(0,0,0,0.4);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 6px;
-          padding: 12px 14px;
-          overflow-x: auto;
-          font-size: 12.5px;
-          line-height: 1.55;
-          margin: 8px 0;
-          position: relative;
-        }
-        pre.eral-code-block::before {
-          content: attr(data-lang);
-          position: absolute;
-          top: 6px; right: 10px;
-          font-size: 10px;
-          color: var(--text-faint);
-          font-family: monospace;
-        }
-        pre.eral-code-block code { color: #c9d1d9; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
         code.eral-inline-code {
           background: rgba(255,255,255,0.08);
           border-radius: 3px;
@@ -1112,6 +1217,79 @@ export function EralPage() {
           font-size: 10px;
           color: var(--text-faint);
           text-align: center;
+        }
+
+        /* Conversation skeleton */
+        .eral-conv-skeleton {
+          height: 28px;
+          margin: 3px 6px;
+          border-radius: 4px;
+          background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+          background-size: 200% 100%;
+          animation: eral-shimmer 1.4s ease infinite;
+        }
+        @keyframes eral-shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+
+        /* Follow-up suggestion chips */
+        .eral-followup-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          padding: 4px 2px 0;
+        }
+        .eral-followup-chip {
+          padding: 4px 10px;
+          background: rgba(129,140,248,0.06);
+          border: 1px solid rgba(129,140,248,0.2);
+          border-radius: 12px;
+          color: #818cf8;
+          font-size: 11px;
+          cursor: pointer;
+          transition: background 0.15s, border-color 0.15s;
+          white-space: nowrap;
+        }
+        .eral-followup-chip:hover {
+          background: rgba(129,140,248,0.14);
+          border-color: rgba(129,140,248,0.4);
+        }
+
+        /* Commands section */
+        .eral-commands-section {
+          margin-top: 28px;
+          width: 100%;
+          max-width: 540px;
+        }
+        .eral-commands-label {
+          font-size: 11px;
+          color: var(--text-faint);
+          text-align: center;
+          margin-bottom: 10px;
+          letter-spacing: 0.02em;
+        }
+        .eral-commands-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          justify-content: center;
+        }
+        .eral-command-chip {
+          padding: 5px 12px;
+          background: rgba(129,140,248,0.07);
+          border: 1px solid rgba(129,140,248,0.15);
+          border-radius: 14px;
+          color: var(--text-muted);
+          font-size: 12px;
+          cursor: pointer;
+          transition: background 0.15s, border-color 0.15s, color 0.15s;
+          font-style: italic;
+        }
+        .eral-command-chip:hover {
+          background: rgba(129,140,248,0.14);
+          border-color: rgba(129,140,248,0.3);
+          color: #818cf8;
         }
 
         /* Mobile */

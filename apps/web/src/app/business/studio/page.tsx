@@ -12,6 +12,9 @@ import type {
 import { PLATFORM_DIMENSIONS } from '@/lib/prompt-builder-business';
 import WorkspaceSelector from '@/app/_components/WorkspaceSelector';
 import { EralSidebar } from '@/app/_components/EralSidebar';
+import { parseApiError, type StudioError } from '@/lib/studio-errors';
+import { StudioErrorBanner } from '@/app/_components/StudioErrorBanner';
+import { usePreferenceSync } from '@/hooks/usePreferenceSync';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -100,6 +103,16 @@ const EXAMPLE_PROMPTS: Record<BusinessTool, string> = {
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+// Loading stages
+// ---------------------------------------------------------------------------
+const BUSINESS_STAGES = [
+  { delay: 0,     message: 'Connecting to generation service...' },
+  { delay: 3000,  message: 'Building your business asset...' },
+  { delay: 15000, message: 'Applying brand styles...' },
+  { delay: 40000, message: 'Almost there...' },
+];
+
+// ---------------------------------------------------------------------------
 // Business Studio Component (inner — needs Suspense for useSearchParams)
 // ---------------------------------------------------------------------------
 function BusinessStudioInner() {
@@ -131,8 +144,9 @@ function BusinessStudioInner() {
   const [jobStatus, setJobStatus]       = useState<JobStatus>('idle');
   const [result, setResult]             = useState<GenerationResult | null>(null);
   const [brandKitResults, setBrandKitResults] = useState<GenerationResult[]>([]);
-  const [error, setError]               = useState<string | null>(null);
+  const [studioError, setStudioError]   = useState<StudioError | null>(null);
   const [elapsedMs, setElapsedMs]       = useState(0);
+  const [loadingMsg, setLoadingMsg]     = useState(BUSINESS_STAGES[0].message);
 
   // ── History ───────────────────────────────────────────────────────────────
   const [history, setHistory]           = useState<HistoryItem[]>([]);
@@ -140,6 +154,14 @@ function BusinessStudioInner() {
 
   // ── Toast ─────────────────────────────────────────────────────────────────
   const [toast, setToast]               = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  // ── Favorites state ────────────────────────────────────────────────────────
+  const [favPrompts, setFavPrompts]     = useState<{ id: string; prompt: string; label?: string }[]>([]);
+  const [showFavMenu, setShowFavMenu]   = useState(false);
+  const [favSaved, setFavSaved]         = useState(false);
+
+  // ── Preference sync ────────────────────────────────────────────────────────
+  usePreferenceSync('business', { tool: activeTool, style, mood, useHD, platform });
 
   // Timer ref
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -152,7 +174,7 @@ function BusinessStudioInner() {
     setActiveTool(tool);
     setResult(null);
     setBrandKitResults([]);
-    setError(null);
+    setStudioError(null);
     setJobStatus('idle');
     setPrompt(EXAMPLE_PROMPTS[tool]);
   }, []);
@@ -192,11 +214,15 @@ function BusinessStudioInner() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim() || jobStatus === 'running') return;
     setJobStatus('running');
-    setError(null);
+    setStudioError(null);
     setResult(null);
     setBrandKitResults([]);
     setElapsedMs(0);
+    setLoadingMsg(BUSINESS_STAGES[0].message);
     startTimer();
+    const stageTimers = BUSINESS_STAGES.slice(1).map(s =>
+      setTimeout(() => setLoadingMsg(s.message), s.delay)
+    );
 
     const dims = getToolDimensions();
 
@@ -273,10 +299,11 @@ function BusinessStudioInner() {
         }, ...prev].slice(0, 30));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setStudioError(parseApiError({ status: 0 }, err instanceof Error ? err.message : String(err)));
       setJobStatus('failed');
     } finally {
       stopTimer();
+      stageTimers.forEach(clearTimeout);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prompt, activeTool, style, mood, industry, colorDirection, platform, slideFormat, useHD, isPublic, jobStatus]);
@@ -319,6 +346,31 @@ function BusinessStudioInner() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [handleGenerate]);
+
+  // ── Load favorite prompts ──────────────────────────────────────────────────
+  useEffect(() => {
+    fetch('/api/favorites?mode=business')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.favorites) setFavPrompts(d.favorites); })
+      .catch(() => {});
+  }, []);
+
+  const savePromptAsFavorite = useCallback(async () => {
+    if (!prompt.trim()) return;
+    try {
+      const res = await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'business', prompt: prompt.trim() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFavPrompts(prev => [data.favorite, ...prev]);
+        setFavSaved(true);
+        setTimeout(() => setFavSaved(false), 2000);
+      }
+    } catch { /* silent fail */ }
+  }, [prompt]);
 
   // ── Download ──────────────────────────────────────────────────────────────
   const handleDownload = useCallback(async (url: string, suffix = '') => {
@@ -402,7 +454,44 @@ function BusinessStudioInner() {
 
         {/* Prompt / concept input */}
         <div className="studio-control-section">
-          <label className="studio-label">Concept / Description</label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="studio-label" style={{ marginBottom: 0 }}>Concept / Description</label>
+            <div className="flex items-center gap-2">
+              {/* Save as Favorite */}
+              <button
+                title={favSaved ? 'Saved!' : 'Save prompt as favorite'}
+                onClick={savePromptAsFavorite}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', lineHeight: 1, color: favSaved ? '#f59e0b' : 'var(--text-disabled)', transition: 'color 0.15s' }}
+              >
+                {favSaved ? '★' : '☆'}
+              </button>
+              {/* My Prompts dropdown */}
+              {favPrompts.length > 0 && (
+                <div style={{ position: 'relative' }}>
+                  <button
+                    title="My saved prompts"
+                    onClick={() => setShowFavMenu(v => !v)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.65rem', color: 'var(--text-disabled)', padding: '0 2px' }}
+                  >
+                    My Prompts ▾
+                  </button>
+                  {showFavMenu && (
+                    <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, minWidth: 220, maxHeight: 180, overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                      {favPrompts.map(f => (
+                        <button
+                          key={f.id}
+                          onClick={() => { setPrompt(f.prompt); setShowFavMenu(false); }}
+                          style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.7rem', color: 'var(--text-primary)', borderBottom: '1px solid var(--border)' }}
+                        >
+                          {f.prompt.length > 60 ? f.prompt.slice(0, 58) + '…' : f.prompt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
           <textarea
             className="studio-textarea"
             value={prompt}
@@ -586,11 +675,13 @@ function BusinessStudioInner() {
       <main className="studio-canvas">
 
         {/* Error state */}
-        {jobStatus === 'failed' && error && (
-          <div className="studio-error-card">
-            <p className="studio-error-title">Generation failed</p>
-            <p className="studio-error-msg">{error}</p>
-            <button className="btn-ghost btn-sm" onClick={handleGenerate}>Retry</button>
+        {jobStatus === 'failed' && studioError && (
+          <div style={{ padding: '0 16px 16px' }}>
+            <StudioErrorBanner
+              error={studioError}
+              onDismiss={() => setStudioError(null)}
+              onRetry={handleGenerate}
+            />
           </div>
         )}
 
@@ -624,7 +715,7 @@ function BusinessStudioInner() {
             {jobStatus === 'running' && (
               <div className="studio-output-loading">
                 <div className="studio-spinner" />
-                <span>Generating… {(elapsedMs / 1000).toFixed(1)}s</span>
+                <span>{loadingMsg} {(elapsedMs / 1000).toFixed(1)}s</span>
               </div>
             )}
             {displayResult?.resultUrl && jobStatus !== 'running' && (

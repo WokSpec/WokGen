@@ -97,6 +97,29 @@ export default function UIUXGallery() {
     return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
   }, [search]);
 
+  // Initialize filters from URL on first mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('tool'))      setComponentFilter(p.get('tool')!);
+    if (p.get('framework')) setFrameworkFilter(p.get('framework')!);
+    if (p.get('search'))    setSearch(p.get('search')!);
+    if (p.get('tab') === 'mine') setGalleryTab('mine');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep URL in sync with active filters
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams();
+    if (componentFilter) p.set('tool', componentFilter);
+    if (frameworkFilter) p.set('framework', frameworkFilter);
+    if (debouncedSearch) p.set('search', debouncedSearch);
+    if (galleryTab === 'mine') p.set('tab', 'mine');
+    const qs = p.toString();
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+  }, [componentFilter, frameworkFilter, debouncedSearch, galleryTab]);
+
   const fetchAssets = useCallback(
     async (cursor: string | null, reset = false) => {
       if (reset) setLoading(true);
@@ -214,19 +237,24 @@ export default function UIUXGallery() {
 
       {/* Grid */}
       {loading ? (
-        <div className="gallery-loading">
-          <div className="studio-spinner" />
+        <div className="gallery-grid gallery-grid--uiux" style={{ padding: '24px' }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="gallery-card--skeleton-tall" style={{ animationDelay: `${i * 0.07}s`, minHeight: 160 }} />
+          ))}
         </div>
       ) : error ? (
         <div className="gallery-error">
-          <p>{error}</p>
+          <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+          <p>Failed to load gallery</p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
           <button className="btn-ghost btn-sm" onClick={() => fetchAssets(null, true)}>Retry</button>
         </div>
       ) : assets.length === 0 ? (
         <div className="gallery-empty">
-          <p className="gallery-empty-title">No components yet</p>
-          <p className="gallery-empty-desc">Be the first to generate and share a UI component.</p>
-          <Link href="/uiux/studio" className="btn-primary btn-sm">Open UI/UX Studio</Link>
+          <div className="gallery-empty-icon">🖥️</div>
+          <p className="gallery-empty-title">No UI/UX components yet</p>
+          <p className="gallery-empty-desc">Generate your first UI component in the UI/UX Studio.</p>
+          <Link href="/uiux/studio" className="btn-primary btn-sm">Go to UI/UX Studio →</Link>
         </div>
       ) : (
         <div className="gallery-grid gallery-grid--uiux">

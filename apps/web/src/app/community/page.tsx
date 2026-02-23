@@ -441,6 +441,20 @@ function CommunityCard({ asset, index, onClick }: { asset: CommunityAsset; index
         )}
       </div>
 
+      {/* Hover download button */}
+      <div className="gallery-card-dl-wrap">
+        <a
+          href={asset.imageUrl}
+          download={`wokgen-${asset.id}.png`}
+          onClick={e => e.stopPropagation()}
+          className="gallery-card-download-btn"
+          title="Download"
+          aria-label="Download"
+        >
+          ↓
+        </a>
+      </div>
+
       {/* Hover overlay */}
       <div className="gallery-card-overlay">
         <p
@@ -563,6 +577,29 @@ export default function CommunityPage() {
     const t = setTimeout(() => setDebouncedSearch(search), 380);
     return () => clearTimeout(t);
   }, [search]);
+
+  // Initialize filters from URL on first mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('mode'))   setModeFilter(p.get('mode')!);
+    if (p.get('search')) setSearch(p.get('search')!);
+    if (p.get('sort') === 'oldest') setSort('oldest');
+    if (p.get('tab') === 'mine')    setGalleryTab('mine');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep URL in sync with active filters
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams();
+    if (modeFilter)        p.set('mode', modeFilter);
+    if (debouncedSearch)   p.set('search', debouncedSearch);
+    if (sort !== 'newest') p.set('sort', sort);
+    if (galleryTab === 'mine') p.set('tab', 'mine');
+    const qs = p.toString();
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+  }, [modeFilter, debouncedSearch, sort, galleryTab]);
 
   // Fetch on filter change
   useEffect(() => {
@@ -854,15 +891,32 @@ export default function CommunityPage() {
       {/* ── Main content ───────────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px 24px 80px' }}>
         {error && (
-          <div style={{ padding: '12px 16px', borderRadius: 8, background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.25)', color: '#f87171', fontSize: '0.85rem', marginBottom: 20 }}>
-            Failed to load: {error}
+          <div style={{
+            padding: '12px 16px', borderRadius: 8, background: 'rgba(239,68,68,.1)',
+            border: '1px solid rgba(239,68,68,.25)', color: '#f87171', fontSize: '0.85rem',
+            marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12,
+          }}>
+            <span style={{ flex: 1 }}>⚠️ Failed to load: {error}</span>
+            <button
+              onClick={() => fetchAssets(null, true)}
+              style={{
+                fontSize: 12, color: '#818cf8', background: 'none',
+                border: '1px solid #818cf8', borderRadius: 6, padding: '3px 10px', cursor: 'pointer',
+              }}
+            >
+              Retry
+            </button>
           </div>
         )}
 
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0', gap: 12, alignItems: 'center' }}>
-            <Spinner />
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Loading community…</span>
+          <div
+            className="gallery-grid"
+            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', padding: '24px' }}
+          >
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="gallery-card gallery-card--skeleton" style={{ animationDelay: `${i * 0.07}s` }} />
+            ))}
           </div>
         ) : (
           <>

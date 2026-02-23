@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { safeMarkdown } from '@/lib/safe-markdown';
+import { parseWAPFromResponse, executeWAP, type WAPResponse } from '@/lib/wap';
 
 // ---------------------------------------------------------------------------
 // EralSidebar — collapsible AI companion widget for studio pages
@@ -19,6 +22,7 @@ interface SidebarMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  wap?: WAPResponse | null;
   createdAt: number;
 }
 
@@ -27,28 +31,14 @@ const MINI_MODEL_OPTIONS: { value: ModelVariant; label: string }[] = [
   { value: 'eral-mini', label: 'Eral Mini' },
 ];
 
-// Lightweight inline markdown for code blocks + bold/inline code
-function renderSidebarMd(text: string): string {
-  let out = text.replace(/```[\w]*\n?([\s\S]*?)```/g, (_m, code) => {
-    const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return `<pre class="esb-code"><code>${escaped.trimEnd()}</code></pre>`;
-  });
-  out = out.replace(/`([^`\n]+)`/g, (_m, c) => {
-    const e = c.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return `<code class="esb-inline-code">${e}</code>`;
-  });
-  out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // Paragraphs
-  return out
-    .split('\n')
-    .map((l) => {
-      const t = l.trim();
-      if (!t) return '';
-      if (/^<(pre|h[1-6])/.test(t)) return t;
-      return `<p>${t}</p>`;
-    })
-    .join('');
-}
+const QUICK_COMMANDS: { label: string; path: string }[] = [
+  { label: '🎨 Pixel Studio',    path: '/pixel/studio'    },
+  { label: '💼 Business Studio', path: '/business/studio' },
+  { label: '🔊 Voice Studio',    path: '/voice/studio'    },
+  { label: '✍️ Text Studio',     path: '/text/studio'     },
+  { label: '🖼️ My Gallery',      path: '/pixel/gallery'   },
+  { label: '💰 Pricing',         path: '/pricing'         },
+];
 
 function SidebarBubble({ msg, isStreaming }: { msg: SidebarMessage; isStreaming?: boolean }) {
   const isUser = msg.role === 'user';
@@ -59,7 +49,7 @@ function SidebarBubble({ msg, isStreaming }: { msg: SidebarMessage; isStreaming?
       ) : (
         <div
           className="esb-prose"
-          dangerouslySetInnerHTML={{ __html: renderSidebarMd(msg.content) }}
+          dangerouslySetInnerHTML={{ __html: safeMarkdown(msg.content) }}
         />
       )}
       {isStreaming && <span className="esb-cursor" aria-hidden="true" />}
@@ -68,12 +58,14 @@ function SidebarBubble({ msg, isStreaming }: { msg: SidebarMessage; isStreaming?
 }
 
 export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<SidebarMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
   const [model, setModel] = useState<ModelVariant>('eral-7c');
+  const [actionConfirmation, setActionConfirmation] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -82,6 +74,25 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingContent]);
+
+  // Add copy buttons to code blocks rendered via safeMarkdown
+  useEffect(() => {
+    const codeBlocks = document.querySelectorAll('.esb-prose .eral-code-block');
+    codeBlocks.forEach((block) => {
+      if (block.querySelector('.esb-copy-btn')) return;
+      const btn = document.createElement('button');
+      btn.className = 'esb-copy-btn';
+      btn.textContent = 'Copy';
+      btn.onclick = () => {
+        const code = block.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+        });
+      };
+      block.appendChild(btn);
+    });
+  }, [messages]);
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -150,15 +161,25 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
         }
       }
 
+      // Parse WAP from collected content (handles both inline and server-sent wap events)
+      const { cleanReply, wap } = parseWAPFromResponse(fullContent);
+
       setMessages((prev) => [
         ...prev,
         {
           id: `sm-${Date.now()}`,
           role: 'assistant',
-          content: fullContent,
+          content: cleanReply,
+          wap,
           createdAt: Date.now(),
         },
       ]);
+
+      if (wap) {
+        setTimeout(() => executeWAP(wap, router), 500);
+        setActionConfirmation(wap.confirmation);
+        setTimeout(() => setActionConfirmation(null), 3000);
+      }
     } catch (err) {
       if ((err as Error).name === 'AbortError') return;
       setMessages((prev) => [
@@ -260,6 +281,17 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
                     Context: {mode} Studio{tool ? ` · ${tool}` : ''}
                   </p>
                 )}
+                <div className="esb-quick-commands">
+                  {QUICK_COMMANDS.map((cmd) => (
+                    <button
+                      key={cmd.path}
+                      className="esb-quick-cmd"
+                      onClick={() => router.push(cmd.path)}
+                    >
+                      {cmd.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             {displayedMessages.map((msg) => (
@@ -300,6 +332,21 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── Action confirmation toast ─────────────────────────────── */}
+      {actionConfirmation && (
+        <div style={{
+          position: 'fixed', bottom: 80, right: 24, zIndex: 200,
+          background: '#1e1b4b', border: '1px solid #818cf8',
+          borderRadius: 8, padding: '8px 16px',
+          color: '#a5b4fc', fontSize: 13,
+          animation: 'esb-slide-in 0.3s ease',
+          maxWidth: 280,
+          pointerEvents: 'none',
+        }}>
+          ⚡ {actionConfirmation}
         </div>
       )}
 
@@ -585,6 +632,27 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           white-space: nowrap;
         }
         .esb-stop-btn:hover { background: rgba(239,68,68,0.2); }
+
+        /* Quick commands */
+        .esb-quick-commands {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 12px;
+          justify-content: center;
+        }
+        .esb-quick-cmd {
+          padding: 4px 10px;
+          background: rgba(129,140,248,0.07);
+          border: 1px solid rgba(129,140,248,0.15);
+          border-radius: 12px;
+          color: #818cf8;
+          font-size: 11px;
+          cursor: pointer;
+          transition: background 0.15s, border-color 0.15s;
+          white-space: nowrap;
+        }
+        .esb-quick-cmd:hover { background: rgba(129,140,248,0.15); border-color: rgba(129,140,248,0.3); }
       `}</style>
     </>
   );

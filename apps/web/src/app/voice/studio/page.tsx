@@ -1,633 +1,754 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-type VoiceType = 'natural' | 'character' | 'whisper' | 'energetic' | 'news' | 'deep';
-type Language  = 'en' | 'es' | 'fr' | 'de' | 'ja' | 'pt' | 'zh';
-type GenerationStatus = 'idle' | 'generating' | 'done' | 'error';
-
-interface VoiceResult {
-  audioBase64?: string;
-  format?: 'wav' | 'mp3';
-  durationEstimate?: number;
-  fallback?: boolean;
-  text?: string;
-  speed?: number;
-  message?: string;
-}
+import { parseApiError, type StudioError } from '@/lib/studio-errors';
+import { StudioErrorBanner } from '@/app/_components/StudioErrorBanner';
+import { preprocessTextForTTS, detectContentType, selectOptimalVoice } from '@/lib/tts-intelligence';
+import type { VoiceStyle, ContentType } from '@/lib/tts-intelligence';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-const ACCENT = '#f59e0b';
 
-const VOICES: { id: VoiceType; label: string; emoji: string }[] = [
-  { id: 'natural',   label: 'Natural',   emoji: '🎙️' },
-  { id: 'character', label: 'Character', emoji: '🎭' },
-  { id: 'whisper',   label: 'Whisper',   emoji: '🤫' },
-  { id: 'energetic', label: 'Energetic', emoji: '⚡' },
-  { id: 'news',      label: 'News',      emoji: '📺' },
-  { id: 'deep',      label: 'Deep',      emoji: '🎯' },
+const VOICE_STYLES: { id: VoiceStyle; label: string; icon: string; desc: string }[] = [
+  { id: 'natural',   label: 'Natural',   icon: '🎙️', desc: 'Warm and conversational' },
+  { id: 'character', label: 'Character', icon: '🎭', desc: 'Expressive and animated' },
+  { id: 'whisper',   label: 'Whisper',   icon: '🤫', desc: 'Soft and intimate' },
+  { id: 'energetic', label: 'Energetic', icon: '⚡', desc: 'Dynamic and exciting' },
+  { id: 'news',      label: 'News',      icon: '📰', desc: 'Clear and authoritative' },
+  { id: 'asmr',      label: 'ASMR',      icon: '✨', desc: 'Gentle and soothing' },
+  { id: 'narrative', label: 'Narrative', icon: '📖', desc: 'Rich storytelling' },
+  { id: 'deep',      label: 'Deep',      icon: '🎸', desc: 'Powerful baritone' },
 ];
 
-const LANGUAGES: { id: Language; label: string }[] = [
-  { id: 'en', label: 'English'    },
-  { id: 'es', label: 'Spanish'    },
-  { id: 'fr', label: 'French'     },
-  { id: 'de', label: 'German'     },
-  { id: 'ja', label: 'Japanese'   },
+const LANGUAGES = [
+  { id: 'en', label: 'English' },
+  { id: 'es', label: 'Spanish' },
+  { id: 'fr', label: 'French' },
+  { id: 'de', label: 'German' },
+  { id: 'it', label: 'Italian' },
   { id: 'pt', label: 'Portuguese' },
-  { id: 'zh', label: 'Chinese'    },
+  { id: 'pl', label: 'Polish' },
+  { id: 'ja', label: 'Japanese' },
+  { id: 'ko', label: 'Korean' },
+  { id: 'zh', label: 'Chinese' },
+  { id: 'hi', label: 'Hindi' },
 ];
 
-const EXAMPLES: { text: string; voice: VoiceType; label: string }[] = [
+const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
+  narrative: 'Narrative',
+  technical: 'Technical',
+  marketing: 'Marketing',
+  dialogue:  'Dialogue',
+  news:      'News',
+  casual:    'Casual',
+};
+
+const CONTENT_TYPE_COLORS: Record<ContentType, string> = {
+  narrative: '#a78bfa',
+  technical: '#60a5fa',
+  marketing: '#fb923c',
+  dialogue:  '#34d399',
+  news:      '#f59e0b',
+  casual:    '#f472b6',
+};
+
+const PROVIDER_LABELS: Record<string, string> = {
+  elevenlabs:  'ElevenLabs ✦',
+  openai:      'OpenAI TTS',
+  huggingface: 'Kokoro',
+};
+
+const PROVIDER_COLORS: Record<string, string> = {
+  elevenlabs:  '#f59e0b',
+  openai:      '#22c55e',
+  huggingface: '#60a5fa',
+};
+
+const ACCENT = '#f59e0b';
+const MAX_CHARS = 5000;
+
+const EXAMPLES = [
   {
-    label: 'Welcome',
-    text:  'Welcome to WokGen, the future of AI asset generation.',
-    voice: 'natural',
+    label: '🎙️ Product Intro',
+    text: "Welcome to WokGen — the world's most powerful AI asset generation platform. Generate stunning pixel art, professional brand kits, and production-ready UI components in seconds.",
+    style: 'natural' as VoiceStyle,
   },
   {
-    label: 'Adventure',
-    text:  'Your quest begins now, brave adventurer!',
-    voice: 'character',
+    label: '🐉 Game Narration',
+    text: "The ancient dragon unfurled its wings across the crimson sky. You've been chosen, young warrior. Your quest begins... now.",
+    style: 'narrative' as VoiceStyle,
   },
   {
-    label: 'Breaking News',
-    text:  'Breaking news: AI generates unlimited creative assets for teams worldwide.',
-    voice: 'news',
+    label: '📰 News Script',
+    text: "Breaking: WokSpec announces Eral 7c — an AI companion that doesn't just answer questions, it controls your entire creative workflow.",
+    style: 'news' as VoiceStyle,
+  },
+  {
+    label: '⚡ Notification',
+    text: "Hey! Your new asset pack just finished generating! Check out these amazing pixel art characters — they turned out incredible!",
+    style: 'energetic' as VoiceStyle,
   },
 ];
 
-const SPEED_STOPS = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
-
 // ---------------------------------------------------------------------------
-// Helpers
+// Component
 // ---------------------------------------------------------------------------
-function formatTime(s: number): string {
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return `${m}:${sec.toString().padStart(2, '0')}`;
-}
+export default function VoiceStudioPage() {
+  const [text, setText]             = useState('');
+  const [style, setStyle]           = useState<VoiceStyle>('natural');
+  const [hd, setHd]                 = useState(false);
+  const [language, setLanguage]     = useState('en');
+  const [generating, setGenerating] = useState(false);
+  const [audioUrl, setAudioUrl]     = useState<string | null>(null);
+  const [voiceName, setVoiceName]   = useState('');
+  const [provider, setProvider]     = useState('');
+  const [contentType, setContentType] = useState('');
+  const [error, setError]           = useState<string | null>(null);
+  const [studioError, setStudioError] = useState<StudioError | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-function msToSecs(ms: number): string {
-  return (ms / 1000).toFixed(1) + 's';
-}
+  const charsLeft = MAX_CHARS - text.length;
+  const isOverLimit = charsLeft < 0;
 
-// ---------------------------------------------------------------------------
-// Audio Player component
-// ---------------------------------------------------------------------------
-function AudioPlayer({
-  src,
-  format,
-  accent,
-}: {
-  src: string;
-  format: string;
-  accent: string;
-}) {
-  const audioRef  = useRef<HTMLAudioElement>(null);
-  const [playing, setPlaying]   = useState(false);
-  const [current, setCurrent]   = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume]     = useState(1);
+  // Live content-type preview (client-side only for UX feedback)
+  const liveContentType = text.trim()
+    ? detectContentType(preprocessTextForTTS(text))
+    : null;
+  const liveVoice = text.trim()
+    ? selectOptimalVoice(style, liveContentType!)
+    : null;
 
-  const toggle = () => {
-    const el = audioRef.current;
-    if (!el) return;
-    if (playing) { el.pause(); setPlaying(false); }
-    else         { void el.play(); setPlaying(true); }
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const el = audioRef.current;
-    if (!el) return;
-    const val = Number(e.target.value);
-    el.currentTime = val;
-    setCurrent(val);
-  };
-
-  const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Number(e.target.value);
-    setVolume(val);
-    if (audioRef.current) audioRef.current.volume = val;
-  };
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <audio
-        ref={audioRef}
-        src={src}
-        onTimeUpdate={() => setCurrent(audioRef.current?.currentTime ?? 0)}
-        onLoadedMetadata={() => setDuration(audioRef.current?.duration ?? 0)}
-        onEnded={() => setPlaying(false)}
-        preload="auto"
-      />
-
-      {/* Waveform bars (animated when playing) */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 36, padding: '0 4px' }}>
-        {Array.from({ length: 24 }, (_, i) => {
-          const h = 10 + ((i % 5) * 6) + ((i % 3) * 4);
-          return (
-            <div
-              key={i}
-              style={{
-                flex: 1,
-                height: playing ? h : h * 0.4,
-                background: accent,
-                borderRadius: 2,
-                opacity: playing ? 0.85 : 0.35,
-                transition: playing
-                  ? `height ${0.3 + (i % 4) * 0.1}s ease-in-out ${(i % 5) * 0.05}s`
-                  : 'height 0.3s ease',
-                animation: playing ? `waveBar${i % 4} ${0.6 + (i % 3) * 0.2}s ease-in-out infinite alternate` : 'none',
-              }}
-            />
-          );
-        })}
-      </div>
-
-      {/* Controls row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <button
-          onClick={toggle}
-          style={{
-            width: 40, height: 40, borderRadius: '50%',
-            background: accent, border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0, color: '#000', fontSize: 16,
-          }}
-          aria-label={playing ? 'Pause' : 'Play'}
-        >
-          {playing ? '⏸' : '▶'}
-        </button>
-
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', minWidth: 36 }}>
-          {formatTime(current)}
-        </span>
-
-        <input
-          type="range" min={0} max={duration || 1} step={0.01} value={current}
-          onChange={handleSeek}
-          style={{ flex: 1, accentColor: accent }}
-        />
-
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', minWidth: 36 }}>
-          {formatTime(duration)}
-        </span>
-
-        {/* Volume */}
-        <span style={{ fontSize: 14 }}>🔊</span>
-        <input
-          type="range" min={0} max={1} step={0.05} value={volume}
-          onChange={handleVolume}
-          style={{ width: 60, accentColor: accent }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
-export default function VoiceStudio() {
-  const [text, setText]           = useState('');
-  const [voice, setVoice]         = useState<VoiceType>('natural');
-  const [language, setLanguage]   = useState<Language>('en');
-  const [speed, setSpeed]         = useState(1.0);
-  const [useHD, setUseHD]         = useState(false);
-  const [status, setStatus]       = useState<GenerationStatus>('idle');
-  const [result, setResult]       = useState<VoiceResult | null>(null);
-  const [audioSrc, setAudioSrc]   = useState<string | null>(null);
-  const [error, setError]         = useState<string | null>(null);
-  const [elapsedMs, setElapsedMs] = useState(0);
-  const [usingBrowserTTS, setUsingBrowserTTS] = useState(false);
-  const [copied, setCopied]       = useState(false);
-
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const startTimer = () => {
-    const start = Date.now();
-    timerRef.current = setInterval(() => setElapsedMs(Date.now() - start), 100);
-  };
-  const stopTimer = () => {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-  };
-  useEffect(() => () => stopTimer(), []);
-
-  const handleGenerate = useCallback(async () => {
-    const trimmed = text.trim();
-    if (!trimmed || status === 'generating') return;
-
-    setStatus('generating');
+  async function handleGenerate() {
+    if (!text.trim() || generating || isOverLimit) return;
+    setGenerating(true);
     setError(null);
-    setResult(null);
-    setAudioSrc(null);
-    setUsingBrowserTTS(false);
-    setElapsedMs(0);
-    startTimer();
-
+    setStudioError(null);
     try {
       const res = await fetch('/api/voice/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: trimmed,
-          voice,
-          language,
-          speed,
-          tier: useHD ? 'hd' : 'standard',
-        }),
+        body: JSON.stringify({ text, style, hd, language }),
       });
-
-      const data: VoiceResult = await res.json();
-
+      const data = await res.json() as {
+        audio?: string;
+        format?: string;
+        provider?: string;
+        voice?: string;
+        contentType?: string;
+        charCount?: number;
+        error?: string;
+      };
       if (!res.ok) {
-        throw new Error((data as { error?: string }).error ?? `HTTP ${res.status}`);
+        const parsed = parseApiError({ status: res.status, error: data.error });
+        setStudioError(parsed);
+        return;
       }
-
-      setResult(data);
-
-      if (data.fallback) {
-        // Use Web Speech API
-        setUsingBrowserTTS(true);
-        const utterance = new SpeechSynthesisUtterance(data.text ?? trimmed);
-        utterance.rate  = data.speed ?? speed;
-        utterance.lang  = language;
-        window.speechSynthesis.speak(utterance);
-        setStatus('done');
-      } else if (data.audioBase64 && data.format) {
-        const mimeType = data.format === 'mp3' ? 'audio/mpeg' : 'audio/wav';
-        const blob = new Blob(
-          [Uint8Array.from(atob(data.audioBase64), c => c.charCodeAt(0))],
-          { type: mimeType },
-        );
-        setAudioSrc(URL.createObjectURL(blob));
-        setStatus('done');
-      } else {
-        throw new Error('Unexpected response from server');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-      setStatus('error');
+      setAudioUrl(data.audio ?? null);
+      setVoiceName(data.voice ?? '');
+      setProvider(data.provider ?? '');
+      setContentType(data.contentType ?? '');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Generation failed');
     } finally {
-      stopTimer();
+      setGenerating(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, voice, language, speed, useHD, status]);
+  }
 
-  const handleDownload = () => {
-    if (!audioSrc || !result?.format) return;
+  function handleDownload() {
+    if (!audioUrl) return;
     const a = document.createElement('a');
-    a.href = audioSrc;
-    a.download = `wokgen-voice-${Date.now()}.${result.format}`;
+    a.href = audioUrl;
+    a.download = `wokgen-voice-${Date.now()}.${audioUrl.startsWith('data:audio/mpeg') ? 'mp3' : 'wav'}`;
     a.click();
-  };
+  }
 
-  const handleRegenerate = () => {
-    setStatus('idle');
-    void handleGenerate();
-  };
+  function handleClear() {
+    setText('');
+    setAudioUrl(null);
+    setVoiceName('');
+    setProvider('');
+    setContentType('');
+    setError(null);
+    setStudioError(null);
+  }
 
-  const loadExample = (ex: (typeof EXAMPLES)[number]) => {
+  function loadExample(ex: typeof EXAMPLES[number]) {
     setText(ex.text);
-    setVoice(ex.voice);
-  };
+    setStyle(ex.style);
+    setAudioUrl(null);
+    setError(null);
+    setStudioError(null);
+  }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div style={{
-        borderBottom: '1px solid var(--surface-border)',
-        padding: '16px 24px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'var(--bg)',
+        color: 'var(--text)',
+        fontFamily: 'var(--font-sans, system-ui)',
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          borderBottom: '1px solid var(--surface-border)',
+          padding: '16px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: 'var(--surface)',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: 14 }}>
-            WokGen
+          <Link href="/voice" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: 13 }}>
+            ← Voice
           </Link>
           <span style={{ color: 'var(--text-muted)' }}>/</span>
-          <span style={{ color: ACCENT, fontWeight: 600 }}>Voice Studio</span>
-          <span style={{
-            padding: '2px 8px', borderRadius: 4, fontSize: '0.7rem',
-            background: `${ACCENT}22`, color: ACCENT,
-            border: `1px solid ${ACCENT}44`, fontWeight: 600,
-          }}>
-            BETA
+          <span style={{ fontSize: 14, fontWeight: 600 }}>Voice Studio</span>
+          <span
+            style={{
+              fontSize: 11,
+              padding: '2px 8px',
+              borderRadius: 4,
+              background: `${ACCENT}22`,
+              border: `1px solid ${ACCENT}44`,
+              color: ACCENT,
+              fontWeight: 600,
+            }}
+          >
+            ElevenLabs
           </span>
         </div>
         <Link
           href="/voice/gallery"
-          style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: 13 }}
+          style={{
+            fontSize: 13,
+            color: 'var(--text-muted)',
+            textDecoration: 'none',
+            padding: '6px 12px',
+            borderRadius: 6,
+            border: '1px solid var(--surface-border)',
+          }}
         >
           Gallery →
         </Link>
       </div>
 
-      {/* ── Main layout ────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(320px, 460px) 1fr',
-        gap: 0,
-        minHeight: 'calc(100vh - 57px)',
-      }}>
-
+      {/* Main layout */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '380px 1fr',
+          minHeight: 'calc(100vh - 60px)',
+        }}
+        className="studio-grid-2col"
+      >
         {/* ── Left panel ─────────────────────────────────────────────── */}
-        <div style={{
-          borderRight: '1px solid var(--surface-border)',
-          padding: 24,
-          display: 'flex', flexDirection: 'column', gap: 20,
-          overflowY: 'auto',
-        }}>
+        <div
+          style={{
+            borderRight: '1px solid var(--surface-border)',
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20,
+            overflowY: 'auto',
+          }}
+        >
+          {/* Voice style selector */}
+          <div>
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                marginBottom: 10,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+              }}
+            >
+              Voice Style
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: 8,
+              }}
+            >
+              {VOICE_STYLES.map(v => (
+                <button
+                  key={v.id}
+                  onClick={() => setStyle(v.id)}
+                  title={v.desc}
+                  style={{
+                    padding: '10px 6px',
+                    borderRadius: 8,
+                    border: `1px solid ${style === v.id ? ACCENT : 'var(--surface-border)'}`,
+                    background: style === v.id ? `${ACCENT}18` : 'var(--surface)',
+                    color: style === v.id ? ACCENT : 'var(--text)',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    transition: 'all 0.15s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>{v.icon}</span>
+                  <span style={{ fontSize: 11, fontWeight: 600 }}>{v.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Selected voice preview */}
+            {liveVoice && (
+              <div
+                style={{
+                  marginTop: 10,
+                  padding: '8px 12px',
+                  borderRadius: 6,
+                  background: 'var(--surface)',
+                  border: '1px solid var(--surface-border)',
+                  fontSize: 12,
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <span>🎤</span>
+                <span>
+                  Voice: <strong style={{ color: 'var(--text)' }}>{liveVoice.name}</strong>
+                  {liveContentType && (
+                    <span style={{ marginLeft: 6 }}>
+                      · detected{' '}
+                      <strong style={{ color: CONTENT_TYPE_COLORS[liveContentType] }}>
+                        {CONTENT_TYPE_LABELS[liveContentType]}
+                      </strong>
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
 
           {/* Text input */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-              <label style={{ fontSize: 13, fontWeight: 600 }}>Text to convert</label>
-              <span style={{
-                fontSize: 12,
-                color: text.length > 450 ? '#ef4444' : 'var(--text-muted)',
-              }}>
-                {text.length}/500
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                marginBottom: 8,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <span>Text</span>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 400,
+                  color: isOverLimit ? '#f87171' : charsLeft < 500 ? ACCENT : 'var(--text-muted)',
+                }}
+              >
+                {isOverLimit ? `${Math.abs(charsLeft)} over limit` : `${charsLeft.toLocaleString()} left`}
               </span>
             </div>
             <textarea
               value={text}
-              onChange={e => setText(e.target.value.slice(0, 500))}
-              placeholder="Enter text to convert to speech..."
-              rows={6}
+              onChange={e => setText(e.target.value)}
+              placeholder="Enter text to synthesize… (Markdown is stripped automatically)"
+              rows={7}
               style={{
-                width: '100%', boxSizing: 'border-box',
-                background: 'var(--surface)', border: '1px solid var(--surface-border)',
-                borderRadius: 8, padding: '10px 12px',
-                color: 'var(--text)', fontSize: 14, resize: 'vertical',
-                fontFamily: 'inherit', lineHeight: 1.5,
+                width: '100%',
+                padding: '12px',
+                borderRadius: 8,
+                background: 'var(--surface)',
+                border: `1px solid ${isOverLimit ? '#f87171' : 'var(--surface-border)'}`,
+                color: 'var(--text)',
+                fontSize: 13,
+                lineHeight: 1.6,
+                resize: 'vertical',
+                outline: 'none',
+                boxSizing: 'border-box',
               }}
             />
           </div>
 
-          {/* Voice selector */}
-          <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 10 }}>
-              Voice
-            </label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {VOICES.map(v => (
-                <button
-                  key={v.id}
-                  onClick={() => setVoice(v.id)}
-                  style={{
-                    padding: '6px 14px', borderRadius: 20, fontSize: 13,
-                    border: `1px solid ${voice === v.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: voice === v.id ? `${ACCENT}22` : 'var(--surface)',
-                    color: voice === v.id ? ACCENT : 'var(--text)',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5,
-                    fontWeight: voice === v.id ? 600 : 400,
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  <span>{v.emoji}</span> {v.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Language selector */}
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: 13,
+                fontWeight: 600,
+                marginBottom: 8,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+              }}
+            >
               Language
             </label>
             <select
               value={language}
-              onChange={e => setLanguage(e.target.value as Language)}
+              onChange={e => setLanguage(e.target.value)}
               style={{
-                width: '100%', padding: '8px 12px', borderRadius: 8,
-                background: 'var(--surface)', border: '1px solid var(--surface-border)',
-                color: 'var(--text)', fontSize: 13, cursor: 'pointer',
+                width: '100%',
+                padding: '8px 12px',
+                borderRadius: 8,
+                background: 'var(--surface)',
+                border: '1px solid var(--surface-border)',
+                color: 'var(--text)',
+                fontSize: 13,
+                cursor: 'pointer',
               }}
             >
               {LANGUAGES.map(l => (
                 <option key={l.id} value={l.id}>{l.label}</option>
               ))}
             </select>
-          </div>
-
-          {/* Speed slider */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-              <label style={{ fontSize: 13, fontWeight: 600 }}>Speed</label>
-              <span style={{ fontSize: 13, color: ACCENT, fontWeight: 600 }}>{speed.toFixed(2)}×</span>
-            </div>
-            <input
-              type="range"
-              min={0} max={SPEED_STOPS.length - 1} step={1}
-              value={SPEED_STOPS.indexOf(speed) === -1 ? 2 : SPEED_STOPS.indexOf(speed)}
-              onChange={e => setSpeed(SPEED_STOPS[Number(e.target.value)])}
-              style={{ width: '100%', accentColor: ACCENT }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-              {SPEED_STOPS.map(s => (
-                <span key={s} style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s}×</span>
-              ))}
-            </div>
+            {hd && (
+              <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                ✦ HD uses ElevenLabs multilingual v2 — all languages supported
+              </p>
+            )}
           </div>
 
           {/* HD toggle */}
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '12px 14px', borderRadius: 8,
-            background: 'var(--surface)', border: `1px solid ${useHD ? ACCENT + '55' : 'var(--surface-border)'}`,
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 14px',
+              borderRadius: 8,
+              background: 'var(--surface)',
+              border: `1px solid ${hd ? ACCENT + '55' : 'var(--surface-border)'}`,
+            }}
+          >
             <div>
               <div style={{ fontSize: 13, fontWeight: 600 }}>HD Quality</div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                Powered by Replicate Bark · costs 1 credit
+                ElevenLabs multilingual v2 · costs 1 credit
               </div>
             </div>
             <button
-              onClick={() => setUseHD(h => !h)}
-              style={{
-                width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer',
-                background: useHD ? ACCENT : 'var(--surface-border)',
-                position: 'relative', transition: 'background 0.2s',
-              }}
+              onClick={() => setHd(h => !h)}
               aria-label="Toggle HD"
+              style={{
+                width: 44,
+                height: 24,
+                borderRadius: 12,
+                border: 'none',
+                cursor: 'pointer',
+                background: hd ? ACCENT : 'var(--surface-border)',
+                position: 'relative',
+                transition: 'background 0.2s',
+                flexShrink: 0,
+              }}
             >
-              <span style={{
-                position: 'absolute', top: 3, left: useHD ? 23 : 3,
-                width: 18, height: 18, borderRadius: '50%', background: '#fff',
-                transition: 'left 0.2s',
-              }} />
+              <span
+                style={{
+                  position: 'absolute',
+                  top: 3,
+                  left: hd ? 23 : 3,
+                  width: 18,
+                  height: 18,
+                  borderRadius: '50%',
+                  background: '#fff',
+                  transition: 'left 0.2s',
+                }}
+              />
             </button>
           </div>
 
-          {/* Generate button */}
-          <button
-            onClick={handleGenerate}
-            disabled={!text.trim() || status === 'generating'}
-            style={{
-              width: '100%', padding: '12px 0', borderRadius: 8, border: 'none',
-              background: !text.trim() || status === 'generating' ? 'var(--surface-border)' : ACCENT,
-              color: !text.trim() || status === 'generating' ? 'var(--text-muted)' : '#000',
-              fontWeight: 700, fontSize: 15, cursor: !text.trim() || status === 'generating' ? 'not-allowed' : 'pointer',
-              transition: 'background 0.15s',
-            }}
-          >
-            {status === 'generating' ? '⚡ Generating…' : '⚡ Generate Voice'}
-          </button>
+          {/* Generate + Clear */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={handleGenerate}
+              disabled={!text.trim() || generating || isOverLimit}
+              style={{
+                flex: 1,
+                padding: '12px 0',
+                borderRadius: 8,
+                border: 'none',
+                background:
+                  !text.trim() || generating || isOverLimit
+                    ? 'var(--surface-border)'
+                    : ACCENT,
+                color:
+                  !text.trim() || generating || isOverLimit
+                    ? 'var(--text-muted)'
+                    : '#000',
+                fontWeight: 700,
+                fontSize: 14,
+                cursor:
+                  !text.trim() || generating || isOverLimit
+                    ? 'not-allowed'
+                    : 'pointer',
+                transition: 'background 0.15s',
+              }}
+            >
+              {generating ? (
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <span
+                    style={{
+                      width: 14,
+                      height: 14,
+                      borderRadius: '50%',
+                      border: `2px solid #00000044`,
+                      borderTopColor: '#000',
+                      animation: 'spin 0.7s linear infinite',
+                      display: 'inline-block',
+                    }}
+                  />
+                  Generating…
+                </span>
+              ) : (
+                '⚡ Generate Voice'
+              )}
+            </button>
+            {(text || audioUrl) && (
+              <button
+                onClick={handleClear}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 8,
+                  border: '1px solid var(--surface-border)',
+                  background: 'var(--surface)',
+                  color: 'var(--text-muted)',
+                  fontSize: 14,
+                  cursor: 'pointer',
+                }}
+                title="Clear all"
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
 
         {/* ── Right panel ─────────────────────────────────────────────── */}
         <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-          {/* Elapsed timer */}
-          {status === 'generating' && (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              color: ACCENT, fontSize: 14,
-            }}>
-              <span style={{
-                display: 'inline-block', width: 14, height: 14, borderRadius: '50%',
-                border: `2px solid ${ACCENT}44`, borderTopColor: ACCENT,
-                animation: 'spin 0.7s linear infinite',
-              }} />
-              Generating… {msToSecs(elapsedMs)}
-            </div>
-          )}
-
-          {/* Error */}
-          {status === 'error' && error && (
-            <div style={{
-              padding: '12px 16px', borderRadius: 8, background: '#ef444422',
-              border: '1px solid #ef4444', color: '#ef4444', fontSize: 13,
-            }}>
+          {/* Error banners */}
+          <StudioErrorBanner
+            error={studioError}
+            onDismiss={() => setStudioError(null)}
+            onRetry={handleGenerate}
+          />
+          {error && !studioError && (
+            <div
+              style={{
+                padding: '10px 14px',
+                borderRadius: 8,
+                background: '#f871711a',
+                border: '1px solid #f8717155',
+                color: '#f87171',
+                fontSize: 13,
+              }}
+            >
               {error}
             </div>
           )}
 
-          {/* Browser TTS note */}
-          {usingBrowserTTS && (
-            <div style={{
-              padding: '10px 14px', borderRadius: 8,
-              background: `${ACCENT}15`, border: `1px solid ${ACCENT}44`,
-              color: ACCENT, fontSize: 13,
-            }}>
-              🔊 Using browser voice (standard quality)
-            </div>
-          )}
-
           {/* Audio player */}
-          {audioSrc && result && (
-            <div style={{
-              padding: 20, borderRadius: 12,
-              background: 'var(--surface)', border: '1px solid var(--surface-border)',
-            }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
-                Audio Output
-                {result.durationEstimate && (
-                  <span style={{ color: 'var(--text-muted)', fontWeight: 400, marginLeft: 8 }}>
-                    ~{result.durationEstimate}s
-                  </span>
-                )}
-              </div>
-              <AudioPlayer src={audioSrc} format={result.format ?? 'wav'} accent={ACCENT} />
-              <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+          {audioUrl && (
+            <div
+              style={{
+                borderRadius: 12,
+                border: '1px solid var(--surface-border)',
+                background: 'var(--surface)',
+                padding: 24,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                }}
+              >
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>Generated Audio</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>
+                    {voiceName && <><strong style={{ color: 'var(--text)' }}>{voiceName}</strong> voice</>}
+                    {provider && (
+                      <span
+                        style={{
+                          marginLeft: 8,
+                          padding: '1px 6px',
+                          borderRadius: 4,
+                          fontSize: 11,
+                          background: `${PROVIDER_COLORS[provider] ?? '#aaa'}22`,
+                          border: `1px solid ${PROVIDER_COLORS[provider] ?? '#aaa'}44`,
+                          color: PROVIDER_COLORS[provider] ?? 'var(--text-muted)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {PROVIDER_LABELS[provider] ?? provider}
+                      </span>
+                    )}
+                    {contentType && (
+                      <span
+                        style={{
+                          marginLeft: 6,
+                          padding: '1px 6px',
+                          borderRadius: 4,
+                          fontSize: 11,
+                          background: `${CONTENT_TYPE_COLORS[contentType as ContentType] ?? '#aaa'}22`,
+                          border: `1px solid ${CONTENT_TYPE_COLORS[contentType as ContentType] ?? '#aaa'}44`,
+                          color: CONTENT_TYPE_COLORS[contentType as ContentType] ?? 'var(--text-muted)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {CONTENT_TYPE_LABELS[contentType as ContentType] ?? contentType}
+                      </span>
+                    )}
+                  </p>
+                </div>
                 <button
                   onClick={handleDownload}
                   style={{
-                    padding: '8px 16px', borderRadius: 6,
-                    background: 'var(--surface-border)', border: 'none',
-                    color: 'var(--text)', fontSize: 13, cursor: 'pointer',
+                    padding: '7px 14px',
+                    borderRadius: 8,
+                    background: '#4f46e5',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
                   }}
                 >
-                  ⬇ Download WAV
-                </button>
-                <button
-                  onClick={handleRegenerate}
-                  style={{
-                    padding: '8px 16px', borderRadius: 6,
-                    background: 'var(--surface-border)', border: 'none',
-                    color: 'var(--text)', fontSize: 13, cursor: 'pointer',
-                  }}
-                >
-                  ↻ Regenerate
-                </button>
-                <button
-                  onClick={() => {
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  }}
-                  style={{
-                    padding: '8px 16px', borderRadius: 6,
-                    background: copied ? `${ACCENT}22` : 'var(--surface-border)',
-                    border: `1px solid ${copied ? ACCENT : 'transparent'}`,
-                    color: copied ? ACCENT : 'var(--text)', fontSize: 13, cursor: 'pointer',
-                  }}
-                >
-                  {copied ? '✓ Saved' : '☆ Save to Gallery'}
+                  ⬇ Download MP3
                 </button>
               </div>
+
+              <audio
+                ref={audioRef}
+                controls
+                src={audioUrl}
+                style={{ width: '100%', borderRadius: 8 }}
+              />
             </div>
           )}
 
           {/* Idle state */}
-          {status === 'idle' && !result && (
-            <div style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-              justifyContent: 'center', gap: 12, color: 'var(--text-muted)',
-              minHeight: 240,
-            }}>
-              <span style={{ fontSize: 48, opacity: 0.3 }}>🎙️</span>
-              <p style={{ fontSize: 14, textAlign: 'center', maxWidth: 260, lineHeight: 1.5 }}>
-                Enter text and click <strong style={{ color: ACCENT }}>Generate Voice</strong> to create audio.
+          {!audioUrl && !generating && (
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 12,
+                color: 'var(--text-muted)',
+                minHeight: 240,
+              }}
+            >
+              <span style={{ fontSize: 52, opacity: 0.25 }}>🎙️</span>
+              <p style={{ fontSize: 14, textAlign: 'center', maxWidth: 280, lineHeight: 1.6, margin: 0 }}>
+                Enter text and click{' '}
+                <strong style={{ color: ACCENT }}>Generate Voice</strong> to create
+                premium audio.
+              </p>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, opacity: 0.6 }}>
+                Powered by ElevenLabs · Near-human quality TTS
               </p>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* ── Examples panel ─────────────────────────────────────────────── */}
-      <div style={{
-        borderTop: '1px solid var(--surface-border)',
-        padding: '20px 24px',
-        background: 'var(--surface)',
-      }}>
-        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--text-muted)' }}>
-          Quick-start examples
-        </div>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          {EXAMPLES.map(ex => (
-            <button
-              key={ex.label}
-              onClick={() => loadExample(ex)}
+          {/* Generating state */}
+          {generating && (
+            <div
               style={{
-                padding: '10px 16px', borderRadius: 8, textAlign: 'left',
-                background: 'var(--bg)', border: '1px solid var(--surface-border)',
-                color: 'var(--text)', cursor: 'pointer', maxWidth: 280,
-                transition: 'border-color 0.15s',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 14,
+                minHeight: 240,
               }}
-              onMouseEnter={e => (e.currentTarget.style.borderColor = ACCENT)}
-              onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--surface-border)')}
             >
-              <div style={{ fontSize: 12, color: ACCENT, fontWeight: 600, marginBottom: 4 }}>
-                {ex.label} · {VOICES.find(v => v.id === ex.voice)?.emoji} {ex.voice}
-              </div>
-              <div style={{ fontSize: 13, lineHeight: 1.4 }}>
-                &ldquo;{ex.text}&rdquo;
-              </div>
-            </button>
-          ))}
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  border: `3px solid ${ACCENT}33`,
+                  borderTopColor: ACCENT,
+                  animation: 'spin 0.8s linear infinite',
+                }}
+              />
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
+                Synthesizing audio with ElevenLabs…
+              </p>
+            </div>
+          )}
+
+          {/* Examples */}
+          <div style={{ marginTop: 'auto' }}>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                marginBottom: 10,
+              }}
+            >
+              Quick-start examples
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {EXAMPLES.map(ex => (
+                <button
+                  key={ex.label}
+                  onClick={() => loadExample(ex)}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: 8,
+                    background: 'var(--surface)',
+                    border: '1px solid var(--surface-border)',
+                    color: 'var(--text)',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    transition: 'border-color 0.15s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = ACCENT)}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--surface-border)')}
+                >
+                  {ex.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Spinner keyframes */}
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+          .studio-grid-2col { grid-template-columns: 1fr !important; }
+        }
       `}</style>
     </div>
   );

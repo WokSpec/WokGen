@@ -234,7 +234,7 @@ export default function PlatformLanding() {
             {MODES.map(mode => (
               <Link
                 key={mode.id}
-                href={mode.href}
+                href={mode.studioCta ?? mode.href}
                 className={`platform-mode-card${(mode.status as string) === 'coming_soon' ? ' platform-mode-card--soon' : mode.status === 'beta' ? ' platform-mode-card--beta' : ''}`}
                 style={{ '--mode-card-accent': mode.accent } as React.CSSProperties}
               >

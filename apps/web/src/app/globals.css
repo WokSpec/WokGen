@@ -1476,7 +1476,7 @@
   border: 1px solid var(--surface-border, #1f1f1f);
   border-radius: 12px;
   text-decoration: none;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background 0.15s, transform 0.2s;
   position: relative;
   overflow: hidden;
 }
@@ -1489,10 +1489,10 @@
   opacity: 0;
   transition: opacity 0.2s;
 }
-.platform-mode-card:hover { border-color: var(--surface-raised, #2a2a2a); background: #131313; }
+.platform-mode-card:hover { border-color: var(--surface-raised, #2a2a2a); background: #131313; transform: translateY(-2px); }
 .platform-mode-card:hover::before { opacity: 1; }
 .platform-mode-card--soon { opacity: 0.6; }
-.platform-mode-card--soon:hover { opacity: 0.8; }
+.platform-mode-card--soon:hover { opacity: 0.8; transform: none; }
 .platform-mode-card-header {
   display: flex;
   align-items: flex-start;
@@ -2817,6 +2817,82 @@
   padding: 1.5rem;
 }
 
+/* ── Skeleton loading cards ───────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: gallery-skeleton-shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+.gallery-card--skeleton {
+  background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: gallery-skeleton-shimmer 1.5s infinite;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--surface-border);
+  cursor: default;
+  pointer-events: none;
+}
+.gallery-card--skeleton-tall {
+  background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: gallery-skeleton-shimmer 1.5s infinite;
+  aspect-ratio: auto;
+  min-height: 120px;
+  border-radius: 10px;
+  border: 1px solid var(--surface-border);
+  cursor: default;
+  pointer-events: none;
+}
+@keyframes gallery-skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Gallery card download overlay ──────────────────────────────────────────
+   Positioned top-right of any .gallery-card; separate from the existing
+   full-card overlay so it can receive pointer events.                       */
+.gallery-card-dl-wrap {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 2;
+  pointer-events: auto;
+}
+.gallery-card:hover .gallery-card-dl-wrap,
+.gallery-card:focus-visible .gallery-card-dl-wrap { opacity: 1; }
+.gallery-card-download-btn {
+  background: rgba(0,0,0,0.75);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s;
+  line-height: 1;
+}
+.gallery-card-download-btn:hover { background: rgba(99,102,241,0.85); }
+
+/* ── Improved gallery empty state ─────────────────────────────────────────── */
+.gallery-empty-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
 /* Lightbox */
 .gallery-lightbox {
   position: fixed;
@@ -3592,4 +3668,231 @@
 .shake {
   animation: shake 0.35s ease;
   border-color: #ef4444 !important;
+}
+
+/* ── Studio Responsive Grid Layouts (voice / text / uiux) ────────────────── */
+
+/* 2-column grid used by voice and text studios */
+.studio-grid-2col {
+  display: grid;
+  grid-template-columns: minmax(320px, 460px) 1fr;
+  gap: 0;
+  min-height: calc(100vh - 57px);
+}
+
+/* On tablet collapse to single column */
+@media (max-width: 900px) {
+  .studio-grid-2col {
+    grid-template-columns: 1fr;
+  }
+  /* Convert right border to bottom border when panels stack */
+  .studio-grid-2col > *:first-child {
+    border-right: none !important;
+    border-bottom: 1px solid var(--surface-border);
+  }
+}
+
+@media (max-width: 600px) {
+  .studio-grid-2col > * {
+    padding: 16px !important;
+  }
+}
+
+/* History sidebar for uiux 3-col layout – auto-hides on tablet */
+.studio-history-sidebar {
+  width: 210px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--surface-border);
+  background: var(--surface-raised);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+@media (max-width: 1100px) {
+  .studio-history-sidebar {
+    display: none !important;
+  }
+}
+
+/* uiux outer flex body – stack to column on mobile */
+.studio-flex-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  .studio-flex-body {
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: auto;
+  }
+}
+
+/* uiux studio outer container — allow scrolling on mobile */
+.uiux-studio-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  .uiux-studio-root {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+}
+
+/* ── Studio generating pulse ────────────────────────────────────────────── */
+@keyframes studio-generating-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.studio-generating {
+  animation: studio-generating-pulse 1.5s ease-in-out infinite;
+}
+
+/* ── Body text rendering ────────────────────────────────────────────────── */
+body {
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Mode tab background transition ────────────────────────────────────── */
+.mode-tab:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+/* ── Eral AI markdown rendering ───────────────────────────────────────────── */
+
+.eral-code-block {
+  position: relative;
+  margin: 0.75rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+}
+
+.eral-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.eral-code-lang {
+  font-size: 11px;
+  color: #818cf8;
+  font-family: monospace;
+  text-transform: lowercase;
+}
+
+.eral-copy-btn {
+  font-size: 11px;
+  color: #6b7280;
+  background: none;
+  border: 1px solid #374151;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.eral-copy-btn:hover {
+  color: #818cf8;
+  border-color: #818cf8;
+}
+
+.eral-copy-btn.copied {
+  color: #10b981;
+  border-color: #10b981;
+}
+
+.eral-message-content pre {
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.eral-message-content code {
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 13px;
+}
+
+.eral-message-content p { margin: 0 0 0.5rem; }
+.eral-message-content p:last-child { margin-bottom: 0; }
+.eral-message-content ul, .eral-message-content ol { padding-left: 1.25rem; margin: 0.5rem 0; }
+.eral-message-content li { margin: 0.2rem 0; }
+.eral-message-content h1, .eral-message-content h2, .eral-message-content h3 { margin: 0.75rem 0 0.25rem; color: #f1f5f9; }
+.eral-message-content a { color: #818cf8; text-decoration: underline; }
+.eral-message-content strong { color: #f1f5f9; }
+.eral-message-content hr { border: none; border-top: 1px solid #2a2a2a; margin: 0.75rem 0; }
+
+/* ── Eral safeMarkdown output classes (eral-* prefix) ─────────────────────── */
+.eral-p { margin: 0 0 0.75rem 0; line-height: 1.6; }
+.eral-p:last-child { margin-bottom: 0; }
+.eral-inline-code {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+.eral-ul { padding-left: 1.5rem; margin: 0.5rem 0; list-style: disc; }
+.eral-li { margin: 0.2rem 0; line-height: 1.5; }
+.eral-h1 { font-size: 1.25rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+.eral-h2 { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.35rem; }
+.eral-h3 { font-size: 1rem; font-weight: 600; margin: 0.5rem 0 0.25rem; color: #a5b4fc; }
+.eral-blockquote {
+  border-left: 3px solid #818cf8;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: rgba(255,255,255,0.65);
+  font-style: italic;
+}
+.eral-hr { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 12px 0; }
+
+/* ── Studio responsive layouts ────────────────────────────────────────────── */
+.studio-layout--sidebar,
+.studio-layout--3col {
+  display: grid;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .studio-layout--sidebar { grid-template-columns: 320px 1fr; }
+  .studio-layout--3col { grid-template-columns: 280px 1fr 280px; }
+}
+
+@media (max-width: 1023px) {
+  .studio-layout--sidebar,
+  .studio-layout--3col { grid-template-columns: 1fr; }
+}
+
+/* Responsive grid for studio card selectors */
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .preset-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Fix Eral sidebar z-index on mobile */
+@media (max-width: 768px) {
+  .eral-sidebar-container { z-index: 9999; }
 }

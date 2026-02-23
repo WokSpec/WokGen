@@ -531,6 +531,20 @@ function GalleryCard({
         />
       </div>
 
+      {/* Hover download button */}
+      <div className="gallery-card-dl-wrap">
+        <a
+          href={asset.imageUrl}
+          download={`wokgen-emoji-${asset.id}.png`}
+          onClick={e => e.stopPropagation()}
+          className="gallery-card-download-btn"
+          title="Download"
+          aria-label="Download"
+        >
+          ↓
+        </a>
+      </div>
+
       <div className="gallery-card-overlay">
         <p
           className="line-clamp-2"
@@ -624,12 +638,28 @@ function EmptyState({ search }: { search: string }) {
   return (
     <>
       <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2.5rem 0 1.25rem' }}>
-        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-          No emoji assets yet — be the first to share!
+        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>😊</div>
+        <p style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+          No emoji assets yet
         </p>
-        <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>
-          Generate something in the Emoji Studio and save it to the gallery.
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+          Generate your first emoji in the Emoji Studio.
         </p>
+        <a
+          href="/emoji/studio"
+          style={{
+            display: 'inline-block',
+            padding: '8px 18px',
+            borderRadius: 8,
+            background: '#fb923c',
+            color: '#fff',
+            fontWeight: 600,
+            fontSize: '0.82rem',
+            textDecoration: 'none',
+          }}
+        >
+          Open Emoji Studio →
+        </a>
       </div>
       {SHOWCASE_EMOJIS.map((item, i) => (
         <ShowcaseCard key={i} item={item} index={i} />
@@ -668,6 +698,31 @@ export default function EmojiGalleryPage() {
     const t = setTimeout(() => setDebouncedSearch(search), 380);
     return () => clearTimeout(t);
   }, [search]);
+
+  // Initialize filters from URL on first mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('tool'))   setToolFilter(p.get('tool')!);
+    if (p.get('style'))  setStyleFilter(p.get('style')!);
+    if (p.get('search')) setSearch(p.get('search')!);
+    if (p.get('sort') === 'oldest') setSort('oldest');
+    if (p.get('tab') === 'mine')    setGalleryTab('mine');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep URL in sync with active filters
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams();
+    if (toolFilter)        p.set('tool', toolFilter);
+    if (styleFilter)       p.set('style', styleFilter);
+    if (debouncedSearch)   p.set('search', debouncedSearch);
+    if (sort !== 'newest') p.set('sort', sort);
+    if (galleryTab === 'mine') p.set('tab', 'mine');
+    const qs = p.toString();
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+  }, [toolFilter, styleFilter, debouncedSearch, sort, galleryTab]);
 
   useEffect(() => {
     setAssets([]);

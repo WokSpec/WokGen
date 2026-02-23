@@ -507,6 +507,20 @@ function GalleryCard({ asset, index, onClick }: { asset: GalleryAsset; index: nu
         />
       </div>
 
+      {/* Hover download button */}
+      <div className="gallery-card-dl-wrap">
+        <a
+          href={asset.imageUrl}
+          download={`wokgen-vector-${asset.id}.png`}
+          onClick={e => e.stopPropagation()}
+          className="gallery-card-download-btn"
+          title="Download"
+          aria-label="Download"
+        >
+          ↓
+        </a>
+      </div>
+
       <div className="gallery-card-overlay">
         <p
           className="line-clamp-2"
@@ -589,13 +603,31 @@ function EmptyState({ search }: { search: string }) {
   }
   return (
     <>
-      <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2.5rem 0 1.25rem' }}>
-        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-          No community assets yet — be the first to share!
+      <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '80px 20px' }}>
+        <div style={{ fontSize: '2.5rem', marginBottom: 16, color: 'var(--text-disabled)' }}>⬡</div>
+        <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>
+          No vector assets yet
+        </h3>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 20 }}>
+          Generate your first vector in the Vector Studio.
         </p>
-        <p style={{ fontSize: '0.72rem', color: 'var(--text-faint)' }}>
-          Generate something in Vector Studio and save it to the gallery.
-        </p>
+        <a
+          href="/vector/studio"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '8px 18px',
+            borderRadius: 6,
+            background: '#FF9D00',
+            color: '#0d0d14',
+            fontSize: '0.82rem',
+            fontWeight: 600,
+            textDecoration: 'none',
+          }}
+        >
+          ✦ Open Vector Studio
+        </a>
       </div>
       {SHOWCASE_PROMPTS.map((item, i) => (
         <ShowcaseCard key={i} item={item} index={i} />
@@ -633,6 +665,31 @@ export default function VectorGalleryPage() {
     const t = setTimeout(() => setDebouncedSearch(search), 380);
     return () => clearTimeout(t);
   }, [search]);
+
+  // Initialize filters from URL on first mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('search'))     setSearch(p.get('search')!);
+    if (p.get('tool'))       setToolFilter(p.get('tool')!);
+    if (p.get('style'))      setStyleFilter(p.get('style')!);
+    if (p.get('sort') === 'oldest') setSort('oldest');
+    if (p.get('tab') === 'mine')    setGalleryTab('mine');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep URL in sync with active filters
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams();
+    if (search)                  p.set('search', search);
+    if (toolFilter)              p.set('tool', toolFilter);
+    if (styleFilter)             p.set('style', styleFilter);
+    if (sort !== 'newest')       p.set('sort', sort);
+    if (galleryTab !== 'community') p.set('tab', galleryTab);
+    const qs = p.toString();
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+  }, [search, toolFilter, styleFilter, sort, galleryTab]);
 
   // Fetch on filter change
   useEffect(() => {

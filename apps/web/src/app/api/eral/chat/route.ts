@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { WAP_CAPABILITIES, parseWAPFromResponse } from '@/lib/wap';
 
 // ---------------------------------------------------------------------------
 // POST /api/eral/chat
@@ -89,7 +90,25 @@ Response format:
 - Keep responses focused — don't pad unnecessarily
 - For prompting help, always output the exact prompt the user should paste
 
-You were created by WokSpec. Do not claim to be any other AI system.`;
+Cross-mode workflows you can suggest:
+- Pixel character → suggest Business Studio for a matching logo/brand
+- Business logo → suggest Pixel Studio for a game-ready icon version
+- Voice generation → suggest Text Studio for the script
+- Text headline → suggest Business Studio for a visual
+- Vector icon set → suggest Emoji Studio for a matching emoji pack
+
+When a user generates something in one mode, proactively suggest related work in other modes.
+
+You were created by WokSpec. Do not claim to be any other AI system.
+
+${WAP_CAPABILITIES}`;
+
+const PERSONALITY_MODIFIERS: Record<string, string> = {
+  balanced:  '',
+  technical: '\n\nAdditional instruction: This user prefers technical depth. Use precise terminology. Include implementation details. Show code when relevant.',
+  creative:  '\n\nAdditional instruction: This user prefers creative exploration. Suggest unconventional approaches. Think expansively.',
+  concise:   '\n\nAdditional instruction: This user prefers brevity. Be extremely concise. One or two sentences when possible. Bullet points over paragraphs.',
+};
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -272,9 +291,31 @@ export async function POST(req: NextRequest) {
 
   // Build message list
   const contextNote = buildContextNote(context);
-  const systemContent = contextNote
-    ? `${ERAL_SYSTEM_PROMPT}\n\n${contextNote}`
-    : ERAL_SYSTEM_PROMPT;
+
+  // Fetch user preferences and inject as context
+  let userPrefsContext = '';
+  let personalityModifier = '';
+  if (userId) {
+    const userPrefs = await prisma.userPreference.findUnique({ where: { userId } }).catch(() => null);
+    if (userPrefs) {
+      const recentModePrefs: string[] = [];
+      if (userPrefs.pixelPrefs)    recentModePrefs.push(`Pixel preferences: ${userPrefs.pixelPrefs}`);
+      if (userPrefs.businessPrefs) recentModePrefs.push(`Business preferences: ${userPrefs.businessPrefs}`);
+      if (userPrefs.voicePrefs)    recentModePrefs.push(`Voice preferences: ${userPrefs.voicePrefs}`);
+      if (recentModePrefs.length > 0) {
+        userPrefsContext = `\n\n[User Preferences: ${recentModePrefs.join('; ')}]`;
+      }
+      const personality = userPrefs.eralPersonality ?? 'balanced';
+      personalityModifier = PERSONALITY_MODIFIERS[personality] ?? '';
+    }
+  }
+
+  const systemContent = [
+    ERAL_SYSTEM_PROMPT,
+    personalityModifier,
+    contextNote ? `\n\n${contextNote}` : '',
+    userPrefsContext,
+  ].join('').trim();
 
   const history = conv.isNew ? [] : await fetchHistory(conv.id);
   const llmMessages: OpenAIMessage[] = [
@@ -368,15 +409,24 @@ export async function POST(req: NextRequest) {
           }
         } finally {
           reader.releaseLock();
+
+          // Parse WAP from accumulated reply
+          const { cleanReply, wap } = parseWAPFromResponse(fullReply);
+
+          // Emit WAP event before closing if actions were found
+          if (wap) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ wap })}\n\n`));
+          }
+
           controller.close();
 
-          // Persist assistant message after stream ends
+          // Persist assistant message after stream ends (store clean reply without <wap> tags)
           const durationMs = Date.now() - start;
           prisma.eralMessage.create({
             data: {
               conversationId: conv.id,
               role: 'assistant',
-              content: fullReply,
+              content: cleanReply,
               modelUsed: model,
               durationMs,
             },
@@ -414,18 +464,20 @@ export async function POST(req: NextRequest) {
   }
 
   // Persist assistant message
+  const { cleanReply, wap } = parseWAPFromResponse(reply);
   const assistantMsg = await prisma.eralMessage.create({
     data: {
       conversationId: conv.id,
       role: 'assistant',
-      content: reply,
+      content: cleanReply,
       modelUsed: providerConfig.model,
       durationMs,
     },
   });
 
   return NextResponse.json({
-    reply,
+    reply: cleanReply,
+    wap: wap ?? null,
     conversationId: conv.id,
     messageId: assistantMsg.id,
     modelUsed: providerConfig.model,

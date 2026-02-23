@@ -168,6 +168,25 @@ export default function VoiceGallery() {
     return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
   }, [search]);
 
+  // Initialize filters from URL on first mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('voice'))  setVoiceFilter(p.get('voice')!);
+    if (p.get('search')) setSearch(p.get('search')!);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep URL in sync with active filters
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams();
+    if (voiceFilter)      p.set('voice', voiceFilter);
+    if (debouncedSearch)  p.set('search', debouncedSearch);
+    const qs = p.toString();
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+  }, [voiceFilter, debouncedSearch]);
+
   const fetchAssets = useCallback(
     async (cursor: string | null, reset = false) => {
       if (reset) setLoading(true);
@@ -252,24 +271,34 @@ export default function VoiceGallery() {
 
       {/* Content */}
       {loading ? (
-        <div className="gallery-loading">
-          <div className="studio-spinner" />
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: 16,
+          padding: '24px',
+        }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="gallery-card--skeleton-tall" style={{ animationDelay: `${i * 0.07}s`, minHeight: 140 }} />
+          ))}
         </div>
       ) : error ? (
         <div className="gallery-error">
-          <p>{error}</p>
+          <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+          <p>Failed to load gallery</p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
           <button className="btn-ghost btn-sm" onClick={() => void fetchAssets(null, true)}>
             Retry
           </button>
         </div>
       ) : assets.length === 0 ? (
         <div className="gallery-empty">
+          <div className="gallery-empty-icon">🎙️</div>
           <p className="gallery-empty-title">No voice clips yet</p>
           <p className="gallery-empty-desc">
             Generate your first audio in the Voice Studio.
           </p>
           <Link href="/voice/studio" className="btn-primary btn-sm">
-            Open Voice Studio
+            Go to Voice Studio →
           </Link>
         </div>
       ) : (

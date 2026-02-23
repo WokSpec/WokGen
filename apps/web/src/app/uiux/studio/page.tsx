@@ -562,7 +562,7 @@ export default function UIUXStudio() {
 
   // ---------------------------------------------------------------------------
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)', overflow: 'hidden' }}>
+    <div className="uiux-studio-root">
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 14px', height: 44, borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-raised)', flexShrink: 0 }}>
         <span style={{ color: '#f472b6', fontSize: '1.1rem' }}>✦</span>
@@ -584,7 +584,7 @@ export default function UIUXStudio() {
       </div>
 
       {/* ── Body ────────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="studio-flex-body">
 
         {/* Page Builder tab */}
         {studioTab === 'page-builder' && (
@@ -603,7 +603,7 @@ export default function UIUXStudio() {
           <>
             {/* ── History sidebar (col 1) ───────────────────────────────── */}
             {historySidebarOpen && (
-              <div style={{ width: 210, flexShrink: 0, borderRight: '1px solid var(--surface-border)', background: 'var(--surface-raised)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+              <div className="studio-history-sidebar">
                 <div style={{ padding: '8px 12px 5px', borderBottom: '1px solid var(--surface-border)' }}>
                   <span style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-disabled)' }}>
                     Recent

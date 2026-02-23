@@ -51,6 +51,27 @@ export default function BusinessGallery() {
     return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
   }, [search]);
 
+  // Initialize filters from URL on first mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('tool'))   setToolFilter(p.get('tool')!);
+    if (p.get('search')) setSearch(p.get('search')!);
+    if (p.get('tab') === 'mine') setGalleryTab('mine');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep URL in sync with active filters
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams();
+    if (toolFilter)      p.set('tool', toolFilter);
+    if (debouncedSearch) p.set('search', debouncedSearch);
+    if (galleryTab === 'mine') p.set('tab', 'mine');
+    const qs = p.toString();
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+  }, [toolFilter, debouncedSearch, galleryTab]);
+
   const fetchAssets = useCallback(
     async (cursor: string | null, reset = false) => {
       if (reset) setLoading(true);
@@ -154,19 +175,24 @@ export default function BusinessGallery() {
 
       {/* Grid */}
       {loading ? (
-        <div className="gallery-loading">
-          <div className="studio-spinner" />
+        <div className="gallery-grid gallery-grid--natural" style={{ padding: '24px' }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="gallery-card gallery-card--skeleton" style={{ animationDelay: `${i * 0.07}s` }} />
+          ))}
         </div>
       ) : error ? (
         <div className="gallery-error">
-          <p>{error}</p>
+          <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+          <p>Failed to load gallery</p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
           <button className="btn-ghost btn-sm" onClick={() => fetchAssets(null, true)}>Retry</button>
         </div>
       ) : assets.length === 0 ? (
         <div className="gallery-empty">
-          <p className="gallery-empty-title">No assets yet</p>
-          <p className="gallery-empty-desc">Be the first to generate and share a business asset.</p>
-          <Link href="/business/studio" className="btn-primary btn-sm">Open Business Studio</Link>
+          <div className="gallery-empty-icon">📊</div>
+          <p className="gallery-empty-title">No business assets yet</p>
+          <p className="gallery-empty-desc">Generate your first business asset in the Business Studio.</p>
+          <Link href="/business/studio" className="btn-primary btn-sm">Go to Business Studio →</Link>
         </div>
       ) : (
         <div className="gallery-grid gallery-grid--natural">
@@ -183,6 +209,19 @@ export default function BusinessGallery() {
                 className="gallery-card-img"
                 loading="lazy"
               />
+              {/* Hover download button */}
+              <div className="gallery-card-dl-wrap">
+                <a
+                  href={asset.imageUrl}
+                  download={`wokgen-biz-${asset.id}.png`}
+                  onClick={e => e.stopPropagation()}
+                  className="gallery-card-download-btn"
+                  title="Download"
+                  aria-label="Download"
+                >
+                  ↓
+                </a>
+              </div>
               <div className="gallery-card-overlay">
                 {asset.tool && <span className="gallery-card-badge">{asset.tool}</span>}
                 {asset.width && asset.height && (

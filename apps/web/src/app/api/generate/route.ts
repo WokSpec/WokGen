@@ -122,6 +122,8 @@ function getFallbackChain(primary: ProviderName): ProviderName[] {
 
 export async function POST(req: NextRequest) {
   const isSelfHosted = process.env.SELF_HOSTED === 'true';
+  // Generate a request ID for tracing
+  const requestId = randomUUID().slice(0, 10);
 
   // --------------------------------------------------------------------------
   // 0. Auth + quota enforcement (hosted mode only)
@@ -1053,6 +1055,11 @@ export async function POST(req: NextRequest) {
       quotaRemaining: !useHD
         ? (req as NextRequest & { _quotaRemaining?: number })._quotaRemaining
         : undefined,
+    }, {
+      headers: {
+        'X-WokGen-Request-Id': requestId,
+        'X-WokGen-Provider':   usedProvider,
+      },
     });
   } catch (err) {
     // ------------------------------------------------------------------------

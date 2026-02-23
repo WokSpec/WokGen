@@ -325,23 +325,29 @@ export function resolveOptimalProvider(
   mode: string,
   tool: string,
   useHD: boolean,
+  style?: string,
 ): ProviderName {
   // Mode-specific matrices
   const modeStandardMap: Record<string, Record<string, ProviderPreference[]>> = {
     ...STANDARD_MATRIX,
     vector: VECTOR_STANDARD,
-    emoji:  EMOJI_STANDARD,
   };
   const modeHdMap: Record<string, Record<string, ProviderPreference[]>> = {
     ...HD_MATRIX,
     vector: VECTOR_HD,
-    emoji:  EMOJI_HD,
   };
 
   const map = useHD ? modeHdMap : modeStandardMap;
   const fallback = useHD ? FALLBACK_HD : FALLBACK_STANDARD;
 
   const modeMatrix = map[mode] ?? null;
+
+  // Style-specific routing: some style presets route to better providers
+  if (style) {
+    const styleProvider = resolveStyleProvider(mode, style, useHD);
+    if (styleProvider) return styleProvider;
+  }
+
   const preferences: ProviderPreference[] =
     modeMatrix?.[tool] ?? fallback[tool] ?? [{ provider: 'pollinations' }];
 
@@ -351,4 +357,39 @@ export function resolveOptimalProvider(
   }
 
   return 'pollinations';
+}
+
+// ---------------------------------------------------------------------------
+// Style-aware provider overrides
+//
+// Some style presets produce measurably better output on specific providers.
+// This function checks style hints and returns a preferred provider when
+// the required key is available. Returns null to fall through to matrix.
+// ---------------------------------------------------------------------------
+
+const STYLE_PROVIDER_MAP: Record<string, { standard: ProviderPreference | null; hd: ProviderPreference | null }> = {
+  // Pixel styles
+  'dithered':        { standard: { provider: 'pollinations' }, hd: { provider: 'replicate', requires: 'REPLICATE_API_TOKEN' } },
+  'isometric':       { standard: { provider: 'together',    requires: 'TOGETHER_API_KEY' }, hd: { provider: 'replicate', requires: 'REPLICATE_API_TOKEN' } },
+  'gb_mono':         { standard: { provider: 'pollinations' }, hd: { provider: 'replicate', requires: 'REPLICATE_API_TOKEN' } },
+  // Business / vector styles
+  'flat-vector':     { standard: { provider: 'pollinations' }, hd: { provider: 'fal', requires: 'FAL_KEY' } },
+  'logo-mark':       { standard: { provider: 'huggingface', requires: 'HF_TOKEN' }, hd: { provider: 'fal', requires: 'FAL_KEY' } },
+  'portrait-photo':  { standard: { provider: 'together',    requires: 'TOGETHER_API_KEY' }, hd: { provider: 'fal', requires: 'FAL_KEY' } },
+  'data-viz':        { standard: { provider: 'pollinations' }, hd: { provider: 'pollinations' } },
+};
+
+function resolveStyleProvider(mode: string, style: string, useHD: boolean): ProviderName | null {
+  void mode; // reserved for future mode-specific style overrides
+  const entry = STYLE_PROVIDER_MAP[style];
+  if (!entry) return null;
+  const pref = useHD ? entry.hd : entry.standard;
+  if (!pref) return null;
+  if (!pref.requires || hasKey(pref.requires)) return pref.provider as ProviderName;
+  // Required key missing — try other tier
+  const fallbackPref = useHD ? entry.standard : entry.hd;
+  if (fallbackPref && (!fallbackPref.requires || hasKey(fallbackPref.requires))) {
+    return fallbackPref.provider as ProviderName;
+  }
+  return null;
 }

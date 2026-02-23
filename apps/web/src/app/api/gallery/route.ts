@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
 import { cache } from '@/lib/cache';
+import { log as logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // GET /api/gallery
@@ -257,7 +258,7 @@ export async function POST(req: NextRequest) {
   await prisma.job.update({
     where: { id: job.id },
     data:  { isPublic: Boolean(isPublic) },
-  }).catch(console.error);
+  }).catch(err => logger.error({ err }, '[gallery]'));
 
   return NextResponse.json({
     ok:    true,

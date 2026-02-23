@@ -7,6 +7,7 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { getUserPlanId, PER_MIN_RATE } from '@/lib/quota';
+import { log as logger } from '@/lib/logger';
 
 export const maxDuration = 60;
 export const runtime = 'nodejs';
@@ -116,7 +117,7 @@ export async function POST(req: NextRequest) {
 
     if (!res.ok) {
       const errText = await res.text().catch(() => '');
-      console.error('[sfx/generate] ElevenLabs error:', res.status, errText);
+      logger.error({ err: errText, status: res.status }, '[sfx/generate] ElevenLabs error');
       return NextResponse.json(
         { error: 'Sound generation failed', code: 'SFX_PROVIDER_ERROR' },
         { status: 502 },
@@ -129,7 +130,7 @@ export async function POST(req: NextRequest) {
     if ((err as Error)?.name === 'AbortError') {
       return NextResponse.json({ error: 'Sound generation timed out' }, { status: 504 });
     }
-    console.error('[sfx/generate] Fetch error:', err);
+    logger.error({ err }, '[sfx/generate] Fetch error');
     return NextResponse.json(
       { error: 'Sound generation requires ElevenLabs API key', code: 'NO_SFX_PROVIDER' },
       { status: 503 },

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cleanupOldGuestUsage } from '@/lib/quota';
 import { prisma } from '@/lib/db';
+import { log as logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // GET /api/cron/cleanup
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
     const deleted = await cleanupOldGuestUsage();
     return NextResponse.json({ ok: true, deleted, resetStuck: resetCount });
   } catch (err) {
-    console.error('[cron/cleanup] error:', err);
+    logger.error({ err }, '[cron/cleanup] error');
     return NextResponse.json({ error: 'Cleanup failed' }, { status: 500 });
   }
 }

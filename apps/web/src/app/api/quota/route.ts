@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getQuotaStatus, getUserPlanId } from '@/lib/quota';
 import { cache } from '@/lib/cache';
+import { log as logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -51,7 +52,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error('[quota] GET failed:', err);
+    logger.error({ err }, '[quota] GET failed');
     return NextResponse.json({ error: 'Failed to fetch quota' }, { status: 500 });
   }
 }

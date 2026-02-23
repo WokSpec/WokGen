@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
+import { log as logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // GET /api/jobs/[id]
@@ -182,7 +183,7 @@ export async function PATCH(
         where: { jobId: id },
         data:  { isPublic: Boolean(body.isPublic) },
       })
-      .catch(console.error);
+      .catch((err: unknown) => logger.error({ err }, '[jobs]'));
   }
 
   return NextResponse.json({

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { removeBackground } from '@/lib/bg-remove';
 import { prisma } from '@/lib/db';
+import { log as logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -109,7 +110,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({ resultBase64, mimeType: 'image/png' });
     } catch (err) {
-      console.error('[bg-remove] base64 path failed:', err);
+      logger.error({ err }, '[bg-remove] base64 path failed');
       return NextResponse.json({ error: 'Background removal failed' }, { status: 500 });
     }
   }

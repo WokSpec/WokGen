@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { log as logger } from '@/lib/logger';
 
 export const maxDuration = 30;
 
@@ -559,11 +560,12 @@ async function generateCode(
     try {
       res = await attempt();
     } catch (err) {
-      console.error('[uiux/generate] provider error:', err);
+      logger.error({ err }, '[uiux/generate] provider error');
       continue;
     }
     if (!res.ok) {
-      console.error(`[uiux/generate] HTTP ${res.status}:`, await res.text().catch(() => ''));
+      const text = await res.text().catch(() => '');
+      logger.error({ status: res.status, err: text }, '[uiux/generate] HTTP error');
       continue;
     }
     const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
@@ -767,7 +769,7 @@ export async function POST(req: NextRequest) {
         },
       });
     } catch (err) {
-      console.error('[uiux/generate] stream error:', err);
+      logger.error({ err }, '[uiux/generate] stream error');
       return errorResponse('Streaming generation failed', 'MODEL_UNAVAILABLE', 503, true);
     }
   }
@@ -778,7 +780,7 @@ export async function POST(req: NextRequest) {
   try {
     ({ code, modelUsed } = await generateCode(messages, modelTier));
   } catch (err) {
-    console.error('[uiux/generate] generation failed:', err);
+    logger.error({ err }, '[uiux/generate] generation failed');
     return errorResponse('Code generation temporarily unavailable. Please try again.', 'MODEL_UNAVAILABLE', 503, true);
   }
 

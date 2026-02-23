@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { log as logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // GET /api/voice/voices
@@ -40,7 +41,7 @@ export async function GET() {
     });
 
     if (!res.ok) {
-      console.error('[voices] ElevenLabs API error:', res.status);
+      logger.error({ status: res.status }, '[voices] ElevenLabs API error');
       return NextResponse.json({ voices: DEFAULT_VOICES });
     }
 
@@ -64,7 +65,7 @@ export async function GET() {
 
     return NextResponse.json({ voices });
   } catch (e) {
-    console.error('[voices] Fetch error:', e);
+    logger.error({ err: e }, '[voices] Fetch error');
     return NextResponse.json({ voices: DEFAULT_VOICES });
   }
 }

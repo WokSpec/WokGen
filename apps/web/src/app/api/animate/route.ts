@@ -25,6 +25,7 @@ import { resolveProviderConfig } from '@/lib/providers';
 import { huggingfaceGenerate } from '@/lib/providers/huggingface';
 import { pollinationsGenerate } from '@/lib/providers/pollinations';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { log as logger } from '@/lib/logger';
 import type { StylePreset, ProviderName } from '@/lib/providers/types';
 import type { GenerateParams } from '@/lib/providers/types';
 
@@ -182,7 +183,7 @@ export async function POST(req: NextRequest) {
   try {
     frameResults = await Promise.all(framePromises);
   } catch (err) {
-    console.error('[animate] Frame generation failed:', err);
+    logger.error({ err }, '[animate] Frame generation failed');
     return NextResponse.json(
       { error: `Frame generation failed: ${(err as Error).message}` },
       { status: 500 },
@@ -206,7 +207,7 @@ export async function POST(req: NextRequest) {
       durationMs: Math.round(1000 * frameDataUrls.length / fps),
     });
   } catch (err) {
-    console.error('[animate] GIF assembly failed:', err);
+    logger.error({ err }, '[animate] GIF assembly failed');
     return NextResponse.json(
       { error: `GIF assembly failed: ${(err as Error).message}` },
       { status: 500 },

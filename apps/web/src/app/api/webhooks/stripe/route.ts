@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe, PLANS } from '@/lib/stripe';
 import { prisma } from '@/lib/db';
 import { sendBillingReceiptEmail, sendSubscriptionCanceledEmail } from '@/lib/email';
+import { log as logger } from '@/lib/logger';
 import type Stripe from 'stripe';
 
 // Raw body required for Stripe signature verification
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    console.error('[stripe/webhook] STRIPE_WEBHOOK_SECRET not set');
+    logger.error({}, '[stripe/webhook] STRIPE_WEBHOOK_SECRET not set');
     return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
   }
 
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     const rawBody = await req.text();
     event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
-    console.error('[stripe/webhook] Signature verification failed:', err);
+    logger.error({ err }, '[stripe/webhook] Signature verification failed');
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -208,7 +209,7 @@ export async function POST(req: NextRequest) {
         break;
     }
   } catch (err) {
-    console.error('[stripe/webhook] Handler error:', err);
+    logger.error({ err }, '[stripe/webhook] Handler error');
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 

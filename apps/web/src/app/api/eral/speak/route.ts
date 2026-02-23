@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { log as logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // POST /api/eral/speak
@@ -237,7 +238,7 @@ export async function POST(req: NextRequest) {
 
     if (!aiRes.ok) {
       const errText = await aiRes.text().catch(() => aiRes.statusText);
-      console.error('[speak] AI provider error:', aiRes.status, errText);
+      logger.error({ err: errText, status: aiRes.status }, '[speak] AI provider error');
       return NextResponse.json({ error: 'AI provider unavailable' }, { status: 503 });
     }
 
@@ -247,7 +248,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Empty AI response' }, { status: 503 });
     }
   } catch (err) {
-    console.error('[speak] AI fetch failed:', err);
+    logger.error({ err }, '[speak] AI fetch failed');
     return NextResponse.json({ error: 'AI provider request failed' }, { status: 503 });
   }
 
@@ -299,7 +300,7 @@ export async function POST(req: NextRequest) {
       },
     );
   } catch (err) {
-    console.error('[speak] ElevenLabs request failed:', err);
+    logger.error({ err }, '[speak] ElevenLabs request failed');
     return NextResponse.json(
       { text: textResponse, fallback: true, conversationId: convId, error: 'TTS unavailable' },
       { status: 200, headers: fallbackHeaders },
@@ -308,7 +309,7 @@ export async function POST(req: NextRequest) {
 
   if (!elevenRes.ok) {
     const errText = await elevenRes.text().catch(() => elevenRes.statusText);
-    console.error('[speak] ElevenLabs error:', elevenRes.status, errText);
+    logger.error({ err: errText, status: elevenRes.status }, '[speak] ElevenLabs error');
     return NextResponse.json(
       { text: textResponse, fallback: true, conversationId: convId, error: 'TTS provider error' },
       { status: 200, headers: fallbackHeaders },

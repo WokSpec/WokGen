@@ -1,6 +1,6 @@
-# WokGen — Private
+# WokGen
 
-> **Internal repository** for the WokSpec engineering team. Contains the full production codebase including all internal systems, quality layer, and pipeline tooling.
+> Multi-mode generative asset platform. Full production codebase — quality layer, pipeline tooling, and all generation systems are open for contribution.
 >
 > Live platform: **[wokgen.wokspec.org](https://wokgen.wokspec.org)**
 
@@ -76,8 +76,8 @@ examples/            Workflow examples per engine
 
 ```bash
 # 1. Clone
-git clone git@github.com:WokSpec/WokGen-private.git
-cd WokGen-private
+git clone git@github.com:WokSpec/WokGen.git
+cd WokGen
 
 # 2. Install dependencies
 npm install --legacy-peer-deps
@@ -135,7 +135,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md). Internal team members have full access
 
 ## License
 
-Apache-2.0 for the codebase. See [docs/licensing.md](./docs/licensing.md) for the full boundary definition (applies to public releases; all systems are visible in this private repo).
+Apache-2.0. See [docs/licensing.md](./docs/licensing.md) for the full boundary definition.
 
 ---
 

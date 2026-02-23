@@ -1,6 +1,6 @@
-# WokGen — Internal Systems Reference
+# WokGen — Systems Reference
 
-Documents all internal systems that were marked `@private` in the OSS release. In this private repo, every system described here is fully editable. This is the reference guide for WokSpec engineers contributing to the quality layer, routing, or generation logic.
+Documents all systems in WokGen. Every system described here is fully editable and open for contribution. This is the reference guide for contributing to the quality layer, routing, or generation logic.
 
 ---
 

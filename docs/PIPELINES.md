@@ -441,7 +441,7 @@ wokgen-db      # Free PostgreSQL (⚠️ expires after 90 days on free tier)
 ```
 
 **Deploy:**
-1. render.com → New → Blueprint → connect `WokSpec/WokGen-private` → Apply
+1. render.com → New → Blueprint → connect `WokSpec/WokGen` → Apply
 2. Set `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` in the Render dashboard (marked `sync: false`)
 
 **How to contribute:**

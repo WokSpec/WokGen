@@ -1,6 +1,6 @@
 # Contributing to WokGen
 
-Internal contribution guide for the WokSpec engineering team. All internal systems — quality profiles, negative banks, provider router, prompt chains, billing, rate limiting — are fully visible and editable in this repo.
+Contribution guide for the WokGen project. All systems — quality profiles, negative banks, provider router, prompt chains, billing, rate limiting — are fully visible and open for contribution.
 
 See [docs/INTERNALS.md](./docs/INTERNALS.md) for a deep-dive on each system and [docs/PIPELINES.md](./docs/PIPELINES.md) for pipeline-specific contribution guides.
 
@@ -15,8 +15,8 @@ See [docs/INTERNALS.md](./docs/INTERNALS.md) for a deep-dive on each system and 
 
 ```bash
 # 1. Clone the repo
-git clone git@github.com:WokSpec/WokGen-private.git
-cd WokGen-private
+git clone git@github.com:WokSpec/WokGen.git
+cd WokGen
 
 # 2. Install dependencies
 npm install --legacy-peer-deps
@@ -34,9 +34,9 @@ npm run web:dev
 
 The app runs at http://localhost:3000. API routes are at `/api/*`.
 
-## Internal Systems You Can Edit
+## Systems Open for Contribution
 
-All of the following were previously marked `@private` in the OSS release. In this repo they are fully open for team contribution:
+All of the following are fully open for contribution:
 
 | System | File(s) | What you can change |
 |--------|---------|---------------------|

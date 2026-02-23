@@ -31,7 +31,7 @@ This is the **private team repository**. All systems listed below as "Not Includ
 | UI components | `apps/web/src/app/_components/` | Apache-2.0 |
 | Database schema | `apps/web/prisma/schema.prisma` | Apache-2.0 |
 
-### Not Included in Public Releases (visible in this private repo)
+### Not Included in Standard Deployments
 
 | Component | Why Not Included |
 |-----------|-----------------|

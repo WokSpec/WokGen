@@ -24,6 +24,7 @@ export async function GET(
     prisma.job.findMany({
       where: { projectId: params.id, status: 'succeeded' },
       orderBy: { createdAt: 'desc' },
+      take: 50,
       select: {
         id: true, tool: true, mode: true, prompt: true,
         resultUrl: true, provider: true, createdAt: true,
@@ -32,6 +33,7 @@ export async function GET(
     }),
     prisma.assetRelationship.findMany({
       where: { projectId: params.id },
+      take: 50,
       select: { id: true, fromJobId: true, toJobId: true, type: true, createdAt: true },
     }),
   ]);

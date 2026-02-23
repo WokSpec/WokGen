@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
   const jobs = await prisma.job.findMany({
     where: { id: { in: ids }, userId: session.user.id, status: 'succeeded', resultUrl: { not: null } },
     select: { id: true, mode: true, tool: true, resultUrl: true, createdAt: true, prompt: true },
+    take: 50,
   });
 
   if (jobs.length === 0) {

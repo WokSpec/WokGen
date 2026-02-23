@@ -18,6 +18,7 @@ export async function GET(
   const comments = await prisma.assetComment.findMany({
     where:   { jobId },
     orderBy: { createdAt: 'asc' },
+    take:    50,
     select: {
       id:        true,
       userId:    true,

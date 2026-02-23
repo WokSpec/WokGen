@@ -30,6 +30,7 @@ export async function GET() {
   const kits = await prisma.brandKit.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: 'desc' },
+    take: 50,
   });
 
   await cache.set(cacheKey, kits, 300);

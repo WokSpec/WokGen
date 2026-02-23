@@ -23,6 +23,7 @@ export async function GET(
   const relationships = await prisma.assetRelationship.findMany({
     where: { projectId: params.id },
     orderBy: { createdAt: 'desc' },
+    take: 50,
   });
   return NextResponse.json({ relationships });
 }

@@ -25,12 +25,14 @@ export async function GET(
   const members = await prisma.projectMember.findMany({
     where: { projectId: params.id },
     orderBy: { createdAt: 'asc' },
+    take: 50,
   });
 
   // Enrich with user display info
   const userIds = members.map(m => m.userId);
   const users = await prisma.user.findMany({
     where: { id: { in: userIds } },
+    take: 50,
     select: { id: true, name: true, email: true, image: true },
   });
   const userMap = Object.fromEntries(users.map(u => [u.id, u]));

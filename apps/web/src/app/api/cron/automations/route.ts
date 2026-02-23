@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const automations = await prisma.automation.findMany({ where: { enabled: true } });
+  const automations = await prisma.automation.findMany({ where: { enabled: true }, take: 50 });
   const fired: string[] = [];
   const errors: string[] = [];
 

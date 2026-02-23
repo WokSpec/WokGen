@@ -29,6 +29,7 @@ export async function GET() {
 
   const keys = await prisma.apiKey.findMany({
     where:   { userId, isActive: true },
+    take:    50,
     select:  {
       id:           true,
       name:         true,

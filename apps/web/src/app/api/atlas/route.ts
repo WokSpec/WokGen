@@ -90,6 +90,7 @@ export async function POST(req: NextRequest) {
       ...(userId ? { userId } : {}),
     },
     select: { id: true, resultUrl: true, prompt: true, tool: true },
+    take: 50,
   });
 
   if (jobs.length < 2) {

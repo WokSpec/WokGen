@@ -40,6 +40,7 @@ export async function GET(req: NextRequest) {
     prisma.job.findMany({
       where:   { userId, status: 'succeeded', createdAt: { gte: thirtyDaysAgo } },
       orderBy: { createdAt: 'desc' },
+      take:    50,
       select:  { id: true, provider: true, mode: true, createdAt: true, resultUrl: true, prompt: true, tool: true },
     }),
     prisma.job.count({ where: { userId, status: 'succeeded' } }),

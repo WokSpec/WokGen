@@ -734,6 +734,9 @@ function OutputPanel({
   displayUrl,
   onBgRemove,
   bgRemoving,
+  compareMode,
+  compareResults,
+  onSelectCompare,
 }: {
   status: JobStatus;
   result: GenerationResult | null;
@@ -754,6 +757,9 @@ function OutputPanel({
   displayUrl?: string | null;
   onBgRemove?: (url: string) => void;
   bgRemoving?: boolean;
+  compareMode?: boolean;
+  compareResults?: GenerationResult[];
+  onSelectCompare?: (r: GenerationResult) => void;
 }) {
   const [zoom, setZoom] = useState<1|2|4>(1);
   const [activeUrl, setActiveUrl] = useState<string | null>(null);
@@ -1196,7 +1202,7 @@ function OutputPanel({
       </div>
 
       {/* Batch thumbnail strip */}
-      {batchResults && batchResults.length > 1 && (
+      {batchResults && batchResults.length > 1 && !compareMode && (
         <div
           className="flex items-center gap-2 px-4 py-2 flex-shrink-0 overflow-x-auto"
           style={{ borderTop: '1px solid var(--surface-border)', background: 'var(--surface-overlay)' }}
@@ -1228,6 +1234,60 @@ function OutputPanel({
           <span style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginLeft: 4 }}>
             {batchResults.length} variations — click to select
           </span>
+        </div>
+      )}
+
+      {/* Compare mode side-by-side */}
+      {compareMode && compareResults && compareResults.length === 2 && (
+        <div
+          className="flex items-center justify-center gap-4 px-4 py-4 flex-shrink-0"
+          style={{ borderTop: '1px solid var(--surface-border)', background: 'var(--surface-overlay)', overflowX: 'auto' }}
+        >
+          {compareResults.map((r: GenerationResult, i: number) => r.resultUrl && (
+            <div
+              key={i}
+              style={{
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <div
+                style={{
+                  border: '1px solid var(--surface-border)',
+                  borderRadius: 6,
+                  padding: 8,
+                  background: 'var(--surface-raised)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <img
+                  src={r.resultUrl}
+                  alt={`Variant ${i + 1}`}
+                  className="pixel-art"
+                  style={{
+                    maxWidth: 120,
+                    maxHeight: 120,
+                    objectFit: 'contain',
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: 6, width: '100%' }}>
+                <button
+                  type="button"
+                  className="btn btn--sm"
+                  onClick={() => onSelectCompare?.(r)}
+                  style={{ flex: 1, fontSize: '0.65rem', padding: '3px 6px' }}
+                >
+                  Use this
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -1344,6 +1404,8 @@ function GenerateForm({
   refImageInputRef,
   seed,
   setSeed,
+  lockSeed,
+  setLockSeed,
   steps,
   setSteps,
   guidance,
@@ -1409,6 +1471,8 @@ function GenerateForm({
   refImageInputRef: React.RefObject<HTMLInputElement>;
   seed: string;
   setSeed: (v: string) => void;
+  lockSeed: boolean;
+  setLockSeed: (v: boolean | ((prev: boolean) => boolean)) => void;
   steps: number;
   setSteps: (v: number) => void;
   guidance: number;
@@ -2224,6 +2288,30 @@ function GenerateForm({
                 </button>
               )}
             </div>
+            {seed && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                <button
+                  type="button"
+                  title={lockSeed ? 'Unlock seed (will vary each generation)' : 'Lock seed (keep same across generations)'}
+                  onClick={() => setLockSeed(v => !v)}
+                  style={{
+                    padding: '3px 8px',
+                    fontSize: 11,
+                    borderRadius: 4,
+                    border: '1px solid #303050',
+                    background: lockSeed ? '#5b21b640' : 'transparent',
+                    color: lockSeed ? '#a78bfa' : 'var(--text-muted)',
+                    cursor: 'pointer',
+                    fontWeight: lockSeed ? 600 : 400,
+                  }}
+                >
+                  {lockSeed ? '🔒 Locked' : '🔓 Lock'}
+                </button>
+                {!lockSeed && (
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Will vary each gen</span>
+                )}
+              </div>
+            )}
           </FormField>
 
           {/* Steps */}
@@ -2311,6 +2399,7 @@ function StudioInner() {
   const [stylePreset, setStylePreset] = useState<StylePreset>('rpg_icon');
   const [presetCategory, setPresetCategory] = useState<PresetCategory>('characters');
   const [seed, setSeed]               = useState('');
+  const [lockSeed, setLockSeed]       = useState(false);
   const [steps, setSteps]             = useState(4);
   const [guidance, setGuidance]       = useState(3.5);
   const [provider, setProvider]       = useState<Provider>('together');
@@ -2318,6 +2407,8 @@ function StudioInner() {
   const [batchCount, setBatchCount]   = useState<1|2|4>(1);
   const [batchResults, setBatchResults] = useState<GenerationResult[]>([]);
   const [selectedBatch, setSelectedBatch] = useState<number>(0);
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareResults, setCompareResults] = useState<GenerationResult[]>([]);
   const [useHD, setUseHD]             = useState(false); // HD = Replicate; Standard = Pollinations
   const [showAdvanced, setShowAdvanced] = useState(false); // negative prompt toggle
 
@@ -2649,6 +2740,10 @@ function StudioInner() {
             return next;
           });
         }
+        // Auto-vary seed if not locked
+        if (!lockSeed && seed) {
+          setSeed(String(baseSeed + 1));
+        }
         return;
       }
 
@@ -2681,7 +2776,9 @@ function StudioInner() {
         },
       });
 
-      const seeds = Array.from({ length: batchCount }, (_, i) =>
+      // Determine number of seeds to generate
+      const numSeeds = compareMode ? 2 : batchCount;
+      const seeds = Array.from({ length: numSeeds }, (_, i) =>
         i === 0 ? baseSeed : baseSeed + i * 137
       );
 
@@ -2717,6 +2814,10 @@ function StudioInner() {
             ...prev.slice(0, 49),
           ]);
         }
+        // Auto-vary seed if not locked
+        if (!lockSeed && seed) {
+          setSeed(String(baseSeed + 1));
+        }
       } else {
         const results = await Promise.allSettled(seeds.map((s, idx) => fetchOne(s, idx)));
         const fulfilled = results
@@ -2726,9 +2827,14 @@ function StudioInner() {
           const firstErr = results.find(r => r.status === 'rejected') as PromiseRejectedResult;
           throw new Error(firstErr?.reason?.message ?? 'All generations failed');
         }
-        setBatchResults(fulfilled);
-        setSelectedBatch(0);
-        setResult(fulfilled[0]);
+        if (compareMode) {
+          setCompareResults(fulfilled);
+          setResult(fulfilled[0]);
+        } else {
+          setBatchResults(fulfilled);
+          setSelectedBatch(0);
+          setResult(fulfilled[0]);
+        }
         fireConfetti('generation');
         setJobStatus('succeeded');
         setPromptHistory(prev => {
@@ -2736,13 +2842,18 @@ function StudioInner() {
           return next;
         });
         fulfilled.forEach(gen => {
-          if (gen.resultUrl) {
+          if (gen.resultUrl && !compareMode) {
             setHistory(prev => [
               { id: gen.jobId, tool: activeTool, prompt: prompt.trim(), resultUrl: gen.resultUrl, provider, width: genWidth, height: genHeight, seed: gen.resolvedSeed ?? null, createdAt: new Date().toISOString() },
               ...prev.slice(0, 49),
             ]);
           }
         });
+        // Auto-vary seed if not locked
+        if (!lockSeed && seed) {
+          const nextSeed = baseSeed + numSeeds * 137;
+          setSeed(String(nextSeed));
+        }
       }
 
       if (isPublic) setSavedToGallery(true);
@@ -2754,7 +2865,7 @@ function StudioInner() {
   }, [
     activeTool, prompt, negPrompt, size, aspectRatio, stylePreset, assetCategory, pixelEra,
     bgMode, outlineStyle, paletteSize, steps, guidance,
-    provider, seed, isPublic, apiKeys, comfyuiHost, useHD, refreshCredits, batchCount,
+    provider, seed, lockSeed, isPublic, apiKeys, comfyuiHost, useHD, refreshCredits, batchCount, compareMode,
     animationType, animFrameCount, animFps, animLoop,
   ]);
 
@@ -3055,6 +3166,8 @@ function StudioInner() {
           refImageInputRef={refImageInputRef}
           seed={seed}
           setSeed={setSeed}
+          lockSeed={lockSeed}
+          setLockSeed={setLockSeed}
           steps={steps}
           setSteps={setSteps}
           guidance={guidance}
@@ -3372,7 +3485,7 @@ function StudioInner() {
                   {([1, 2, 4] as const).map(n => (
                     <button
                       key={n}
-                      onClick={() => setBatchCount(n)}
+                      onClick={() => { setBatchCount(n); setCompareMode(false); }}
                       style={{
                         padding: '2px 8px',
                         borderRadius: 4,
@@ -3389,6 +3502,27 @@ function StudioInner() {
                     </button>
                   ))}
                 </div>
+              </div>
+              {/* Compare mode toggle */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '0.125rem' }}>
+                <button
+                  type="button"
+                  onClick={() => { setCompareMode(v => !v); if (!compareMode) setBatchCount(1); }}
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '0.72rem',
+                    borderRadius: 4,
+                    border: '1px solid',
+                    borderColor: compareMode ? 'var(--accent-muted)' : 'var(--surface-border)',
+                    background: compareMode ? 'var(--accent-dim)' : 'transparent',
+                    color: compareMode ? 'var(--accent)' : 'var(--text-muted)',
+                    cursor: 'pointer',
+                    fontWeight: compareMode ? 600 : 400,
+                  }}
+                  title="Generate 2 variants side-by-side for comparison"
+                >
+                  🔀 Compare
+                </button>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', color: 'var(--text-faint)', paddingTop: '0.125rem' }}>
                 <span style={{ color: '#10b981', marginRight: '0.25rem' }}>∞</span>
@@ -3420,10 +3554,23 @@ function StudioInner() {
           displayUrl={bgDisplayUrl}
           onBgRemove={handleBgRemove}
           bgRemoving={bgRemoving}
+          compareMode={compareMode}
+          compareResults={compareResults}
           onSelectBatch={(i) => {
             setSelectedBatch(i);
             setResult(batchResults[i] ?? null);
             setBgDisplayUrl(null);
+          }}
+          onSelectCompare={(r) => {
+            setResult(r);
+            setCompareMode(false);
+            setCompareResults([]);
+            if (r.resultUrl) {
+              setHistory(prev => [
+                { id: r.jobId, tool: activeTool, prompt: prompt.trim(), resultUrl: r.resultUrl, provider, width: result?.width ?? 0, height: result?.height ?? 0, seed: r.resolvedSeed ?? null, createdAt: new Date().toISOString() },
+                ...prev.slice(0, 49),
+              ]);
+            }
           }}
         />
 

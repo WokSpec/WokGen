@@ -27,6 +27,7 @@ export async function GET(
   const jobs = await prisma.job.findMany({
     where: { projectId: params.id, status: 'succeeded', resultUrl: { not: null } },
     orderBy: { createdAt: 'asc' },
+    take: 50,
     select: { id: true, mode: true, tool: true, resultUrl: true, createdAt: true, prompt: true },
   });
 

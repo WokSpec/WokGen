@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { EralSidebar } from '@/app/_components/EralSidebar';
+import { QuotaBadge } from '@/components/quota-badge';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -330,6 +331,7 @@ function EmojiStudioInner() {
         {/* Mode header */}
         <div className="studio-mode-header" style={{ '--mode-accent': '#fb923c' } as React.CSSProperties}>
           <span className="studio-mode-label">Emoji Studio</span>
+          <QuotaBadge />
           <a
             href="/pixel/studio"
             style={{

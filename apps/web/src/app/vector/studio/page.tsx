@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import WorkspaceSelector from '@/app/_components/WorkspaceSelector';
 import { EralSidebar } from '@/app/_components/EralSidebar';
+import { QuotaBadge } from '@/components/quota-badge';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -356,6 +357,7 @@ function VectorStudioInner() {
         {/* Mode header */}
         <div className="studio-mode-header" style={{ '--mode-accent': ACCENT } as React.CSSProperties}>
           <span className="studio-mode-label" style={{ color: ACCENT }}>Vector Studio</span>
+          <QuotaBadge />
           <a
             href="/pixel/studio"
             style={{

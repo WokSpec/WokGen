@@ -10,6 +10,7 @@ import { EralSidebar } from '@/app/_components/EralSidebar';
 import { parseApiError, type StudioError } from '@/lib/studio-errors';
 import { usePreferenceSync } from '@/hooks/usePreferenceSync';
 import { useWAPListener } from '@/hooks/useWAPListener';
+import { QuotaBadge } from '@/components/quota-badge';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -2739,6 +2740,7 @@ function StudioInner() {
             </h1>
           </div>
           <ProviderBadge provider={provider} />
+          <QuotaBadge />
         </div>
 
         {/* Workspace selector */}

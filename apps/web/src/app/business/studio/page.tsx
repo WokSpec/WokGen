@@ -12,6 +12,7 @@ import type {
 import { PLATFORM_DIMENSIONS } from '@/lib/prompt-builder-business';
 import WorkspaceSelector from '@/app/_components/WorkspaceSelector';
 import { EralSidebar } from '@/app/_components/EralSidebar';
+import { QuotaBadge } from '@/components/quota-badge';
 import { parseApiError, type StudioError } from '@/lib/studio-errors';
 import { StudioErrorBanner } from '@/app/_components/StudioErrorBanner';
 import { usePreferenceSync } from '@/hooks/usePreferenceSync';
@@ -408,6 +409,7 @@ function BusinessStudioInner() {
         {/* Mode identifier */}
         <div className="studio-mode-header" style={{ '--mode-accent': '#60a5fa' } as React.CSSProperties}>
           <span className="studio-mode-label">Business Studio</span>
+          <QuotaBadge />
           <a
             href="/pixel/studio"
             style={{

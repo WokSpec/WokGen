@@ -5,6 +5,7 @@ import React, {
 } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { QuotaBadge } from '@/components/quota-badge';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -577,6 +578,7 @@ export default function UIUXStudio() {
           ))}
         </div>
         <div style={{ flex: 1 }} />
+        <QuotaBadge />
         <button onClick={() => setHistorySidebarOpen((v) => !v)} style={{ padding: '3px 10px', borderRadius: 5, border: '1px solid var(--surface-border)', background: 'transparent', color: 'var(--text-muted)', fontSize: '0.7rem', cursor: 'pointer' }}>
           {historySidebarOpen ? '⊟ History' : '⊞ History'}
         </button>

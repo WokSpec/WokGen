@@ -8925,3 +8925,21 @@ select:focus-visible {
   background: rgba(167,139,250,0.06);
   color: var(--text);
 }
+
+/* --- API docs page --- */
+.docs-api { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+.docs-api__header { margin-bottom: 40px; }
+.docs-api__title { font-size: 28px; font-weight: 700; margin: 0 0 8px; }
+.docs-api__version { font-size: 12px; background: #252538; padding: 3px 8px; border-radius: 4px; color: var(--accent); font-family: monospace; }
+.docs-api__desc { margin-top: 16px; color: var(--text-muted); line-height: 1.6; }
+.docs-api__auth { background: #0d0d1a; border: 1px solid #303050; border-radius: 8px; padding: 24px; margin-bottom: 32px; }
+.docs-api__auth h2 { font-size: 16px; font-weight: 600; margin: 0 0 12px; }
+.docs-api__auth p { color: var(--text-muted); font-size: 14px; margin: 0 0 12px; }
+.docs-api__code { font-family: monospace; font-size: 13px; background: #1a1a2e; border: 1px solid #303050; border-radius: 4px; padding: 10px 14px; color: var(--accent); margin: 0; overflow-x: auto; }
+.docs-api__endpoints { display: flex; flex-direction: column; gap: 4px; }
+.docs-api__endpoint { }
+.docs-api__op { border: 1px solid #252538; border-radius: 6px; overflow: hidden; }
+.docs-api__op-header { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; background: #0d0d1a; border: none; cursor: pointer; text-align: left; transition: background 0.15s; }
+.docs-api__op-header:hover { background: #131326; }
+.docs-api__op-body { padding: 16px; background: #0a0a18; border-top: 1px solid #252538; }
+.docs-loading, .docs-error { padding: 48px; text-align: center; color: var(--text-muted); }

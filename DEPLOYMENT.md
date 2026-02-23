@@ -58,6 +58,8 @@ In **Project → Settings → Environment Variables**, add:
 | `HF_TOKEN` | *(optional)* HuggingFace access token — improves free rate limits on FLUX.1-schnell |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | *(optional)* OpenTelemetry OTLP exporter URL (e.g. `https://api.honeycomb.io/v1/traces`) |
 | `OTEL_EXPORTER_OTLP_HEADERS` | *(optional)* OpenTelemetry headers as comma-separated key=value pairs (e.g. `x-honeycomb-team=YOUR_KEY`) |
+| `AXIOM_TOKEN` | *(optional)* Axiom/Betterstack API token for log ingestion |
+| `AXIOM_DATASET` | *(optional)* Axiom dataset name (logs sent to `https://cloud.axiom.co/api/v1/datasets/{AXIOM_DATASET}/ingest`; requires `AXIOM_TOKEN`) |
 
 > **CONNECTION POOLING (important for serverless)**
 >

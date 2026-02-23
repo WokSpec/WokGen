@@ -32,3 +32,25 @@ export function serializeErr(err: unknown): Record<string, unknown> {
   }
   return { raw: String(err) };
 }
+
+/** Log drain for Axiom/Betterstack — sends logs via HTTP to Axiom's NDJSON ingest endpoint */
+export function createLogDrain() {
+  if (!process.env.AXIOM_TOKEN || !process.env.AXIOM_DATASET) return null;
+
+  return {
+    send: async (logs: string) => {
+      try {
+        await fetch(`https://cloud.axiom.co/api/v1/datasets/${process.env.AXIOM_DATASET}/ingest`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.AXIOM_TOKEN}`,
+            'Content-Type': 'application/x-ndjson',
+          },
+          body: logs,
+        });
+      } catch {
+        // silent — log drain should never crash the app
+      }
+    },
+  };
+}

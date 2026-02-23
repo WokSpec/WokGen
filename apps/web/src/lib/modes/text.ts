@@ -11,9 +11,9 @@ export const textMode: ModeContract = {
   exportFormats: ['txt', 'md', 'zip'],
   sizeConstraints: { min: 50, max: 5000, defaults: [150, 300, 800, 1500], defaultSize: 300 },
   tools: [
-    { id: 'headline', label: 'Headlines', description: 'Generate brand headlines and taglines', icon: '✍️', outputType: 'copy', exportFormats: ['txt', 'md'] },
-    { id: 'blog', label: 'Blog Post', description: 'Generate long-form blog posts and articles', icon: '📝', outputType: 'copy', exportFormats: ['txt', 'md'] },
-    { id: 'ad', label: 'Ad Copy', description: 'Generate ad copy and CTAs', icon: '📣', outputType: 'copy', exportFormats: ['txt', 'zip'] },
+    { id: 'headline', label: 'Headlines', description: 'Generate brand headlines and taglines', outputType: 'copy', exportFormats: ['txt', 'md'] },
+    { id: 'blog', label: 'Blog Post', description: 'Generate long-form blog posts and articles', outputType: 'copy', exportFormats: ['txt', 'md'] },
+    { id: 'ad', label: 'Ad Copy', description: 'Generate ad copy and CTAs', outputType: 'copy', exportFormats: ['txt', 'zip'] },
   ],
   presets: [
     { id: 'brand', label: 'Brand Voice', tokens: ['brand voice', 'consistent tone', 'on-brand messaging'] },

@@ -22,7 +22,7 @@ export function GenerationStatus({ state, error, progress }: GenerationStatusPro
   if (state === 'error') {
     return (
       <div className="generation-status error">
-        <span>⚠️ {error || 'Generation failed. Please try again.'}</span>
+        <span>{error || 'Generation failed. Please try again.'}</span>
       </div>
     );
   }

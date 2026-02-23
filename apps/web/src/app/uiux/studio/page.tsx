@@ -62,25 +62,25 @@ interface HistoryEntry {
 // Constants
 // ---------------------------------------------------------------------------
 
-const COMPONENT_TYPES: { id: ComponentType; label: string; icon: string; category: string }[] = [
-  { id: 'hero',         label: 'Hero Section',   icon: '◈', category: 'Sections'   },
-  { id: 'features',     label: 'Features',        icon: '◆', category: 'Sections'   },
-  { id: 'pricing',      label: 'Pricing',         icon: '◉', category: 'Sections'   },
-  { id: 'testimonials', label: 'Testimonials',    icon: '◎', category: 'Sections'   },
-  { id: 'faq',          label: 'FAQ',             icon: '◌', category: 'Sections'   },
-  { id: 'cta',          label: 'CTA',             icon: '▶', category: 'Sections'   },
-  { id: 'footer',       label: 'Footer',          icon: '▬', category: 'Sections'   },
-  { id: 'navbar',       label: 'Navbar',          icon: '≡',  category: 'Navigation' },
-  { id: 'sidebar',      label: 'Sidebar',         icon: '⊟', category: 'Navigation' },
-  { id: 'card',         label: 'Card',            icon: '▭', category: 'Components' },
-  { id: 'form',         label: 'Form',            icon: '⊞', category: 'Components' },
-  { id: 'modal',        label: 'Modal',           icon: '⊡', category: 'Components' },
-  { id: 'table',        label: 'Data Table',      icon: '⊟', category: 'Components' },
-  { id: 'dashboard',    label: 'Dashboard',       icon: '⊞', category: 'Pages'      },
-  { id: 'landing',      label: 'Landing Page',    icon: '◈', category: 'Pages'      },
-  { id: 'auth',         label: 'Auth Page',       icon: '⊙', category: 'Pages'      },
-  { id: 'settings',     label: 'Settings Page',   icon: '⊛', category: 'Pages'      },
-  { id: 'custom',       label: 'Custom',          icon: '✦', category: 'Advanced'   },
+const COMPONENT_TYPES: { id: ComponentType; label: string; icon?: string; category: string }[] = [
+  { id: 'hero',         label: 'Hero Section',   category: 'Sections'   },
+  { id: 'features',     label: 'Features',        category: 'Sections'   },
+  { id: 'pricing',      label: 'Pricing',         category: 'Sections'   },
+  { id: 'testimonials', label: 'Testimonials',    category: 'Sections'   },
+  { id: 'faq',          label: 'FAQ',             category: 'Sections'   },
+  { id: 'cta',          label: 'CTA',             category: 'Sections'   },
+  { id: 'footer',       label: 'Footer',          category: 'Sections'   },
+  { id: 'navbar',       label: 'Navbar',           category: 'Navigation' },
+  { id: 'sidebar',      label: 'Sidebar',         category: 'Navigation' },
+  { id: 'card',         label: 'Card',            category: 'Components' },
+  { id: 'form',         label: 'Form',            category: 'Components' },
+  { id: 'modal',        label: 'Modal',           category: 'Components' },
+  { id: 'table',        label: 'Data Table',      category: 'Components' },
+  { id: 'dashboard',    label: 'Dashboard',       category: 'Pages'      },
+  { id: 'landing',      label: 'Landing Page',    category: 'Pages'      },
+  { id: 'auth',         label: 'Auth Page',       category: 'Pages'      },
+  { id: 'settings',     label: 'Settings Page',   category: 'Pages'      },
+  { id: 'custom',       label: 'Custom',          category: 'Advanced'   },
 ];
 
 const COMPONENT_CATEGORIES = ['Sections', 'Navigation', 'Components', 'Pages', 'Advanced'];
@@ -105,16 +105,16 @@ const STYLE_PRESETS: { id: StylePreset; label: string; colors: string[]; desc: s
   { id: 'brutalist',      label: 'Brutalist',       colors: ['#000000', '#ffffff', '#ff0000'], desc: 'Raw, bold, no-nonsense'      },
 ];
 
-const MODEL_OPTIONS: { id: ModelTier; label: string; model: string; badge: string; speed: string }[] = [
-  { id: 'fast',    label: 'Eral Fast',    model: 'Groq Llama 3.3 70B', badge: '⚡', speed: 'fastest'      },
-  { id: 'quality', label: 'Eral Quality', model: 'DeepSeek V3',         badge: '⭐', speed: 'best quality' },
+const MODEL_OPTIONS: { id: ModelTier; label: string; model: string; badge?: string; speed: string }[] = [
+  { id: 'fast',    label: 'Eral Fast',    model: 'Groq Llama 3.3 70B', speed: 'fastest'      },
+  { id: 'quality', label: 'Eral Quality', model: 'DeepSeek V3',         badge: '', speed: 'best quality' },
   { id: 'smart',   label: 'Eral Smart',   model: 'Llama 3.1 70B',       badge: '◎', speed: 'balanced'     },
 ];
 
-const VIEWPORT_OPTIONS: { id: ViewportMode; icon: string; label: string; width: number | undefined }[] = [
-  { id: 'mobile',  icon: '📱', label: 'Mobile',  width: 375  },
-  { id: 'tablet',  icon: '📲', label: 'Tablet',  width: 768  },
-  { id: 'desktop', icon: '🖥',  label: 'Desktop', width: undefined },
+const VIEWPORT_OPTIONS: { id: ViewportMode; icon?: string; label: string; width: number | undefined }[] = [
+  { id: 'mobile',  label: 'Mobile',  width: 375  },
+  { id: 'tablet',  label: 'Tablet',  width: 768  },
+  { id: 'desktop',  label: 'Desktop', width: undefined },
 ];
 
 const EXAMPLE_PROMPTS: Partial<Record<ComponentType, string>> = {
@@ -569,7 +569,7 @@ export default function UIUXStudio() {
     <div className="uiux-studio-root">
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 14px', height: 44, borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-raised)', flexShrink: 0 }}>
-        <span style={{ color: '#f472b6', fontSize: '1.1rem' }}>✦</span>
+        
         <span style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-primary)' }}>WokGen UI/UX</span>
         <div style={{ width: 1, height: 18, background: 'var(--surface-border)', margin: '0 4px' }} />
         {/* Studio / Page Builder tabs */}
@@ -799,7 +799,7 @@ export default function UIUXStudio() {
                   </button>
                 ) : (
                   <button onClick={handleGenerate} disabled={isLoading} style={{ width: '100%', padding: '9px', borderRadius: 7, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg,#a855f7,#ec4899)', color: '#fff', fontWeight: 700, fontSize: '0.83rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                    <span>✦ Generate {FRAMEWORKS.find((f) => f.id === framework)?.label ?? 'Code'}</span>
+                    <span>Generate {FRAMEWORKS.find((f) => f.id === framework)?.label ?? 'Code'}</span>
                     <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>⌘↵</span>
                   </button>
                 )}
@@ -835,7 +835,7 @@ export default function UIUXStudio() {
                     {/* Tabs */}
                     <div style={{ display: 'flex', gap: 2 }}>
                       {(['preview', 'code', 'accessibility'] as OutputTab[]).map((tab) => {
-                        const labels: Record<OutputTab, string> = { preview: '◈ Preview', code: '{ } Code', accessibility: '♿ A11y' };
+                        const labels: Record<OutputTab, string> = { preview: 'Preview', code: '{ } Code', accessibility: '♿ A11y' };
                         return (
                           <button key={tab} onClick={() => setOutputTab(tab)} disabled={!currentResult} style={{ padding: '3px 9px', borderRadius: 5, border: `1px solid ${outputTab === tab ? 'var(--accent-muted)' : 'transparent'}`, background: outputTab === tab ? 'var(--accent-dim)' : 'transparent', color: outputTab === tab ? 'var(--accent)' : 'var(--text-muted)', fontSize: '0.72rem', cursor: currentResult ? 'pointer' : 'not-allowed', opacity: currentResult ? 1 : 0.4 }}>
                             {labels[tab]}
@@ -885,7 +885,7 @@ export default function UIUXStudio() {
                     {currentResult && (
                       <div style={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap' }}>
                         <button onClick={handleCopyCode} style={{ padding: '3px 7px', borderRadius: 4, background: copied ? 'rgba(34,197,94,0.1)' : 'var(--surface-raised)', color: copied ? '#22c55e' : 'var(--text-secondary)', fontSize: '0.7rem', cursor: 'pointer', border: copied ? '1px solid rgba(34,197,94,0.3)' : '1px solid var(--surface-border)' }}>
-                          {copied ? '✓ Copied!' : '⎘ Copy'}
+                          {copied ? 'Copied!' : 'Copy'}
                         </button>
                         <button onClick={stableHandleDownload} style={{ padding: '3px 7px', borderRadius: 4, border: '1px solid var(--surface-border)', background: 'var(--surface-raised)', color: 'var(--text-secondary)', fontSize: '0.7rem', cursor: 'pointer' }}>↓ Download</button>
                         <button onClick={stableHandleZipExport} title="Export as ZIP (multi-file for React)" style={{ padding: '3px 7px', borderRadius: 4, border: '1px solid var(--surface-border)', background: 'var(--surface-raised)', color: 'var(--text-secondary)', fontSize: '0.7rem', cursor: 'pointer' }}>⊞ Export</button>
@@ -896,7 +896,7 @@ export default function UIUXStudio() {
                               <span style={{ fontSize: '0.62rem', color: 'var(--text-disabled)' }}>public</span>
                             </label>
                             <button onClick={handleSaveToGallery} disabled={isSavingToGallery || gallerySaved} style={{ padding: '3px 7px', borderRadius: 4, fontSize: '0.7rem', cursor: isSavingToGallery || gallerySaved ? 'not-allowed' : 'pointer', border: `1px solid ${gallerySaved ? 'rgba(34,197,94,0.4)' : 'var(--surface-border)'}`, background: gallerySaved ? 'rgba(34,197,94,0.08)' : 'var(--surface-raised)', color: gallerySaved ? '#22c55e' : 'var(--text-secondary)' }}>
-                              {gallerySaved ? '✓ Saved' : isSavingToGallery ? '…' : '⬆ Save'}
+                              {gallerySaved ? 'Saved' : isSavingToGallery ? '…' : 'Save'}
                             </button>
                           </>
                         )}
@@ -909,7 +909,7 @@ export default function UIUXStudio() {
                     {!currentResult && !isLoading && !isRefining && <UIUXEmptyState onSelect={(ct) => { setComponentType(ct); setCategoryFilter(COMPONENT_TYPES.find((c) => c.id === ct)?.category ?? 'Sections'); }} />}
                     {(isLoading || isRefining) && (
                       <div className="uiux-loading-state">
-                        <div className="uiux-loading-icon">✦</div>
+                        <div className="uiux-loading-icon"></div>
                         <div className="uiux-loading-text">{loadingStage || (isRefining ? 'Refining…' : 'Generating…')}</div>
                         <div className="uiux-loading-sub">
                           {isRefining ? `Applying refinement to v${currentVersion + 1}…` : `Crafting ${COMPONENT_TYPES.find((c) => c.id === componentType)?.label ?? 'component'} in ${FRAMEWORKS.find((f) => f.id === framework)?.label}`}
@@ -1023,7 +1023,7 @@ function UIUXCodePane({ code, ext, onCopy, copied }: { code: string; ext: string
         <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>component.{ext}</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: '0.62rem', color: 'var(--text-disabled)' }}>{code.split('\n').length} lines · {(new Blob([code]).size / 1024).toFixed(1)} KB</span>
-          <button className="btn-ghost btn-xs" onClick={onCopy}>{copied ? '✓ Copied!' : '⎘ Copy'}</button>
+          <button className="btn-ghost btn-xs" onClick={onCopy}>{copied ? 'Copied!' : 'Copy'}</button>
         </div>
       </div>
       <pre className="uiux-code-content" dangerouslySetInnerHTML={{ __html: highlighted }} />
@@ -1039,7 +1039,7 @@ function UIUXAccessibilityPanel({ hints }: { hints: string[] }) {
   if (hints.length === 0) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 10, padding: '2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '2rem' }}>✅</div>
+        <div style={{ fontSize: '2rem' }}>✓</div>
         <div style={{ fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No accessibility issues detected</div>
         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: 320, lineHeight: 1.6 }}>The component appears to follow accessibility best practices. Always test with a screen reader for full verification.</div>
       </div>
@@ -1055,8 +1055,8 @@ function UIUXAccessibilityPanel({ hints }: { hints: string[] }) {
         {hints.map((hint, i) => {
           const isWarning = /warning|missing|lacks|no\s+alt|no\s+label/i.test(hint) || hint.includes('⚠');
           return (
-            <div key={i} style={{ display: 'flex', gap: 9, padding: '9px 11px', borderRadius: 7, background: isWarning ? 'rgba(245,158,11,0.07)' : 'rgba(99,102,241,0.07)', border: `1px solid ${isWarning ? 'rgba(245,158,11,0.2)' : 'rgba(99,102,241,0.2)'}` }}>
-              <span style={{ fontSize: '0.95rem', flexShrink: 0, marginTop: 1 }}>{isWarning ? '⚠️' : 'ℹ️'}</span>
+            <div key={i} style={{ display: 'flex', gap: 9, padding: '9px 11px', borderRadius: 7, background: isWarning ? '!' : '→', border: `1px solid ${isWarning ? '!' : '→'}` }}>
+              <span style={{ fontSize: '0.95rem', flexShrink: 0, marginTop: 1 }}>{isWarning ? '!' : '→'}</span>
               <div style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>{hint}</div>
             </div>
           );
@@ -1074,7 +1074,7 @@ function UIUXEmptyState({ onSelect }: { onSelect: (ct: ComponentType) => void })
   const featured: ComponentType[] = ['hero', 'pricing', 'dashboard', 'auth', 'landing', 'navbar'];
   return (
     <div className="uiux-empty-state">
-      <div className="uiux-empty-icon">✦</div>
+      <div className="uiux-empty-icon"></div>
       <h2 className="uiux-empty-title">WokGen UI/UX</h2>
       <p className="uiux-empty-desc">Generate production-ready front-end components from a prompt. Preview HTML instantly, copy React / Vue / Svelte for your project.</p>
       <div className="uiux-empty-chips">

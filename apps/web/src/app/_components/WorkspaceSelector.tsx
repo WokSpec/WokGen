@@ -219,7 +219,7 @@ export default function WorkspaceSelector({ mode, activeWorkspaceId, onChange }:
           >
             <span style={{ fontSize: 10, opacity: 0.5 }}>∞</span>
             <span style={{ flex: 1 }}>All Generations</span>
-            {activeWorkspaceId === null && <span style={{ fontSize: 10 }}>✓</span>}
+            {activeWorkspaceId === null && <span style={{ fontSize: 10 }}>{'\u2713'}</span>}
           </button>
 
           {/* Workspace list */}
@@ -298,7 +298,7 @@ export default function WorkspaceSelector({ mode, activeWorkspaceId, onChange }:
                         <span style={{ fontSize: 10, opacity: 0.5 }}>⊡</span>
                         <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ws.name}</span>
                         <span style={{ fontSize: '0.68rem', color: 'var(--text-faint, #555)', marginLeft: 'auto', paddingLeft: '0.5rem' }}>{ws.jobCount}</span>
-                        {activeWorkspaceId === ws.id && <span style={{ fontSize: 10, marginLeft: '0.25rem' }}>✓</span>}
+                        {activeWorkspaceId === ws.id && <span style={{ fontSize: 10, marginLeft: '0.25rem' }}>{'\u2713'}</span>}
                       </button>
                       {/* Rename + delete icons on hover */}
                       <span
@@ -314,7 +314,7 @@ export default function WorkspaceSelector({ mode, activeWorkspaceId, onChange }:
                           onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-muted)')}
                           onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-faint, #555)')}
                         >
-                          ✎
+                          Edit
                         </button>
                         <button
                           onClick={() => setDeleteConf(ws.id)}
@@ -323,7 +323,7 @@ export default function WorkspaceSelector({ mode, activeWorkspaceId, onChange }:
                           onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
                           onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-faint, #555)')}
                         >
-                          ✕
+                          ×
                         </button>
                       </span>
                     </div>
@@ -377,7 +377,7 @@ export default function WorkspaceSelector({ mode, activeWorkspaceId, onChange }:
                     opacity: (!newName.trim() || creating) ? 0.5 : 1,
                   }}
                 >
-                  {creating ? '…' : '✓'}
+                  {creating ? '…' : 'OK'}
                 </button>
               </div>
             ) : (

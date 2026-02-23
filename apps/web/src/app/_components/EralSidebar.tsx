@@ -33,12 +33,12 @@ const MINI_MODEL_OPTIONS: { value: ModelVariant; label: string }[] = [
 ];
 
 const QUICK_COMMANDS: { label: string; path: string }[] = [
-  { label: '🎨 Pixel Studio',    path: '/pixel/studio'    },
-  { label: '💼 Business Studio', path: '/business/studio' },
-  { label: '🔊 Voice Studio',    path: '/voice/studio'    },
-  { label: '✍️ Text Studio',     path: '/text/studio'     },
-  { label: '🖼️ My Gallery',      path: '/pixel/gallery'   },
-  { label: '💰 Pricing',         path: '/pricing'         },
+  { label: 'Pixel Studio',    path: '/pixel/studio'    },
+  { label: 'Business Studio', path: '/business/studio' },
+  { label: 'Voice Studio',    path: '/voice/studio'    },
+  { label: 'Text Studio',     path: '/text/studio'     },
+  { label: 'My Gallery',      path: '/pixel/gallery'   },
+  { label: 'Pricing',         path: '/pricing'         },
 ];
 
 function SidebarBubble({ msg, isStreaming }: { msg: SidebarMessage; isStreaming?: boolean }) {
@@ -188,7 +188,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
         {
           id: `sm-err-${Date.now()}`,
           role: 'assistant',
-          content: `⚠️ ${(err as Error).message ?? 'Something went wrong.'}`,
+          content: `${(err as Error).message ?? 'Something went wrong.'}`,
           createdAt: Date.now(),
         },
       ]);
@@ -222,7 +222,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           aria-label="Open Eral AI companion"
           title="Open Eral"
         >
-          🧠 <span className="esb-toggle-label">Eral</span>
+          <span className="esb-toggle-label">Eral</span>
         </button>
       )}
 
@@ -232,7 +232,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           {/* Header */}
           <div className="esb-header">
             <div className="esb-header-left">
-              <span className="esb-header-icon">🧠</span>
+              <span className="esb-header-icon">AI</span>
               <span className="esb-header-name">Eral</span>
               {mode && (
                 <span className="esb-ctx-badge">{mode}</span>
@@ -347,7 +347,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           maxWidth: 280,
           pointerEvents: 'none',
         }}>
-          ⚡ {actionConfirmation}
+          {actionConfirmation}
         </div>
       )}
 

@@ -42,7 +42,7 @@ function PlanItemCard({
   const [draft, setDraft] = useState(item.prompt);
 
   const statusIcon: Record<string, string> = {
-    pending: '○', running: '◌', done: '✓', skipped: '—', failed: '✗',
+    pending: '', running: '', done: '', skipped: '—', failed: '',
   };
 
   return (
@@ -93,7 +93,7 @@ function PlanItemCard({
         ) : (
           <div className="director-item__prompt" onClick={() => setEditingPrompt(true)} title="Click to edit prompt">
             {item.prompt}
-            <span className="director-item__edit-hint">✎</span>
+            <span className="director-item__edit-hint">Edit</span>
           </div>
         )}
       </div>

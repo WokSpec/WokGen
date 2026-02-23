@@ -519,7 +519,7 @@ function AssetModal({
                     transition: 'color 0.15s ease',
                   }}
                 >
-                  {copied ? '✓ Copied' : '⊕ Copy'}
+                  {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
               <p
@@ -780,7 +780,7 @@ function EmptyState({ search }: { search: string }) {
   if (search) {
     return (
       <div className="empty-state" style={{ gridColumn: '1 / -1', padding: '80px 20px' }}>
-        <div className="empty-state-icon" style={{ fontSize: '2rem' }}>🔍</div>
+        <div className="empty-state-icon"></div>
         <h3 className="empty-state-title">No results for &ldquo;{search}&rdquo;</h3>
         <p className="empty-state-body">Try a different search term or clear filters.</p>
       </div>
@@ -789,7 +789,7 @@ function EmptyState({ search }: { search: string }) {
   return (
     <>
       <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2.5rem 0 1.25rem' }}>
-        <div className="gallery-empty-icon">🕹️</div>
+        <div className="gallery-empty-icon"></div>
         <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.35rem' }}>
           No pixel assets yet
         </p>

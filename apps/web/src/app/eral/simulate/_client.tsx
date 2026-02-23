@@ -18,11 +18,11 @@ interface TurnMessage {
 }
 
 const TONE_OPTIONS = [
-  { id: 'roast',      label: '🔥 Roast Battle',   desc: 'Brutal, comedic burns between personas' },
-  { id: 'debate',     label: '⚖️ Debate',           desc: 'Structured argument with positions' },
-  { id: 'brainstorm', label: '💡 Brainstorm',       desc: 'Collaborative ideation session' },
-  { id: 'interview',  label: '🎤 Interview',        desc: 'Q&A — first persona is the interviewer' },
-  { id: 'casual',     label: '☕ Casual Chat',      desc: 'Natural free-flowing conversation' },
+  { id: 'roast',      label: 'Roast Battle',   desc: 'Brutal, comedic burns between personas' },
+  { id: 'debate',     label: 'Debate',           desc: 'Structured argument with positions' },
+  { id: 'brainstorm', label: 'Brainstorm',       desc: 'Collaborative ideation session' },
+  { id: 'interview',  label: 'Interview',        desc: 'Q&A — first persona is the interviewer' },
+  { id: 'casual',     label: 'Casual Chat',      desc: 'Natural free-flowing conversation' },
 ];
 
 const PRESET_PERSONAS: Persona[][] = [
@@ -351,7 +351,7 @@ export default function SimulateClient() {
         <div className="simulate-feed">
           {transcript.length === 0 && !running && (
             <div className="simulate-feed__empty">
-              <div className="simulate-feed__empty-icon">🎭</div>
+              <div className="simulate-feed__empty-icon"></div>
               <p>Set up your personas and hit <strong>Start simulation</strong> to begin.</p>
             </div>
           )}

@@ -36,7 +36,7 @@ export async function sendWelcomeEmail(to: string, name?: string) {
   const displayName = name ?? 'there';
   await send({
     to,
-    subject: 'Welcome to WokGen ✦',
+    subject: 'Welcome to WokGen',
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;padding:2rem;background:#0d0d0d;color:#ebebeb">
         <h1 style="font-size:1.5rem;font-weight:700;color:#a78bfa;margin:0 0 1rem">WokGen</h1>

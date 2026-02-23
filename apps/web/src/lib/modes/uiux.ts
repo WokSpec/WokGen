@@ -11,9 +11,9 @@ export const uiuxMode: ModeContract = {
   exportFormats: ['tsx', 'html', 'css', 'zip'],
   sizeConstraints: { min: 320, max: 1920, defaults: [375, 768, 1280, 1440, 1920], defaultSize: 1280 },
   tools: [
-    { id: 'section', label: 'Section', description: 'Generate a complete page section (hero, pricing, CTA, etc.)', icon: '▤', outputType: 'code', exportFormats: ['tsx', 'html'] },
-    { id: 'component', label: 'Component', description: 'Generate a reusable UI component (button, card, modal, etc.)', icon: '⬡', outputType: 'code', exportFormats: ['tsx', 'html'] },
-    { id: 'page', label: 'Page', description: 'Generate a complete page layout from multiple sections', icon: '📄', outputType: 'code', exportFormats: ['tsx', 'zip'] },
+    { id: 'section', label: 'Section', description: 'Generate a complete page section (hero, pricing, CTA, etc.)', outputType: 'code', exportFormats: ['tsx', 'html'] },
+    { id: 'component', label: 'Component', description: 'Generate a reusable UI component (button, card, modal, etc.)', outputType: 'code', exportFormats: ['tsx', 'html'] },
+    { id: 'page', label: 'Page', description: 'Generate a complete page layout from multiple sections', outputType: 'code', exportFormats: ['tsx', 'zip'] },
   ],
   presets: [
     { id: 'dark_saas', label: 'Dark SaaS', tokens: ['dark mode', 'SaaS design', 'minimal', 'Tailwind CSS'] },

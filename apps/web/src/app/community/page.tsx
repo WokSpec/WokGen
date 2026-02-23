@@ -40,12 +40,11 @@ interface GalleryResponse {
 // ---------------------------------------------------------------------------
 
 const MODE_FILTERS = [
-  { id: '',         label: 'All Engines', icon: '✦' },
-  { id: 'pixel',    label: 'Pixel',       icon: '🕹️' },
-  { id: 'business', label: 'Business',    icon: '📊' },
-  { id: 'uiux',     label: 'UI/UX',       icon: '🖥️' },
-  { id: 'vector',   label: 'Vector',      icon: '⬡'  },
-  { id: 'emoji',    label: 'Emoji',       icon: '😊' },
+  { id: '',         label: 'All Engines', },
+  { id: 'pixel',    label: 'Pixel',       },
+  { id: 'business', label: 'Business',    },
+  { id: 'uiux',     label: 'UI/UX',       },
+  { id: 'vector',   label: 'Vector',       },
 ] as const;
 
 const SORT_OPTIONS = [
@@ -261,7 +260,7 @@ function AssetModal({
                 onClick={copyPrompt}
                 className={`community-modal-copy-btn${copied ? ' community-modal-copy-btn--copied' : ''}`}
               >
-                {copied ? '✓ Copied' : '⊕ Copy'}
+                {copied ? 'Copied' : 'Copy'}
               </button>
             </div>
             <p
@@ -402,7 +401,7 @@ function EmptyState({ search }: { search: string }) {
   if (search) {
     return (
       <div className="empty-state community-empty-wrap">
-        <div className="empty-state-icon community-empty-icon">🔍</div>
+        <div className="empty-state-icon community-empty-icon"></div>
         <h3 className="empty-state-title">No results for &ldquo;{search}&rdquo;</h3>
         <p className="empty-state-body">Try a different search term or clear filters.</p>
       </div>
@@ -410,7 +409,7 @@ function EmptyState({ search }: { search: string }) {
   }
   return (
     <div className="empty-state community-empty-wrap">
-      <div className="empty-state-icon community-empty-icon community-empty-icon--lg">✦</div>
+      <div className="empty-state-icon community-empty-icon community-empty-icon--lg"></div>
       <h3 className="empty-state-title">Community is just getting started</h3>
       <p className="empty-state-body">
         Be the first to share. Generate something in a studio and enable &ldquo;Share to Gallery&rdquo;.
@@ -641,7 +640,7 @@ export default function CommunityPage() {
                     onClick={() => setGalleryTab(tab)}
                     className={`community-gallery-tab${galleryTab === tab ? ' community-gallery-tab--active' : ''}`}
                   >
-                    {tab === 'community' ? '🌐 Community' : '🔒 My Generations'}
+                    {tab === 'community' ? 'Community' : 'My Generations'}
                   </button>
                 ))}
                 <div className="community-tab-separator" />
@@ -655,7 +654,7 @@ export default function CommunityPage() {
                 onClick={() => setModeFilter(m.id)}
                 className={`community-mode-tab${modeFilter === m.id ? ' community-mode-tab--active' : ''}`}
               >
-                <span className="community-mode-tab-icon">{m.icon}</span>
+                
                 {m.label}
               </button>
             ))}
@@ -687,7 +686,7 @@ export default function CommunityPage() {
       <div className="community-main">
         {error && (
           <div className="community-error-banner">
-            <span className="community-error-message">⚠️ Failed to load: {error}</span>
+            <span className="community-error-message">Failed to load: {error}</span>
             <button
               onClick={() => fetchAssets(null, true)}
               className="community-retry-btn"

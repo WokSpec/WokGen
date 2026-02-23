@@ -60,7 +60,7 @@ function Callout({
   children: React.ReactNode;
   type?: 'info' | 'tip' | 'warn';
 }) {
-  const icons = { info: 'ℹ', tip: '✦', warn: '⚠' };
+  const icons = { info: 'i', tip: '→', warn: '!' };
   return (
     <div className={`docs-callout docs-callout--${type}`}>
       <span className="docs-callout-icon">{icons[type]}</span>
@@ -97,7 +97,7 @@ export default function PixelDocs() {
         <aside className="docs-sidebar">
           <Link href="/docs" className="docs-back">← Docs Hub</Link>
           <div className="docs-sidebar-mode">
-            <span style={{ color: '#a78bfa' }}>👾</span>
+            
             <span>WokGen Pixel</span>
           </div>
           <nav className="docs-toc">
@@ -223,10 +223,10 @@ export default function PixelDocs() {
             200 characters</strong>. Lead with the subject, then add descriptors.
           </P>
           <Callout type="warn">
-            ❌ <strong>Bad:</strong> &quot;I want a really cool fire sword that looks ancient
+            <strong>Bad:</strong> &quot;I want a really cool fire sword that looks ancient
             and battle-worn, maybe with some glowing runes on the blade and a red gem in the
             hilt, it should feel powerful and dangerous&quot;<br />
-            ✅ <strong>Good:</strong> <Code>fire sword, battle-worn blade, glowing runes, red gem hilt</Code>
+            <strong>Good:</strong> <Code>fire sword, battle-worn blade, glowing runes, red gem hilt</Code>
           </Callout>
           <P>
             Notice: do <strong>not</strong> write &quot;pixel art&quot; yourself — the engine
@@ -793,7 +793,7 @@ crystal orb,      glowing purple,   faceted glass,   arcane magic`}</Pre>
           <div className="docs-table-wrap">
             <table className="docs-table">
               <thead>
-                <tr><th>❌ Bad</th><th>✅ Good</th><th>Why</th></tr>
+                <tr><th>Bad</th><th>Good</th><th>Why</th></tr>
               </thead>
               <tbody>
                 {[
@@ -963,7 +963,7 @@ potion bottle, warm glow, limited palette: amber, gold, orange`}</Pre>
                   ],
                   [
                     '64 × 64',
-                    'Standard ✓',
+                    'Standard',
                     'Most sprites — characters, enemies, items, weapons, tiles',
                     'Standard or HD',
                     'Recommended default for the majority of game assets. Best bang-for-buck.',

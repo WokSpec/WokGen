@@ -184,7 +184,7 @@ export default function SfxBrowser({ onSelectPrompt }: Props) {
                   whiteSpace:   'nowrap',
                 }}
               >
-                ✦ Similar
+                Similar
               </button>
             )}
           </div>

@@ -185,14 +185,14 @@ export default function BusinessGallery() {
         </div>
       ) : error ? (
         <div className="gallery-error">
-          <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+          <span className="gallery-warn-icon">!</span>
           <p>Failed to load gallery</p>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
           <button className="btn-ghost btn-sm" onClick={() => fetchAssets(null, true)}>Retry</button>
         </div>
       ) : assets.length === 0 ? (
         <div className="gallery-empty">
-          <div className="gallery-empty-icon">📊</div>
+          <div className="gallery-empty-icon"></div>
           <p className="gallery-empty-title">No business assets yet</p>
           <p className="gallery-empty-desc">Generate your first business asset in the Business Studio.</p>
           <Link href="/business/studio" className="btn-primary btn-sm">Go to Business Studio →</Link>
@@ -248,7 +248,7 @@ export default function BusinessGallery() {
       {selected && (
         <div className="gallery-lightbox" onClick={() => setSelected(null)}>
           <div className="gallery-lightbox-inner" onClick={e => e.stopPropagation()}>
-            <button className="gallery-lightbox-close" onClick={() => setSelected(null)}>✕</button>
+            <button className="gallery-lightbox-close" onClick={() => setSelected(null)}>×</button>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={selected.imageUrl}

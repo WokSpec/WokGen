@@ -19,18 +19,18 @@ export const metadata: Metadata = {
 };
 
 const FEATURES = [
-  { icon: '∞', label: 'Free Forever', desc: 'Unlimited standard generation, no account required for basic use.' },
-  { icon: '⚡', label: 'HD Quality',   desc: 'Replicate FLUX for crisp, high-detail pixel art on paid plans.' },
-  { icon: '🎞', label: 'GIF Animation', desc: 'Generate multi-frame sprite animations as looping GIFs.' },
-  { icon: '🎮', label: 'Game-Ready',   desc: 'Pixel-perfect sizes: 32px, 64px, 128px, 256px, 512px.' },
+  { label: 'Free Forever', desc: 'Unlimited standard generation, no account required for basic use.' },
+  { label: 'HD Quality',   desc: 'Replicate FLUX for crisp, high-detail pixel art on paid plans.' },
+  { label: 'GIF Animation', desc: 'Generate multi-frame sprite animations as looping GIFs.' },
+  { label: 'Game-Ready',   desc: 'Pixel-perfect sizes: 32px, 64px, 128px, 256px, 512px.' },
 ];
 
 const TOOLS = [
-  { id: 'generate', label: 'Generate', icon: '✦', desc: 'Create a single pixel art asset from a prompt. 18 style presets, category and era controls.', example: 'warrior RPG sprite, front-facing, 64x64' },
-  { id: 'animate',  label: 'Animate',  icon: '🎞', desc: 'Generate animated sprite sequences as GIFs. Idle, walk, run, attack, and effect presets.', example: 'fire mage character, idle animation, 8 frames' },
-  { id: 'scene',    label: 'Scene',    icon: '🗺', desc: 'Generate cohesive tilesets and environmental scenes with consistent palette.', example: 'dungeon stone floor tileset, dark atmosphere' },
-  { id: 'rotate',   label: 'Rotate',   icon: '↻', desc: 'Generate multi-directional character views: front, back, left, right.', example: 'knight character, all 4 directions, consistent style' },
-  { id: 'inpaint',  label: 'Inpaint',  icon: '✏', desc: 'Edit or extend an existing pixel art image with a brush mask.', example: 'add a glowing sword to the existing warrior sprite' },
+  { id: 'generate', label: 'Generate', desc: 'Create a single pixel art asset from a prompt. 18 style presets, category and era controls.', example: 'warrior RPG sprite, front-facing, 64x64' },
+  { id: 'animate',  label: 'Animate',  desc: 'Generate animated sprite sequences as GIFs. Idle, walk, run, attack, and effect presets.', example: 'fire mage character, idle animation, 8 frames' },
+  { id: 'scene',    label: 'Scene',    desc: 'Generate cohesive tilesets and environmental scenes with consistent palette.', example: 'dungeon stone floor tileset, dark atmosphere' },
+  { id: 'rotate',   label: 'Rotate',   desc: 'Generate multi-directional character views: front, back, left, right.', example: 'knight character, all 4 directions, consistent style' },
+  { id: 'inpaint',  label: 'Inpaint',  desc: 'Edit or extend an existing pixel art image with a brush mask.', example: 'add a glowing sword to the existing warrior sprite' },
 ];
 
 const SHOWCASE = [
@@ -78,7 +78,7 @@ export default function PixelLanding() {
       <section className="landing-features">
         {FEATURES.map(f => (
           <div key={f.label} className="landing-feature-card">
-            <span className="landing-feature-icon">{f.icon}</span>
+            <span className="landing-feature-icon"></span>
             <div>
               <div className="landing-feature-label">{f.label}</div>
               <div className="landing-feature-desc">{f.desc}</div>
@@ -96,8 +96,7 @@ export default function PixelLanding() {
             {TOOLS.map(t => (
               <div key={t.id} className="landing-tool-card">
                 <div className="landing-tool-header">
-                  <span className="landing-tool-icon">{t.icon}</span>
-                  <span className="landing-tool-label">{t.label}</span>
+                                    <span className="landing-tool-label">{t.label}</span>
                 </div>
                 <p className="landing-tool-desc">{t.desc}</p>
                 <Link

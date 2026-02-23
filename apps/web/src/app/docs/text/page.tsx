@@ -55,7 +55,7 @@ function Callout({
   children: React.ReactNode;
   type?: 'info' | 'tip' | 'warn';
 }) {
-  const icons = { info: 'ℹ', tip: '✦', warn: '⚠' };
+  const icons = { info: 'i', tip: '→', warn: '!' };
   return (
     <div className={`docs-callout docs-callout--${type}`}>
       <span className="docs-callout-icon">{icons[type]}</span>
@@ -93,7 +93,7 @@ export default function TextDocs() {
         <aside className="docs-sidebar">
           <Link href="/docs" className="docs-back">← Docs Hub</Link>
           <div className="docs-sidebar-mode">
-            <span style={{ color: '#10b981' }}>✍️</span>
+            
             <span>WokGen Text</span>
           </div>
           <nav className="docs-toc">
@@ -435,7 +435,7 @@ export default function TextDocs() {
           </UL>
 
           <Callout type="info">
-            Eral is also available as a standalone AI companion in the sidebar (🧠 Eral button)
+            Eral is also available as a standalone AI companion in the sidebar (Eral button)
             across all WokGen studios, and as a full chat interface at{' '}
             <Link href="/eral">/eral</Link>.
           </Callout>

@@ -15,7 +15,7 @@ export default function DocsGallery() {
         <aside className="docs-sidebar">
           <Link href="/docs" className="docs-back">← Docs Hub</Link>
           <div className="docs-sidebar-mode">
-            <span>🖼</span> Gallery
+             Gallery
           </div>
           <nav className="docs-toc">
             <a href="#overview"       className="docs-toc-link">What the Gallery Is</a>
@@ -91,7 +91,7 @@ export default function DocsGallery() {
               </li>
             </ul>
             <div className="docs-callout docs-callout--info">
-              <span className="docs-callout-icon">ℹ</span>
+              <span className="docs-callout-icon">i</span>
               <span>
                 A search bar to filter gallery assets by prompt text is coming soon. For now,
                 use the mode and sort filters to navigate the community feed.
@@ -118,7 +118,7 @@ export default function DocsGallery() {
                 after saving.</li>
             </ul>
             <div className="docs-callout docs-callout--warn">
-              <span className="docs-callout-icon">⚠</span>
+              <span className="docs-callout-icon">!</span>
               <span>
                 Prompts are publicly visible when you save to the gallery. Do not include personal
                 information, private brand names, or confidential details in prompts you intend to save.
@@ -168,7 +168,7 @@ export default function DocsGallery() {
               compression or resizing applied to gallery-saved assets.
             </p>
             <div className="docs-callout docs-callout--info">
-              <span className="docs-callout-icon">ℹ</span>
+              <span className="docs-callout-icon">i</span>
               <span>
                 Assets in the gallery are hosted on CDN URLs. You do not need to be signed in
                 to download community assets.
@@ -248,7 +248,7 @@ export default function DocsGallery() {
               </li>
             </ul>
             <div className="docs-callout docs-callout--warn">
-              <span className="docs-callout-icon">⚠</span>
+              <span className="docs-callout-icon">!</span>
               <span>
                 Do not use WokGen to generate hateful, violent, sexually explicit, or otherwise
                 harmful content. Violations result in asset removal and potential account suspension.

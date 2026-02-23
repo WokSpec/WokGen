@@ -19,35 +19,35 @@ export const metadata: Metadata = {
 };
 
 const FEATURES = [
-  { icon: '⬛', label: 'Logo Generation',  desc: 'Minimal brand marks and symbol icons, clean isolated backgrounds.' },
-  { icon: '🎨', label: 'Brand Kit (4×)',   desc: 'Generate a coherent 4-image brand set in one click.' },
-  { icon: '📊', label: 'Slide Visuals',    desc: '16:9, 4:3, and square backgrounds for decks and keynotes.' },
-  { icon: '📱', label: 'Social Banners',   desc: 'Platform-correct sizes: Twitter, Instagram, LinkedIn, YouTube, OG.' },
+  { label: 'Logo Generation',  desc: 'Minimal brand marks and symbol icons, clean isolated backgrounds.' },
+  { label: 'Brand Kit (4×)',   desc: 'Generate a coherent 4-image brand set in one click.' },
+  { label: 'Slide Visuals',    desc: '16:9, 4:3, and square backgrounds for decks and keynotes.' },
+  { label: 'Social Banners',   desc: 'Platform-correct sizes: Twitter, Instagram, LinkedIn, YouTube, OG.' },
 ];
 
 const TOOLS = [
   {
-    id: 'logo', label: 'Logo', icon: '⬛',
+    id: 'logo', label: 'Logo',
     desc: 'Symbol-first logo generation. Isolated on clean backgrounds, scalable to any size. 8 style presets from minimal flat to bold geometric.',
     example: 'FinTech startup focused on international payments, minimal, trustworthy',
   },
   {
-    id: 'brand-kit', label: 'Brand Kit', icon: '🎨',
+    id: 'brand-kit', label: 'Brand Kit',
     desc: 'Fire 4 parallel generations: logo mark, brand banner, profile image, OG meta. All from one concept, consistent visual language.',
     example: 'Creative agency specializing in branding and digital design, bold and modern',
   },
   {
-    id: 'slide', label: 'Slide Asset', icon: '📊',
+    id: 'slide', label: 'Slide Asset',
     desc: 'Full-bleed presentation backgrounds with text-safe zones. 16:9 widescreen, 4:3 standard, 1:1 square formats.',
     example: 'SaaS product launch keynote, dark tech style, subtle circuit board texture',
   },
   {
-    id: 'social', label: 'Social Banner', icon: '📱',
+    id: 'social', label: 'Social Banner',
     desc: 'Platform-smart sizing. Select your target platform and get pixel-perfect dimensions automatically.',
     example: 'New feature announcement for a productivity app, clean minimal flat design',
   },
   {
-    id: 'web-hero', label: 'Web Hero', icon: '🌐',
+    id: 'web-hero', label: 'Web Hero',
     desc: 'Full-resolution hero backgrounds with configurable text zones. 1920×1080 by default, designed for web.',
     example: 'Developer tools company, dark atmospheric background, subtle code texture',
   },
@@ -107,7 +107,7 @@ export default function BusinessLanding() {
       <section className="landing-features">
         {FEATURES.map(f => (
           <div key={f.label} className="landing-feature-card">
-            <span className="landing-feature-icon">{f.icon}</span>
+            <span className="landing-feature-icon"></span>
             <div>
               <div className="landing-feature-label">{f.label}</div>
               <div className="landing-feature-desc">{f.desc}</div>
@@ -127,8 +127,7 @@ export default function BusinessLanding() {
             {TOOLS.map(t => (
               <div key={t.id} className="landing-tool-card">
                 <div className="landing-tool-header">
-                  <span className="landing-tool-icon">{t.icon}</span>
-                  <span className="landing-tool-label">{t.label}</span>
+                                    <span className="landing-tool-label">{t.label}</span>
                 </div>
                 <p className="landing-tool-desc">{t.desc}</p>
                 <Link

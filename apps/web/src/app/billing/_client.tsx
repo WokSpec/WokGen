@@ -176,7 +176,7 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
       {/* Toast */}
       {toast && (
         <div className={`billing-toast billing-toast--${toast.type}`}>
-          <span>{toast.type === 'error' ? '⚠ ' : '✓ '}{toast.msg}</span>
+          <span>{toast.type === 'error' ? '! ' : '✓ '}{toast.msg}</span>
           <button className="billing-toast__dismiss" onClick={() => setToast(null)} aria-label="Dismiss">×</button>
         </div>
       )}
@@ -184,7 +184,7 @@ export default function BillingClient({ currentPlanId, stripeEnabled, plans, hdC
       {/* Stripe unavailable */}
       {!stripeEnabled && (
         <div className="billing-banner--warn">
-          <span>⚠</span>
+          <span>!</span>
           <span>Billing is not configured on this deployment. Standard generation is still free and unlimited.</span>
         </div>
       )}

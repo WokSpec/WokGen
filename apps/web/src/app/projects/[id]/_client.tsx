@@ -129,7 +129,7 @@ function RelationshipPanel({
     <div className="rel-panel">
       <div className="rel-panel__header">
         <h3 className="rel-panel__title">Link asset</h3>
-        <button className="btn btn--ghost btn--sm" onClick={onClose}>✕</button>
+        <button className="btn btn--ghost btn--sm" onClick={onClose}>&times;</button>
       </div>
       <div className="rel-panel__from">
         <span className="rel-panel__label">From:</span>
@@ -271,7 +271,7 @@ function AssetLightbox({ job, onClose }: { job: Job; onClose: () => void }) {
     <div className="lightbox" onClick={e => { if (e.target === dialogRef.current?.parentElement) onClose(); }}>
       <div className="lightbox__backdrop" onClick={onClose} />
       <div className="lightbox__dialog" ref={dialogRef}>
-        <button className="lightbox__close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="lightbox__close" onClick={onClose} aria-label="Close">&times;</button>
         <div className="lightbox__image-wrap">
           {job.resultUrl ? (
             <img src={job.resultUrl} alt={job.prompt.slice(0, 80)} className="lightbox__image" />
@@ -303,8 +303,8 @@ function AssetLightbox({ job, onClose }: { job: Job; onClose: () => void }) {
 // ─── Activity Feed ────────────────────────────────────────────────────────────
 
 const ACTIVITY_ICONS: Record<string, string> = {
-  generate: '⚡', comment: '💬', export: '📦', member_join: '👋',
-  brief_update: '📝', batch: '🗂️', like: '❤️',
+  generate: '→', comment: '»', export: '↓', member_join: '+',
+  brief_update: '»', batch: '□', like: '♥',
 };
 
 function timeAgo(iso: string): string {
@@ -412,7 +412,7 @@ function CommentsPanel({ jobId }: { jobId: string }) {
             <div className="comments-panel__header">
               <span className="comments-panel__author">{c.author.name ?? c.author.email ?? 'You'}</span>
               <span className="comments-panel__time">{timeAgo(c.createdAt)}</span>
-              <button className="comments-panel__del" onClick={() => del(c.id)} title="Delete">✕</button>
+              <button className="comments-panel__del" onClick={() => del(c.id)} title="Delete">&times;</button>
             </div>
             <p className="comments-panel__body">{c.body}</p>
           </li>
@@ -646,7 +646,7 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
                     >
                       Link
                     </button>
-                    <button className="btn btn--ghost btn--sm" onClick={() => setSelectedId(null)}>✕</button>
+                    <button className="btn btn--ghost btn--sm" onClick={() => setSelectedId(null)}>&times;</button>
                   </div>
                   {selectedRels.length > 0 && (
                     <div className="project-selected-rels">
@@ -681,7 +681,7 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
                       onClick={() => handleExtractPalette(selectedId)}
                       disabled={extractingPalette || !selectedJob?.resultUrl}
                     >
-                      {extractingPalette ? '⏳ Extracting…' : '🎨 Extract palette'}
+                      {extractingPalette ? 'Extracting…' : 'Extract palette'}
                     </button>
                     {extractedPalette && extractedPalette.length > 0 && (
                       <div className="style-dna-panel__swatches">

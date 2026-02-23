@@ -166,7 +166,7 @@ export function FontPairing({ brandStyle }: Props) {
                 onClick={() => copyCss(pair, idx)}
                 style={{ fontSize: '0.68rem' }}
               >
-                {copiedIdx === idx ? '✓ Copied' : 'Copy CSS'}
+                {copiedIdx === idx ? 'Copied' : 'Copy CSS'}
               </button>
               <a
                 href={`https://fonts.google.com/specimen/${pair.heading.replace(/ /g, '+')}`}

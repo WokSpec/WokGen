@@ -419,7 +419,7 @@ function AssetModal({
                   onClick={copyPrompt}
                   style={{ fontSize: '0.65rem', color: copied ? 'var(--success)' : 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, transition: 'color 0.15s ease' }}
                 >
-                  {copied ? '✓ Copied' : '⊕ Copy'}
+                  {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
               <p
@@ -576,7 +576,7 @@ function ShowcaseCard({ item, index }: { item: typeof SHOWCASE_PROMPTS[number]; 
       <div className="gallery-card-image">
         <div aria-hidden="true" style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.3 }}>
           <span style={{ fontSize: 48, color: ACCENT }}>
-            {item.tool === 'icon' ? '◈' : '✿'}
+            {''}
           </span>
         </div>
       </div>
@@ -598,7 +598,7 @@ function EmptyState({ search }: { search: string }) {
   if (search) {
     return (
       <div className="empty-state" style={{ gridColumn: '1 / -1', padding: '80px 20px' }}>
-        <div className="empty-state-icon" style={{ fontSize: '2rem' }}>🔍</div>
+        <div className="empty-state-icon"></div>
         <h3 className="empty-state-title">No results for &ldquo;{search}&rdquo;</h3>
         <p className="empty-state-body">Try a different search term or clear filters.</p>
       </div>

@@ -36,10 +36,10 @@ export function useToast(): ToastContextValue {
 // Colors
 // ---------------------------------------------------------------------------
 const TOAST_COLORS: Record<ToastType, { bg: string; border: string; icon: string }> = {
-  success: { bg: 'rgba(16,185,129,0.12)', border: '#10b981', icon: '✓' },
-  error:   { bg: 'rgba(239,68,68,0.12)',  border: '#ef4444', icon: '✕' },
-  info:    { bg: 'rgba(139,92,246,0.12)', border: '#8b5cf6', icon: 'ℹ' },
-  warning: { bg: 'rgba(245,158,11,0.12)', border: '#f59e0b', icon: '⚠' },
+  success: { bg: 'rgba(16,185,129,0.12)', border: '#10b981', icon: 'ok' },
+  error:   { bg: 'rgba(239,68,68,0.12)',  border: '#ef4444', icon: 'x' },
+  info:    { bg: 'rgba(139,92,246,0.12)', border: '#8b5cf6', icon: 'i' },
+  warning: { bg: 'rgba(245,158,11,0.12)', border: '#f59e0b', icon: '!' },
 };
 
 // ---------------------------------------------------------------------------

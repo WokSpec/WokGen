@@ -67,7 +67,7 @@ export default function ApiDocsPage() {
                   <div className="docs-api__op-body">
                     {op.description && <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{op.description}</p>}
                     {op.security && op.security.length > 0 && (
-                      <div style={{ fontSize: 12, color: '#f59e0b', marginTop: 8 }}>🔑 Requires authentication</div>
+                      <div style={{ fontSize: 12, color: '#f59e0b', marginTop: 8 }}>Requires authentication</div>
                     )}
                     <div style={{ marginTop: 12 }}>
                       <strong style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Responses</strong>

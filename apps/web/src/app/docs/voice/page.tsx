@@ -51,7 +51,7 @@ function Callout({
   children: React.ReactNode;
   type?: 'info' | 'tip' | 'warn';
 }) {
-  const icons = { info: 'ℹ', tip: '✦', warn: '⚠' };
+  const icons = { info: 'i', tip: '→', warn: '!' };
   return (
     <div className={`docs-callout docs-callout--${type}`}>
       <span className="docs-callout-icon">{icons[type]}</span>
@@ -90,7 +90,7 @@ export default function VoiceDocs() {
         <aside className="docs-sidebar">
           <Link href="/docs" className="docs-back">← Docs Hub</Link>
           <div className="docs-sidebar-mode">
-            <span style={{ color: '#f59e0b' }}>🎙️</span>
+            
             <span>WokGen Voice</span>
           </div>
           <nav className="docs-toc">
@@ -284,10 +284,10 @@ export default function VoiceDocs() {
             platforms, especially for non-English text.
           </P>
           <UL>
-            <LI>✓ Instant — no network latency</LI>
-            <LI>✓ Free, no credits consumed</LI>
-            <LI>✗ Robotic on some OS/browser combos</LI>
-            <LI>✗ Language quality varies by installed system voices</LI>
+            <LI>Instant — no network latency</LI>
+            <LI>Free, no credits consumed</LI>
+            <LI>Robotic on some OS/browser combos</LI>
+            <LI>Language quality varies by installed system voices</LI>
           </UL>
 
           <H3>HD tier (1 credit per clip)</H3>
@@ -297,11 +297,11 @@ export default function VoiceDocs() {
             significantly more natural, with proper prosody, breathing, and emotional inflection.
           </P>
           <UL>
-            <LI>✓ Natural-sounding neural TTS</LI>
-            <LI>✓ Consistent quality across all languages</LI>
-            <LI>✓ Better character voice expressiveness with Bark</LI>
-            <LI>✗ Costs 1 credit per clip</LI>
-            <LI>✗ Takes 5–15 seconds to generate</LI>
+            <LI>Natural-sounding neural TTS</LI>
+            <LI>Consistent quality across all languages</LI>
+            <LI>Better character voice expressiveness with Bark</LI>
+            <LI>Costs 1 credit per clip</LI>
+            <LI>Takes 5–15 seconds to generate</LI>
           </UL>
 
           <Callout type="tip">

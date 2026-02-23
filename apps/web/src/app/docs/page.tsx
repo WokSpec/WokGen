@@ -16,7 +16,6 @@ const DOCS_SECTIONS = [
         href: '/docs/pixel',
         title: 'WokGen Pixel',
         desc: 'Sprites, animations, tilesets, and game-ready assets. Prompting guide, tools, and export.',
-        icon: '👾',
         badge: 'Live',
         badgeColor: '#a78bfa',
       },
@@ -24,7 +23,6 @@ const DOCS_SECTIONS = [
         href: '/docs/business',
         title: 'WokGen Business',
         desc: 'Logos, brand kits, slide visuals, social banners, and web hero images.',
-        icon: '💼',
         badge: 'Live',
         badgeColor: '#60a5fa',
       },
@@ -32,7 +30,6 @@ const DOCS_SECTIONS = [
         href: '/docs/vector',
         title: 'WokGen Vector',
         desc: 'SVG icon sets, illustration libraries, and design system components.',
-        icon: '✦',
         badge: 'Beta',
         badgeColor: '#34d399',
       },
@@ -40,7 +37,6 @@ const DOCS_SECTIONS = [
         href: '/docs/emoji',
         title: 'WokGen Emoji',
         desc: 'Custom emoji packs, reaction sets, and app icon generation.',
-        icon: '😄',
         badge: 'Beta',
         badgeColor: '#fb923c',
       },
@@ -48,7 +44,6 @@ const DOCS_SECTIONS = [
         href: '/docs/uiux',
         title: 'WokGen UI/UX',
         desc: 'React components, Tailwind sections, and design-to-code generation.',
-        icon: '⌨',
         badge: 'Live',
         badgeColor: '#f472b6',
       },
@@ -56,7 +51,6 @@ const DOCS_SECTIONS = [
         href: '/docs/voice',
         title: 'WokGen Voice',
         desc: 'AI text-to-speech for narration, NPC dialogue, product demos, podcast intros, and ads.',
-        icon: '🎙️',
         badge: 'Beta',
         badgeColor: '#f59e0b',
       },
@@ -64,7 +58,6 @@ const DOCS_SECTIONS = [
         href: '/docs/text',
         title: 'WokGen Text',
         desc: 'AI copywriting engine: headlines, blog posts, product descriptions, emails, social posts, and more.',
-        icon: '✍️',
         badge: 'Beta',
         badgeColor: '#10b981',
       },
@@ -77,7 +70,6 @@ const DOCS_SECTIONS = [
         href: '/docs/platform/account',
         title: 'Account & Auth',
         desc: 'Sign up with GitHub, manage your account, and understand your profile.',
-        icon: '👤',
         badge: null,
         badgeColor: null,
       },
@@ -85,7 +77,6 @@ const DOCS_SECTIONS = [
         href: '/docs/platform/billing',
         title: 'Plans & Billing',
         desc: 'Free tier limits, HD credits, mode add-ons, and Stripe subscription management.',
-        icon: '💳',
         badge: null,
         badgeColor: null,
       },
@@ -93,7 +84,6 @@ const DOCS_SECTIONS = [
         href: '/docs/platform/api',
         title: 'API Reference',
         desc: 'Generate assets programmatically. Endpoints, authentication, and response formats.',
-        icon: '{}',
         badge: null,
         badgeColor: null,
       },
@@ -101,7 +91,6 @@ const DOCS_SECTIONS = [
         href: '/docs/platform/gallery',
         title: 'Gallery & Projects',
         desc: 'Save, organize, and share your generated assets.',
-        icon: '🖼',
         badge: null,
         badgeColor: null,
       },
@@ -134,7 +123,7 @@ export default function DocsHub() {
                   className={`docs-hub-card${item.href === '#' ? ' docs-hub-card--disabled' : ''}`}
                 >
                   <div className="docs-hub-card-header">
-                    <span className="docs-hub-card-icon">{item.icon}</span>
+                    
                     <span className="docs-hub-card-title">{item.title}</span>
                     {item.badge && (
                       <span

@@ -15,15 +15,15 @@ import type { VoiceStyle, ContentType } from '@/lib/tts-intelligence';
 // Constants
 // ---------------------------------------------------------------------------
 
-const VOICE_STYLES: { id: VoiceStyle; label: string; icon: string; desc: string }[] = [
-  { id: 'natural',   label: 'Natural',   icon: '🎙️', desc: 'Warm and conversational' },
-  { id: 'character', label: 'Character', icon: '🎭', desc: 'Expressive and animated' },
-  { id: 'whisper',   label: 'Whisper',   icon: '🤫', desc: 'Soft and intimate' },
-  { id: 'energetic', label: 'Energetic', icon: '⚡', desc: 'Dynamic and exciting' },
-  { id: 'news',      label: 'News',      icon: '📰', desc: 'Clear and authoritative' },
-  { id: 'asmr',      label: 'ASMR',      icon: '✨', desc: 'Gentle and soothing' },
-  { id: 'narrative', label: 'Narrative', icon: '📖', desc: 'Rich storytelling' },
-  { id: 'deep',      label: 'Deep',      icon: '🎸', desc: 'Powerful baritone' },
+const VOICE_STYLES: { id: VoiceStyle; label: string; icon?: string; desc: string }[] = [
+  { id: 'natural',   label: 'Natural',   desc: 'Warm and conversational' },
+  { id: 'character', label: 'Character', desc: 'Expressive and animated' },
+  { id: 'whisper',   label: 'Whisper',   desc: 'Soft and intimate' },
+  { id: 'energetic', label: 'Energetic', desc: 'Dynamic and exciting' },
+  { id: 'news',      label: 'News',      desc: 'Clear and authoritative' },
+  { id: 'asmr',      label: 'ASMR',      desc: 'Gentle and soothing' },
+  { id: 'narrative', label: 'Narrative', desc: 'Rich storytelling' },
+  { id: 'deep',      label: 'Deep',      desc: 'Powerful baritone' },
 ];
 
 const LANGUAGES = [
@@ -59,7 +59,7 @@ const CONTENT_TYPE_COLORS: Record<ContentType, string> = {
 };
 
 const PROVIDER_LABELS: Record<string, string> = {
-  elevenlabs:  'ElevenLabs ✦',
+  elevenlabs:  'ElevenLabs',
   openai:      'OpenAI TTS',
   huggingface: 'Kokoro',
 };
@@ -75,22 +75,22 @@ const MAX_CHARS = 10000; // shown in UI; actual server limit depends on tier
 
 const EXAMPLES = [
   {
-    label: '🎙️ Product Intro',
+    label: 'Product Intro',
     text: "Welcome to WokGen — the world's most powerful AI asset generation platform. Generate stunning pixel art, professional brand kits, and production-ready UI components in seconds.",
     style: 'natural' as VoiceStyle,
   },
   {
-    label: '🐉 Game Narration',
+    label: 'Game Narration',
     text: "The ancient dragon unfurled its wings across the crimson sky. You've been chosen, young warrior. Your quest begins... now.",
     style: 'narrative' as VoiceStyle,
   },
   {
-    label: '📰 News Script',
+    label: 'News Script',
     text: "Breaking: WokSpec announces Eral 7c — an AI companion that doesn't just answer questions, it controls your entire creative workflow.",
     style: 'news' as VoiceStyle,
   },
   {
-    label: '⚡ Notification',
+    label: 'Notification',
     text: "Hey! Your new asset pack just finished generating! Check out these amazing pixel art characters — they turned out incredible!",
     style: 'energetic' as VoiceStyle,
   },
@@ -379,7 +379,7 @@ export default function VoiceStudioPage() {
                   gap: 6,
                 }}
               >
-                <span>🎤</span>
+                
                 <span>
                   Voice: <strong style={{ color: 'var(--text)' }}>{liveVoice.name}</strong>
                   {liveContentType && (
@@ -675,7 +675,7 @@ export default function VoiceStudioPage() {
                   Generating…
                 </span>
               ) : (
-                '⚡ Generate Voice'
+                'Generate Voice'
               )}
             </button>
             {(text || audioUrl) && (
@@ -823,7 +823,7 @@ export default function VoiceStudioPage() {
                 minHeight: 240,
               }}
             >
-              <span style={{ fontSize: 52, opacity: 0.25 }}>🎙️</span>
+              
               <p style={{ fontSize: 14, textAlign: 'center', maxWidth: 280, lineHeight: 1.6, margin: 0 }}>
                 Enter text and click{' '}
                 <strong style={{ color: ACCENT }}>Generate Voice</strong> to create
@@ -913,7 +913,7 @@ export default function VoiceStudioPage() {
                 padding: 20,
               }}
             >
-              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>🎤 Voice Cloning</div>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>Voice Cloning</div>
               {userPlan === 'pro' || userPlan === 'max' ? (
                 <div>
                   {/* TODO: Implement voice cloning — upload WAV (10–30s), call /api/voice/clone */}

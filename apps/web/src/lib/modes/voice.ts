@@ -11,8 +11,8 @@ export const voiceMode: ModeContract = {
   exportFormats: ['mp3', 'wav', 'zip'],
   sizeConstraints: { min: 1, max: 300, defaults: [30, 60, 120], defaultSize: 30 },
   tools: [
-    { id: 'narration', label: 'Narration', description: 'Generate character narration or voiceover', icon: '🎙️', outputType: 'audio', exportFormats: ['mp3', 'wav'] },
-    { id: 'dialogue', label: 'Dialogue', description: 'Generate NPC or character dialogue clips', icon: '💬', outputType: 'audio', exportFormats: ['mp3', 'wav', 'zip'] },
+    { id: 'narration', label: 'Narration', description: 'Generate character narration or voiceover', outputType: 'audio', exportFormats: ['mp3', 'wav'] },
+    { id: 'dialogue', label: 'Dialogue', description: 'Generate NPC or character dialogue clips', outputType: 'audio', exportFormats: ['mp3', 'wav', 'zip'] },
   ],
   presets: [
     { id: 'narrator', label: 'Narrator', tokens: ['clear narration', 'neutral tone', 'professional voice'] },

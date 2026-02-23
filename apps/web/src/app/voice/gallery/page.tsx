@@ -40,10 +40,7 @@ const VOICE_FILTERS = [
   { id: 'deep',      label: 'Deep'      },
 ];
 
-const VOICE_EMOJI: Record<string, string> = {
-  natural: '🎙️', character: '🎭', whisper: '🤫',
-  energetic: '⚡', news: '📺', deep: '🎯',
-};
+
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -91,7 +88,7 @@ function VoiceCard({ asset }: { asset: VoiceAsset }) {
       {/* Top row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 18 }}>{VOICE_EMOJI[voiceType] ?? '🎙️'}</span>
+          <span style={{ fontSize: 18 }}></span>
           <span style={{
             padding: '2px 8px', borderRadius: 4, fontSize: 11,
             background: `${ACCENT}22`, color: ACCENT, fontWeight: 600,
@@ -259,7 +256,7 @@ export default function VoiceGallery() {
               onClick={() => setVoiceFilter(f.id)}
               style={voiceFilter === f.id ? { borderColor: ACCENT, color: ACCENT, background: `${ACCENT}18` } : {}}
             >
-              {f.id ? `${VOICE_EMOJI[f.id] ?? ''} ` : ''}{f.label}
+              {f.id ? `$ ` : ''}{f.label}
             </button>
           ))}
         </div>
@@ -286,7 +283,7 @@ export default function VoiceGallery() {
         </div>
       ) : error ? (
         <div className="gallery-error">
-          <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+          <span>!</span>
           <p>Failed to load gallery</p>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
           <button className="btn-ghost btn-sm" onClick={() => void fetchAssets(null, true)}>
@@ -295,7 +292,7 @@ export default function VoiceGallery() {
         </div>
       ) : assets.length === 0 ? (
         <div className="gallery-empty">
-          <div className="gallery-empty-icon">🎙️</div>
+          <div className="gallery-empty-icon"></div>
           <p className="gallery-empty-title">No voice clips yet</p>
           <p className="gallery-empty-desc">
             Generate your first audio in the Voice Studio.

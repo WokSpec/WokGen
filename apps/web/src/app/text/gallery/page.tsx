@@ -44,11 +44,7 @@ const CONTENT_FILTERS = [
   { id: 'ad-copy',      label: 'Ad Copy'      },
 ];
 
-const CONTENT_EMOJI: Record<string, string> = {
-  headline: '✍️', tagline: '💡', blog: '📝', 'product-desc': '🛍️',
-  email: '✉️', social: '📱', 'code-snippet': '💻', story: '📖',
-  essay: '🎓', 'ad-copy': '📢',
-};
+
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -101,7 +97,7 @@ function TextCard({ asset }: { asset: TextAsset }) {
       {/* Top row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 16 }}>{CONTENT_EMOJI[contentType] ?? '✦'}</span>
+          <span style={{ fontSize: 16 }}></span>
           <span style={{
             padding: '2px 8px', borderRadius: 4, fontSize: 11,
             background: `${ACCENT}22`, color: ACCENT, fontWeight: 600,
@@ -149,7 +145,7 @@ function TextCard({ asset }: { asset: TextAsset }) {
           fontWeight: copied ? 600 : 400,
         }}
       >
-        {copied ? '✓ Copied' : '⎘ Copy'}
+        {copied ? 'Copied' : 'Copy'}
       </button>
     </div>
   );
@@ -265,7 +261,7 @@ export default function TextGallery() {
               onClick={() => setTypeFilter(f.id)}
               style={typeFilter === f.id ? { borderColor: ACCENT, color: ACCENT, background: `${ACCENT}18` } : {}}
             >
-              {f.id ? `${CONTENT_EMOJI[f.id] ?? ''} ` : ''}{f.label}
+              {f.id ? `$ ` : ''}{f.label}
             </button>
           ))}
         </div>
@@ -292,7 +288,7 @@ export default function TextGallery() {
         </div>
       ) : error ? (
         <div className="gallery-error">
-          <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+          <span>!</span>
           <p>Failed to load gallery</p>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
           <button className="btn-ghost btn-sm" onClick={() => void fetchAssets(null, true)}>
@@ -301,7 +297,7 @@ export default function TextGallery() {
         </div>
       ) : assets.length === 0 ? (
         <div className="gallery-empty">
-          <div className="gallery-empty-icon">✍️</div>
+          <div className="gallery-empty-icon"></div>
           <p className="gallery-empty-title">No text assets yet</p>
           <p className="gallery-empty-desc">
             Generate your first piece of content in the Text Studio.

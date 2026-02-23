@@ -256,7 +256,7 @@ export default function UsageClient() {
       {/* Quota alert at 80%+ */}
       {quota.dailyLimit > 0 && dailyPct >= 80 && (
         <div className="usage-alert">
-          <span className="usage-alert__icon">⚠</span>
+          <span className="usage-alert__icon">!</span>
           {dailyPct >= 100
             ? 'You\'ve used your daily generation limit. Resets at midnight UTC.'
             : `You've used ${dailyPct}% of today's limit (${quota.todayUsed}/${quota.dailyLimit}).`}

@@ -31,7 +31,7 @@ export interface ModeToolDef {
   id: string;
   label: string;
   description: string;
-  icon: string;
+  icon?: string;
   aspectRatios?: string[];
   maxBatch?: number;
   outputType: OutputType;

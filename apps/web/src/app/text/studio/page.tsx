@@ -37,17 +37,17 @@ const TEXT_STAGES = [
   { delay: 10000, message: 'Finalizing...' },
 ];
 
-const CONTENT_TYPES: { id: ContentType; label: string; emoji: string; desc: string }[] = [
-  { id: 'headline',     label: 'Headline',     emoji: '✍️',  desc: 'Powerful single-line title' },
-  { id: 'tagline',      label: 'Tagline',      emoji: '💡',  desc: 'Memorable brand line' },
-  { id: 'blog',         label: 'Blog Post',    emoji: '📝',  desc: 'Structured article' },
-  { id: 'product-desc', label: 'Product Desc', emoji: '🛍️',  desc: 'Conversion copy' },
-  { id: 'email',        label: 'Email',        emoji: '✉️',  desc: 'Marketing email' },
-  { id: 'social',       label: 'Social Post',  emoji: '📱',  desc: 'Platform-ready post' },
-  { id: 'code-snippet', label: 'Code Snippet', emoji: '💻',  desc: 'Clean code solution' },
-  { id: 'story',        label: 'Story',        emoji: '📖',  desc: 'Creative fiction' },
-  { id: 'essay',        label: 'Essay',        emoji: '🎓',  desc: 'Academic writing' },
-  { id: 'ad-copy',      label: 'Ad Copy',      emoji: '📢',  desc: 'Direct response' },
+const CONTENT_TYPES: { id: ContentType; label: string; desc: string }[] = [
+  { id: 'headline',     label: 'Headline',    desc: 'Powerful single-line title' },
+  { id: 'tagline',      label: 'Tagline',     desc: 'Memorable brand line' },
+  { id: 'blog',         label: 'Blog Post',   desc: 'Structured article' },
+  { id: 'product-desc', label: 'Product Desc',desc: 'Conversion copy' },
+  { id: 'email',        label: 'Email',       desc: 'Marketing email' },
+  { id: 'social',       label: 'Social Post', desc: 'Platform-ready post' },
+  { id: 'code-snippet', label: 'Code Snippet',desc: 'Clean code solution' },
+  { id: 'story',        label: 'Story',       desc: 'Creative fiction' },
+  { id: 'essay',        label: 'Essay',       desc: 'Academic writing' },
+  { id: 'ad-copy',      label: 'Ad Copy',     desc: 'Direct response' },
 ];
 
 const TONES: { id: Tone; label: string }[] = [
@@ -243,7 +243,7 @@ export default function TextStudio() {
                     cursor: 'pointer', transition: 'all 0.15s',
                   }}
                 >
-                  <div style={{ fontSize: 18, marginBottom: 3 }}>{ct.emoji}</div>
+                  <div style={{ fontSize: 18, marginBottom: 3 }}></div>
                   <div style={{ fontSize: 12, fontWeight: 600 }}>{ct.label}</div>
                   <div style={{ fontSize: 11, color: contentType === ct.id ? `${ACCENT}cc` : 'var(--text-muted)', marginTop: 1 }}>
                     {ct.desc}
@@ -337,7 +337,7 @@ export default function TextStudio() {
               transition: 'background 0.15s',
             }}
           >
-            {status === 'generating' ? '✦ Generating…' : '✦ Generate Text'}
+            {status === 'generating' ? 'Generating…' : 'Generate Text'}
           </button>
         </div>
 
@@ -433,7 +433,7 @@ export default function TextStudio() {
                     fontWeight: copied ? 600 : 400,
                   }}
                 >
-                  {copied ? '✓ Copied!' : '⎘ Copy'}
+                  {copied ? 'Copied!' : 'Copy'}
                 </button>
                 <button
                   onClick={() => downloadText(result.content, `wokgen-text-${Date.now()}.txt`)}
@@ -467,7 +467,7 @@ export default function TextStudio() {
                     fontSize: 13, cursor: 'pointer',
                   }}
                 >
-                  {savedMsg ? '✓ Saved' : '☆ Save to Gallery'}
+                  {savedMsg ? 'Saved' : 'Save to Gallery'}
                 </button>
                 <button
                   onClick={() => { setStatus('idle'); void handleGenerate(); }}
@@ -490,7 +490,7 @@ export default function TextStudio() {
               alignItems: 'center', justifyContent: 'center',
               gap: 12, color: 'var(--text-muted)', minHeight: 240,
             }}>
-              <span style={{ fontSize: 48, opacity: 0.3 }}>✦</span>
+              
               <p style={{ fontSize: 14, textAlign: 'center', maxWidth: 260, lineHeight: 1.5 }}>
                 Choose a content type, set your tone and length, then click{' '}
                 <strong style={{ color: ACCENT }}>Generate Text</strong>.

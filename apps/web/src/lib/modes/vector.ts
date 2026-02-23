@@ -11,8 +11,8 @@ export const vectorMode: ModeContract = {
   exportFormats: ['svg', 'zip'],
   sizeConstraints: { min: 24, max: 512, defaults: [24, 32, 48, 64, 128, 256], defaultSize: 48 },
   tools: [
-    { id: 'icon', label: 'Icon', description: 'Generate a scalable icon or symbol', icon: '◈', outputType: 'svg', exportFormats: ['svg'] },
-    { id: 'illustration', label: 'Illustration', description: 'Generate scalable spot illustrations', icon: '✿', outputType: 'svg', exportFormats: ['svg', 'zip'] },
+    { id: 'icon', label: 'Icon', description: 'Generate a scalable icon or symbol', outputType: 'svg', exportFormats: ['svg'] },
+    { id: 'illustration', label: 'Illustration', description: 'Generate scalable spot illustrations', outputType: 'svg', exportFormats: ['svg', 'zip'] },
   ],
   presets: [
     { id: 'outline', label: 'Outline', tokens: ['outline icon', 'stroke style', 'line icon', 'consistent stroke width'] },

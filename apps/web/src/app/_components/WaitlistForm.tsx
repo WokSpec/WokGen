@@ -50,7 +50,7 @@ export function WaitlistForm({ mode, accent = '#a78bfa' }: Props) {
         color: accent,
         fontWeight: 500,
       }}>
-        <span>✓</span>
+        <span>{'\u2713'}</span>
         <span>You&apos;re on the list! We&apos;ll notify you when {mode} launches.</span>
       </div>
     );
@@ -111,7 +111,7 @@ export function WaitlistForm({ mode, accent = '#a78bfa' }: Props) {
       </div>
       {status === 'error' && (
         <p style={{ fontSize: '0.8rem', color: '#f87171', margin: 0 }}>
-          ⚠ {errorMsg}
+          {errorMsg}
         </p>
       )}
     </form>

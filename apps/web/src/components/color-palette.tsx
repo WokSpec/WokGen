@@ -127,7 +127,6 @@ export function ColorPalette({ imageUrl }: Props) {
       )}
 
       <span style={{ fontSize: '0.68rem', color: 'var(--text-disabled, #666)', flexShrink: 0 }}>
-        🎨
       </span>
 
       {status === 'loading' && (

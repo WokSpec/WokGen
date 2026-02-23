@@ -75,12 +75,12 @@ interface HistoryItem {
 // Constants
 // ---------------------------------------------------------------------------
 
-const TOOLS: { id: Tool; icon: string; label: string; shortLabel: string; kbd: string }[] = [
-  { id: 'generate', icon: '✦', label: 'Sprite',      shortLabel: 'Sprite',  kbd: '1' },
-  { id: 'animate',  icon: '▶', label: 'Animate',     shortLabel: 'Anim',    kbd: '2' },
-  { id: 'rotate',   icon: '⊕', label: 'Directions',  shortLabel: 'Dir',     kbd: '3' },
-  { id: 'inpaint',  icon: '⬛', label: 'Edit',        shortLabel: 'Edit',    kbd: '4' },
-  { id: 'scene',    icon: '⊞', label: 'Tileset',     shortLabel: 'Tile',    kbd: '5' },
+const TOOLS: { id: Tool; icon?: string; label: string; shortLabel: string; kbd: string }[] = [
+  { id: 'generate', label: 'Sprite',      shortLabel: 'Sprite',  kbd: '1' },
+  { id: 'animate',  label: 'Animate',     shortLabel: 'Anim',    kbd: '2' },
+  { id: 'rotate',   label: 'Directions',  shortLabel: 'Dir',     kbd: '3' },
+  { id: 'inpaint',  label: 'Edit',        shortLabel: 'Edit',    kbd: '4' },
+  { id: 'scene',    label: 'Tileset',     shortLabel: 'Tile',    kbd: '5' },
 ];
 
 // Preset categories
@@ -537,7 +537,7 @@ function SettingsModal({
                     tabIndex={-1}
                     aria-label={showKeys[pid] ? 'Hide key' : 'Show key'}
                   >
-                    {showKeys[pid] ? '🙈' : '👁'}
+                    {showKeys[pid] ? 'Hide' : 'Show'}
                   </button>
                 </div>
               </div>
@@ -649,7 +649,7 @@ function HistoryPanel({
       <div className="scroll-region flex flex-col">
         {items.length === 0 && (
           <div className="empty-state py-12">
-            <span className="empty-state-icon text-2xl">🎨</span>
+            
             <p className="empty-state-body">Generated assets will appear here.</p>
           </div>
         )}
@@ -846,7 +846,7 @@ function OutputPanel({
                     (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)';
                   }}
                 >
-                  <span style={{ color: '#a78bfa', marginRight: '0.4rem' }}>✦</span>{ex}
+                  {ex}
                 </button>
               ))}
             </div>
@@ -1018,8 +1018,8 @@ function OutputPanel({
         )}
         {result?.jobId && !result.jobId.startsWith('anim-') && !result.jobId.startsWith('local') && (
           <div style={{ display: 'flex', gap: 2 }}>
-            <RatingButton jobId={result.jobId} value={1} label="👍" title="Good result" />
-            <RatingButton jobId={result.jobId} value={-1} label="👎" title="Bad result" />
+            <RatingButton jobId={result.jobId} value={1} label="+" title="Good result" />
+            <RatingButton jobId={result.jobId} value={-1} label="-" title="Bad result" />
           </div>
         )}
         {result?.guestDownloadGated ? (
@@ -1049,7 +1049,7 @@ function OutputPanel({
           onClick={onSaveToGallery}
           disabled={savedToGallery}
         >
-          {savedToGallery ? '✓ Saved' : '⊕ Save to Gallery'}
+          {savedToGallery ? 'Saved' : 'Save to Gallery'}
         </button>
       </div>
 
@@ -1146,7 +1146,7 @@ function OutputPanel({
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '0'; }}
                 title="Remove background"
               >
-                {bgRemoving ? '⏳' : '✂ BG'}
+                {bgRemoving ? '' : 'Remove BG'}
               </button>
             )}
             {/* Pixel grid overlay */}
@@ -1556,7 +1556,7 @@ function GenerateForm({
                 onClick={savePromptAsFavorite}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', lineHeight: 1, color: favSaved ? '#f59e0b' : 'var(--text-disabled)', transition: 'color 0.15s' }}
               >
-                {favSaved ? '★' : '☆'}
+                {favSaved ? '+' : '+'}
               </button>
               {/* My Prompts dropdown */}
               {favPrompts.length > 0 && (
@@ -1730,21 +1730,21 @@ function GenerateForm({
       <div className="p-4">
         <div className="grid grid-cols-4 gap-1">
           {([
-            { id: 'none',       emoji: '🎲', label: 'Any',      hint: 'Model decides composition' },
-            { id: 'weapon',     emoji: '⚔️',  label: 'Weapon',   hint: 'Single weapon, transparent bg, clear silhouette' },
-            { id: 'armor',      emoji: '🛡️',  label: 'Armor',    hint: 'Armor piece, centered, metallic, no wearer' },
-            { id: 'character',  emoji: '🧙',  label: 'Char',     hint: 'Full body sprite, centered, idle pose, transparent bg' },
-            { id: 'monster',    emoji: '👾',  label: 'Monster',  hint: 'Enemy sprite, menacing, centered, transparent bg' },
-            { id: 'consumable', emoji: '💊',  label: 'Item',     hint: 'Game item icon, clear readable silhouette' },
-            { id: 'gem',        emoji: '💎',  label: 'Gem',      hint: 'Gemstone, faceted, centered, transparent bg' },
-            { id: 'structure',  emoji: '🏰',  label: 'Build',    hint: 'Building or structure, side or top-down view' },
-            { id: 'nature',     emoji: '🌿',  label: 'Nature',   hint: 'Organic terrain, foliage, tileable-friendly' },
-            { id: 'ui',         emoji: '🎮',  label: 'UI',       hint: 'HUD element, flat design, readable at small size' },
-            { id: 'effect',     emoji: '✨',  label: 'Effect',   hint: 'Particle or magic effect, transparent-friendly' },
-            { id: 'tile',       emoji: '🗺️',  label: 'Tile',     hint: 'Seamless tile, no visible seams, tileable edges' },
-            { id: 'container',  emoji: '📦',  label: 'Chest',    hint: 'Container prop, readable silhouette, centered' },
-            { id: 'portrait',   emoji: '🖼️',  label: 'Portrait', hint: 'Character bust, face and upper body, expressive' },
-            { id: 'vehicle',    emoji: '🚀',  label: 'Vehicle',  hint: 'Vehicle or mount, side or top-down view' },
+            { id: 'none',       label: 'Any',      hint: 'Model decides composition' },
+            { id: 'weapon',      label: 'Weapon',   hint: 'Single weapon, transparent bg, clear silhouette' },
+            { id: 'armor',       label: 'Armor',    hint: 'Armor piece, centered, metallic, no wearer' },
+            { id: 'character',   label: 'Char',     hint: 'Full body sprite, centered, idle pose, transparent bg' },
+            { id: 'monster',     label: 'Monster',  hint: 'Enemy sprite, menacing, centered, transparent bg' },
+            { id: 'consumable',  label: 'Item',     hint: 'Game item icon, clear readable silhouette' },
+            { id: 'gem',         label: 'Gem',      hint: 'Gemstone, faceted, centered, transparent bg' },
+            { id: 'structure',   label: 'Build',    hint: 'Building or structure, side or top-down view' },
+            { id: 'nature',      label: 'Nature',   hint: 'Organic terrain, foliage, tileable-friendly' },
+            { id: 'ui',          label: 'UI',       hint: 'HUD element, flat design, readable at small size' },
+            { id: 'effect',      label: 'Effect',   hint: 'Particle or magic effect, transparent-friendly' },
+            { id: 'tile',        label: 'Tile',     hint: 'Seamless tile, no visible seams, tileable edges' },
+            { id: 'container',   label: 'Chest',    hint: 'Container prop, readable silhouette, centered' },
+            { id: 'portrait',    label: 'Portrait', hint: 'Character bust, face and upper body, expressive' },
+            { id: 'vehicle',     label: 'Vehicle',  hint: 'Vehicle or mount, side or top-down view' },
           ] as { id: import('@/lib/prompt-builder').AssetCategory; emoji: string; label: string; hint: string }[]).map((cat) => (
             <button
               key={cat.id}
@@ -1834,9 +1834,9 @@ function GenerateForm({
       <div className="p-4">
         <div className="flex gap-1.5">
           {([
-            { id: 'transparent', label: '🔲 None' },
-            { id: 'dark',        label: '🌑 Dark'  },
-            { id: 'scene',       label: '🌄 Scene' },
+            { id: 'transparent', label: 'None' },
+            { id: 'dark',        label: 'Dark'  },
+            { id: 'scene',       label: 'Scene' },
           ] as { id: import('@/lib/prompt-builder').BackgroundMode; label: string }[]).map((bg) => (
             <button
               key={bg.id}
@@ -1863,10 +1863,10 @@ function GenerateForm({
       <div className="px-4 pb-4">
         <div className="flex gap-1.5">
           {([
-            { id: 'bold', label: '■ Bold'  },
-            { id: 'soft', label: '▫ Soft'  },
-            { id: 'none', label: '○ None'  },
-            { id: 'glow', label: '✦ Glow'  },
+            { id: 'bold', label: 'Bold'  },
+            { id: 'soft', label: 'Soft'  },
+            { id: 'none', label: 'None'  },
+            { id: 'glow', label: 'Glow'  },
           ] as { id: import('@/lib/prompt-builder').OutlineStyle; label: string }[]).map((o) => (
             <button
               key={o.id}
@@ -1919,17 +1919,17 @@ function GenerateForm({
           <div className="p-4">
             <div className="grid grid-cols-2 gap-1.5">
               {([
-                { id: 'idle',      label: '💤 Idle',       desc: 'Breathing, subtle motion'   },
-                { id: 'walk',      label: '🚶 Walk',       desc: '8-frame walk cycle'          },
-                { id: 'run',       label: '🏃 Run',        desc: 'Fast movement cycle'         },
-                { id: 'attack',    label: '⚔️ Attack',     desc: 'Strike animation'            },
-                { id: 'cast',      label: '✨ Cast',       desc: 'Magic spell release'         },
-                { id: 'death',     label: '💀 Death',      desc: 'Fall and fade out'           },
-                { id: 'fire',      label: '🔥 Fire',       desc: 'Looping flame effect'        },
-                { id: 'magic',     label: '🌟 Magic',      desc: 'Particle burst loop'         },
-                { id: 'explosion', label: '💥 Explode',    desc: 'Expand and dissipate'        },
-                { id: 'water',     label: '🌊 Water',      desc: 'Ripple surface loop'         },
-                { id: 'custom',    label: '🎬 Custom',     desc: 'Describe your own'           },
+                { id: 'idle',      label: 'Idle',       desc: 'Breathing, subtle motion'   },
+                { id: 'walk',      label: 'Walk',       desc: '8-frame walk cycle'          },
+                { id: 'run',       label: 'Run',        desc: 'Fast movement cycle'         },
+                { id: 'attack',    label: 'Attack',     desc: 'Strike animation'            },
+                { id: 'cast',      label: 'Cast',       desc: 'Magic spell release'         },
+                { id: 'death',     label: 'Death',      desc: 'Fall and fade out'           },
+                { id: 'fire',      label: 'Fire',       desc: 'Looping flame effect'        },
+                { id: 'magic',     label: 'Magic',      desc: 'Particle burst loop'         },
+                { id: 'explosion', label: 'Explode',    desc: 'Expand and dissipate'        },
+                { id: 'water',     label: 'Water',      desc: 'Ripple surface loop'         },
+                { id: 'custom',    label: 'Custom',     desc: 'Describe your own'           },
               ] as { id: import('@/lib/prompt-builder').AnimationType; label: string; desc: string }[]).map((atype) => (
                 <button
                   key={atype.id}
@@ -1990,9 +1990,9 @@ function GenerateForm({
               <label className="label" style={{ marginBottom: 6 }}>Loop Mode</label>
               <div className="flex gap-1.5">
                 {([
-                  { id: 'infinite', label: '∞ Loop'      },
-                  { id: 'pingpong', label: '↔ Ping-Pong' },
-                  { id: 'once',     label: '▶ Once'      },
+                  { id: 'infinite', label: 'Loop'      },
+                  { id: 'pingpong', label: 'Ping-Pong' },
+                  { id: 'once',     label: 'Once'      },
                 ] as { id: typeof animLoop; label: string }[]).map((lm) => (
                   <button key={lm.id} onClick={() => setAnimLoop(lm.id)}
                     className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
@@ -2013,8 +2013,8 @@ function GenerateForm({
               <label className="label" style={{ marginBottom: 6 }}>Output Format</label>
               <div className="flex gap-1.5">
                 {([
-                  { id: 'gif',          label: '🎞 GIF'         },
-                  { id: 'png_sequence', label: '🗂 PNG Sequence' },
+                  { id: 'gif',          label: 'GIF'         },
+                  { id: 'png_sequence', label: 'PNG Sequence' },
                 ] as { id: 'gif' | 'png_sequence'; label: string }[]).map((fmt) => (
                   <button key={fmt.id} onClick={() => setAnimOutputFormat(fmt.id)}
                     className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
@@ -2129,7 +2129,7 @@ function GenerateForm({
               >
                 <span>{s}</span>
                 <span style={{ fontSize: '0.55rem', color: isRec ? 'var(--accent-muted)' : 'var(--text-disabled)', marginTop: 1 }}>
-                  {SIZE_LABELS[s]}{isRec ? ' ✓' : ''}
+                  {SIZE_LABELS[s]}
                 </span>
               </button>
             );
@@ -2305,7 +2305,7 @@ function GenerateForm({
                     fontWeight: lockSeed ? 600 : 400,
                   }}
                 >
-                  {lockSeed ? '🔒 Locked' : '🔓 Lock'}
+                  {lockSeed ? 'Locked' : 'Lock'}
                 </button>
                 {!lockSeed && (
                   <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Will vary each gen</span>
@@ -3041,7 +3041,7 @@ function StudioInner() {
           }}
           title="Switch to Business Studio"
         >
-          <span style={{ fontSize: 12 }}>💼</span>
+          
           <span>Biz</span>
         </Link>
 
@@ -3058,7 +3058,7 @@ function StudioInner() {
           aria-label="History"
           aria-pressed={showHistory}
         >
-          <span style={{ fontSize: 14 }}>☰</span>
+          ≡
           <span style={{ fontSize: '0.52rem' }}>History</span>
         </button>
 
@@ -3080,7 +3080,7 @@ function StudioInner() {
             (e.currentTarget as HTMLElement).style.color = 'var(--text-disabled)';
           }}
         >
-          <span style={{ fontSize: 14 }}>⚙</span>
+          
           <span style={{ fontSize: '0.52rem' }}>Config</span>
         </button>
         )}
@@ -3189,7 +3189,7 @@ function StudioInner() {
           setShowPromptHistory={setShowPromptHistory}
         />
 
-        {/* ── 🔊 Sounds panel ───────────────────────────────────────────── */}
+        
         <div style={{ borderTop: '1px solid var(--surface-border)' }}>
           <div
             className="px-4 py-3 flex items-center justify-between cursor-pointer transition-colors duration-150"
@@ -3199,7 +3199,7 @@ function StudioInner() {
             onKeyDown={(e) => e.key === 'Enter' && setShowSoundsPanel((v) => !v)}
             aria-expanded={showSoundsPanel}
           >
-            <span className="section-title">🔊 Sounds</span>
+            <span className="section-title">Sounds</span>
             <span style={{ color: 'var(--text-disabled)', fontSize: 12 }}>
               {showSoundsPanel ? '▾' : '▸'}
             </span>
@@ -3326,7 +3326,7 @@ function StudioInner() {
                   <span className="flex items-center justify-center gap-2"><Spinner size="sm" />Generating…</span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    <span>🎵</span> Generate Sound
+                    Generate Sound
                   </span>
                 )}
               </button>
@@ -3401,7 +3401,7 @@ function StudioInner() {
                   onClick={() => setUseHD(true)}
                   title="Uses HD credits (Replicate). Requires Plus plan or top-up pack."
                 >
-                  HD ✦
+                  HD
                 </button>
               </div>
             </div>
@@ -3425,7 +3425,7 @@ function StudioInner() {
               </span>
             ) : (
               <span className="flex items-center gap-2">
-                <span style={{ fontSize: 15 }}>✦</span>
+                
                 Generate
                 <kbd
                   className="ml-auto opacity-60"
@@ -3609,7 +3609,7 @@ function StudioInner() {
           <div className="modal" style={{ maxWidth: 440 }} onClick={e => e.stopPropagation()}>
             <div className="modal__header">
               <span className="modal__title">Keyboard Shortcuts</span>
-              <button className="btn btn--ghost btn--sm btn--icon" onClick={() => setShowShortcuts(false)} aria-label="Close">✕</button>
+              <button className="btn btn--ghost btn--sm btn--icon" onClick={() => setShowShortcuts(false)} aria-label="Close">&times;</button>
             </div>
             <div className="modal__body" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {([

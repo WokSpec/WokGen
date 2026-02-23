@@ -15,7 +15,7 @@ export default function DocsAccount() {
         <aside className="docs-sidebar">
           <Link href="/docs" className="docs-back">← Docs Hub</Link>
           <div className="docs-sidebar-mode">
-            <span>⚙</span> Platform
+             Platform
           </div>
           <nav className="docs-toc">
             <a href="#profile" className="docs-toc-link">Your Profile</a>
@@ -71,7 +71,7 @@ export default function DocsAccount() {
               or update your avatar, the change will be reflected in WokGen the next time you sign in.
             </p>
             <div className="docs-callout docs-callout--info">
-              <span className="docs-callout-icon">ℹ</span>
+              <span className="docs-callout-icon">i</span>
               <span>
                 You can override your display name within WokGen at{' '}
                 <Link href="/account" className="docs-code">/account</Link> without
@@ -115,7 +115,7 @@ export default function DocsAccount() {
               We do not request access to your repositories, organizations, or any write scopes.
             </p>
             <div className="docs-callout docs-callout--info">
-              <span className="docs-callout-icon">ℹ</span>
+              <span className="docs-callout-icon">i</span>
               <span>
                 You can revoke WokGen&apos;s access at any time from{' '}
                 <a
@@ -145,7 +145,7 @@ export default function DocsAccount() {
               brand-new WokGen account.
             </p>
             <div className="docs-callout docs-callout--warn">
-              <span className="docs-callout-icon">⚠</span>
+              <span className="docs-callout-icon">!</span>
               <span>
                 Support for additional OAuth providers (e.g., Google) may be added in the future.
                 When that happens, account merging will require an explicit linking step from{' '}
@@ -210,7 +210,7 @@ export default function DocsAccount() {
               </li>
             </ul>
             <div className="docs-callout docs-callout--tip">
-              <span className="docs-callout-icon">✦</span>
+              <span className="docs-callout-icon">→</span>
               <span>
                 Avatar updates are not available on <Link href="/account" className="docs-code">/account</Link>.
                 To change your avatar, update it on GitHub — it will sync automatically on your next sign-in.
@@ -307,7 +307,7 @@ export default function DocsAccount() {
               your job history so you can access them later.
             </p>
             <div className="docs-callout docs-callout--info">
-              <span className="docs-callout-icon">ℹ</span>
+              <span className="docs-callout-icon">i</span>
               <span>
                 CDN URLs for generation results may have a limited lifetime depending on the
                 underlying provider. Download important generations to your device for permanent storage.
@@ -335,7 +335,7 @@ export default function DocsAccount() {
               <li className="docs-li">Your session is invalidated and you are signed out.</li>
             </ul>
             <div className="docs-callout docs-callout--warn">
-              <span className="docs-callout-icon">⚠</span>
+              <span className="docs-callout-icon">!</span>
               <span>
                 <strong>Account deletion is irreversible.</strong> There is no grace period and no
                 recovery option. All data is permanently removed. Download any assets you want to

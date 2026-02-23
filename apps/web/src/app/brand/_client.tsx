@@ -83,7 +83,7 @@ function PaletteEditor({
           <select className="input input--sm" value={c.role} onChange={e => update(i, 'role', e.target.value)} style={{ width: 110 }}>
             {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
-          <button className="btn btn--ghost btn--sm btn--icon" onClick={() => remove(i)} title="Remove" aria-label="Remove color">✕</button>
+          <button className="btn btn--ghost btn--sm btn--icon" onClick={() => remove(i)} title="Remove" aria-label="Remove color">×</button>
         </div>
       ))}
       <button className="btn btn--ghost btn--sm" onClick={add}>+ Add color</button>

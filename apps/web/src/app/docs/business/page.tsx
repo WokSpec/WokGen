@@ -53,7 +53,7 @@ function OL({ children }: { children: React.ReactNode }) {
 }
 
 function Callout({ children, type = 'info' }: { children: React.ReactNode; type?: 'info' | 'tip' | 'warn' }) {
-  const icons = { info: 'ℹ', tip: '✦', warn: '⚠' };
+  const icons = { info: 'i', tip: '→', warn: '!' };
   return (
     <div className={`docs-callout docs-callout--${type}`}>
       <span className="docs-callout-icon">{icons[type]}</span>
@@ -94,7 +94,7 @@ export default function BusinessDocs() {
         <aside className="docs-sidebar">
           <Link href="/docs" className="docs-back">← Docs Hub</Link>
           <div className="docs-sidebar-mode">
-            <span style={{ color: '#60a5fa' }}>💼</span>
+            
             <span>WokGen Business</span>
           </div>
           <nav className="docs-toc">

@@ -1,4 +1,5 @@
 'use client';
+import { WarningIcon } from '@/app/_components/icons';
 import type { StudioError } from '@/lib/studio-errors';
 
 interface Props {
@@ -20,7 +21,7 @@ export function StudioErrorBanner({ error, onDismiss, onRetry }: Props) {
       gap: 12,
       alignItems: 'flex-start',
     }}>
-      <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
+      <WarningIcon size={16} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ margin: 0, color: '#fca5a5', fontSize: 14, fontWeight: 500 }}>
           {error.message}

@@ -43,31 +43,9 @@ const FRAMEWORK_FILTERS = [
   { id: 'next-tsx',      label: 'Next TSX' },
 ];
 
-const COMPONENT_ICONS: Record<string, string> = {
-  hero:         '🏠',
-  pricing:      '💰',
-  navbar:       '☰',
-  card:         '🃏',
-  form:         '📝',
-  dashboard:    '📊',
-  landing:      '🚀',
-  auth:         '🔐',
-  settings:     '⚙️',
-  table:        '📋',
-  modal:        '📦',
-  sidebar:      '◫',
-  footer:       '🔻',
-  faq:          '❓',
-  testimonials: '💬',
-  features:     '✨',
-  cta:          '🎯',
-  custom:       '🎨',
-};
 
-function getComponentIcon(tool?: string): string {
-  if (!tool) return '🎨';
-  return COMPONENT_ICONS[tool.toLowerCase()] ?? '🎨';
-}
+
+function getComponentIcon(_tool?: string): string { return ''; }
 
 function getFrameworkLabel(framework?: string): string {
   switch (framework) {
@@ -247,14 +225,14 @@ export default function UIUXGallery() {
         </div>
       ) : error ? (
         <div className="gallery-error">
-          <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+          <span>!</span>
           <p>Failed to load gallery</p>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
           <button className="btn-ghost btn-sm" onClick={() => fetchAssets(null, true)}>Retry</button>
         </div>
       ) : assets.length === 0 ? (
         <div className="gallery-empty">
-          <div className="gallery-empty-icon">🖥️</div>
+          <div className="gallery-empty-icon"></div>
           <p className="gallery-empty-title">No UI/UX components yet</p>
           <p className="gallery-empty-desc">Generate your first UI component in the UI/UX Studio.</p>
           <Link href="/uiux/studio" className="btn-primary btn-sm">Go to UI/UX Studio →</Link>
@@ -322,7 +300,7 @@ export default function UIUXGallery() {
       {selected && (
         <div className="gallery-lightbox" onClick={() => setSelected(null)}>
           <div className="gallery-lightbox-inner gallery-lightbox-inner--uiux" onClick={e => e.stopPropagation()}>
-            <button className="gallery-lightbox-close" onClick={() => setSelected(null)}>✕</button>
+            <button className="gallery-lightbox-close" onClick={() => setSelected(null)}>×</button>
 
             {/* Preview area */}
             {selected.imageUrl ? (

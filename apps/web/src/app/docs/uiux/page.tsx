@@ -60,7 +60,7 @@ function Callout({
   children: React.ReactNode;
   type?: 'info' | 'tip' | 'warn';
 }) {
-  const icons = { info: 'ℹ', tip: '✦', warn: '⚠' };
+  const icons = { info: 'i', tip: '→', warn: '!' };
   return (
     <div className={`docs-callout docs-callout--${type}`}>
       <span className="docs-callout-icon">{icons[type]}</span>
@@ -99,7 +99,7 @@ export default function UIUXDocsPage() {
         <aside className="docs-sidebar">
           <Link href="/docs" className="docs-back">← Docs Hub</Link>
           <div className="docs-sidebar-mode">
-            <span style={{ color: '#6366f1' }}>✦</span>
+            
             <span>WokGen UI/UX</span>
           </div>
           <nav className="docs-toc">

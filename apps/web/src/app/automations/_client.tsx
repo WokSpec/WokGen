@@ -89,9 +89,9 @@ function AutomationForm({
         <label>Target</label>
         <div className="automation-form__target-row">
           <select className="input automation-form__target-type" value={targetType} onChange={e => setType(e.target.value)}>
-            <option value="email">✉️ Email</option>
-            <option value="webhook">🔗 Webhook</option>
-            <option value="in_app">🔔 In-app</option>
+            <option value="email">Email</option>
+            <option value="webhook">Webhook</option>
+            <option value="in_app">In-app</option>
           </select>
           {(targetType === 'email' || targetType === 'webhook') && (
             <input
@@ -170,7 +170,7 @@ function AutomationRow({
         <div className="automation-row__header">
           <span className="automation-row__name">{auto.name}</span>
           <span className={`automation-row__status ${auto.lastRunStatus === 'error' ? 'automation-row__status--error' : auto.lastRunStatus === 'ok' ? 'automation-row__status--ok' : ''}`}>
-            {auto.lastRunStatus === 'error' ? '⚠️ Error' : auto.lastRunStatus === 'ok' ? '✓ OK' : 'Never run'}
+            {auto.lastRunStatus === 'error' ? 'Error' : auto.lastRunStatus === 'ok' ? 'OK' : 'Never run'}
           </span>
         </div>
         <div className="automation-row__meta">
@@ -205,7 +205,7 @@ function AutomationRow({
           </button>
         )}
         <button className="btn btn--ghost btn--sm" onClick={handleDelete} disabled={deleting}>
-          {deleting ? '…' : '🗑'}
+          {deleting ? '…' : 'Delete'}
         </button>
       </div>
     </div>

@@ -98,7 +98,7 @@ export default function NotificationSettingsClient() {
         {/* Email notifications */}
         <div className="notify-section">
           <div className="notify-section__header">
-            <span className="notify-section__icon">✉️</span>
+            <span className="notify-section__icon">@</span>
             <div>
               <h2 className="notify-section__title">Email</h2>
               <p className="notify-section__desc">Emails go to your account address.</p>
@@ -129,7 +129,7 @@ export default function NotificationSettingsClient() {
         {/* In-app notifications */}
         <div className="notify-section">
           <div className="notify-section__header">
-            <span className="notify-section__icon">🔔</span>
+            <span className="notify-section__icon">!</span>
             <div>
               <h2 className="notify-section__title">In-app</h2>
               <p className="notify-section__desc">Alerts shown inside WokGen.</p>
@@ -154,7 +154,7 @@ export default function NotificationSettingsClient() {
         {/* Advanced routing */}
         <div className="notify-section">
           <div className="notify-section__header">
-            <span className="notify-section__icon">⚡</span>
+            <span className="notify-section__icon">»</span>
             <div>
               <h2 className="notify-section__title">Advanced routing</h2>
               <p className="notify-section__desc">Where important system alerts get sent.</p>
@@ -170,10 +170,10 @@ export default function NotificationSettingsClient() {
                     className={`notify-channel-btn ${settings.notifyAdminChannel === ch ? 'notify-channel-btn--active' : ''}`}
                     onClick={() => update('notifyAdminChannel', ch)}
                   >
-                    {ch === 'email'   && '✉️ Email'}
-                    {ch === 'webhook' && '🔗 Webhook'}
-                    {ch === 'both'    && '✉️ + 🔗 Both'}
-                    {ch === 'none'    && '🔕 None'}
+                    {ch === 'email'   && 'Email'}
+                    {ch === 'webhook' && 'Webhook'}
+                    {ch === 'both'    && 'Both'}
+                    {ch === 'none'    && 'None'}
                   </button>
                 ))}
               </div>

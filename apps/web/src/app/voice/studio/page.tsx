@@ -962,9 +962,6 @@ export default function VoiceStudioPage() {
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 768px) {
-          .studio-grid-2col { grid-template-columns: 1fr !important; }
-        }
       `}</style>
     </div>
   );

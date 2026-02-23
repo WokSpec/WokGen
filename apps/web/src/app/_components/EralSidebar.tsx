@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { safeMarkdown, sanitizeHtml } from '@/lib/safe-markdown';
 import { parseWAPFromResponse, executeWAP, type WAPResponse } from '@/lib/wap';
@@ -238,9 +239,9 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
               )}
             </div>
             <div className="esb-header-actions">
-              <a href="/eral" className="esb-open-full" title="Open full Eral page">
+              <Link href="/eral" className="esb-open-full" title="Open full Eral page">
                 Open full ↗
-              </a>
+              </Link>
               <button
                 className="esb-clear-btn"
                 onClick={() => { setMessages([]); setStreamingContent(''); }}
@@ -356,11 +357,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           position: fixed;
           bottom: 24px;
           right: 24px;
-          z-index: 100;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 8px 14px;
+          z-index: 40;
           background: #1c1c2e;
           border: 1px solid rgba(129,140,248,0.35);
           border-radius: 20px;
@@ -383,7 +380,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           position: fixed;
           bottom: 24px;
           right: 24px;
-          z-index: 100;
+          z-index: 40;
           width: 360px;
           max-height: calc(100vh - 120px);
           display: flex;

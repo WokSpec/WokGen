@@ -112,6 +112,7 @@ function NavBar() {
           </NavLink>
           <NavLink href="/eral/director">Director</NavLink>
           <NavLink href="/brand">Brand</NavLink>
+          <NavLink href="/pricing">Pricing</NavLink>
           <NavLink href="/docs">Docs</NavLink>
         </div>
 

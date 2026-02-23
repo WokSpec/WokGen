@@ -21,6 +21,7 @@ const PLATFORM_LINKS = [
   { label: 'Projects',          href: '/projects'        },
   { label: 'Community',         href: '/community'       },
   { label: 'Usage & Limits',    href: '/account/usage'   },
+  { label: 'Pricing',           href: '/pricing'         },
   { label: 'Billing',           href: '/billing'         },
 ];
 

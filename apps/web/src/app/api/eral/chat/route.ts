@@ -99,6 +99,7 @@ interface ChatRequest {
     tool?: string;
     prompt?: string;
     studioContext?: string;
+    projectId?: string; // inject project asset context
   };
   stream?: boolean;
 }
@@ -288,11 +289,41 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Inject project context: last 20 generated assets for this project
+  let projectContext = '';
+  if (context?.projectId && userId) {
+    try {
+      const projectJobs = await prisma.job.findMany({
+        where:   { projectId: context.projectId, userId, status: 'completed' },
+        orderBy: { createdAt: 'desc' },
+        take:    20,
+        select:  { tool: true, prompt: true, createdAt: true },
+      });
+      if (projectJobs.length > 0) {
+        const assetList = projectJobs
+          .map(j => `- [${j.tool}] "${j.prompt.slice(0, 80)}"`)
+          .join('\n');
+        projectContext = `\n\n[Project Context — last ${projectJobs.length} assets generated in this project:\n${assetList}\nUse this context to give consistent, project-aware suggestions.]`;
+      }
+      // Also inject brand kit if available
+      const kit = await prisma.brandKit.findFirst({
+        where:  { projectId: context.projectId },
+        select: { name: true, industry: true, mood: true, styleGuide: true, paletteJson: true },
+      });
+      if (kit) {
+        const palette = JSON.parse(kit.paletteJson || '[]') as { hex?: string; role?: string; name?: string }[];
+        const palStr = palette.slice(0, 5).map(c => `${c.role ?? 'color'}: ${c.hex ?? '?'}`).join(', ');
+        projectContext += `\n[Brand Kit: "${kit.name}" | Industry: ${kit.industry ?? 'unknown'} | Mood: ${kit.mood ?? 'unknown'} | Palette: ${palStr}]`;
+      }
+    } catch { /* non-fatal */ }
+  }
+
   const systemContent = [
     ERAL_SYSTEM_PROMPT,
     personalityModifier,
     contextNote ? `\n\n${contextNote}` : '',
     userPrefsContext,
+    projectContext,
   ].join('').trim();
 
   const history = conv.isNew ? [] : await fetchHistory(conv.id);

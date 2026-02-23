@@ -351,14 +351,41 @@ export async function POST(req: NextRequest) {
     const bizIndex    = typeof extraRecord.brandKitIndex === 'number'
       ? extraRecord.brandKitIndex as 1 | 2 | 3 | 4
       : undefined;
+
+    // ── Brand Kit injection: if projectId is provided, fetch the project's
+    //    brand kit and auto-inject colors, mood, and industry into the prompt.
+    let brandColorDirection: string | undefined = typeof body.colorDirection === 'string' ? body.colorDirection || undefined : undefined;
+    let brandIndustry:       string | undefined = typeof body.industry       === 'string' ? body.industry       || undefined : undefined;
+    let brandMoodOverride:   BusinessMood | undefined = bizMood;
+
+    if (typeof projectId === 'string' && projectId) {
+      try {
+        const kit = await prisma.brandKit.findFirst({
+          where:  { projectId },
+          select: { paletteJson: true, mood: true, industry: true },
+        });
+        if (kit) {
+          // Parse palette JSON → extract primary hex color direction string
+          const palette = JSON.parse(kit.paletteJson || '[]') as { hex?: string; role?: string }[];
+          const primaryColor = palette.find(c => c.role === 'primary' || c.role === 'brand')?.hex
+            ?? palette[0]?.hex;
+          if (primaryColor && !brandColorDirection) {
+            brandColorDirection = primaryColor; // inject primary brand color
+          }
+          if (kit.industry && !brandIndustry)  brandIndustry      = kit.industry;
+          if (kit.mood     && !brandMoodOverride) brandMoodOverride = kit.mood as BusinessMood;
+        }
+      } catch { /* non-fatal — brand kit fetch failure should not block generation */ }
+    }
+
     const built = buildBusinessPrompt({
       tool:           bizTool,
       concept:        effectivePrompt || 'professional brand visual',
-      industry:       typeof body.industry      === 'string' ? body.industry      || undefined : undefined,
+      industry:       brandIndustry,
       style:          bizStyle,
-      mood:           bizMood,
+      mood:           brandMoodOverride,
       platform:       bizPlatform,
-      colorDirection: typeof body.colorDirection === 'string' ? body.colorDirection || undefined : undefined,
+      colorDirection: brandColorDirection,
       brandKitIndex:  bizIndex,
     });
     effectivePrompt  = built.prompt;
@@ -869,6 +896,19 @@ export async function POST(req: NextRequest) {
       }).catch((err) => {
         console.error('[generate] GalleryAsset creation failed:', err);
       });
+    }
+
+    // Record activity event if this job belongs to a project (non-blocking)
+    if (job && typeof projectId === 'string' && projectId) {
+      prisma.activityEvent.create({
+        data: {
+          projectId,
+          userId:  authedUserId ?? null,
+          type:    'generate',
+          message: `Generated "${effectivePrompt.slice(0, 60)}" with ${resolvedMode}/${effectiveTool}`,
+          refId:   job.id,
+        },
+      }).catch(() => {});
     }
 
     return NextResponse.json({

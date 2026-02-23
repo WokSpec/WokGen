@@ -65,6 +65,16 @@ export async function GET(
   const zipBuf = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
   const safeName = project.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
+  // Record activity event (non-blocking)
+  prisma.activityEvent.create({
+    data: {
+      projectId: params.id,
+      userId:  session.user.id ?? null,
+      type:    'export',
+      message: `Exported ${jobs.length} assets as ZIP`,
+    },
+  }).catch(() => {});
+
   return new NextResponse(zipBuf, {
     headers: {
       'Content-Type': 'application/zip',

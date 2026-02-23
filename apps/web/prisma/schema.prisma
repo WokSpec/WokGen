@@ -211,6 +211,7 @@ model Job {
   assetRelFrom AssetRelationship[] @relation("RelFrom")
   assetRelTo   AssetRelationship[] @relation("RelTo")
   assetTags    AssetTag[]
+  comments     AssetComment[]
 
   @@index([userId])
   @@index([status])
@@ -304,6 +305,7 @@ model Project {
   brandKit     BrandKit[]
   members      ProjectMember[]
   relationships AssetRelationship[]
+  activity     ActivityEvent[]
 
   @@index([userId, mode])
   @@index([userId, isArchived])
@@ -511,3 +513,37 @@ model AssetTag {
   @@index([jobId])
   @@index([tag])
 }
+
+/// Activity feed event for a project
+model ActivityEvent {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String?
+  /// generate | comment | like | export | member_join | brief_update | batch
+  type      String
+  /// Human-readable summary: "Generated 'dragon sprite' with pixel/generate"
+  message   String
+  /// Optional reference: jobId, commentId, etc.
+  refId     String?
+
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+}
+
+/// Comment on a generated asset
+model AssetComment {
+  id        String   @id @default(cuid())
+  jobId     String
+  userId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId, createdAt])
+}
+

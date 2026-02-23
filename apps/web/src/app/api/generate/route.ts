@@ -26,10 +26,11 @@ import {
   type EmojiStyle,
   type EmojiPlatform,
 } from '@/lib/prompt-builder-vector';
+import { buildPixelPrompt } from '@/lib/prompt-builder-pixel';
 import { resolveOptimalProvider } from '@/lib/provider-router';
 import { assembleNegativePrompt, encodeNegativesIntoPositive } from '@/lib/negative-banks';
 import { validateAndSanitize } from '@/lib/prompt-validator';
-import { resolveQualityProfile } from '@/lib/quality-profiles';
+import { resolveQualityProfile, getQualityProfile } from '@/lib/quality-profiles';
 import { buildVariantPrompt } from '@/lib/variant-builder';
 
 // ---------------------------------------------------------------------------
@@ -311,6 +312,34 @@ export async function POST(req: NextRequest) {
   }
 
   // --------------------------------------------------------------------------
+  // Pixel mode: enrich prompt via buildPixelPrompt
+  // --------------------------------------------------------------------------
+  if (resolvedMode === 'pixel' && effectivePrompt && !_promptBuilt) {
+    const spriteType =
+      typeof extraRecord.spriteType === 'string' ? extraRecord.spriteType
+      : typeof assetCategory === 'string' && assetCategory !== 'none' ? assetCategory
+      : undefined;
+    const pixelEraStr  = typeof pixelEra === 'string' && pixelEra !== 'none' ? pixelEra : undefined;
+    const paletteSizeN = typeof paletteSize === 'number' ? paletteSize : undefined;
+    const frameCountN  = typeof extraRecord.animFrameCount === 'number' ? extraRecord.animFrameCount : undefined;
+
+    const built = buildPixelPrompt({
+      concept:     effectivePrompt,
+      width:       effectiveWidth,
+      height:      effectiveHeight,
+      spriteType,
+      era:         pixelEraStr,
+      paletteSize: paletteSizeN,
+      frameCount:  frameCountN,
+    });
+
+    effectivePrompt = built.prompt;
+    effectiveNeg    = effectiveNeg
+      ? `${effectiveNeg}, ${built.negPrompt}`
+      : built.negPrompt;
+  }
+
+  // --------------------------------------------------------------------------
   // Vector mode: enrich prompt via buildVectorPrompt
   // --------------------------------------------------------------------------
   if (resolvedMode === 'vector' && effectivePrompt && !_promptBuilt) {
@@ -365,6 +394,26 @@ export async function POST(req: NextRequest) {
   }
 
   // --------------------------------------------------------------------------
+  // Mode quality booster — appended after all builders, before validation.
+  // Adds a consistent set of quality anchors per mode without overriding user
+  // intent. Only applied when the prompt was NOT pre-built by the studio.
+  // --------------------------------------------------------------------------
+  const QUALITY_BOOSTERS: Record<string, string> = {
+    pixel:    'best quality, masterpiece, highly detailed pixel art, game-ready, crisp pixel grid',
+    business: 'professional quality, clean design, high resolution, polished, masterpiece',
+    vector:   'clean vector art, crisp edges, scalable, professional quality, print ready',
+    emoji:    'clean emoji design, high contrast, readable at small size, expressive, crisp',
+    uiux:     'clean UI design, professional interface, modern, accessible, pixel perfect',
+  };
+
+  if (!_promptBuilt) {
+    const booster = QUALITY_BOOSTERS[resolvedMode];
+    if (booster) {
+      effectivePrompt = `${effectivePrompt}, ${booster}`;
+    }
+  }
+
+  // --------------------------------------------------------------------------
   // Prompt pipeline: validate + sanitize → negative bank assembly
   // --------------------------------------------------------------------------
   const validation = validateAndSanitize(
@@ -405,12 +454,36 @@ export async function POST(req: NextRequest) {
     effectiveNeg = richNeg;
   }
 
-  // Resolve quality profile if client didn't supply steps/guidance
-  const qualityProfile = resolveQualityProfile(
-    typeof stylePreset === 'string' ? stylePreset : undefined,
-  );
-  const resolvedSteps    = typeof steps    === 'number' ? steps    : qualityProfile.steps;
-  const resolvedGuidance = typeof guidance === 'number' ? guidance : qualityProfile.guidance;
+  // Resolve quality profile — mode-aware first, then preset-level fallback
+  // Mode-aware profile picks up correct steps/guidance tuned per mode+type.
+  const modeType = (() => {
+    if (resolvedMode === 'pixel') {
+      const spriteType = typeof body.extra === 'object' && body.extra !== null
+        ? (body.extra as Record<string, unknown>).spriteType as string | undefined
+        : undefined;
+      return spriteType ?? (typeof stylePreset === 'string' ? stylePreset : 'standard');
+    }
+    if (resolvedMode === 'business') {
+      return typeof (body.extra as Record<string, unknown>)?.businessTool === 'string'
+        ? String((body.extra as Record<string, unknown>).businessTool)
+        : 'standard';
+    }
+    if (resolvedMode === 'vector') {
+      return typeof (body.extra as Record<string, unknown>)?.vectorTool === 'string'
+        ? String((body.extra as Record<string, unknown>).vectorTool)
+        : 'standard';
+    }
+    if (resolvedMode === 'emoji') return 'standard';
+    if (resolvedMode === 'uiux') {
+      return typeof stylePreset === 'string' ? stylePreset.replace('uiux_', '') : 'standard';
+    }
+    return 'standard';
+  })();
+  const modeQuality    = getQualityProfile(resolvedMode, modeType, useHD);
+  const presetQuality  = resolveQualityProfile(typeof stylePreset === 'string' ? stylePreset : undefined);
+  // Client-supplied values take priority, then mode-aware, then preset-level
+  const resolvedSteps    = typeof steps    === 'number' ? steps    : (modeQuality.steps    ?? presetQuality.steps);
+  const resolvedGuidance = typeof guidance === 'number' ? guidance : (modeQuality.guidance ?? presetQuality.guidance);
 
   if (!isValidTool(effectiveTool)) {
     return NextResponse.json(
@@ -646,6 +719,21 @@ export async function POST(req: NextRequest) {
           }
         }
       }
+    }
+
+    // Update user generation stats (non-blocking)
+    if (!isSelfHosted && authedUserId) {
+      prisma.userPreference.upsert({
+        where: { userId: authedUserId },
+        create: {
+          userId: authedUserId,
+          stats: JSON.stringify({ totalGenerations: 1, successRate: 1.0, lastActive: new Date().toISOString() }),
+        },
+        update: {
+          stats: JSON.stringify({ totalGenerations: 1, successRate: 1.0, lastActive: new Date().toISOString() }),
+          updatedAt: new Date(),
+        },
+      }).catch(() => {});
     }
 
     // ------------------------------------------------------------------------

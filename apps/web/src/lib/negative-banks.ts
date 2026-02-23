@@ -10,6 +10,31 @@
  */
 
 // ---------------------------------------------------------------------------
+// PIXEL_NEGATIVES — aggressive set used by prompt-builder-pixel.ts
+// ---------------------------------------------------------------------------
+
+export const PIXEL_NEGATIVES: string[] = [
+  // Anti-pixel art
+  'photorealistic', 'photograph', 'photo', '3d render', '3d model', 'realistic',
+  'hyperrealistic', 'detailed texture', 'complex shading', 'smooth gradient',
+  'anti-aliased', 'blurry', 'soft edges', 'watercolor', 'oil painting', 'sketch',
+  'pencil drawing', 'charcoal', 'impressionist',
+  // Wrong scale
+  'tiny details', 'high resolution', 'HD', 'ultra HD', '8K', '4K', 'detailed',
+  'complex', 'intricate', 'fine details',
+  // Wrong style
+  'anime style', 'manga', 'cartoon', 'vector', 'flat design', 'minimalist',
+  'geometric', 'abstract', 'surreal',
+  // Wrong format issues
+  'white background', 'grey background', 'background elements',
+  'drop shadow', 'glow effect', 'particle effects',
+  // AI artifacts
+  'multiple characters', 'duplicate', 'mirror image', 'extra limbs',
+  'deformed', 'mutated', 'text', 'watermark', 'signature', 'artist name',
+  'frame', 'border', 'grid lines', 'ui elements outside sprite',
+];
+
+// ---------------------------------------------------------------------------
 // Global negatives — applied to ALL pixel art generations
 // ---------------------------------------------------------------------------
 
@@ -38,6 +63,19 @@ export const GLOBAL_PIXEL_NEGATIVES: string[] = [
   'cut off',
   'dithering artifacts',
   'noise',
+  // Additional anti-hallucination guards
+  'sub-pixel rendering',
+  'smooth interpolation',
+  'nearest-neighbor upscale artifacts',
+  'AI artifacts',
+  'deformed',
+  'mutated',
+  'ugly',
+  'duplicate',
+  'floating elements',
+  'inconsistent style',
+  'mixed art styles',
+  'out of frame',
 ];
 
 // ---------------------------------------------------------------------------
@@ -203,21 +241,15 @@ export const PRESET_NEGATIVES: Record<string, string[]> = {
 // ---------------------------------------------------------------------------
 
 export const BUSINESS_NEGATIVES: string[] = [
-  'pixel art',
-  'pixelated',
-  'low resolution',
-  'crude drawing',
-  'childish',
-  'cartoonish',
-  'watermark',
-  'text overlay',
-  'dark background',
+  'pixel art', '8-bit', 'retro game', 'sprite', 'pixelated',
+  'low resolution', 'crude drawing', 'childish', 'cartoonish',
+  'stock photo feel', 'generic', 'cliché', 'cheesy', 'clip art',
+  'watermark', 'text overlay', 'sample', 'demo', 'placeholder text',
   'horror elements',
-  'blurry',
-  'noise',
-  'jpeg artifacts',
-  'low quality',
-  'amateurish',
+  'blurry', 'noise', 'jpeg artifacts', 'low quality', 'amateurish',
+  'cluttered', 'crowded', 'chaotic layout', 'too many elements',
+  'inconsistent style', 'off-brand colors', 'mixed styles',
+  'overexposed', 'bad composition', 'distorted',
 ];
 
 // ---------------------------------------------------------------------------
@@ -225,28 +257,15 @@ export const BUSINESS_NEGATIVES: string[] = [
 // ---------------------------------------------------------------------------
 
 export const VECTOR_NEGATIVES: string[] = [
-  'raster',
-  'pixel art',
-  'photorealistic',
-  'photograph',
-  'painterly',
-  'watercolor',
-  'oil paint',
-  'blurry',
-  'noise',
-  'jpeg artifacts',
-  'gradient mesh',
-  'irregular stroke width',
-  'misaligned nodes',
-  'inconsistent style',
-  'drop shadow',
-  'bevel',
-  'emboss',
-  'lens flare',
-  'glow effects',
-  'busy background',
-  'texture',
-  'multiple styles mixed',
+  'raster', 'pixel art', 'bitmap effects',
+  'photorealistic', 'photograph', '3D render', 'CGI',
+  'painterly', 'watercolor', 'oil paint', 'sketch',
+  'blurry', 'noise', 'grain', 'jpeg artifacts',
+  'gradient mesh', 'complex texture', 'busy background',
+  'irregular stroke width', 'inconsistent stroke weight', 'jagged edges', 'rough lines',
+  'misaligned nodes', 'inconsistent style', 'multiple styles mixed',
+  'drop shadow', 'bevel', 'emboss', 'lens flare', 'glow effects',
+  'watermark', 'text', 'signature',
 ];
 
 // ---------------------------------------------------------------------------
@@ -254,21 +273,16 @@ export const VECTOR_NEGATIVES: string[] = [
 // ---------------------------------------------------------------------------
 
 export const EMOJI_NEGATIVES: string[] = [
-  'complex background',
-  'detailed scene',
-  'realistic',
-  'photographic',
-  'multiple characters',
-  'landscape',
-  'text overlay',
-  'watermark',
-  'blurry',
-  'low contrast',
-  'dark',
-  'noise',
-  'tiny details invisible at small size',
-  'inconsistent line weight',
-  'amateurish',
+  'complex background', 'detailed scene', 'landscape',
+  'realistic', 'photographic', 'photograph', '3D render',
+  'multiple characters', 'multiple subjects',
+  'text overlay', 'watermark',
+  'blurry', 'low contrast', 'dark',
+  'noise', 'grain',
+  'tiny details invisible at small size', 'hard to read at small size',
+  'inconsistent line weight', 'inconsistent style', 'mixed art styles',
+  'amateurish', 'ugly', 'distorted',
+  'realistic texture', 'detailed shading',
 ];
 
 // ---------------------------------------------------------------------------
@@ -276,27 +290,32 @@ export const EMOJI_NEGATIVES: string[] = [
 // ---------------------------------------------------------------------------
 
 export const UIUX_NEGATIVES: string[] = [
-  'pixel art',
-  'pixelated',
-  'illustration',
-  'hand-drawn',
-  'sketch',
-  'watercolor',
-  'painterly',
-  'anime',
-  'cartoon',
-  'photorealistic',
-  'photograph',
-  'blurry',
-  'low contrast',
-  'cluttered',
-  'hard to read text',
-  'inaccessible',
-  'inconsistent spacing',
-  'multiple color themes mixed',
-  'low quality',
-  'amateur',
+  'pixel art', 'pixelated',
+  'illustration', 'hand-drawn', 'sketch', 'watercolor', 'painterly',
+  'anime', 'cartoon', 'photorealistic', 'photograph',
+  'blurry', 'low contrast', 'low quality', 'amateur',
+  'cluttered', 'crowded', 'inconsistent spacing', 'misaligned elements',
+  'overlapping text', 'unreadable text', 'poor contrast',
+  'hard to read text', 'inaccessible',
+  'outdated design patterns',
+  'multiple color themes mixed', 'inconsistent style',
+  'watermark', 'placeholder text visible', 'lorem ipsum without styling',
+  'skeuomorphic' ,
 ];
+
+// ---------------------------------------------------------------------------
+// Unified negative bank — indexed by mode (for route-level assembly)
+// ---------------------------------------------------------------------------
+
+export const NEGATIVE_BANKS = {
+  pixel:    GLOBAL_PIXEL_NEGATIVES,
+  business: BUSINESS_NEGATIVES,
+  vector:   VECTOR_NEGATIVES,
+  emoji:    EMOJI_NEGATIVES,
+  uiux:     UIUX_NEGATIVES,
+} as const;
+
+export type GenerationMode = keyof typeof NEGATIVE_BANKS;
 
 // ---------------------------------------------------------------------------
 // Utility functions

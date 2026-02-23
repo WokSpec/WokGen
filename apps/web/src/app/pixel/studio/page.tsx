@@ -7,6 +7,9 @@ import Image from 'next/image';
 import { useToast } from '@/components/Toast';
 import WorkspaceSelector from '@/app/_components/WorkspaceSelector';
 import { EralSidebar } from '@/app/_components/EralSidebar';
+import { parseApiError, type StudioError } from '@/lib/studio-errors';
+import { usePreferenceSync } from '@/hooks/usePreferenceSync';
+import { useWAPListener } from '@/hooks/useWAPListener';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -214,7 +217,7 @@ const PROVIDER_LABELS: Record<Provider, string> = {
   replicate:    'Replicate',
   fal:          'fal.ai',
   together:     'Together.ai',
-  comfyui:      'ComfyUI',
+  comfyui:      'Custom Pipeline',
   huggingface:  'HuggingFace',
   pollinations: 'Pollinations',
 };
@@ -285,6 +288,14 @@ const EXAMPLE_PROMPTS: Record<Tool, string[]> = {
 // ---------------------------------------------------------------------------
 // Utility
 // ---------------------------------------------------------------------------
+
+const PIXEL_STAGES = [
+  { delay: 0,     message: 'Initializing pixel engine...' },
+  { delay: 5000,  message: 'Generating your sprite...' },
+  { delay: 15000, message: 'Rendering pixel art...' },
+  { delay: 30000, message: 'Applying palette...' },
+  { delay: 60000, message: 'Still working... (complex sprites can take up to 2min)' },
+];
 
 function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(' ');
@@ -534,17 +545,17 @@ function SettingsModal({
                 style={{ background: PROVIDER_COLORS.comfyui }}
               />
               <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                ComfyUI (Local)
+                Custom Pipeline
               </span>
               <span className="badge-success text-2xs ml-auto" style={{ fontSize: '0.65rem' }}>
                 Always free
               </span>
             </div>
-            <FormField label="ComfyUI Host URL" hint="Default: http://127.0.0.1:8188">
+            <FormField label="Pipeline Endpoint URL" hint="Your custom inference endpoint URL">
               <input
                 type="url"
                 className="input font-mono text-xs"
-                placeholder="http://127.0.0.1:8188"
+                placeholder="https://your-inference-endpoint.example.com"
                 value={host}
                 onChange={(e) => setHost(e.target.value)}
               />
@@ -731,13 +742,18 @@ function OutputPanel({
   const [zoom, setZoom] = useState<1|2|4>(1);
   const [activeUrl, setActiveUrl] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [loadingMsg, setLoadingMsg] = useState(PIXEL_STAGES[0].message);
 
   useEffect(() => {
     if (status === 'pending') {
       setElapsed(0);
+      setLoadingMsg(PIXEL_STAGES[0].message);
       const start = Date.now();
       const iv = setInterval(() => setElapsed(Math.floor((Date.now() - start) / 1000)), 500);
-      return () => clearInterval(iv);
+      const stageTimers = PIXEL_STAGES.slice(1).map(s =>
+        setTimeout(() => setLoadingMsg(s.message), s.delay)
+      );
+      return () => { clearInterval(iv); stageTimers.forEach(clearTimeout); };
     }
   }, [status]);
 
@@ -838,7 +854,7 @@ function OutputPanel({
           </div>
           <div className="text-center">
             <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-              Generating… {elapsed > 0 && <span style={{ color: 'var(--text-muted)' }}>{elapsed}s</span>}
+              {loadingMsg} {elapsed > 0 && <span style={{ color: 'var(--text-muted)' }}>{elapsed}s</span>}
             </p>
             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
               Usually 3–15 seconds
@@ -1307,9 +1323,44 @@ function GenerateForm({
         <div className="form-group">
           <div className="flex items-center justify-between mb-1.5">
             <label className="label mb-0">Prompt</label>
-            <span className="text-2xs" style={{ fontSize: '0.65rem', color: promptLenColor }}>
-              {promptLen}/200
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-2xs" style={{ fontSize: '0.65rem', color: promptLenColor }}>
+                {promptLen}/200
+              </span>
+              {/* Save as Favorite */}
+              <button
+                title={favSaved ? 'Saved!' : 'Save prompt as favorite'}
+                onClick={savePromptAsFavorite}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', lineHeight: 1, color: favSaved ? '#f59e0b' : 'var(--text-disabled)', transition: 'color 0.15s' }}
+              >
+                {favSaved ? '★' : '☆'}
+              </button>
+              {/* My Prompts dropdown */}
+              {favPrompts.length > 0 && (
+                <div style={{ position: 'relative' }}>
+                  <button
+                    title="My saved prompts"
+                    onClick={() => setShowFavMenu(v => !v)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.65rem', color: 'var(--text-disabled)', padding: '0 2px' }}
+                  >
+                    My Prompts ▾
+                  </button>
+                  {showFavMenu && (
+                    <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, minWidth: 220, maxHeight: 180, overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                      {favPrompts.map(f => (
+                        <button
+                          key={f.id}
+                          onClick={() => { setPrompt(f.prompt); setShowFavMenu(false); }}
+                          style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.7rem', color: 'var(--text-primary)', borderBottom: '1px solid var(--border)' }}
+                        >
+                          {f.prompt.length > 60 ? f.prompt.slice(0, 58) + '…' : f.prompt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           <textarea
             ref={textareaRef}
@@ -1428,25 +1479,26 @@ function GenerateForm({
       <div className="p-4">
         <div className="grid grid-cols-4 gap-1">
           {([
-            { id: 'none',       emoji: '🎲', label: 'Any'      },
-            { id: 'weapon',     emoji: '⚔️',  label: 'Weapon'   },
-            { id: 'armor',      emoji: '🛡️',  label: 'Armor'    },
-            { id: 'character',  emoji: '🧙',  label: 'Char'     },
-            { id: 'monster',    emoji: '👾',  label: 'Monster'  },
-            { id: 'consumable', emoji: '💊',  label: 'Item'     },
-            { id: 'gem',        emoji: '💎',  label: 'Gem'      },
-            { id: 'structure',  emoji: '🏰',  label: 'Build'    },
-            { id: 'nature',     emoji: '🌿',  label: 'Nature'   },
-            { id: 'ui',         emoji: '🎮',  label: 'UI'       },
-            { id: 'effect',     emoji: '✨',  label: 'Effect'   },
-            { id: 'tile',       emoji: '🗺️',  label: 'Tile'     },
-            { id: 'container',  emoji: '📦',  label: 'Chest'    },
-            { id: 'portrait',   emoji: '🖼️',  label: 'Portrait' },
-            { id: 'vehicle',    emoji: '🚀',  label: 'Vehicle'  },
-          ] as { id: import('@/lib/prompt-builder').AssetCategory; emoji: string; label: string }[]).map((cat) => (
+            { id: 'none',       emoji: '🎲', label: 'Any',      hint: 'Model decides composition' },
+            { id: 'weapon',     emoji: '⚔️',  label: 'Weapon',   hint: 'Single weapon, transparent bg, clear silhouette' },
+            { id: 'armor',      emoji: '🛡️',  label: 'Armor',    hint: 'Armor piece, centered, metallic, no wearer' },
+            { id: 'character',  emoji: '🧙',  label: 'Char',     hint: 'Full body sprite, centered, idle pose, transparent bg' },
+            { id: 'monster',    emoji: '👾',  label: 'Monster',  hint: 'Enemy sprite, menacing, centered, transparent bg' },
+            { id: 'consumable', emoji: '💊',  label: 'Item',     hint: 'Game item icon, clear readable silhouette' },
+            { id: 'gem',        emoji: '💎',  label: 'Gem',      hint: 'Gemstone, faceted, centered, transparent bg' },
+            { id: 'structure',  emoji: '🏰',  label: 'Build',    hint: 'Building or structure, side or top-down view' },
+            { id: 'nature',     emoji: '🌿',  label: 'Nature',   hint: 'Organic terrain, foliage, tileable-friendly' },
+            { id: 'ui',         emoji: '🎮',  label: 'UI',       hint: 'HUD element, flat design, readable at small size' },
+            { id: 'effect',     emoji: '✨',  label: 'Effect',   hint: 'Particle or magic effect, transparent-friendly' },
+            { id: 'tile',       emoji: '🗺️',  label: 'Tile',     hint: 'Seamless tile, no visible seams, tileable edges' },
+            { id: 'container',  emoji: '📦',  label: 'Chest',    hint: 'Container prop, readable silhouette, centered' },
+            { id: 'portrait',   emoji: '🖼️',  label: 'Portrait', hint: 'Character bust, face and upper body, expressive' },
+            { id: 'vehicle',    emoji: '🚀',  label: 'Vehicle',  hint: 'Vehicle or mount, side or top-down view' },
+          ] as { id: import('@/lib/prompt-builder').AssetCategory; emoji: string; label: string; hint: string }[]).map((cat) => (
             <button
               key={cat.id}
               onClick={() => setAssetCategory(cat.id)}
+              title={cat.hint}
               className="flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-md transition-all duration-150"
               style={{
                 background: assetCategory === cat.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
@@ -1459,6 +1511,34 @@ function GenerateForm({
             </button>
           ))}
         </div>
+        {/* Hint text for the active category */}
+        {assetCategory !== 'none' && (() => {
+          const CATEGORY_HINTS: Partial<Record<import('@/lib/prompt-builder').AssetCategory, string>> = {
+            weapon:     'Single weapon, transparent bg, clear silhouette',
+            armor:      'Armor piece, centered, metallic detail, no wearer',
+            character:  'Full body sprite, centered, idle pose, transparent bg',
+            monster:    'Enemy sprite, menacing pose, centered, transparent bg',
+            consumable: 'Game item icon, glowing aura, readable silhouette',
+            gem:        'Gemstone, faceted surfaces, centered, transparent bg',
+            structure:  'Building or structure, side or top-down view',
+            nature:     'Organic terrain or foliage, tileable-friendly',
+            ui:         'HUD element, flat design, readable at small size',
+            effect:     'Particle or magic effect, bright, transparent-friendly',
+            tile:       'Seamless tile, no visible seams, tileable in all directions',
+            container:  'Container prop, readable silhouette, centered',
+            portrait:   'Character bust, face and upper body, expressive detail',
+            vehicle:    'Vehicle or mount, full body, side or top-down view',
+          };
+          const hint = CATEGORY_HINTS[assetCategory];
+          return hint ? (
+            <p
+              className="mt-2 text-2xs leading-relaxed"
+              style={{ fontSize: '0.65rem', color: 'var(--text-muted)', lineHeight: 1.5 }}
+            >
+              {hint}
+            </p>
+          ) : null;
+        })()}
       </div>
         </>
       )}
@@ -2073,7 +2153,7 @@ function StudioInner() {
   // Job state
   const [jobStatus, setJobStatus]     = useState<JobStatus>('idle');
   const [result, setResult]           = useState<GenerationResult | null>(null);
-  const [error, setError]             = useState<string | null>(null);
+  const [studioError, setStudioError] = useState<StudioError | null>(null);
   const [savedToGallery, setSavedToGallery] = useState(false);
 
   // UI state
@@ -2096,6 +2176,14 @@ function StudioInner() {
     pollinations: '',
   });
   const [comfyuiHost, setComfyuiHost] = useState('http://127.0.0.1:8188');
+
+  // ── Favorites state ────────────────────────────────────────────────────────
+  const [favPrompts, setFavPrompts]     = useState<{ id: string; prompt: string; label?: string }[]>([]);
+  const [showFavMenu, setShowFavMenu]   = useState(false);
+  const [favSaved, setFavSaved]         = useState(false);
+
+  // ── Preference sync ────────────────────────────────────────────────────────
+  usePreferenceSync('pixel', { tool: activeTool, size, stylePreset, useHD, assetCategory, pixelEra });
 
   // ── Fetch providers on mount ───────────────────────────────────────────────
   useEffect(() => {
@@ -2161,6 +2249,64 @@ function StudioInner() {
       .catch(() => {});
   }, [activeWorkspaceId]);
 
+  // ── Load favorite prompts ──────────────────────────────────────────────────
+  useEffect(() => {
+    fetch('/api/favorites?mode=pixel')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.favorites) setFavPrompts(d.favorites); })
+      .catch(() => {});
+  }, []);
+
+  const savePromptAsFavorite = useCallback(async () => {
+    if (!prompt.trim()) return;
+    try {
+      const res = await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'pixel', prompt: prompt.trim() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFavPrompts(prev => [data.favorite, ...prev]);
+        setFavSaved(true);
+        setTimeout(() => setFavSaved(false), 2000);
+      }
+    } catch { /* silent fail */ }
+  }, [prompt]);
+
+  // ── WAP listener — Eral AI action protocol ────────────────────────────────
+  useWAPListener((action) => {
+    switch (action.type) {
+      case 'setParam':
+        if (action.key === 'size' && typeof action.value === 'number') {
+          setSize(action.value as PixelSize);
+        }
+        if (action.key === 'style' && typeof action.value === 'string') {
+          setStylePreset(action.value as StylePreset);
+        }
+        if (action.key === 'hd' && typeof action.value === 'boolean') {
+          setUseHD(action.value);
+        }
+        break;
+      case 'setPrompt':
+        if (action.text) setPrompt(action.text);
+        break;
+      case 'setTool':
+        if (action.tool) setActiveTool(action.tool as Tool);
+        break;
+      case 'toggleHD':
+        setUseHD((prev) => !prev);
+        break;
+      case 'generate':
+        if (action.prompt) setPrompt(action.prompt);
+        setTimeout(() => {
+          const btn = document.querySelector<HTMLButtonElement>('[data-generate-btn]');
+          btn?.click();
+        }, 100);
+        break;
+    }
+  }, []);
+
   // ── Keyboard shortcuts ─────────────────────────────────────────────────────
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -2209,7 +2355,7 @@ function StudioInner() {
     setJobStatus('pending');
     setResult(null);
     setBatchResults([]);
-    setError(null);
+    setStudioError(null);
     setSavedToGallery(false);
 
     try {
@@ -2350,7 +2496,7 @@ function StudioInner() {
       if (isPublic) setSavedToGallery(true);
       if (useHD) refreshCredits();
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setStudioError(parseApiError({ status: 0 }, err instanceof Error ? err.message : String(err)));
       setJobStatus('failed');
     }
   }, [
@@ -2421,7 +2567,7 @@ function StudioInner() {
     setSeed(String(randomSeed()));
     setJobStatus('idle');
     setResult(null);
-    setError(null);
+    setStudioError(null);
   }, []);
 
   // ── History select ─────────────────────────────────────────────────────────
@@ -2700,6 +2846,7 @@ function StudioInner() {
           )}
 
           <button
+            data-generate-btn
             className="btn-primary w-full"
             style={{
               height: 44,
@@ -2808,7 +2955,7 @@ function StudioInner() {
         <OutputPanel
           status={jobStatus}
           result={result}
-          error={error}
+          error={studioError?.message ?? null}
           onDownload={handleDownload}
           onSaveToGallery={handleSaveToGallery}
           onReroll={handleReroll}

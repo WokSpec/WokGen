@@ -212,6 +212,9 @@ model Job {
   /// Extracted dominant palette (JSON: [{hex, name, ratio}])
   paletteJson String? @db.Text
 
+  /// User thumbs-up (1) or thumbs-down (-1) rating on this result
+  userRating  Int?
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

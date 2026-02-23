@@ -38,7 +38,7 @@ import { buildPixelPrompt } from '@/lib/prompt-builder-pixel';
 import { removeBackground, removeBackgroundWithFallback } from '@/lib/bg-remove';
 import { resolveOptimalProvider } from '@/lib/provider-router';
 import { assembleNegativePrompt, encodeNegativesIntoPositive } from '@/lib/negative-banks';
-import { validateAndSanitize } from '@/lib/prompt-validator';
+import { validateAndSanitize, autoEnrichPrompt } from '@/lib/prompt-validator';
 import { resolveQualityProfile, getQualityProfile } from '@/lib/quality-profiles';
 import { buildVariantPrompt } from '@/lib/variant-builder';
 import { buildPrompt as buildEnginePrompt } from '@/lib/prompt-engine';
@@ -545,6 +545,10 @@ export async function POST(req: NextRequest) {
 
   effectivePrompt = validation.sanitized;
   effectiveNeg    = validation.sanitizedNeg || undefined;
+
+  // Auto-enrich minimal prompts with art-direction context
+  const enrichResult = autoEnrichPrompt(effectivePrompt, resolvedMode);
+  if (enrichResult.wasEnriched) effectivePrompt = enrichResult.enriched;
 
   // Assemble rich negative prompt (merges user neg + automatic banks)
   // For business mode the route already built a neg above — augment it

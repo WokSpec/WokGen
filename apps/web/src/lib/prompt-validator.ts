@@ -234,3 +234,37 @@ function normalize(s: string): string {
     .replace(/\s*[,.\-–—]+\s*$/g, '')   // strip trailing punctuation
     .trim();
 }
+
+// ---------------------------------------------------------------------------
+// Prompt quality classifier + auto-enrichment
+// ---------------------------------------------------------------------------
+
+export type PromptQuality = 'minimal' | 'average' | 'rich';
+
+export function classifyPromptQuality(prompt: string): PromptQuality {
+  const trimmed = prompt.trim();
+  if (trimmed.length < 20) return 'minimal';
+  const words = trimmed.split(/[\s,]+/).filter(w => w.length > 2);
+  if (words.length < 3) return 'minimal';
+  if (trimmed.length > 80 && words.length >= 6) return 'rich';
+  return 'average';
+}
+
+const ENRICHMENTS: Record<string, Record<string, string>> = {
+  pixel:    { lighting: 'soft ambient lighting', detail: 'fine pixel detail, clean edges', composition: 'centered composition', style: '16-bit RPG style' },
+  business: { lighting: 'professional studio lighting', detail: 'sharp vector clarity, clean lines', composition: 'centered on white background', style: 'modern flat design' },
+  default:  { lighting: 'well-lit', detail: 'high detail', composition: 'balanced composition', style: 'professional quality' },
+};
+
+export function autoEnrichPrompt(prompt: string, mode: string): { enriched: string; wasEnriched: boolean } {
+  if (classifyPromptQuality(prompt) !== 'minimal') return { enriched: prompt, wasEnriched: false };
+  const fields = ENRICHMENTS[mode] ?? ENRICHMENTS['default'];
+  const lower = prompt.toLowerCase();
+  const additions: string[] = [];
+  if (!lower.match(/light|lit|bright|dark|glow|shadow/)) additions.push(fields.lighting);
+  if (!lower.match(/detail|sharp|clean|crisp|clear/))    additions.push(fields.detail);
+  if (!lower.match(/center|compos|layout|background/))   additions.push(fields.composition);
+  if (!lower.match(/style|art|design|render|look/))      additions.push(fields.style);
+  if (additions.length === 0) return { enriched: prompt, wasEnriched: false };
+  return { enriched: `${prompt.replace(/[,\s]+$/, '')}, ${additions.join(', ')}`, wasEnriched: true };
+}

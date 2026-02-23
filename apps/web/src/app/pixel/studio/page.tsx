@@ -1005,11 +1005,16 @@ function OutputPanel({
             onClick={() => {
               const url = `${window.location.origin}/assets/${result.jobId}`;
               navigator.clipboard.writeText(url).catch(() => {});
-              // toast handled by parent caller if wired; silent fallback here
             }}
           >
             ⇧ Share
           </button>
+        )}
+        {result?.jobId && !result.jobId.startsWith('anim-') && !result.jobId.startsWith('local') && (
+          <div style={{ display: 'flex', gap: 2 }}>
+            <RatingButton jobId={result.jobId} value={1} label="👍" title="Good result" />
+            <RatingButton jobId={result.jobId} value={-1} label="👎" title="Bad result" />
+          </div>
         )}
         {result?.guestDownloadGated ? (
           <a
@@ -1260,6 +1265,35 @@ function OutputPanel({
         </div>
       )}
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Rating button — thumbs up / down on a job result
+// ---------------------------------------------------------------------------
+function RatingButton({ jobId, value, label, title }: { jobId: string; value: 1 | -1; label: string; title: string }) {
+  const [rated, setRated] = useState<1 | -1 | null>(null);
+  const handle = async () => {
+    const next = rated === value ? 0 : value;
+    setRated(next === 0 ? null : (next as 1 | -1));
+    await fetch(`/api/jobs/${jobId}/rate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating: next }),
+    }).catch(() => {});
+  };
+  return (
+    <button
+      className="btn-ghost btn-xs"
+      onClick={handle}
+      title={title}
+      style={{
+        opacity: rated === value ? 1 : 0.5,
+        filter: rated === value ? 'none' : 'grayscale(1)',
+        transition: 'opacity 0.15s, filter 0.15s',
+        fontSize: 14,
+      }}
+    >{label}</button>
   );
 }
 
@@ -2326,6 +2360,7 @@ function StudioInner() {
   const [favPrompts, setFavPrompts]     = useState<{ id: string; prompt: string; label?: string }[]>([]);
   const [showFavMenu, setShowFavMenu]   = useState(false);
   const [favSaved, setFavSaved]         = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   // ── Preference sync ────────────────────────────────────────────────────────
   usePreferenceSync('pixel', { tool: activeTool, size, stylePreset, useHD, assetCategory, pixelEra });
@@ -2455,16 +2490,38 @@ function StudioInner() {
   // ── Keyboard shortcuts ─────────────────────────────────────────────────────
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      const tag = (document.activeElement?.tagName ?? '').toLowerCase();
+      const inputFocused = tag === 'input' || tag === 'textarea' || tag === 'select';
+
       // ⌘/Ctrl + Enter → generate
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault();
-        if (!e.target || !(e.target as HTMLElement).closest('textarea')) {
-          handleGenerate();
-        }
+        handleGenerate();
+        return;
+      }
+      // ⌘/Ctrl + R → regenerate
+      if ((e.metaKey || e.ctrlKey) && e.key === 'r') {
+        e.preventDefault();
+        handleGenerate();
+        return;
+      }
+      // ⌘/Ctrl + ArrowUp → enhance prompt
+      if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowUp') {
+        e.preventDefault();
+        setPrompt((p: string) => {
+          const tag = ', masterwork, highly detailed, crisp pixels';
+          return p.endsWith(tag) ? p : p + tag;
+        });
+        return;
+      }
+      // ? → shortcut sheet (not in inputs)
+      if (!inputFocused && e.key === '?') {
+        e.preventDefault();
+        setShowShortcuts(v => !v);
+        return;
       }
       // 1–5 → switch tool (only when no input focused)
-      const tag = (document.activeElement?.tagName ?? '').toLowerCase();
-      if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
+      if (!inputFocused) {
         const toolMap: Record<string, Tool> = {
           '1': 'generate', '2': 'animate', '3': 'rotate', '4': 'inpaint', '5': 'scene',
         };
@@ -3340,6 +3397,36 @@ function StudioInner() {
           onSave={handleSaveSettings}
           onClose={() => setShowSettings(false)}
         />
+      )}
+      {showShortcuts && (
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Keyboard shortcuts"
+          onClick={() => setShowShortcuts(false)}
+        >
+          <div className="modal" style={{ maxWidth: 440 }} onClick={e => e.stopPropagation()}>
+            <div className="modal__header">
+              <span className="modal__title">Keyboard Shortcuts</span>
+              <button className="btn btn--ghost btn--sm btn--icon" onClick={() => setShowShortcuts(false)} aria-label="Close">✕</button>
+            </div>
+            <div className="modal__body" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {([
+                ['⌘ / Ctrl + Enter', 'Generate'],
+                ['⌘ / Ctrl + R', 'Regenerate'],
+                ['⌘ / Ctrl + ↑', 'Enhance prompt'],
+                ['1 – 5', 'Switch tool (Generate / Animate / Rotate / Inpaint / Scene)'],
+                ['?', 'Toggle this shortcut sheet'],
+              ] as [string, string][]).map(([key, desc]) => (
+                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, fontSize: 13 }}>
+                  <kbd style={{ fontFamily: 'monospace', background: '#252538', border: '1px solid #303050', borderRadius: 4, padding: '2px 8px', color: 'var(--accent)', flexShrink: 0 }}>{key}</kbd>
+                  <span style={{ color: 'var(--text-muted)', textAlign: 'right' }}>{desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
       <EralSidebar mode="pixel" tool={activeTool} prompt={prompt} />
     </div>

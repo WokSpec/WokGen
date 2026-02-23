@@ -72,9 +72,30 @@ export default auth((req) => {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Add X-WokGen-Request-Id to all responses for traceability
+  // Security headers + request ID on all responses
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+  const cspHeader = [
+    `default-src 'self'`,
+    `script-src 'self' 'nonce-${nonce}' https://js.stripe.com https://cdn.vercel-insights.com`,
+    `style-src 'self' 'unsafe-inline'`,
+    `img-src 'self' data: blob: https: http:`,
+    `font-src 'self' data:`,
+    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://*.upstash.io wss:`,
+    `frame-src https://js.stripe.com https://hooks.stripe.com`,
+    `object-src 'none'`,
+    `base-uri 'self'`,
+    `form-action 'self'`,
+    `upgrade-insecure-requests`,
+  ].join('; ');
+
   const response = NextResponse.next();
   response.headers.set('X-WokGen-Request-Id', crypto.randomUUID());
+  response.headers.set('Content-Security-Policy', cspHeader);
+  response.headers.set('X-Nonce', nonce);
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   return response;
 });
 

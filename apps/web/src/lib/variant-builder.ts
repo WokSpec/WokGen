@@ -61,6 +61,43 @@ const DEFAULT_MUTATIONS: MutationSet = [
   'alternate color palette variant',
 ];
 
+// ---------------------------------------------------------------------------
+// Mode-level mutations — used by buildVariantPrompts when no preset is set
+// ---------------------------------------------------------------------------
+
+const BUSINESS_MODE_MUTATIONS: MutationSet = [
+  'alternate color scheme, same design language',
+  'minimalist stripped-down version',
+  'bold high-contrast variant',
+];
+
+const VECTOR_MODE_MUTATIONS: MutationSet = [
+  'alternate stroke weight, same icon concept',
+  'filled solid version',
+  'outlined thin-stroke version',
+];
+
+const EMOJI_MODE_MUTATIONS: MutationSet = [
+  'slightly different expression, same emoji',
+  'alternate color, same design',
+  'more expressive variant',
+];
+
+const UIUX_MODE_MUTATIONS: MutationSet = [
+  'alternate layout arrangement, same components',
+  'dark mode version',
+  'compact condensed version',
+];
+
+/** Maps product-line mode → mutation set for when no style preset is available */
+const MODE_MUTATION_MAP: Partial<Record<string, MutationSet>> = {
+  business: BUSINESS_MODE_MUTATIONS,
+  vector:   VECTOR_MODE_MUTATIONS,
+  emoji:    EMOJI_MODE_MUTATIONS,
+  uiux:     UIUX_MODE_MUTATIONS,
+  pixel:    DEFAULT_MUTATIONS,
+};
+
 // Map preset → mutation set
 const PRESET_MUTATION_MAP: Partial<Record<StylePreset, MutationSet>> = {
   character_idle:  CHARACTER_MUTATIONS,
@@ -133,4 +170,41 @@ export function buildVariantPrompt(
 
   const modifier = mutations[idx];
   return `${basePrompt}, ${modifier}`;
+}
+
+/**
+ * Build an array of `count` semantically distinct prompt variants for batch generation.
+ *
+ * Index 0 is always the canonical (unmodified) prompt.
+ * Subsequent indices apply distinct mutations drawn from preset-aware or
+ * mode-aware mutation tables, cycling through all categories when count > 3.
+ *
+ * @param basePrompt — Assembled prompt for the canonical slot.
+ * @param count      — Total number of variants to produce (including the canonical).
+ * @param mode       — Product-line mode ('pixel' | 'business' | 'vector' | 'emoji' | 'uiux').
+ * @param preset     — Optional style preset; takes precedence over mode mutations when set.
+ * @returns Array of `count` prompt strings, first element is always `basePrompt`.
+ */
+export function buildVariantPrompts(
+  basePrompt: string,
+  count: number,
+  mode: string,
+  preset?: StylePreset | string,
+): string[] {
+  if (count <= 1) return [basePrompt];
+
+  // Pick mutation table: preset-specific first, then mode-level, then global default
+  const resolvedPreset = (preset as StylePreset | undefined);
+  const mutations: string[] =
+    (resolvedPreset ? PRESET_MUTATION_MAP[resolvedPreset] : undefined) ??
+    MODE_MUTATION_MAP[mode] ??
+    DEFAULT_MUTATIONS;
+
+  const results: string[] = [basePrompt];
+  for (let i = 1; i < count; i++) {
+    // Cycle through mutations for counts larger than the mutation set
+    const modifier = mutations[(i - 1) % mutations.length];
+    results.push(`${basePrompt}, ${modifier}`);
+  }
+  return results;
 }

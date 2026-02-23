@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/components/Toast';
 import WorkspaceSelector from '@/app/_components/WorkspaceSelector';
+import { EralSidebar } from '@/app/_components/EralSidebar';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -2846,6 +2847,7 @@ function StudioInner() {
           onClose={() => setShowSettings(false)}
         />
       )}
+      <EralSidebar mode="pixel" tool={activeTool} prompt={prompt} />
     </div>
   );
 }

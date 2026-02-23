@@ -57,6 +57,17 @@ export const QUALITY_PROFILES: Record<string, QualityProfile> = {
 
   // ── Default fallback ─────────────────────────────────────────────────────
   default:         { steps: 20, guidance: 7.5 },
+
+  // ── UI/UX mode (mockup image generation) ─────────────────────────────────
+  // Higher guidance for precise layout adherence; moderate steps for speed
+  uiux_section:    { steps: 25, guidance: 8.0 },
+  uiux_component:  { steps: 22, guidance: 8.0 },
+  uiux_page:       { steps: 28, guidance: 8.5 },
+
+  // ── Voice / Text modes — non-image; steps/guidance are not used
+  // but entries are included for exhaustive coverage and future use.
+  voice:           { steps: 1,  guidance: 1.0 },
+  text:            { steps: 1,  guidance: 1.0 },
 };
 
 /**

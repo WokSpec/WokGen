@@ -1,0 +1,40 @@
+import type { ModeContract } from './types';
+
+export const textMode: ModeContract = {
+  id: 'text',
+  label: 'WokGen Text',
+  shortLabel: 'Text',
+  tagline: 'AI Copywriting Engine',
+  description: 'Headlines, blogs, product copy, social posts, and creative writing at scale.',
+  accentColor: '#10b981',
+  outputs: ['copy'],
+  exportFormats: ['txt', 'md', 'zip'],
+  sizeConstraints: { min: 50, max: 5000, defaults: [150, 300, 800, 1500], defaultSize: 300 },
+  tools: [
+    { id: 'headline', label: 'Headlines', description: 'Generate brand headlines and taglines', icon: '✍️', outputType: 'copy', exportFormats: ['txt', 'md'] },
+    { id: 'blog', label: 'Blog Post', description: 'Generate long-form blog posts and articles', icon: '📝', outputType: 'copy', exportFormats: ['txt', 'md'] },
+    { id: 'ad', label: 'Ad Copy', description: 'Generate ad copy and CTAs', icon: '📣', outputType: 'copy', exportFormats: ['txt', 'zip'] },
+  ],
+  presets: [
+    { id: 'brand', label: 'Brand Voice', tokens: ['brand voice', 'consistent tone', 'on-brand messaging'] },
+    { id: 'conversion', label: 'Conversion', tokens: ['conversion focused', 'clear CTA', 'benefit-driven'] },
+    { id: 'creative', label: 'Creative', tokens: ['creative writing', 'engaging narrative', 'storytelling'] },
+    { id: 'technical', label: 'Technical', tokens: ['technical accuracy', 'precise language', 'informational'] },
+  ],
+  promptBuilder: 'text',
+  models: { standardProvider: 'pollinations', hdProvider: 'replicate', standardRateLimit: 10, hdCreditsPerGeneration: 1 },
+  galleryAspect: 'wide',
+  galleryFilters: ['tool', 'category', 'style'],
+  licenseKey: 'commercial_brand',
+  routes: { landing: '/text', studio: '/text/studio', gallery: '/text/gallery', docs: '/docs/text' },
+  servicePairing: { label: 'WokSpec Content Strategy', description: 'Need a full content system? WokSpec builds editorial and copy pipelines.', href: 'https://wokspec.org' },
+  status: 'beta',
+  targetUsers: ['Marketers', 'Content creators', 'SaaS founders', 'Copywriters'],
+  notFor: ['Code generation', 'Image generation', 'Audio production'],
+  examplePrompts: [
+    { prompt: 'Brand headline for a minimalist productivity app, 5 variations', label: 'Brand Headlines' },
+    { prompt: 'Blog post intro: top 5 AI tools for small businesses, engaging hook', label: 'Blog Post' },
+    { prompt: 'Google Ads copy for a SaaS email tool, 3 headline + description sets', label: 'Ad Copy' },
+    { prompt: 'Email campaign for a product launch, subject line + body, conversion focused', label: 'Email Campaign' },
+  ],
+};

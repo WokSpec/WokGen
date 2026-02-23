@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
+import { EralSidebar } from '@/app/_components/EralSidebar';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -746,6 +747,7 @@ function EmojiStudioInner() {
         </div>
       </aside>
 
+      <EralSidebar mode="emoji" tool={activeTool} prompt={prompt} />
     </div>
   );
 }

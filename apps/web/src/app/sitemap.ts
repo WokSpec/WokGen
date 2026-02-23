@@ -18,10 +18,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/business/studio`,     lastModified: now, changeFrequency: 'monthly',  priority: 0.85 },
     { url: `${base}/business/gallery`,    lastModified: now, changeFrequency: 'daily',    priority: 0.8 },
 
-    // Coming soon
+    // Coming soon / beta
     { url: `${base}/vector`,              lastModified: now, changeFrequency: 'monthly',  priority: 0.5 },
     { url: `${base}/emoji`,               lastModified: now, changeFrequency: 'monthly',  priority: 0.5 },
     { url: `${base}/uiux`,                lastModified: now, changeFrequency: 'monthly',  priority: 0.5 },
+
+    // Voice mode (beta)
+    { url: `${base}/voice`,               lastModified: now, changeFrequency: 'monthly',  priority: 0.7 },
+    { url: `${base}/voice/studio`,        lastModified: now, changeFrequency: 'monthly',  priority: 0.65 },
+    { url: `${base}/voice/gallery`,       lastModified: now, changeFrequency: 'daily',    priority: 0.6 },
+
+    // Text mode (beta)
+    { url: `${base}/text`,                lastModified: now, changeFrequency: 'monthly',  priority: 0.7 },
+    { url: `${base}/text/studio`,         lastModified: now, changeFrequency: 'monthly',  priority: 0.65 },
+    { url: `${base}/text/gallery`,        lastModified: now, changeFrequency: 'daily',    priority: 0.6 },
+
+    // Eral — AI companion
+    { url: `${base}/eral`,                lastModified: now, changeFrequency: 'weekly',   priority: 0.75 },
 
     // Docs
     { url: `${base}/docs`,                lastModified: now, changeFrequency: 'weekly',   priority: 0.7 },

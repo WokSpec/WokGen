@@ -11,6 +11,7 @@ import type {
 } from '@/lib/prompt-builder-business';
 import { PLATFORM_DIMENSIONS } from '@/lib/prompt-builder-business';
 import WorkspaceSelector from '@/app/_components/WorkspaceSelector';
+import { EralSidebar } from '@/app/_components/EralSidebar';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -713,6 +714,7 @@ function BusinessStudioInner() {
         </div>
       </aside>
 
+      <EralSidebar mode="business" tool={activeTool} prompt={prompt} />
     </div>
   );
 }

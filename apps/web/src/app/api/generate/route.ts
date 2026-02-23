@@ -9,7 +9,7 @@ import {
 import { checkRateLimit } from '@/lib/rate-limit';
 import { sendLowCreditsEmail } from '@/lib/email';
 import { isSupportedMode, getMode } from '@/lib/modes';
-import type { ProviderName, Tool, GenerateParams } from '@/lib/providers';
+import type { ProviderName, Tool, GenerateParams, GenerateResult } from '@/lib/providers';
 import {
   buildBusinessPrompt,
   type BusinessTool,
@@ -43,6 +43,43 @@ import { buildVariantPrompt } from '@/lib/variant-builder';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
+
+// ---------------------------------------------------------------------------
+// Module-level provider failure tracker
+// Skips providers that have failed ≥3 times in the last 60 seconds.
+// ---------------------------------------------------------------------------
+const _providerFailureCounts = new Map<string, { count: number; resetAt: number }>();
+const _FAILURE_WINDOW_MS = 60_000;
+const _MAX_FAILURES = 3;
+
+function recordProviderFailure(provider: string): void {
+  const now = Date.now();
+  const entry = _providerFailureCounts.get(provider);
+  if (!entry || now > entry.resetAt) {
+    _providerFailureCounts.set(provider, { count: 1, resetAt: now + _FAILURE_WINDOW_MS });
+  } else {
+    entry.count += 1;
+  }
+}
+
+function isProviderThrottled(provider: string): boolean {
+  const now = Date.now();
+  const entry = _providerFailureCounts.get(provider);
+  if (!entry || now > entry.resetAt) return false;
+  return entry.count >= _MAX_FAILURES;
+}
+
+/** Ordered fallback providers to try when `primary` fails (non-self-hosted only). */
+function getFallbackChain(primary: ProviderName): ProviderName[] {
+  const candidates: Array<{ provider: ProviderName; key?: string }> = [
+    { provider: 'together',    key: 'TOGETHER_API_KEY' },
+    { provider: 'huggingface', key: 'HF_TOKEN' },
+    { provider: 'pollinations' }, // always available — no key needed
+  ];
+  return candidates
+    .filter(c => c.provider !== primary && (!c.key || Boolean(process.env[c.key])))
+    .map(c => c.provider);
+}
 
 export async function POST(req: NextRequest) {
   const isSelfHosted = process.env.SELF_HOSTED === 'true';
@@ -175,6 +212,20 @@ export async function POST(req: NextRequest) {
   }
   const resolvedMode = isSupportedMode(mode) ? mode : 'pixel';
   const modeContract = getMode(resolvedMode);
+
+  // Voice and text modes have dedicated endpoints — reject early with a helpful message
+  if (resolvedMode === 'voice') {
+    return NextResponse.json(
+      { error: 'Voice generation uses /api/voice/generate', code: 'WRONG_ENDPOINT' },
+      { status: 400 },
+    );
+  }
+  if (resolvedMode === 'text') {
+    return NextResponse.json(
+      { error: 'Text generation uses /api/text/generate', code: 'WRONG_ENDPOINT' },
+      { status: 400 },
+    );
+  }
 
   // In hosted mode: ignore any client-supplied provider keys
   const resolvedByokKey  = isSelfHosted ? (typeof byokKey  === 'string' ? byokKey  : null) : null;
@@ -455,49 +506,79 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    let actualProvider: ProviderName = resolvedProvider;
-    const generationPromise = generate(resolvedProvider, genParams, config).catch(async (err: unknown) => {
-      if (!isSelfHosted) {
-        // Pollinations down → try HuggingFace (if key set) or Replicate as last resort
-        if (resolvedProvider === 'pollinations') {
-          if (process.env.HF_TOKEN) {
-            console.warn('[generate] Pollinations failed, falling back to HuggingFace:', (err as Error).message);
-            actualProvider = 'huggingface';
-            return generate('huggingface', genParams, resolveProviderConfig('huggingface', null, null));
-          }
-          if (process.env.REPLICATE_API_TOKEN) {
-            console.warn('[generate] Pollinations failed, falling back to Replicate:', (err as Error).message);
-            actualProvider = 'replicate';
-            return generate('replicate', genParams, resolveProviderConfig('replicate', null, null));
-          }
-          // All fallbacks exhausted — return actionable error
-          throw Object.assign(
-            new Error(
-              'Generation unavailable: Pollinations is temporarily down and no backup provider is configured. ' +
-              'To fix this, set HF_TOKEN (free at huggingface.co/settings/tokens) or TOGETHER_API_KEY (free at api.together.ai) in your environment variables.'
+    // Build provider chain: primary first, then key-available fallbacks (skip throttled ones).
+    const providerChain: ProviderName[] = isSelfHosted
+      ? [resolvedProvider]
+      : [resolvedProvider, ...getFallbackChain(resolvedProvider).filter(p => !isProviderThrottled(p))];
+
+    let usedProvider: ProviderName = resolvedProvider;
+    let result: GenerateResult | undefined;
+    let lastErr: unknown;
+
+    for (const candidateProvider of providerChain) {
+      try {
+        const candidateConfig = candidateProvider === resolvedProvider
+          ? config
+          : resolveProviderConfig(candidateProvider, null, null);
+
+        const timedResult = await Promise.race([
+          generate(candidateProvider, genParams, candidateConfig),
+          new Promise<never>((_, reject) =>
+            setTimeout(
+              () => reject(Object.assign(new Error('Generation timed out'), { statusCode: 504 })),
+              180_000,
             ),
-            { statusCode: 503 }
+          ),
+        ]);
+
+        // Validate the result URL — reject empty/malformed responses before accepting
+        const hasValidUrl =
+          isValidResultUrl(timedResult.resultUrl) ||
+          timedResult.resultUrls?.some(u => isValidResultUrl(u));
+        if (!hasValidUrl) {
+          throw Object.assign(
+            new Error(`Provider ${candidateProvider} returned an invalid image URL`),
+            { statusCode: 502, provider: candidateProvider },
           );
         }
-        // HuggingFace failed → fall back to Pollinations (always available)
-        if (resolvedProvider === 'huggingface') {
-          console.warn('[generate] HuggingFace failed, falling back to Pollinations:', (err as Error).message);
-          actualProvider = 'pollinations';
-          return generate('pollinations', genParams, resolveProviderConfig('pollinations', null, null));
-        }
-      }
-      throw err;
-    });
 
-    const result = await Promise.race([
-      generationPromise,
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Generation timed out after 3 minutes')), 180_000),
-      ),
-    ]);
+        result     = timedResult;
+        usedProvider = candidateProvider;
+        if (candidateProvider !== resolvedProvider) {
+          console.warn(`[generate] Primary ${resolvedProvider} failed; used fallback ${candidateProvider}`);
+        }
+        break;
+      } catch (err) {
+        lastErr = err;
+        recordProviderFailure(candidateProvider);
+        const statusCode = (err as { statusCode?: number }).statusCode ?? 0;
+        // Continue the chain only for transient failures (503, 429, 504/timeout)
+        const isTransient =
+          statusCode === 503 || statusCode === 429 || statusCode === 504 ||
+          (err instanceof Error && /timeout|loading|unavailable|rate.?limit/i.test(err.message));
+        if (!isTransient) {
+          // Hard failure (auth error, bad request, etc.) — don't try fallbacks
+          throw err;
+        }
+        console.warn(
+          `[generate] ${candidateProvider} transient error (${statusCode}), trying next:`,
+          (err as Error).message,
+        );
+      }
+    }
+
+    if (!result) {
+      throw Object.assign(
+        new Error(
+          providerChain.length > 1
+            ? 'All generation providers are temporarily busy. Please try again in a moment.'
+            : ((lastErr as Error)?.message ?? 'Generation failed'),
+        ),
+        { statusCode: 503 },
+      );
+    }
 
     // actual provider used (may differ from resolvedProvider if fallback occurred)
-    const usedProvider: ProviderName = actualProvider;
 
     // ------------------------------------------------------------------------
     // 5a. Update Job as succeeded
@@ -722,6 +803,21 @@ function getErrorHint(err: unknown): string {
   if (msg.includes('nsfw') || msg.includes('safety')) return 'Your prompt triggered a safety filter. Try rephrasing it.';
   if (msg.includes('unauthorized') || msg.includes('401')) return 'API key invalid or expired. Check your provider settings.';
   return 'Generation failed. Try again or switch providers.';
+}
+
+/**
+ * Verify a generation result URL is well-formed.
+ * Accepts data: URIs (base64 image blobs) and http/https remote URLs.
+ */
+function isValidResultUrl(url: string | null | undefined): boolean {
+  if (!url) return false;
+  if (url.startsWith('data:image/') || url.startsWith('data:audio/')) return true;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
 }
 
 const VALID_TOOLS    = new Set(['generate', 'animate', 'rotate', 'inpaint', 'scene']);

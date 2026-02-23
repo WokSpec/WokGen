@@ -77,6 +77,30 @@ const MODES = [
     href: '/uiux',
     studioCta: '/uiux/studio',
   },
+  {
+    id: 'voice',
+    label: 'WokGen Voice',
+    accent: '#f59e0b',
+    status: 'beta' as const,
+    tagline: 'Speech & Audio Generation',
+    desc: 'Generate natural speech, character voices, and audio clips with AI.',
+    icon: '🎙️',
+    highlights: ['Character narration', 'Product demos', 'Podcast intros', 'Game NPC dialogue'],
+    href: '/voice',
+    studioCta: '/voice/studio',
+  },
+  {
+    id: 'text',
+    label: 'WokGen Text',
+    accent: '#10b981',
+    status: 'beta' as const,
+    tagline: 'AI Copywriting Engine',
+    desc: 'Headlines, blogs, product copy, social posts, and creative writing at scale.',
+    icon: '✍️',
+    highlights: ['Brand headlines', 'Blog posts', 'Ad copy', 'Email campaigns'],
+    href: '/text',
+    studioCta: '/text/studio',
+  },
 ] satisfies Array<{ id: string; label: string; accent: string; status: 'live' | 'beta' | 'coming_soon'; tagline: string; desc: string; icon: string; highlights: readonly string[]; href: string; studioCta: string }>;
 
 const QUICK_PROMPTS = [
@@ -139,7 +163,7 @@ const QUICK_PROMPTS = [
 ] as const;
 
 const STATS = [
-  { value: '5',  label: 'Product Modes' },
+  { value: '7',  label: 'Product Modes' },
   { value: '6+', label: 'AI Providers' },
   { value: '∞',  label: 'Standard Generations' },
   { value: '0',  label: 'Setup Required' },

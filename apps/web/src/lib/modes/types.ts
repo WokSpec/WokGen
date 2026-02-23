@@ -3,13 +3,13 @@
 // Hard separation enforced at: UI state, model profiles, prompt scaffolding,
 // output formats, tooling, galleries, presets, projects.
 
-export type ModeId = 'pixel' | 'business' | 'vector' | 'emoji' | 'uiux';
+export type ModeId = 'pixel' | 'business' | 'vector' | 'emoji' | 'uiux' | 'voice' | 'text';
 
 export type ModeStatus = 'live' | 'beta' | 'coming_soon';
 
-export type OutputType = 'image' | 'gif' | 'svg' | 'code' | 'pack';
+export type OutputType = 'image' | 'gif' | 'svg' | 'code' | 'pack' | 'audio' | 'copy';
 
-export type ExportFormat = 'png' | 'gif' | 'svg' | 'tsx' | 'html' | 'css' | 'zip';
+export type ExportFormat = 'png' | 'gif' | 'svg' | 'tsx' | 'html' | 'css' | 'zip' | 'mp3' | 'wav' | 'txt' | 'md';
 
 export type GalleryFilter = 'tool' | 'era' | 'size' | 'platform' | 'mood' | 'style' | 'category';
 
@@ -22,7 +22,7 @@ export type LicenseKey =
   | 'design_system'
   | 'code_ownership';
 
-export type PromptBuilderKey = 'pixel' | 'business' | 'vector' | 'emoji' | 'uiux';
+export type PromptBuilderKey = 'pixel' | 'business' | 'vector' | 'emoji' | 'uiux' | 'voice' | 'text';
 
 // ---------------------------------------------------------------------------
 // Tool definition per mode

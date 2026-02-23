@@ -102,6 +102,9 @@ function NavBar() {
         <NavLink href="/pixel/studio">Studio</NavLink>
         <NavLink href="/community">Community</NavLink>
         <NavLink href="/docs">Docs</NavLink>
+        <NavLink href="/eral">
+          <span style={{ color: '#818cf8' }}>💬 Eral</span>
+        </NavLink>
       </div>
 
       {/* Right side */}

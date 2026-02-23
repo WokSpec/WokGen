@@ -81,14 +81,41 @@ export async function huggingfaceGenerate(
   const controller = new AbortController();
   const tid        = setTimeout(() => controller.abort(), timeoutMs);
 
-  let res: Response;
+  const MAX_LOADING_RETRIES = 3;
+  let res!: Response;
+  let loadingRetries = 0;
+
   try {
-    res = await fetch(`${HF_ROUTER}/${model}`, {
-      method:  'POST',
-      headers,
-      body:    JSON.stringify(body),
-      signal:  controller.signal,
-    });
+    // Retry loop: HF returns 503 { error: "Model is loading" } while warming up.
+    // We wait 3 s and retry up to 3 times before failing over to the next provider.
+    while (true) {
+      res = await fetch(`${HF_ROUTER}/${model}`, {
+        method:  'POST',
+        headers,
+        body:    JSON.stringify(body),
+        signal:  controller.signal,
+      });
+
+      if (res.status === 503 && loadingRetries < MAX_LOADING_RETRIES) {
+        let detail = '';
+        try {
+          const txt = await res.text();
+          const j   = JSON.parse(txt);
+          detail    = typeof j?.error === 'string' ? j.error : '';
+        } catch { /* ignore */ }
+
+        if (detail.toLowerCase().includes('loading')) {
+          loadingRetries++;
+          console.warn(
+            `[huggingface] Model loading (attempt ${loadingRetries}/${MAX_LOADING_RETRIES}), retrying in 3s…`,
+          );
+          await new Promise(r => setTimeout(r, 3_000));
+          continue; // retry
+        }
+      }
+
+      break; // got a non-503-loading response
+    }
   } finally {
     clearTimeout(tid);
   }

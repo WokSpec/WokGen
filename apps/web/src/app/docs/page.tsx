@@ -52,6 +52,22 @@ const DOCS_SECTIONS = [
         badge: 'Live',
         badgeColor: '#f472b6',
       },
+      {
+        href: '/docs/voice',
+        title: 'WokGen Voice',
+        desc: 'AI text-to-speech for narration, NPC dialogue, product demos, podcast intros, and ads.',
+        icon: '🎙️',
+        badge: 'Beta',
+        badgeColor: '#f59e0b',
+      },
+      {
+        href: '/docs/text',
+        title: 'WokGen Text',
+        desc: 'AI copywriting engine: headlines, blog posts, product descriptions, emails, social posts, and more.',
+        icon: '✍️',
+        badge: 'Beta',
+        badgeColor: '#10b981',
+      },
     ],
   },
   {

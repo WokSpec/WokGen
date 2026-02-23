@@ -272,6 +272,33 @@ export const EMOJI_NEGATIVES: string[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// UI/UX mode negatives
+// ---------------------------------------------------------------------------
+
+export const UIUX_NEGATIVES: string[] = [
+  'pixel art',
+  'pixelated',
+  'illustration',
+  'hand-drawn',
+  'sketch',
+  'watercolor',
+  'painterly',
+  'anime',
+  'cartoon',
+  'photorealistic',
+  'photograph',
+  'blurry',
+  'low contrast',
+  'cluttered',
+  'hard to read text',
+  'inaccessible',
+  'inconsistent spacing',
+  'multiple color themes mixed',
+  'low quality',
+  'amateur',
+];
+
+// ---------------------------------------------------------------------------
 // Utility functions
 // ---------------------------------------------------------------------------
 
@@ -288,7 +315,7 @@ export function assembleNegativePrompt(
   tool: string,
   preset: string | undefined,
   userNeg: string | undefined,
-  mode: 'pixel' | 'business' | string,
+  mode: 'pixel' | 'business' | 'vector' | 'emoji' | 'uiux' | string,
 ): string {
   const parts: string[] = [];
 
@@ -303,6 +330,8 @@ export function assembleNegativePrompt(
     parts.push(...VECTOR_NEGATIVES);
   } else if (mode === 'emoji') {
     parts.push(...EMOJI_NEGATIVES);
+  } else if (mode === 'uiux') {
+    parts.push(...UIUX_NEGATIVES);
   } else {
     // Pixel mode (and others default to pixel negatives)
     parts.push(...GLOBAL_PIXEL_NEGATIVES);

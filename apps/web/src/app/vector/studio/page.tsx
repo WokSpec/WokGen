@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import WorkspaceSelector from '@/app/_components/WorkspaceSelector';
+import { EralSidebar } from '@/app/_components/EralSidebar';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -766,6 +767,7 @@ function VectorStudioInner() {
         </div>
       </aside>
 
+      <EralSidebar mode="vector" tool={activeTool} prompt={prompt} />
     </div>
   );
 }

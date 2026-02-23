@@ -3,6 +3,8 @@ import { businessMode } from './business';
 import { vectorMode } from './vector';
 import { emojiMode } from './emoji';
 import { uiuxMode } from './uiux';
+import { voiceMode } from './voice';
+import { textMode } from './text';
 import type { ModeContract, ModeId } from './types';
 
 // ---------------------------------------------------------------------------
@@ -14,6 +16,8 @@ export const MODES: Record<ModeId, ModeContract> = {
   vector:   vectorMode,
   emoji:    emojiMode,
   uiux:     uiuxMode,
+  voice:    voiceMode,
+  text:     textMode,
 };
 
 export const MODES_LIST: ModeContract[] = Object.values(MODES);

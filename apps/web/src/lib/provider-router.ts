@@ -258,6 +258,55 @@ const FALLBACK_HD: Record<string, ProviderPreference[]> = {
 };
 
 // ---------------------------------------------------------------------------
+// Voice and Text provider routing
+//
+// These modes use non-image providers (HuggingFace for TTS, Groq/Together for
+// LLM). Exposed as separate resolver functions used by /api/voice/generate
+// and /api/text/generate respectively.
+// ---------------------------------------------------------------------------
+
+/** A provider entry with model identifier and priority rank. */
+export interface ProviderEntry {
+  provider: string;
+  model: string;
+  priority: number;
+  requires?: string; // env var name required for this provider
+}
+
+const VOICE_STANDARD: ProviderEntry[] = [
+  { provider: 'huggingface', model: 'hexgrad/Kokoro-82M', priority: 1, requires: 'HF_TOKEN' },
+];
+
+const TEXT_STANDARD: ProviderEntry[] = [
+  { provider: 'groq',     model: 'llama-3.3-70b-versatile',                    priority: 1, requires: 'GROQ_API_KEY' },
+  { provider: 'together', model: 'meta-llama/Llama-3.1-70B-Instruct-Turbo',    priority: 2, requires: 'TOGETHER_API_KEY' },
+];
+
+/**
+ * Resolve the best available voice provider.
+ * Returns the highest-priority entry whose required env key is present,
+ * or null if no voice provider is configured.
+ */
+export function resolveVoiceProvider(): ProviderEntry | null {
+  for (const entry of VOICE_STANDARD) {
+    if (!entry.requires || hasKey(entry.requires)) return entry;
+  }
+  return null;
+}
+
+/**
+ * Resolve the best available text/LLM provider.
+ * Returns the highest-priority entry whose required env key is present,
+ * or null if no LLM provider is configured.
+ */
+export function resolveTextProvider(): ProviderEntry | null {
+  for (const entry of TEXT_STANDARD) {
+    if (!entry.requires || hasKey(entry.requires)) return entry;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
 // Resolve function
 // ---------------------------------------------------------------------------
 

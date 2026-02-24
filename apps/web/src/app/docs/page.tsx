@@ -94,6 +94,13 @@ const DOCS_SECTIONS = [
         badge: null,
         badgeColor: null,
       },
+      {
+        href: '/docs/eral',
+        title: 'Eral AI Assistant',
+        desc: 'WAP commands, batch generation, Director feature, and connecting Eral to a project.',
+        badge: 'Beta',
+        badgeColor: '#38bdf8',
+      },
     ],
   },
 ];

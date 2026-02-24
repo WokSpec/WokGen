@@ -59,6 +59,8 @@ model User {
   activityEvents     ActivityEvent[]
   notifications      Notification[]
   webhooks           Webhook[]
+  referralsGiven     Referral[] @relation("ReferralsGiven")
+  referralsReceived  Referral[] @relation("ReferralsReceived")
 }
 
 model Account {
@@ -706,4 +708,24 @@ model Webhook {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Referral — user referral tracking (Cycle 31)
+// ---------------------------------------------------------------------------
+model Referral {
+  id             String   @id @default(cuid())
+  referrerId     String
+  referredUserId String   @unique
+  code           String
+  /// pending | credited
+  status         String   @default("pending")
+  creditsAwarded Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  referrer User @relation("ReferralsGiven",    fields: [referrerId],     references: [id], onDelete: Cascade)
+  referred User @relation("ReferralsReceived", fields: [referredUserId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([code])
 }

@@ -85,7 +85,7 @@ function checkMinuteRateLimit(key: string, max: number): { allowed: boolean } {
 // ─── TTS preprocessing ────────────────────────────────────────────────────────
 
 function preprocessForTTS(text: string): string {
-  let t = text
+  const t = text
     .replace(/\*\*|[*#`~]/g, '')
     .replace(/\n+/g, '. ')
     .replace(/\.{2,}/g, '.')

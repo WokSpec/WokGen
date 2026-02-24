@@ -43,6 +43,7 @@ interface GenerationResult {
   height?: number;
   seed?: number | null;
   guestDownloadGated?: boolean;
+  provider?: string;
 }
 
 interface ProviderInfo {
@@ -1322,6 +1323,12 @@ function OutputPanel({
           )}
           {urls.length > 1 && (
             <span>{urls.length} outputs</span>
+          )}
+          {result.provider && (
+            <span style={{ color: 'var(--text-disabled)' }}>via {result.provider}</span>
+          )}
+          {result.durationMs && (
+            <span style={{ color: 'var(--text-disabled)' }}>{(result.durationMs / 1000).toFixed(1)}s</span>
           )}
         </div>
       )}
@@ -2804,6 +2811,7 @@ function StudioInner() {
           durationMs:         data.durationMs as number | undefined,
           resolvedSeed:       data.resolvedSeed as number | undefined,
           guestDownloadGated: data.guestDownloadGated as boolean | undefined,
+          provider:           res.headers.get('X-WokGen-Provider') ?? (data.provider as string | undefined),
         } as GenerationResult;
       };
 

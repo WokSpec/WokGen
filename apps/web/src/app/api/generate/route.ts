@@ -40,6 +40,7 @@ import { validateAndSanitize, autoEnrichPrompt } from '@/lib/prompt-validator';
 import { resolveQualityProfile, getQualityProfile } from '@/lib/quality-profiles';
 import { buildVariantPrompt } from '@/lib/variant-builder';
 import { buildPrompt as buildEnginePrompt } from '@/lib/prompt-engine';
+import { validatePrompt } from '@/lib/input-sanitize';
 
 // ---------------------------------------------------------------------------
 // POST /api/generate
@@ -343,6 +344,14 @@ export async function POST(req: NextRequest) {
     extra,
     async: asyncFlag = false, // flag for BullMQ async path
   } = body;
+
+  // Validate prompt length and sanitize at API boundary
+  if (prompt !== undefined) {
+    const promptCheck = validatePrompt(prompt);
+    if (!promptCheck.ok) {
+      return NextResponse.json({ error: promptCheck.error }, { status: 400 });
+    }
+  }
 
   // Async path: enqueue and return immediately if REDIS_URL + async flag
   if (asyncFlag === true && process.env.REDIS_URL && authedUserId) {

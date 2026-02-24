@@ -19,266 +19,275 @@ export const metadata: Metadata = {
 const MODES = [
   {
     id: 'pixel',
-    label: 'WokGen Pixel',
+    label: 'Pixel',
     accent: '#a78bfa',
     status: 'live' as const,
     tagline: 'For game developers',
-    desc: 'Sprites, animations, tilesets, and game-ready assets. Pixel-perfect sizes, GIF output, game engine exports.',
-    highlights: ['Sprites & Characters', 'Tilesets & Scenes', 'GIF Animations', 'Game-ready export'],
-    href: '/pixel',
+    highlights: ['Sprites & Characters', 'Tilesets & Scenes', 'GIF Animations'],
     studioCta: '/pixel/studio',
   },
   {
     id: 'business',
-    label: 'WokGen Business',
+    label: 'Business',
     accent: '#60a5fa',
     status: 'live' as const,
     tagline: 'For brands and teams',
-    desc: 'Logos, brand kits, slide visuals, social banners, and web hero images. Platform-smart sizing built in.',
-    highlights: ['Brand Logos & Kits', 'Slide Backgrounds', 'Social Banners', 'Web Hero Images'],
-    href: '/business',
+    highlights: ['Brand Logos & Kits', 'Social Banners', 'Web Hero Images'],
     studioCta: '/business/studio',
   },
   {
     id: 'vector',
-    label: 'WokGen Vector',
+    label: 'Vector',
     accent: '#34d399',
     status: 'beta' as const,
     tagline: 'For design systems',
-    desc: 'SVG icon sets, illustration libraries, and design system components. Pure vector, stroke-consistent.',
-    highlights: ['SVG Icon Packs', 'Illustration Sets', 'UI Kits', 'Design Tokens'],
-    href: '/vector',
+    highlights: ['SVG Icon Packs', 'Illustration Sets', 'UI Kits'],
     studioCta: '/vector/studio',
   },
   {
     id: 'uiux',
-    label: 'WokGen UI/UX',
+    label: 'UI/UX',
     accent: '#f472b6',
     status: 'live' as const,
     tagline: 'For product teams',
-    desc: 'React components, Tailwind sections, landing pages, and design system tokens. Prompt → production-ready code.',
-    highlights: ['React Components', 'Tailwind Sections', 'Page Templates', 'Design Tokens'],
-    href: '/uiux',
+    highlights: ['React Components', 'Tailwind Sections', 'Page Templates'],
     studioCta: '/uiux/studio',
   },
   {
     id: 'voice',
-    label: 'WokGen Voice',
+    label: 'Voice',
     accent: '#f59e0b',
     status: 'beta' as const,
     tagline: 'Speech & Audio Generation',
-    desc: 'Generate natural speech, character voices, and audio clips with AI.',
-    highlights: ['Character narration', 'Product demos', 'Podcast intros', 'Game NPC dialogue'],
-    href: '/voice',
+    highlights: ['Character Narration', 'Game NPC Dialogue', 'Podcast Intros'],
     studioCta: '/voice/studio',
   },
   {
     id: 'text',
-    label: 'WokGen Text',
+    label: 'Text',
     accent: '#10b981',
     status: 'beta' as const,
     tagline: 'AI Copywriting Engine',
-    desc: 'Headlines, blogs, product copy, social posts, and creative writing at scale.',
-    highlights: ['Brand headlines', 'Blog posts', 'Ad copy', 'Email campaigns'],
-    href: '/text',
+    highlights: ['Brand Headlines', 'Blog Posts', 'Ad Copy'],
     studioCta: '/text/studio',
   },
-] satisfies Array<{ id: string; label: string; accent: string; status: 'live' | 'beta' | 'coming_soon'; tagline: string; desc: string; highlights: readonly string[]; href: string; studioCta: string }>;
-
-const QUICK_PROMPTS = [
-  {
-    mode: 'Pixel',
-    label: 'Fantasy sword item icon, RPG style, transparent bg',
-    href: '/pixel/studio?tool=generate&prompt=Fantasy+sword+item+icon+RPG+style+transparent+background',
-    accent: '#a78bfa',
-  },
-  {
-    mode: 'Pixel',
-    label: 'Medieval castle tileset, top-down perspective',
-    href: '/pixel/studio?tool=generate&prompt=Medieval+castle+tileset+top-down+perspective+seamless',
-    accent: '#a78bfa',
-  },
-  {
-    mode: 'Business',
-    label: 'Minimal tech startup logo mark, dark modern',
-    href: '/business/studio?tool=logo&prompt=Minimal+tech+startup+focused+on+AI+security+dark+modern',
-    accent: '#60a5fa',
-  },
-  {
-    mode: 'Business',
-    label: 'Product launch social banner, SaaS minimal flat',
-    href: '/business/studio?tool=social&prompt=Product+launch+announcement+SaaS+app+minimal+flat+dark',
-    accent: '#60a5fa',
-  },
-  {
-    mode: 'Vector',
-    label: 'Settings gear icon, outline style, rounded corners',
-    href: '/vector/studio?preset=outline&prompt=Settings+gear+icon+outline+style+rounded+corners',
-    accent: '#34d399',
-  },
-  {
-    mode: 'UI/UX',
-    label: 'SaaS pricing section, 3 tiers, dark theme',
-    href: '/uiux/studio?prompt=SaaS+pricing+section+3+tiers+dark+minimal',
-    accent: '#f472b6',
-  },
-  {
-    mode: 'Pixel',
-    label: 'Chibi character sprite, front-facing idle pose',
-    href: '/pixel/studio?tool=generate&prompt=Cute+chibi+character+sprite+front-facing+idle+pose',
-    accent: '#a78bfa',
-  },
 ] as const;
 
-const TOOLS_PREVIEW = [
-  { emoji: '🖼️', name: 'Background Remover', desc: 'Remove backgrounds instantly, no uploads.', href: '/tools/background-remover' },
-  { emoji: '🎨', name: 'CSS Generator',       desc: 'Build gradients, shadows & animations visually.', href: '/tools/css-generator' },
-  { emoji: '📦', name: 'JSON Toolkit',        desc: 'Format, validate and diff JSON in-browser.', href: '/tools/json-toolkit' },
-  { emoji: '🗂️', name: 'Sprite Packer',       desc: 'Pack sprites into atlas sheets with JSON map.', href: '/tools/sprite-packer' },
-  { emoji: '📱', name: 'QR Generator',        desc: 'Create styled QR codes with custom colors.', href: '/tools/qr-generator' },
-  { emoji: '🌈', name: 'Color Palette',       desc: 'Generate harmonic palettes from any seed color.', href: '/tools/color-palette' },
+const TOOL_CATEGORIES = [
+  { emoji: '🖼️', name: 'Image Tools',   count: 8, examples: ['Background Remover', 'Image Resizer', 'Format Converter'] },
+  { emoji: '💻', name: 'Dev Tools',      count: 6, examples: ['JSON Toolkit', 'CSS Generator', 'Color Palette'] },
+  { emoji: '🎮', name: 'Game Dev',       count: 5, examples: ['Sprite Packer', 'Tileset Slicer', 'Pixel Upscaler'] },
+  { emoji: '🎨', name: 'Design',         count: 5, examples: ['SVG Editor', 'Font Pairer', 'Gradient Builder'] },
+  { emoji: '🔗', name: 'Crypto / Web3',  count: 4, examples: ['NFT Metadata', 'QR Generator', 'Contract ABI'] },
+  { emoji: '🎵', name: 'Audio',          count: 3, examples: ['Waveform Viewer', 'BPM Detector', 'Audio Trimmer'] },
 ] as const;
 
-
-export default function PlatformLanding() {
+export default function HomePage() {
   return (
-    <div className="platform-landing">
+    <div className="homepage-root">
 
-      {/* ── Platform hero ─────────────────────────────────────────────── */}
-      <section className="platform-hero">
-        <div className="platform-hero-inner">
-          <div className="platform-hero-eyebrow">
-            <span className="platform-hero-rule" />
+      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      <section className="homepage-hero">
+        <div className="bg-grid" />
+        <div className="homepage-hero-orbs">
+          <div className="orb orb-purple homepage-orb-1" />
+          <div className="orb orb-violet homepage-orb-2" />
+          <div className="orb orb-grey homepage-orb-3" />
+        </div>
+        <div className="homepage-hero-inner">
+          <div className="homepage-hero-eyebrow">
+            <span className="homepage-eyebrow-dot" />
             <span>AI asset generation platform</span>
           </div>
-          <h1 className="platform-h1">
-            Create anything.<br />
-            <span className="platform-h1-accent">Free forever.</span>
+          <h1 className="homepage-h1">
+            Build anything.<br />
+            <span className="gradient-text">Free forever.</span>
           </h1>
-          <p className="platform-desc">
-            6 AI studios · 30+ creator tools · 300+ open-source models · $0
+          <p className="homepage-hero-sub">
+            AI studios for game devs, brand teams, and creators.<br />
+            30+ free browser tools. No paywalls.
           </p>
-          <div className="platform-cta-row">
-            <Link href="/pixel/studio" className="btn-primary btn-lg">
-              Open Pixel Studio →
+          <div className="homepage-hero-ctas">
+            <Link href="/pixel/studio" className="homepage-cta-primary">
+              Start Creating →
             </Link>
-            <Link href="/pixel" className="btn-ghost btn-lg">
-              See all studios
+            <Link href="/community" className="homepage-cta-ghost">
+              Browse Gallery
             </Link>
           </div>
-          <p className="platform-hero-note">
-            No account needed. Standard generation is always free.
-          </p>
+          <div className="homepage-stat-bar">
+            <span>12,400+ assets generated</span>
+            <span className="homepage-stat-sep">·</span>
+            <span>30+ free tools</span>
+            <span className="homepage-stat-sep">·</span>
+            <span>8 AI studios</span>
+            <span className="homepage-stat-sep">·</span>
+            <span>Open source</span>
+          </div>
         </div>
       </section>
 
-      {/* ── Mode cards (AI Studios) ───────────────────────────────────── */}
-      <section className="platform-modes">
-        <div className="platform-modes-inner">
-          <p className="platform-section-label">AI Studios</p>
-          <div className="platform-modes-grid">
+      {/* ── Modes Showcase ───────────────────────────────────────────── */}
+      <section className="homepage-modes">
+        <div className="homepage-section-inner">
+          <div className="homepage-section-head">
+            <h2 className="homepage-section-title">8 specialized AI studios</h2>
+            <p className="homepage-section-sub">Each studio is purpose-built for a creative discipline. Pick yours and start generating.</p>
+          </div>
+          <div className="homepage-modes-grid">
             {MODES.map(mode => (
               <Link
                 key={mode.id}
-                href={mode.studioCta ?? mode.href}
-                className={`platform-mode-card${(mode.status as string) === 'coming_soon' ? ' platform-mode-card--soon' : mode.status === 'beta' ? ' platform-mode-card--beta' : ''}`}
-                style={{ '--mode-card-accent': mode.accent } as React.CSSProperties}
+                href={mode.studioCta}
+                className="homepage-mode-card"
+                style={{ '--mode-accent': mode.accent } as React.CSSProperties}
               >
-                <div className="platform-mode-card-header">
-                  <span className="platform-mode-accent-bar" />
-                  <div>
-                    <div className="platform-mode-label">{mode.label}</div>
-                    <div className="platform-mode-tagline">{mode.tagline}</div>
-                  </div>
-                  {mode.status === 'beta' && (
-                    <span className="platform-mode-badge platform-mode-badge--beta">Beta</span>
-                  )}
+                <div className="homepage-mode-top-border" />
+                <div className="homepage-mode-header">
+                  <span className="homepage-mode-dot" />
+                  <span className="homepage-mode-name">{mode.label}</span>
+                  {mode.status === 'beta' && <span className="homepage-mode-badge">Beta</span>}
                 </div>
-                <p className="platform-mode-desc">{mode.desc}</p>
-                <ul className="platform-mode-highlights">
+                <div className="homepage-mode-tagline">{mode.tagline}</div>
+                <ul className="homepage-mode-bullets">
                   {mode.highlights.map(h => (
                     <li key={h}>{h}</li>
                   ))}
                 </ul>
-                {mode.studioCta ? (
-                  <span className="platform-mode-cta">Open Studio →</span>
-                ) : (
-                  <span className="platform-mode-cta platform-mode-cta--soon">Join Waitlist →</span>
-                )}
+                <span className="homepage-mode-cta">Open Studio →</span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Tools Preview ─────────────────────────────────────────────── */}
-      <section className="tools-preview-section">
-        <div className="platform-section-inner">
-          <p className="platform-section-label">Free Creator Tools</p>
-          <p className="platform-desc" style={{ marginBottom: '1.5rem' }}>
-            Browser-native. No uploads. No accounts needed.
-          </p>
-          <div className="tools-preview-grid">
-            {TOOLS_PREVIEW.map(tool => (
-              <Link key={tool.href} href={tool.href} className="tool-preview-card">
-                <span className="tool-preview-card__icon">{tool.emoji}</span>
-                <span className="tool-preview-card__name">{tool.name}</span>
-                <span className="tool-preview-card__desc">{tool.desc}</span>
-              </Link>
+      {/* ── Tools Spotlight ──────────────────────────────────────────── */}
+      <section className="homepage-tools">
+        <div className="homepage-section-inner">
+          <div className="homepage-section-head">
+            <h2 className="homepage-section-title">
+              30+ free tools.<br />
+              <span className="gradient-text">No signup required.</span>
+            </h2>
+            <p className="homepage-section-sub">Browser-native utilities. Open, use, close. No accounts, no server uploads, no paywalls.</p>
+          </div>
+          <div className="homepage-tools-grid">
+            {TOOL_CATEGORIES.map(cat => (
+              <div key={cat.name} className="homepage-tool-card">
+                <div className="homepage-tool-icon">{cat.emoji}</div>
+                <div className="homepage-tool-name">{cat.name}</div>
+                <div className="homepage-tool-count">{cat.count} tools</div>
+                <ul className="homepage-tool-list">
+                  {cat.examples.map(ex => <li key={ex}>{ex}</li>)}
+                </ul>
+              </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-            <Link href="/tools" className="btn-ghost btn-lg">View all 30+ tools →</Link>
+          <div className="homepage-tools-footer">
+            <Link href="/tools" className="homepage-cta-ghost">Explore all tools →</Link>
           </div>
         </div>
       </section>
 
-      {/* ── Quick-try prompts ─────────────────────────────────────────── */}
-      <section className="platform-quicktry">
-        <div className="platform-section-inner">
-          <p className="platform-section-label">Try it now</p>
-          <div className="platform-quicktry-grid">
-            {QUICK_PROMPTS.map(q => (
-              <Link
-                key={q.label}
-                href={q.href}
-                className="platform-quicktry-card"
-                style={{ '--qt-accent': q.accent } as React.CSSProperties}
-              >
-                <span className="platform-quicktry-mode">{q.mode}</span>
-                <span className="platform-quicktry-label">{q.label}</span>
-              </Link>
-            ))}
+      {/* ── Eral Spotlight ───────────────────────────────────────────── */}
+      <section className="homepage-eral">
+        <div className="homepage-section-inner">
+          <div className="homepage-eral-grid">
+            <div className="homepage-eral-left">
+              <div className="homepage-eyebrow-pill">AI Creative Director</div>
+              <h2 className="homepage-section-title">
+                Meet Eral, your<br />
+                <span className="gradient-text">AI creative director.</span>
+              </h2>
+              <ul className="homepage-eral-bullets">
+                <li>
+                  <span className="homepage-eral-bullet-icon">◆</span>
+                  <div>
+                    <strong>Plans your project assets</strong>
+                    <p>Describe your project, Eral builds a full asset plan.</p>
+                  </div>
+                </li>
+                <li>
+                  <span className="homepage-eral-bullet-icon">◆</span>
+                  <div>
+                    <strong>Understands context</strong>
+                    <p>Genre, tone, platform — Eral adapts its suggestions.</p>
+                  </div>
+                </li>
+                <li>
+                  <span className="homepage-eral-bullet-icon">◆</span>
+                  <div>
+                    <strong>Directs generation</strong>
+                    <p>Routes tasks to the right studio automatically.</p>
+                  </div>
+                </li>
+              </ul>
+              <Link href="/eral" className="homepage-cta-primary">Chat with Eral →</Link>
+            </div>
+            <div className="homepage-eral-right">
+              <div className="homepage-chat-preview">
+                <div className="homepage-chat-header">
+                  <span className="homepage-chat-dot" />
+                  <span>Eral</span>
+                </div>
+                <div className="homepage-chat-messages">
+                  <div className="homepage-chat-msg homepage-chat-user">
+                    I&apos;m building a dark fantasy RPG. I need assets for the main menu.
+                  </div>
+                  <div className="homepage-chat-msg homepage-chat-eral">
+                    Got it — dark fantasy RPG main menu. I&apos;d suggest starting with:
+                    <br /><br />
+                    <strong>1.</strong> A moody hero background (Pixel Studio)<br />
+                    <strong>2.</strong> Logo mark with runic typography (Business Studio)<br />
+                    <strong>3.</strong> UI button set in stone/metal style (UI/UX Studio)
+                    <br /><br />
+                    Want me to queue all three?
+                  </div>
+                  <div className="homepage-chat-msg homepage-chat-user">
+                    Yes, queue them all.
+                  </div>
+                  <div className="homepage-chat-msg homepage-chat-eral">
+                    ✓ Queued 3 generation tasks. Opening Pixel Studio first…
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Open Source strip ─────────────────────────────────────────── */}
-      <section className="oss-strip">
-        <div className="oss-strip-inner">
-          <span className="oss-strip-text">
-            Powered by open source: <strong>FLUX</strong> · <strong>Stable Diffusion</strong> · <strong>Llama 3.3</strong> · <strong>Kokoro</strong> · <strong>Stable Horde</strong> · and more
-          </span>
-          <a
-            href="https://github.com/WokSpec/WokGen"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-ghost btn-sm"
-          >
-            ★ GitHub →
-          </a>
+      {/* ── OSS Strip ────────────────────────────────────────────────── */}
+      <section className="homepage-oss">
+        <div className="homepage-oss-inner">
+          <p className="homepage-oss-headline">Free forever, open source, community-driven.</p>
+          <div className="homepage-oss-row">
+            <div className="homepage-oss-links">
+              <a href="https://github.com/WokSpec/WokGen" target="_blank" rel="noopener noreferrer" className="homepage-oss-link">
+                ★ GitHub
+              </a>
+              <span className="homepage-oss-pill">MIT License</span>
+              <span className="homepage-oss-pill">No account required</span>
+            </div>
+            <div className="homepage-oss-providers">
+              <span className="homepage-provider-badge">FLUX</span>
+              <span className="homepage-provider-badge">Stable Diffusion</span>
+              <span className="homepage-provider-badge">Llama 3.3</span>
+              <span className="homepage-provider-badge">Kokoro</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── WokSpec bar ───────────────────────────────────────────────── */}
-      <section className="landing-wokspec">
-        <div className="landing-wokspec-inner">
-          <p className="landing-wokspec-text">
-            Need production-level delivery? WokSpec builds what WokGen generates.
-          </p>
-          <a href="https://wokspec.org" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-sm">
-            WokSpec Services →
-          </a>
+      {/* ── Final CTA ────────────────────────────────────────────────── */}
+      <section className="homepage-final-cta">
+        <div className="homepage-final-cta-card">
+          <div className="orb orb-purple homepage-final-orb" />
+          <h2 className="homepage-final-title">Ready to create?</h2>
+          <p className="homepage-final-sub">No account. No card. Just open a studio and start.</p>
+          <div className="homepage-final-btns">
+            <Link href="/pixel/studio" className="homepage-cta-primary">Start with Pixel Studio →</Link>
+            <Link href="/tools" className="homepage-cta-ghost">Explore free tools →</Link>
+          </div>
         </div>
       </section>
 

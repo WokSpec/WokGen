@@ -2,6 +2,50 @@
 
 All notable changes to WokGen are documented in this file.
 
+## [2.0.0] — 2025-07-20
+
+### Master Plan Cycles C1–C21 (Professional Hardening & Expansion)
+
+#### Branding & Polish (C1–C3)
+- **Zero emoji enforcement**: All emoji removed from 48+ source files, tools-registry, Discord messages, and email templates. Tools-registry uses text abbreviations (BG, CV, CMP, etc.) as icons.
+- **WokGen IS the studio**: Pixel, Business, Vector, UI/UX, Voice, Text are now consistently referred to as "modes" within WokGen Studio — not individual studios. All navigation, breadcrumbs, metadata, and copy updated.
+- **Eral 7c branding**: AI companion is consistently branded as "Eral 7c" (variants: Eral Mini, Eral Code, Eral Creative) across all UI surfaces.
+- **canvas-confetti removed**: Dependency removed from package.json; `lib/confetti.ts` deleted; all `fireConfetti()` call sites removed.
+- **DonationStrip removed** from the main layout.
+
+#### Auth (C9)
+- **Google OAuth**: Added Google provider to NextAuth v5 config with `allowDangerousEmailAccountLinking: true`. Login page shows Google and GitHub buttons. DEPLOYMENT.md updated with Google OAuth setup guide.
+
+#### Eral Notepad (C7)
+- **EralNote + EralNoteTag** models added to Prisma schema (cascade delete).
+- **API routes**: `GET/POST /api/eral/notes`, `PATCH/DELETE /api/eral/notes/[id]`.
+- **EralNotepad component**: Full UI with note list, editor, auto-save (debounced 500ms), pin, 5-color swatches, guest localStorage fallback.
+- **EralSidebar** now has Chat/Notes tab switcher — Eral 7c chat on one tab, notepad on the other.
+- "Send to Eral" from a note pre-fills the chat input.
+
+#### Eral Personalization (C8)
+- **eralMemory** and **eralContext** fields added to `UserPreference` model.
+- **`/api/eral/memory`** route: GET (list facts/context), POST (remember/forget/set_context).
+- **WAP `rememberFact` action**: Eral can now save user facts via WAP when asked to "remember" something.
+- **Eral chat API** injects eralMemory facts and eralContext (project type, main tool, style preference) into every system prompt.
+
+#### WokGen Studio Hub (C17)
+- **`/studio`** is now a proper mode-selector hub page instead of a redirect. Displays all 6 modes with status badges, descriptions, and category tags.
+
+#### New Tools (C14/C15/C16C)
+- **README Generator**: Form-based professional README.md builder with live preview and download.
+- **JWT Debugger**: Client-side JWT decode — header, payload, expiry, signature display. Nothing leaves the browser.
+- **Base Converter**: Binary / octal / decimal / hexadecimal conversion with copy buttons.
+- **Tech Stack Badge Builder**: Select from 40+ technologies; generates shields.io badge markdown for READMEs.
+
+#### Security & Quality (C10/C12/C19)
+- Confirmed CSP, HSTS, and edge rate limiting in middleware.
+- All admin routes require `requireAdmin()` guard.
+- `console.log` removed from automation test route.
+- `npm audit` — no critical vulnerabilities.
+
+---
+
 ## [1.1.0] — 2025-07-15
 
 ### Cycles 40–44 (Final Cycles)

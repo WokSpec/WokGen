@@ -13917,3 +13917,111 @@ select:focus-visible {
   flex: none;
   align-self: stretch;
 }
+
+/* ============================================================
+   TUTORIAL OVERLAY
+   ============================================================ */
+
+.tutorial-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  backdrop-filter: blur(1px);
+}
+
+.tutorial-highlight {
+  position: absolute;
+  z-index: 9999;
+  border: 2px solid var(--accent-primary);
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.tutorial-tooltip {
+  position: fixed;
+  z-index: 10000;
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-primary);
+  border-radius: 12px;
+  padding: 1.1rem;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.tutorial-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.tutorial-step-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--accent-primary);
+}
+
+.tutorial-skip-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+}
+.tutorial-skip-btn:hover { color: var(--text-primary); }
+
+.tutorial-tooltip-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+
+.tutorial-tooltip-body {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.tutorial-action-hint {
+  font-size: 0.8rem;
+  color: #86efac;
+  background: rgba(134, 239, 172, 0.08);
+  border: 1px solid rgba(134, 239, 172, 0.2);
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  margin: 0 0 0.75rem;
+}
+
+.tutorial-tooltip-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.tutorial-progress {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  justify-content: center;
+}
+
+.tutorial-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-subtle);
+  transition: all .15s;
+}
+.tutorial-dot.active { background: var(--accent-primary); width: 18px; border-radius: 3px; }
+.tutorial-dot.done { background: rgba(99, 102, 241, .4); }

@@ -4,91 +4,70 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const PRODUCT_LINKS = [
-  { label: 'Pixel Studio',      href: '/pixel/studio'    },
-  { label: 'Business Studio',   href: '/business/studio' },
-  { label: 'Vector Studio',     href: '/vector/studio'   },
-  { label: 'UI/UX Studio',      href: '/uiux/studio'     },
-  { label: 'Voice Studio',      href: '/voice/studio'    },
-  { label: 'SFX Studio',        href: '/sfx/studio'      },
-  { label: 'Text Studio',       href: '/text/studio'     },
+  { label: 'Studios',      href: '/pixel/studio' },
+  { label: 'Free Tools',   href: '/tools'        },
+  { label: 'Community',    href: '/community'    },
+  { label: 'Eral',         href: '/eral'         },
+  { label: 'Open Source',  href: 'https://github.com/WokSpec/WokGen', ext: true },
 ];
 
-const PLATFORM_LINKS = [
-  { label: 'Eral AI',           href: '/eral'            },
-  { label: 'Eral Director',     href: '/eral/director'   },
-  { label: 'Eral Simulate',     href: '/eral/simulate'   },
-  { label: 'Brand Kits',        href: '/brand'           },
-  { label: 'Projects',          href: '/projects'        },
-  { label: 'Community',         href: '/community'       },
-  { label: 'Usage & Limits',    href: '/account/usage'   },
-  { label: 'Notifications',     href: '/settings'        },
-  { label: 'Automations',       href: '/automations'     },
-  { label: 'Pricing',           href: '/pricing'         },
-  { label: 'Billing',           href: '/billing'         },
+const RESOURCES_LINKS = [
+  { label: 'Docs',       href: '/docs',                                  ext: false },
+  { label: 'Changelog',  href: '/changelog',                             ext: false },
+  { label: 'GitHub',     href: 'https://github.com/WokSpec/WokGen',      ext: true  },
+  { label: 'Status',     href: '/status',                                ext: false },
 ];
 
-const COMPANY_LINKS = [
-  { label: 'Docs',              href: '/docs',                                  ext: false },
-  { label: 'GitHub',            href: 'https://github.com/WokSpec/WokGen',      ext: true  },
-  { label: 'WokSpec',           href: 'https://wokspec.org',                   ext: true  },
-  { label: 'Terms',             href: '/terms',                                 ext: false },
-  { label: 'Privacy',           href: '/privacy',                               ext: false },
-  { label: 'Security',          href: '/security',                              ext: false },
+const SUPPORT_LINKS = [
+  { label: 'Donate',     href: '/support',                               ext: false },
+  { label: 'Discord',    href: '#',                                      ext: false },
+  { label: 'Twitter / X', href: '#',                                     ext: false },
 ];
+
+const MODEL_CHIPS = ['FLUX', 'Stable Diffusion', 'Llama 3.3', 'Kokoro'];
 
 export function Footer() {
   const pathname = usePathname();
-  // Studios get a minimal footer strip, not the full footer
   if (pathname.endsWith('/studio')) return null;
 
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
-        <div className="site-footer__cols">
-
-          {/* Brand */}
-          <div className="site-footer__brand">
-            <Link href="/" className="site-footer__wordmark">
-              <span>Wok</span><span>Gen</span>
-            </Link>
-            <p className="site-footer__brand-sub">
-              Open-source multi-engine AI asset generator.
-              Free to use, free to fork.{' '}
-              <a href="https://github.com/WokSpec/WokGen" target="_blank" rel="noopener noreferrer">
-                MIT license.
-              </a>
-            </p>
-          </div>
+        <div className="site-footer__cols site-footer__cols--3">
 
           {/* Product */}
           <div>
-            <p className="site-footer__col-title">Studios</p>
+            <p className="site-footer__col-title">Product</p>
             <ul className="site-footer__col-links">
               {PRODUCT_LINKS.map(l => (
                 <li key={l.label}>
-                  <Link href={l.href} className="site-footer__link">{l.label}</Link>
+                  {l.ext
+                    ? <a href={l.href} target="_blank" rel="noopener noreferrer" className="site-footer__link">{l.label}</a>
+                    : <Link href={l.href} className="site-footer__link">{l.label}</Link>}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Platform */}
+          {/* Resources */}
           <div>
-            <p className="site-footer__col-title">Platform</p>
+            <p className="site-footer__col-title">Resources</p>
             <ul className="site-footer__col-links">
-              {PLATFORM_LINKS.map(l => (
+              {RESOURCES_LINKS.map(l => (
                 <li key={l.label}>
-                  <Link href={l.href} className="site-footer__link">{l.label}</Link>
+                  {l.ext
+                    ? <a href={l.href} target="_blank" rel="noopener noreferrer" className="site-footer__link">{l.label}</a>
+                    : <Link href={l.href} className="site-footer__link">{l.label}</Link>}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Support */}
           <div>
-            <p className="site-footer__col-title">WokSpec</p>
+            <p className="site-footer__col-title">Support</p>
             <ul className="site-footer__col-links">
-              {COMPANY_LINKS.map(l => (
+              {SUPPORT_LINKS.map(l => (
                 <li key={l.label}>
                   {l.ext
                     ? <a href={l.href} target="_blank" rel="noopener noreferrer" className="site-footer__link">{l.label}</a>
@@ -101,17 +80,33 @@ export function Footer() {
         </div>
 
         <div className="site-footer__bottom">
+          {/* Left */}
           <p className="site-footer__copy">
-            © {new Date().getFullYear()} Wok Specialists LLC.{' '}
-            Released under the <a href="/license">MIT license</a>.
+            © 2025 WokGen — Free forever
           </p>
-          <div className="site-footer__tech-tags">
-            <span className="site-footer__tech-tag">Next.js</span>
-            <span className="site-footer__tech-tag">Vercel</span>
-            <span className="site-footer__tech-tag">Open Source</span>
+
+          {/* Center — powered by open source + model chips */}
+          <div className="site-footer__powered">
+            <span className="site-footer__powered-label">Powered by open source</span>
+            <div className="site-footer__model-chips">
+              {MODEL_CHIPS.map(m => (
+                <span key={m} className="site-footer__model-chip">{m}</span>
+              ))}
+            </div>
           </div>
+
+          {/* Right — GitHub stars */}
+          <a
+            href="https://github.com/WokSpec/WokGen"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="site-footer__gh-stars"
+          >
+            ⭐ Star on GitHub
+          </a>
         </div>
       </div>
     </footer>
   );
 }
+

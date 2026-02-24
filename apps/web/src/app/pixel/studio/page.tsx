@@ -18,6 +18,7 @@ import { usePreferenceSync } from '@/hooks/usePreferenceSync';
 import { useWAPListener } from '@/hooks/useWAPListener';
 import { QuotaBadge } from '@/components/quota-badge';
 import { ColorPalette } from '@/components/color-palette';
+import { StudioResult } from '@/components/StudioResult';
 import PromptIntelligenceBar from '@/app/_components/PromptIntelligenceBar';
 import SfxBrowser from '@/components/sfx-browser';
 
@@ -1203,27 +1204,15 @@ function OutputPanel({
         )}
       </div>
 
-      {/* Studio action bar — quick-link tools for the generated image */}
+      {/* Studio result panel — image preview, metadata, and tool actions */}
       {activeUrl && (
-        <div className="studio-action-bar">
-          {[
-            { emoji: '✂️', label: 'Remove BG', tool: 'background-remover' },
-            { emoji: '↔️', label: 'Resize',    tool: 'image-resize'        },
-            { emoji: '🎨', label: 'Colors',    tool: 'color-palette'       },
-            { emoji: '🗜️', label: 'Compress',  tool: 'image-compress'      },
-          ].map(({ emoji, label, tool }) => (
-            <a
-              key={tool}
-              href={`/tools/${tool}?image=${encodeURIComponent(activeUrl)}`}
-              className="studio-action-btn"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span>{emoji}</span>
-              <span>{label}</span>
-            </a>
-          ))}
-        </div>
+        <StudioResult
+          imageUrl={displayUrl ?? activeUrl}
+          provider={result?.provider}
+          durationMs={result?.durationMs}
+          seed={result?.resolvedSeed ?? (result?.seed ?? undefined)}
+          onSave={onSaveToGallery}
+        />
       )}
 
 

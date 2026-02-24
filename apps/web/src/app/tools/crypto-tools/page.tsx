@@ -1,5 +1,6 @@
 'use client';
 import ToolShell from '@/components/tools/ToolShell';
+import CryptoUtilsTool from '@/components/tools/CryptoUtilsTool';
 
 export default function Page() {
   return (
@@ -8,6 +9,8 @@ export default function Page() {
       label="Crypto / Web3 Utils"
       description="QR codes, wallet validators, ENS lookup, and hex converters."
       icon="₿"
-    />
+    >
+      <CryptoUtilsTool />
+    </ToolShell>
   );
 }

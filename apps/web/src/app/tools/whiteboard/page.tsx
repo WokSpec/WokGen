@@ -1,8 +1,12 @@
-'use client';
-
-import { useEffect, useRef } from 'react';
+import type { Metadata } from 'next';
 import ToolShell from '@/components/tools/ToolShell';
-import 'tldraw/tldraw.css';
+import WhiteboardClient from './_client';
+
+export const metadata: Metadata = {
+  title: 'Infinite Whiteboard',
+  description: 'Free infinite canvas powered by tldraw. Shapes, arrows, stickies, freehand. Auto-saves locally.',
+  openGraph: { title: 'Infinite Whiteboard — WokGen', description: 'Free infinite canvas powered by tldraw. Shapes, arrows, stickies, freehand. Auto-saves locally.', type: 'website' },
+};
 
 export default function Page() {
   return (
@@ -12,42 +16,7 @@ export default function Page() {
       description="Open-source infinite canvas powered by tldraw. Shapes, arrows, sticky notes, freehand drawing. Auto-saves to your browser."
       icon="🖊️"
     >
-      <WhiteboardTool />
+      <WhiteboardClient />
     </ToolShell>
-  );
-}
-
-function WhiteboardTool() {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    let unmountFn: (() => void) | undefined;
-
-    async function init() {
-      const container = containerRef.current;
-      if (!container || !mounted) return;
-      const { Tldraw } = await import('tldraw');
-      const { createRoot } = await import('react-dom/client');
-      const { createElement } = await import('react');
-      if (!mounted) return;
-      const root = createRoot(container);
-      root.render(
-        createElement(Tldraw, {
-          persistenceKey: 'wokgen-whiteboard',
-        } as Parameters<typeof Tldraw>[0])
-      );
-      unmountFn = () => root.unmount();
-    }
-
-    init();
-    return () => { mounted = false; unmountFn?.(); };
-  }, []);
-
-  return (
-    <div
-      ref={containerRef}
-      style={{ width: '100%', height: '75vh', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-subtle)' }}
-    />
   );
 }

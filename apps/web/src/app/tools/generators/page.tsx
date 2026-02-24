@@ -1,4 +1,9 @@
-'use client';
+import type { Metadata } from 'next';
+export const metadata: Metadata = {
+  title: 'Developer Generators',
+  description: 'UUID v4/v7, secure passwords, Lorem ipsum, CRON builder, timestamps, text diff.',
+  openGraph: { title: 'Developer Generators — WokGen', description: 'UUID v4/v7, secure passwords, Lorem ipsum, CRON builder, timestamps, text diff.', type: 'website' },
+};
 import ToolShell from '@/components/tools/ToolShell';
 import GeneratorsTool from '@/components/tools/GeneratorsTool';
 export default function Page() {

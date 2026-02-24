@@ -3,9 +3,10 @@
 
 
 
-import { useState, useRef } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 import { parseApiError, type StudioError } from '@/lib/studio-errors';
 import { StudioErrorBanner } from '@/app/_components/StudioErrorBanner';
 import { preprocessTextForTTS, detectContentType, selectOptimalVoice } from '@/lib/tts-intelligence';
@@ -24,6 +25,16 @@ const VOICE_STYLES: { id: VoiceStyle; label: string; icon?: string; desc: string
   { id: 'asmr',      label: 'ASMR',      desc: 'Gentle and soothing' },
   { id: 'narrative', label: 'Narrative', desc: 'Rich storytelling' },
   { id: 'deep',      label: 'Deep',      desc: 'Powerful baritone' },
+];
+
+// Character presets — map to existing VoiceStyle values with descriptive labels
+const CHARACTER_PRESETS: { label: string; style: VoiceStyle; desc: string }[] = [
+  { label: 'Brand Voice',  style: 'natural',   desc: 'Stable, confident' },
+  { label: 'Narrator',     style: 'narrative', desc: 'Measured, authoritative' },
+  { label: 'Demo Host',    style: 'energetic', desc: 'Energetic, direct' },
+  { label: 'News Anchor',  style: 'news',      desc: 'Neutral, formal' },
+  { label: 'Deep Voice',   style: 'deep',      desc: 'Low, resonant' },
+  { label: 'ASMR',         style: 'asmr',      desc: 'Soft, close' },
 ];
 
 const LANGUAGES = [
@@ -99,12 +110,13 @@ const EXAMPLES = [
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-export default function VoiceStudioPage() {
+function VoiceStudioInner() {
   const { data: session } = useSession();
   const userId = session?.user?.id ?? null;
   const userPlan: string = (session?.user as { plan?: string } | undefined)?.plan ?? 'free';
+  const searchParams = useSearchParams();
 
-  const [text, setText]             = useState('');
+  const [text, setText]             = useState(() => searchParams.get('text') ?? '');
   const [style, setStyle]           = useState<VoiceStyle>('natural');
   const [hd, setHd]                 = useState(false);
   const [language, setLanguage]     = useState('en');
@@ -361,6 +373,31 @@ export default function VoiceStudioPage() {
                   <span style={{ fontSize: 11, fontWeight: 600 }}>{v.label}</span>
                 </button>
               ))}
+            </div>
+
+            {/* Character presets — quick access shortcuts for common use cases */}
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
+                Character Presets
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {CHARACTER_PRESETS.map(p => (
+                  <button
+                    key={p.label}
+                    onClick={() => setStyle(p.style)}
+                    title={p.desc}
+                    className="btn btn--ghost btn--sm"
+                    style={{
+                      fontSize: 11,
+                      borderColor: style === p.style ? ACCENT : 'var(--surface-border)',
+                      color: style === p.style ? ACCENT : 'var(--text-muted)',
+                      background: style === p.style ? `${ACCENT}18` : 'transparent',
+                    }}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Selected voice preview */}
@@ -967,5 +1004,13 @@ export default function VoiceStudioPage() {
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
     </div>
+  );
+}
+
+export default function VoiceStudioPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: 'var(--bg)' }} />}>
+      <VoiceStudioInner />
+    </Suspense>
   );
 }

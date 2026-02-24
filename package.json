@@ -34,7 +34,8 @@
     "cycle:cpu": "node scripts/run-cycle.mjs --engine cpu",
     "all": "node scripts/run-cycle.mjs",
     "all:detailed": "node scripts/run-cycle.mjs --profile detailed",
-    "all:cpu": "node scripts/run-cycle.mjs --engine cpu --profile detailed"
+    "all:cpu": "node scripts/run-cycle.mjs --engine cpu --profile detailed",
+    "typecheck": "npm run typecheck --workspace=apps/web"
   },
   "engines": {
     "node": ">=20"

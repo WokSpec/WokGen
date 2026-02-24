@@ -1,6 +1,10 @@
 export type ApiErrorCode =
   | 'RATE_LIMITED'
   | 'INSUFFICIENT_CREDITS'
+  | 'QUOTA_EXCEEDED'
+  | 'CONTENT_FILTERED'
+  | 'PROVIDER_ERROR'
+  | 'INVALID_INPUT'
   | 'MODEL_UNAVAILABLE'
   | 'INVALID_PROMPT'
   | 'WRONG_ENDPOINT'
@@ -23,6 +27,10 @@ export function parseApiError(response: { status: number; error?: string; code?:
   const messages: Record<string, string> = {
     RATE_LIMITED:          'You\'ve hit the generation limit. Please wait a moment before trying again.',
     INSUFFICIENT_CREDITS:  'You\'ve run out of HD credits. Upgrade your plan or add more credits.',
+    QUOTA_EXCEEDED:        'Daily generation limit reached. Come back tomorrow or upgrade your plan.',
+    CONTENT_FILTERED:      'Your prompt was blocked by a content filter. Please revise and try again.',
+    PROVIDER_ERROR:        'Generation provider encountered an error. Please try again shortly.',
+    INVALID_INPUT:         'Invalid input provided. Check your prompt and settings, then try again.',
     MODEL_UNAVAILABLE:     'Generation providers are temporarily busy. Your request will succeed if you try again.',
     INVALID_PROMPT:        'Your prompt couldn\'t be processed. Try making it more specific.',
     TIMEOUT:               'Generation took too long. This sometimes happens — please try again.',
@@ -33,7 +41,9 @@ export function parseApiError(response: { status: number; error?: string; code?:
   const hints: Partial<Record<string, string>> = {
     RATE_LIMITED:         'Free tier: 20 generations/hour',
     INSUFFICIENT_CREDITS: 'Go to Settings → Billing to add credits',
+    QUOTA_EXCEEDED:       'Free tier resets daily — or upgrade for more',
     INVALID_PROMPT:       'Tip: Be specific about style, subject, and format',
+    INVALID_INPUT:        'Tip: Be specific about style, subject, and format',
   };
 
   return {

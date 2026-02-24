@@ -295,7 +295,7 @@ export async function POST(req: NextRequest) {
           concurrent: { running: concur.running, max: concur.max },
           code: 'CONCURRENT_LIMIT',
         },
-        { status: 503 },
+        { status: 503, headers: { 'Retry-After': '60' } },
       );
     }
   }
@@ -414,8 +414,8 @@ export async function POST(req: NextRequest) {
   // Guard: HD requires REPLICATE_API_TOKEN on server
   if (useHD && !process.env.REPLICATE_API_TOKEN) {
     return NextResponse.json(
-      { error: 'HD generation is temporarily unavailable. Please try standard quality.' },
-      { status: 503 },
+      { error: 'HD generation is temporarily unavailable. Please try standard quality.', code: 'PROVIDER_ERROR' },
+      { status: 503, headers: { 'Retry-After': '60' } },
     );
   }
 
@@ -1111,6 +1111,7 @@ export async function POST(req: NextRequest) {
         ok:    false,
         jobId: job?.id ?? null,
         hint,
+        code:  'PROVIDER_ERROR',
         ...serialized,
       },
       { status: statusCode >= 400 ? statusCode : 500 },

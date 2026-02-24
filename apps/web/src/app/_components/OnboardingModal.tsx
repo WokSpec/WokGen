@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 // WokGen Onboarding Modal — 4-step first-login flow
 // ---------------------------------------------------------------------------
 
-type UseCase = 'game-dev' | 'brand' | 'creative' | 'developer';
+type UseCase = 'game-dev' | 'brand' | 'creative' | 'developer' | 'product' | 'explore';
 
 const USE_CASES: { id: UseCase; label: string; desc: string; prompt: string; mode: string }[] = [
   {
@@ -37,6 +37,20 @@ const USE_CASES: { id: UseCase; label: string; desc: string; prompt: string; mod
     desc:   'API access, automation, CI pipelines, and tooling integrations.',
     prompt: 'minimal vector icon set, 24px grid, solid fill, monochrome, UI system',
     mode:   'vector',
+  },
+  {
+    id:     'product',
+    label:  'Product Design',
+    desc:   'UI components, wireframes, design systems, and prototypes.',
+    prompt: 'pricing table component, 3 tiers, dark mode, modern SaaS style, React',
+    mode:   'uiux',
+  },
+  {
+    id:     'explore',
+    label:  'Just Exploring',
+    desc:   'Try all the studios and see what WokGen can do.',
+    prompt: 'vibrant fantasy landscape, pixel art, wide panorama, rich color palette',
+    mode:   'pixel',
   },
 ];
 

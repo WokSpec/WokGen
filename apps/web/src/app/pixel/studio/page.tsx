@@ -1366,6 +1366,42 @@ function RatingButton({ jobId, value, label, title }: { jobId: string; value: 1 
 }
 
 // ---------------------------------------------------------------------------
+// Apply Saved Style button — reads wokgen:style_token from localStorage
+// ---------------------------------------------------------------------------
+function ApplySavedStyleButton({ mode, onApply }: { mode: string; onApply: (preset: string) => void }) {
+  const [label, setLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('wokgen:style_token');
+      if (!raw) return;
+      const token = JSON.parse(raw) as { mode: string; style: string | null; prompt: string };
+      if (token.mode === mode && token.style) setLabel(token.style);
+    } catch { /* ignore */ }
+  }, [mode]);
+
+  if (!label) return null;
+
+  const handleApply = () => {
+    onApply(label);
+    setLabel(null);
+  };
+
+  return (
+    <div className="px-4 pb-2">
+      <button
+        onClick={handleApply}
+        className="community-modal-btn"
+        style={{ width: '100%', textAlign: 'left', fontSize: '0.72rem' }}
+        title={`Apply saved style: ${label}`}
+      >
+        ✦ Apply saved style: <strong>{label}</strong>
+      </button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Generate form (left panel body for each tool)
 // ---------------------------------------------------------------------------
 function GenerateForm({
@@ -1686,6 +1722,7 @@ function GenerateForm({
 
       {/* Style preset — always visible, categorized tabs */}
       <SectionHeader>Style Preset</SectionHeader>
+      <ApplySavedStyleButton mode="pixel" onApply={(preset) => onPresetSelect(preset as StylePreset)} />
       <div className="px-4 pb-1">
         {/* Category tabs */}
         <div className="flex gap-1 mb-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>

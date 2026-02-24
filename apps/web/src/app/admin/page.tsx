@@ -17,7 +17,7 @@ interface ProviderHealthEntry {
 }
 
 interface Stats {
-  users: { total: number; activeThisMonth: number; byPlan: Record<string, number> };
+  users: { total: number; activeThisMonth: number; activeToday?: number; byPlan: Record<string, number> };
   jobs:  { total: number; today: number; hd: number; standard: number };
   recentJobs: { id: string; prompt: string; provider: string; status: string; createdAt: string; user?: { email: string } }[];
   providerHealth?: ProviderHealthEntry[];
@@ -69,6 +69,27 @@ const TABS: { id: Tab; label: string }[] = [
 /* ── Overview tab ────────────────────────────────────────────────────────── */
 
 function OverviewTab({ stats }: { stats: Stats }) {
+  const [actionMsg, setActionMsg] = useState<string | null>(null);
+
+  const quickAction = async (action: string) => {
+    const res = await fetch(`/api/admin/actions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action }),
+    });
+    const d = await res.json().catch(() => ({})) as { message?: string };
+    setActionMsg(d.message ?? (res.ok ? 'Done.' : 'Failed.'));
+    setTimeout(() => setActionMsg(null), 4000);
+  };
+
+  const failedJobs = stats.recentJobs.filter(j => j.status === 'failed').slice(0, 5);
+  const totalJobs  = stats.jobs.hd + stats.jobs.standard || 1;
+  void totalJobs;
+  const providerCounts: Record<string, number> = {};
+  stats.recentJobs.forEach(j => {
+    providerCounts[j.provider] = (providerCounts[j.provider] ?? 0) + 1;
+  });
+
   return (
     <>
       <section style={{ marginBottom: '2rem' }}>
@@ -76,6 +97,7 @@ function OverviewTab({ stats }: { stats: Stats }) {
         <div className="admin-grid">
           <StatCard label="Total users" value={stats.users.total} />
           <StatCard label="Active this month" value={stats.users.activeThisMonth} sub="≥1 generation" />
+          <StatCard label="Active today" value={stats.users.activeToday ?? '—'} sub="unique users" />
           {Object.entries(stats.users.byPlan).map(([plan, count]) => (
             <StatCard key={plan} label={`Plan: ${plan}`} value={count} />
           ))}
@@ -89,6 +111,69 @@ function OverviewTab({ stats }: { stats: Stats }) {
           <StatCard label="Today" value={stats.jobs.today.toLocaleString()} />
           <StatCard label="HD (Replicate)" value={stats.jobs.hd.toLocaleString()} />
           <StatCard label="Standard" value={stats.jobs.standard.toLocaleString()} />
+        </div>
+      </section>
+
+      {/* Provider Usage Chart */}
+      <section style={{ marginBottom: '2rem' }}>
+        <p className="admin-section-label">Provider usage (recent jobs)</p>
+        <div className="admin-provider-chart">
+          {Object.entries(providerCounts).map(([provider, count]) => {
+            const pct = Math.round((count / stats.recentJobs.length) * 100);
+            return (
+              <div key={provider} className="admin-provider-chart__row">
+                <span className="admin-provider-chart__name">{provider}</span>
+                <div className="admin-provider-chart__track">
+                  <div className="admin-provider-chart__bar" style={{ width: `${pct}%` }} />
+                </div>
+                <span className="admin-provider-chart__pct">{pct}%</span>
+                <span className="admin-provider-chart__count">({count})</span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Recent Errors */}
+      {failedJobs.length > 0 && (
+        <section style={{ marginBottom: '2rem' }}>
+          <p className="admin-section-label admin-section-label--error">Recent errors (last 5 failed jobs)</p>
+          <div className="admin-table-wrap">
+            <div className="admin-table-row admin-table-row--header" style={{ gridTemplateColumns: '2fr 1fr 1fr auto' }}>
+              <span className="admin-table-cell admin-table-cell--head">Prompt / User</span>
+              <span className="admin-table-cell admin-table-cell--head">Mode</span>
+              <span className="admin-table-cell admin-table-cell--head">Provider</span>
+              <span className="admin-table-cell admin-table-cell--head">Time</span>
+            </div>
+            {failedJobs.map((job, i) => (
+              <div key={job.id} className={`admin-table-row admin-table-row--error ${i % 2 === 0 ? 'admin-table-row--odd' : 'admin-table-row--even'}`} style={{ gridTemplateColumns: '2fr 1fr 1fr auto' }}>
+                <div>
+                  <p className="admin-table-cell" style={{ margin: 0 }}>{job.prompt.slice(0, 60)}</p>
+                  <p className="admin-table-cell admin-table-cell--faint" style={{ margin: '0.1rem 0 0', fontSize: '0.7rem' }}>{job.user?.email ?? 'guest'}</p>
+                </div>
+                <span className={`admin-table-cell ${job.provider === 'replicate' ? 'admin-table-cell--hd' : 'admin-table-cell--std'}`}>{job.provider}</span>
+                <span className="admin-table-cell admin-table-cell--fail">failed</span>
+                <span className="admin-table-cell admin-table-cell--faint">{new Date(job.createdAt).toLocaleDateString()}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Quick Actions */}
+      <section style={{ marginBottom: '2rem' }}>
+        <p className="admin-section-label">Quick Actions</p>
+        {actionMsg && <p className="admin-action-msg">{actionMsg}</p>}
+        <div className="admin-quick-actions">
+          <button className="admin-action-btn" onClick={() => quickAction('reset_stuck_jobs')}>
+            🔄 Reset Stuck Jobs
+          </button>
+          <button className="admin-action-btn" onClick={() => quickAction('clear_rate_limits')}>
+            🚫 Clear Rate Limits
+          </button>
+          <a href="/api/admin/users/export.csv" className="admin-action-btn" download>
+            📥 Export User CSV
+          </a>
         </div>
       </section>
 

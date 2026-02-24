@@ -168,6 +168,80 @@ function getFollowUpSuggestions(content: string): string[] {
 }
 
 // ---------------------------------------------------------------------------
+// Tool suggestions
+// ---------------------------------------------------------------------------
+
+interface ToolSuggestionItem {
+  action: string;
+  name: string;
+  href: string;
+}
+
+function getToolSuggestions(content: string): ToolSuggestionItem[] {
+  const c = content.toLowerCase();
+  if (/pixel art|sprite|icon set/.test(c)) {
+    return [
+      { action: 'Remove the background', name: 'Remove BG', href: '/tools/background-remover' },
+      { action: 'Pack your sprites', name: 'Sprite Packer', href: '/tools/sprite-packer' },
+    ];
+  }
+  if (/\blogo\b|\bbrand\b|\bbusiness asset/.test(c)) {
+    return [
+      { action: 'Remove the background', name: 'Remove BG', href: '/tools/background-remover' },
+      { action: 'Create mockups', name: 'Mockup Generator', href: '/tools/mockup' },
+    ];
+  }
+  if (/\bcolor\b|\bpalette\b|\bcolour\b/.test(c)) {
+    return [
+      { action: 'Explore color tools', name: 'Color Tools', href: '/tools/color-tools' },
+      { action: 'Generate CSS', name: 'CSS Generator', href: '/tools/css-generator' },
+    ];
+  }
+  if (/\bvoice\b|\baudio\b|\bsound\b/.test(c)) {
+    return [
+      { action: 'Work with audio', name: 'Audio Tools', href: '/tools/audio-tools' },
+    ];
+  }
+  if (/\bwrite\b|\bcopy\b|\btext\b|\bmarkdown\b/.test(c)) {
+    return [
+      { action: 'Edit in Markdown', name: 'Markdown Editor', href: '/tools/markdown' },
+      { action: 'Polish your text', name: 'Text Tools', href: '/tools/text-tools' },
+    ];
+  }
+  if (/\bfont\b|\btypography\b/.test(c)) {
+    return [
+      { action: 'Pair fonts', name: 'Font Pairer', href: '/tools/font-pairer' },
+    ];
+  }
+  return [];
+}
+
+function ToolSuggestion({
+  suggestions,
+  onDismiss,
+}: {
+  suggestions: ToolSuggestionItem[];
+  onDismiss: () => void;
+}) {
+  if (suggestions.length === 0) return null;
+  return (
+    <div className="eral-tool-suggestion">
+      <span className="eral-tool-suggestion-icon">🔧</span>
+      <span className="eral-tool-suggestion-links">
+        {suggestions.map((s, i) => (
+          <span key={s.href}>
+            {i > 0 && <span className="eral-tool-suggestion-sep">·</span>}
+            {s.action}?{' '}
+            <a href={s.href} className="eral-tool-suggestion-link">→ {s.name}</a>
+          </span>
+        ))}
+      </span>
+      <button className="eral-tool-suggestion-dismiss" onClick={onDismiss} title="Dismiss" aria-label="Dismiss suggestion">×</button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Message bubble
 // ---------------------------------------------------------------------------
 
@@ -337,6 +411,7 @@ export function EralPage() {
   const [conversationsLoaded, setConversationsLoaded] = useState(false);
   const [actionConfirmation, setActionConfirmation] = useState<string | null>(null);
   const [wapLog, setWapLog] = useState<WAPLogEntry[]>([]);
+  const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
 
   // ── Call Mode state ────────────────────────────────────────────────────────
   const [callActive, setCallActive] = useState(false);
@@ -863,14 +938,29 @@ export function EralPage() {
                 const lastAssistantIdx = activeConv.messages.reduce(
                   (acc, m, i) => (m.role === 'assistant' ? i : acc), -1
                 );
-                return activeConv.messages.map((msg, idx) => (
-                  <MessageBubble
-                    key={msg.id}
-                    msg={msg}
-                    showSuggestions={!loading && idx === lastAssistantIdx}
-                    onFollowUp={sendMessage}
-                  />
-                ));
+                return activeConv.messages.map((msg, idx) => {
+                  const isLast = !loading && idx === lastAssistantIdx;
+                  const toolSuggestions = isLast && msg.role === 'assistant'
+                    ? getToolSuggestions(msg.content)
+                    : [];
+                  return (
+                    <React.Fragment key={msg.id}>
+                      <MessageBubble
+                        msg={msg}
+                        showSuggestions={isLast}
+                        onFollowUp={sendMessage}
+                      />
+                      {toolSuggestions.length > 0 && !dismissedSuggestions.has(msg.id) && (
+                        <div className="eral-tool-suggestion-wrap">
+                          <ToolSuggestion
+                            suggestions={toolSuggestions}
+                            onDismiss={() => setDismissedSuggestions((prev) => new Set([...prev, msg.id]))}
+                          />
+                        </div>
+                      )}
+                    </React.Fragment>
+                  );
+                });
               })()}
               {streamingMsg && (
                 <MessageBubble msg={streamingMsg} isStreaming />
@@ -1651,6 +1741,44 @@ export function EralPage() {
           background: rgba(129,140,248,0.14);
           border-color: rgba(129,140,248,0.4);
         }
+
+        /* Tool suggestion banner */
+        .eral-tool-suggestion-wrap {
+          padding: 0 12px 0 52px;
+        }
+        .eral-tool-suggestion {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 5px 10px 5px 9px;
+          background: rgba(34,211,238,0.06);
+          border: 1px solid rgba(34,211,238,0.18);
+          border-radius: 8px;
+          font-size: 11.5px;
+          color: var(--text-muted);
+          margin-top: 4px;
+        }
+        .eral-tool-suggestion-icon { flex-shrink: 0; font-size: 13px; }
+        .eral-tool-suggestion-links { flex: 1; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+        .eral-tool-suggestion-sep { margin: 0 4px; opacity: 0.4; }
+        .eral-tool-suggestion-link {
+          color: #22d3ee;
+          text-decoration: none;
+          font-weight: 500;
+        }
+        .eral-tool-suggestion-link:hover { text-decoration: underline; }
+        .eral-tool-suggestion-dismiss {
+          flex-shrink: 0;
+          background: none;
+          border: none;
+          color: var(--text-faint);
+          cursor: pointer;
+          font-size: 15px;
+          line-height: 1;
+          padding: 0 2px;
+          opacity: 0.6;
+        }
+        .eral-tool-suggestion-dismiss:hover { opacity: 1; }
 
         /* Commands section */
         .eral-commands-section {

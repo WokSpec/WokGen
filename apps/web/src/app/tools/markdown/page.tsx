@@ -1,4 +1,9 @@
-'use client';
+import type { Metadata } from 'next';
+export const metadata: Metadata = {
+  title: 'Markdown Editor',
+  description: 'Split-pane markdown editor with live GFM preview. Export HTML. Word count.',
+  openGraph: { title: 'Markdown Editor — WokGen', description: 'Split-pane markdown editor with live GFM preview. Export HTML. Word count.', type: 'website' },
+};
 import ToolShell from '@/components/tools/ToolShell';
 import MarkdownTool from '@/components/tools/MarkdownTool';
 

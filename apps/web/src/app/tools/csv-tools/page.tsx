@@ -1,4 +1,9 @@
-'use client';
+import type { Metadata } from 'next';
+export const metadata: Metadata = {
+  title: 'CSV Tools',
+  description: 'View, convert, and analyze CSV files. CSV↔JSON↔YAML, column stats, find & replace.',
+  openGraph: { title: 'CSV Tools — WokGen', description: 'View, convert, and analyze CSV files. CSV↔JSON↔YAML, column stats, find & replace.', type: 'website' },
+};
 import ToolShell from '@/components/tools/ToolShell';
 import CsvTool from '@/components/tools/CsvTool';
 

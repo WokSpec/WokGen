@@ -745,17 +745,20 @@ function VoiceStudioInner() {
             onRetry={handleGenerate}
           />
           {error && !studioError && (
-            <div
-              style={{
-                padding: '10px 14px',
-                borderRadius: 8,
-                background: '#f871711a',
-                border: '1px solid #f8717155',
-                color: '#f87171',
-                fontSize: 13,
-              }}
-            >
-              {error}
+            <div className="studio-error-card">
+              <span className="studio-error-card__icon">⚠️</span>
+              <p className="studio-error-card__title">Generation failed</p>
+              <p className="studio-error-card__msg">{error}</p>
+              <button
+                onClick={handleGenerate}
+                style={{
+                  padding: '8px 20px', borderRadius: 6, border: 'none',
+                  background: ACCENT, color: '#fff', fontSize: 13,
+                  fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                ↻ Retry
+              </button>
             </div>
           )}
 
@@ -847,24 +850,13 @@ function VoiceStudioInner() {
           )}
 
           {/* Idle state */}
-          {!audioUrl && !generating && (
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 12,
-                color: 'var(--text-muted)',
-                minHeight: 240,
-              }}
-            >
-              
-              <p style={{ fontSize: 14, textAlign: 'center', maxWidth: 280, lineHeight: 1.6, margin: 0 }}>
+          {!audioUrl && !generating && !error && !studioError && (
+            <div className="studio-empty-canvas">
+              <span className="studio-empty-canvas__icon">🎙️</span>
+              <p className="studio-empty-canvas__title">Generate your first voice</p>
+              <p className="studio-empty-canvas__desc">
                 Enter text and click{' '}
-                <strong style={{ color: ACCENT }}>Generate Voice</strong> to create
-                premium audio.
+                <strong style={{ color: ACCENT }}>Generate Voice</strong> to create premium audio.
               </p>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, opacity: 0.6 }}>
                 Powered by ElevenLabs · Near-human quality TTS
@@ -872,33 +864,25 @@ function VoiceStudioInner() {
             </div>
           )}
 
-          {/* Generating state */}
+          {/* Generating skeleton */}
           {generating && (
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 14,
-                minHeight: 240,
-              }}
-            >
-              <span
-                style={{
-                  display: 'inline-block',
-                  width: 36,
-                  height: 36,
-                  borderRadius: '50%',
-                  border: `3px solid ${ACCENT}33`,
-                  borderTopColor: ACCENT,
-                  animation: 'spin 0.8s linear infinite',
-                }}
-              />
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 160 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: ACCENT, fontSize: 14, marginBottom: 4 }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    width: 14, height: 14, borderRadius: '50%',
+                    border: `2px solid ${ACCENT}44`, borderTopColor: ACCENT,
+                    animation: 'spin 0.8s linear infinite',
+                  }}
+                />
                 Synthesizing audio with ElevenLabs…
-              </p>
+              </div>
+              <div className="studio-shimmer-wrap">
+                <div className="studio-shimmer-block" style={{ height: 64, borderRadius: 8 }} />
+                <div className="studio-shimmer-block" style={{ height: 16, width: '55%' }} />
+                <div className="studio-shimmer-block" style={{ height: 16, width: '38%' }} />
+              </div>
             </div>
           )}
 

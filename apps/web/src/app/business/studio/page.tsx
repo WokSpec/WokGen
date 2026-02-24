@@ -1011,6 +1011,20 @@ function BusinessStudioInner() {
               <div className="studio-output-loading">
                 <div className="studio-spinner" />
                 <span>{loadingMsg} {(elapsedMs / 1000).toFixed(1)}s</span>
+                <div className="studio-shimmer-wrap" style={{ marginTop: 12, maxWidth: 360 }}>
+                  <div className="studio-shimmer-block" style={{ height: 240, borderRadius: 8 }} />
+                  <div className="studio-shimmer-block" style={{ height: 14, width: '45%', alignSelf: 'center' }} />
+                </div>
+              </div>
+            )}
+            {jobStatus === 'failed' && (
+              <div className="studio-error-card">
+                <span className="studio-error-card__icon">⚠️</span>
+                <p className="studio-error-card__title">Generation failed</p>
+                {studioError && (
+                  <p className="studio-error-card__msg">{studioError.message}</p>
+                )}
+                <button className="btn-secondary" onClick={handleGenerate}>↻ Retry</button>
               </div>
             )}
             {displayResult?.resultUrl && jobStatus !== 'running' && (

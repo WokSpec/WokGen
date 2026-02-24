@@ -1,5 +1,14 @@
 import type { MetadataRoute } from 'next';
 
+const TOOL_SLUGS = [
+  'background-remover', 'image-converter', 'image-compress', 'image-resize',
+  'favicon', 'social-resize', 'pixel-editor', 'sprite-packer', 'color-palette',
+  'mockup', 'css-generator', 'color-tools', 'og-preview', 'font-pairer',
+  'json-tools', 'regex', 'encode-decode', 'hash', 'generators', 'text-tools',
+  'markdown', 'csv-tools', 'tilemap', 'pdf', 'crypto-tools', 'audio-tools',
+  'whiteboard', 'snippets', 'asset-manifest',
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = (process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
   const now  = new Date();
@@ -36,11 +45,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Eral — AI companion
     { url: `${base}/eral`,                lastModified: now, changeFrequency: 'weekly',   priority: 0.75 },
 
+    // Free Tools hub
+    { url: `${base}/tools`,               lastModified: now, changeFrequency: 'weekly',   priority: 0.9 },
+    ...TOOL_SLUGS.map(slug => ({
+      url: `${base}/tools/${slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    })),
+
+    // Open source + support
+    { url: `${base}/open-source`,         lastModified: now, changeFrequency: 'monthly',  priority: 0.7 },
+    { url: `${base}/support`,             lastModified: now, changeFrequency: 'monthly',  priority: 0.6 },
+    { url: `${base}/pricing`,             lastModified: now, changeFrequency: 'monthly',  priority: 0.5 },
+
     // Docs
     { url: `${base}/docs`,                lastModified: now, changeFrequency: 'weekly',   priority: 0.7 },
     { url: `${base}/docs/pixel`,          lastModified: now, changeFrequency: 'weekly',   priority: 0.65 },
     { url: `${base}/docs/business`,       lastModified: now, changeFrequency: 'weekly',   priority: 0.65 },
-    { url: `${base}/docs/platform/billing`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 },
 
     // Legal
     { url: `${base}/terms`,               lastModified: now, changeFrequency: 'yearly',   priority: 0.3 },

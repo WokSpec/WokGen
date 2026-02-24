@@ -13800,3 +13800,228 @@ select:focus-visible {
   border: 1px dashed var(--border-subtle);
   border-radius: 10px;
 }
+
+/* ============================================================
+   STUDIO POLISH — shimmer skeletons, empty states, error cards
+   ============================================================ */
+
+/* Shimmer animation */
+@keyframes studio-shimmer-slide {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.studio-shimmer-block {
+  background: linear-gradient(
+    90deg,
+    var(--surface-border, #252538) 25%,
+    var(--surface-raised, #1e1e30) 50%,
+    var(--surface-border, #252538) 75%
+  );
+  background-size: 1200px 100%;
+  animation: studio-shimmer-slide 1.6s ease-in-out infinite;
+  border-radius: 5px;
+}
+
+.studio-shimmer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Empty canvas state (text / voice studios) */
+.studio-empty-canvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 280px;
+  border: 2px dashed var(--surface-border, #252538);
+  border-radius: 12px;
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.studio-empty-canvas__icon {
+  font-size: 2.5rem;
+  opacity: 0.55;
+  line-height: 1;
+}
+
+.studio-empty-canvas__title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.studio-empty-canvas__desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  max-width: 300px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Error card shown in canvas area */
+.studio-error-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 24px;
+  border-radius: 10px;
+  border: 1px solid var(--danger, #ef4444);
+  background: rgba(239, 68, 68, 0.06);
+  text-align: center;
+  max-width: 380px;
+  width: 100%;
+}
+
+.studio-error-card__icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.studio-error-card__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--danger-hover, #fca5a5);
+  margin: 0;
+}
+
+.studio-error-card__msg {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  word-break: break-word;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin: 0;
+  max-width: 100%;
+  width: 100%;
+  text-align: left;
+}
+
+/* Dashed border extension for business studio idle state */
+.studio-canvas > .studio-idle {
+  border: 2px dashed var(--surface-border, #252538);
+  border-radius: 12px;
+  margin: 1.5rem;
+  flex: none;
+  align-self: stretch;
+}
+
+/* ============================================================
+   TUTORIAL OVERLAY
+   ============================================================ */
+
+.tutorial-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  backdrop-filter: blur(1px);
+}
+
+.tutorial-highlight {
+  position: absolute;
+  z-index: 9999;
+  border: 2px solid var(--accent-primary);
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.tutorial-tooltip {
+  position: fixed;
+  z-index: 10000;
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-primary);
+  border-radius: 12px;
+  padding: 1.1rem;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.tutorial-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.tutorial-step-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--accent-primary);
+}
+
+.tutorial-skip-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+}
+.tutorial-skip-btn:hover { color: var(--text-primary); }
+
+.tutorial-tooltip-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+
+.tutorial-tooltip-body {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.tutorial-action-hint {
+  font-size: 0.8rem;
+  color: #86efac;
+  background: rgba(134, 239, 172, 0.08);
+  border: 1px solid rgba(134, 239, 172, 0.2);
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  margin: 0 0 0.75rem;
+}
+
+.tutorial-tooltip-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.tutorial-progress {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  justify-content: center;
+}
+
+.tutorial-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-subtle);
+  transition: all .15s;
+}
+.tutorial-dot.active { background: var(--accent-primary); width: 18px; border-radius: 3px; }
+.tutorial-dot.done { background: rgba(99, 102, 241, .4); }

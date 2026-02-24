@@ -13800,3 +13800,120 @@ select:focus-visible {
   border: 1px dashed var(--border-subtle);
   border-radius: 10px;
 }
+
+/* ============================================================
+   STUDIO POLISH — shimmer skeletons, empty states, error cards
+   ============================================================ */
+
+/* Shimmer animation */
+@keyframes studio-shimmer-slide {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.studio-shimmer-block {
+  background: linear-gradient(
+    90deg,
+    var(--surface-border, #252538) 25%,
+    var(--surface-raised, #1e1e30) 50%,
+    var(--surface-border, #252538) 75%
+  );
+  background-size: 1200px 100%;
+  animation: studio-shimmer-slide 1.6s ease-in-out infinite;
+  border-radius: 5px;
+}
+
+.studio-shimmer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Empty canvas state (text / voice studios) */
+.studio-empty-canvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 280px;
+  border: 2px dashed var(--surface-border, #252538);
+  border-radius: 12px;
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.studio-empty-canvas__icon {
+  font-size: 2.5rem;
+  opacity: 0.55;
+  line-height: 1;
+}
+
+.studio-empty-canvas__title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.studio-empty-canvas__desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  max-width: 300px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Error card shown in canvas area */
+.studio-error-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 24px;
+  border-radius: 10px;
+  border: 1px solid var(--danger, #ef4444);
+  background: rgba(239, 68, 68, 0.06);
+  text-align: center;
+  max-width: 380px;
+  width: 100%;
+}
+
+.studio-error-card__icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.studio-error-card__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--danger-hover, #fca5a5);
+  margin: 0;
+}
+
+.studio-error-card__msg {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  word-break: break-word;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin: 0;
+  max-width: 100%;
+  width: 100%;
+  text-align: left;
+}
+
+/* Dashed border extension for business studio idle state */
+.studio-canvas > .studio-idle {
+  border: 2px dashed var(--surface-border, #252538);
+  border-radius: 12px;
+  margin: 1.5rem;
+  flex: none;
+  align-self: stretch;
+}

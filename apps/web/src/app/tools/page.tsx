@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { TOOLS, TAG_LABELS } from '@/lib/tools-registry';
 import type { ToolTag } from '@/lib/tools-registry';
+import TutorialOverlay, { useTutorial, TOOLS_TUTORIAL } from '@/components/TutorialOverlay';
 
 const ALL_TAGS: ToolTag[] = ['image', 'design', 'dev', 'gamedev', 'pdf', 'text', 'crypto', 'audio', 'collab'];
 
@@ -14,6 +15,7 @@ const ALL_TAGS: ToolTag[] = ['image', 'design', 'dev', 'gamedev', 'pdf', 'text',
 export default function ToolsPage() {
   const [search, setSearch] = useState('');
   const [activeTag, setActiveTag] = useState<ToolTag | null>(null);
+  const { active: tutActive, start: startTut, complete: completeTut, skip: skipTut } = useTutorial(TOOLS_TUTORIAL, false);
 
   const filtered = useMemo(() => {
     let list = TOOLS;
@@ -35,6 +37,9 @@ export default function ToolsPage() {
 
   return (
     <main className="tools-hub-page">
+      {tutActive && (
+        <TutorialOverlay tutorial={TOOLS_TUTORIAL} onComplete={completeTut} onSkip={skipTut} />
+      )}
       {/* Hero */}
       <section className="tools-hub-hero">
         <div className="tools-hub-hero-inner">
@@ -46,7 +51,7 @@ export default function ToolsPage() {
           </p>
 
           {/* Search */}
-          <div className="tools-hub-search-wrap">
+          <div className="tools-hub-search-wrap tools-search">
             <input
               className="tools-hub-search"
               type="search"
@@ -127,6 +132,10 @@ export default function ToolsPage() {
           <a href="https://github.com/WokSpec/WokGen/issues" target="_blank" rel="noopener noreferrer" className="tools-hub-footer-link">
             Request it on GitHub
           </a>
+          {' · '}
+          <button className="tools-hub-footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={startTut}>
+            ? Take a tour
+          </button>
         </p>
       </section>
     </main>

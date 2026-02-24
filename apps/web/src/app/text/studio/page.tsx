@@ -346,16 +346,28 @@ export default function TextStudio() {
         {/* ── Right panel ─────────────────────────────────────────────── */}
         <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-          {/* Elapsed timer */}
+          {/* Loading skeleton */}
           {status === 'generating' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: ACCENT, fontSize: 14 }}>
-              <span style={{
-                display: 'inline-block', width: 14, height: 14, borderRadius: '50%',
-                border: `2px solid ${ACCENT}44`, borderTopColor: ACCENT,
-                animation: 'spin 0.7s linear infinite',
-              }} />
-              {loadingMsg} {msToSecs(elapsedMs)}
-            </div>
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: ACCENT, fontSize: 14 }}>
+                <span style={{
+                  display: 'inline-block', width: 14, height: 14, borderRadius: '50%',
+                  border: `2px solid ${ACCENT}44`, borderTopColor: ACCENT,
+                  animation: 'spin 0.7s linear infinite',
+                }} />
+                {loadingMsg} {msToSecs(elapsedMs)}
+              </div>
+              <div className="studio-shimmer-wrap">
+                <div className="studio-shimmer-block" style={{ height: 18, width: '92%' }} />
+                <div className="studio-shimmer-block" style={{ height: 18, width: '78%' }} />
+                <div className="studio-shimmer-block" style={{ height: 18, width: '86%' }} />
+                <div className="studio-shimmer-block" style={{ height: 18, width: '62%' }} />
+                <div className="studio-shimmer-block" style={{ height: 18, width: '80%' }} />
+                <div className="studio-shimmer-block" style={{ height: 18, width: '55%' }} />
+                <div className="studio-shimmer-block" style={{ height: 18, width: '70%' }} />
+                <div className="studio-shimmer-block" style={{ height: 18, width: '88%' }} />
+              </div>
+            </>
           )}
 
           {/* Error */}
@@ -487,13 +499,10 @@ export default function TextStudio() {
 
           {/* Idle state */}
           {status === 'idle' && !result && (
-            <div style={{
-              flex: 1, display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              gap: 12, color: 'var(--text-muted)', minHeight: 240,
-            }}>
-              
-              <p style={{ fontSize: 14, textAlign: 'center', maxWidth: 260, lineHeight: 1.5 }}>
+            <div className="studio-empty-canvas">
+              <span className="studio-empty-canvas__icon">✍️</span>
+              <p className="studio-empty-canvas__title">Generate your first text</p>
+              <p className="studio-empty-canvas__desc">
                 Choose a content type, set your tone and length, then click{' '}
                 <strong style={{ color: ACCENT }}>Generate Text</strong>.
               </p>

@@ -89,6 +89,8 @@ const PLATFORMS: { id: BusinessPlatform; label: string; size: string; icon?: str
   { id: 'instagram_story',  label: 'Instagram Story',   size: '1080×1920', },
   { id: 'linkedin_banner',  label: 'LinkedIn Banner',   size: '1584×396',  },
   { id: 'youtube_art',      label: 'YouTube Art',       size: '2560×1440', },
+  { id: 'youtube_thumbnail', label: 'YouTube Thumbnail', size: '1280×720',  },
+  { id: 'tiktok_cover',     label: 'TikTok Cover',      size: '1080×1920', },
 ];
 
 const SLIDE_FORMATS = [
@@ -137,6 +139,7 @@ function BusinessStudioInner() {
   const [mood, setMood]                 = useState<BusinessMood>('professional');
   const [industry, setIndustry]         = useState('');
   const [colorDirection, setColorDir]   = useState('');
+  const [targetAudience, setTargetAudience] = useState('');
   const [platform, setPlatform]         = useState<BusinessPlatform>('og_image');
   const [slideFormat, setSlideFormat]   = useState(SLIDE_FORMATS[0]);
   const [logoBg, setLogoBg]             = useState<'white' | 'dark' | 'transparent'>('white');
@@ -278,7 +281,9 @@ function BusinessStudioInner() {
     const body = {
       tool:           activeTool === 'brand-kit' ? 'generate' : activeTool,
       mode:           'business',
-      prompt:         prompt.trim(),
+      prompt:         activeTool === 'logo' && targetAudience.trim()
+                        ? `${prompt.trim()}, target audience: ${targetAudience.trim()}`
+                        : prompt.trim(),
       style,
       mood,
       industry:       industry.trim() || undefined,
@@ -356,7 +361,7 @@ function BusinessStudioInner() {
       stageTimers.forEach(clearTimeout);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prompt, activeTool, style, mood, industry, colorDirection, platform, slideFormat, useHD, isPublic, jobStatus]);
+  }, [prompt, activeTool, style, mood, industry, colorDirection, targetAudience, platform, slideFormat, useHD, isPublic, jobStatus]);
 
   // ── Load history from API on mount ───────────────────────────────────────
   useEffect(() => {
@@ -650,6 +655,20 @@ function BusinessStudioInner() {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Target audience (logo only) */}
+        {activeTool === 'logo' && (
+          <div className="studio-control-section">
+            <label className="studio-label">Target Audience <span className="studio-label-opt">(optional)</span></label>
+            <input
+              className="studio-input"
+              type="text"
+              value={targetAudience}
+              onChange={e => setTargetAudience(e.target.value)}
+              placeholder="e.g. senior engineers, Gen Z founders"
+            />
           </div>
         )}
 

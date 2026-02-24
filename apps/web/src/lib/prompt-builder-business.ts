@@ -38,7 +38,9 @@ export type BusinessPlatform =
   | 'instagram_square'
   | 'instagram_story'
   | 'linkedin_banner'
-  | 'youtube_art';
+  | 'youtube_art'
+  | 'youtube_thumbnail'
+  | 'tiktok_cover';
 
 export type BusinessTextZone = 'center' | 'left' | 'right' | 'none';
 
@@ -95,6 +97,8 @@ const PLATFORM_DIMENSIONS: Record<BusinessPlatform, { width: number; height: num
   instagram_story:   { width: 1080, height: 1920, label: 'Instagram story' },
   linkedin_banner:   { width: 1584, height: 396,  label: 'LinkedIn banner' },
   youtube_art:       { width: 2560, height: 1440, label: 'YouTube channel art' },
+  youtube_thumbnail: { width: 1280, height: 720,  label: 'YouTube thumbnail' },
+  tiktok_cover:      { width: 1080, height: 1920, label: 'TikTok cover' },
 };
 
 // Universal business negative prompt — applied to all business generations

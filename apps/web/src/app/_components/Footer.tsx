@@ -8,7 +8,7 @@ const PRODUCT_LINKS = [
   { label: 'Free Tools',   href: '/tools'        },
   { label: 'Community',    href: '/community'    },
   { label: 'Eral',         href: '/eral'         },
-  { label: 'Open Source',  href: 'https://github.com/WokSpec/WokGen', ext: true },
+  { label: 'Open Source',  href: '/open-source', ext: false },
 ];
 
 const RESOURCES_LINKS = [

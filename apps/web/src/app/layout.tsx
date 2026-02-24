@@ -125,6 +125,7 @@ function NavBar() {
           <NavLink href="/eral">
             <span className="nav-eral-badge">Eral</span>
           </NavLink>
+          <NavLink href="/open-source">Open Source</NavLink>
           <NavLink href="/support">Support</NavLink>
         </div>
 

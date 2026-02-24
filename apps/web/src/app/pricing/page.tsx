@@ -92,6 +92,11 @@ export default function PricingPage() {
               </div>
             ))}
           </div>
+          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            <Link href="/open-source" className="btn-ghost">
+              View full model registry →
+            </Link>
+          </div>
         </div>
       </section>
 

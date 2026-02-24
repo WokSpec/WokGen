@@ -7,6 +7,8 @@ const TOOL_SLUGS = [
   'json-tools', 'regex', 'encode-decode', 'hash', 'generators', 'text-tools',
   'markdown', 'csv-tools', 'tilemap', 'pdf', 'crypto-tools', 'audio-tools',
   'whiteboard', 'snippets', 'asset-manifest',
+  // New tools — Cycle 24
+  'color-extractor', 'type-scale', 'gradient-generator', 'border-radius', 'image-diff',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -60,9 +62,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/pricing`,             lastModified: now, changeFrequency: 'monthly',  priority: 0.5 },
 
     // Docs
-    { url: `${base}/docs`,                lastModified: now, changeFrequency: 'weekly',   priority: 0.7 },
-    { url: `${base}/docs/pixel`,          lastModified: now, changeFrequency: 'weekly',   priority: 0.65 },
-    { url: `${base}/docs/business`,       lastModified: now, changeFrequency: 'weekly',   priority: 0.65 },
+    { url: `${base}/docs`,                    lastModified: now, changeFrequency: 'weekly',   priority: 0.7 },
+    { url: `${base}/docs/getting-started`,    lastModified: now, changeFrequency: 'weekly',   priority: 0.75 },
+    { url: `${base}/docs/pixel`,              lastModified: now, changeFrequency: 'weekly',   priority: 0.65 },
+    { url: `${base}/docs/business`,           lastModified: now, changeFrequency: 'weekly',   priority: 0.65 },
+    { url: `${base}/docs/eral`,               lastModified: now, changeFrequency: 'weekly',   priority: 0.65 },
+    { url: `${base}/docs/api`,                lastModified: now, changeFrequency: 'weekly',   priority: 0.65 },
+
+    // Community + Profile
+    { url: `${base}/community`,               lastModified: now, changeFrequency: 'daily',    priority: 0.8 },
+    { url: `${base}/status`,                  lastModified: now, changeFrequency: 'daily',    priority: 0.6 },
+    { url: `${base}/chopsticks`,              lastModified: now, changeFrequency: 'monthly',  priority: 0.7 },
 
     // Legal
     { url: `${base}/terms`,               lastModified: now, changeFrequency: 'yearly',   priority: 0.3 },

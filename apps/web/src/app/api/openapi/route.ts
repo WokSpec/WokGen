@@ -333,6 +333,311 @@ export async function GET() {
           },
         },
       },
+      '/api/credits': {
+        get: {
+          summary: 'Get credit balance',
+          operationId: 'getCredits',
+          responses: {
+            '200': {
+              description: 'Credit balance and plan info',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      credits:  { type: 'integer' },
+                      plan:     { type: 'string' },
+                      resetAt:  { type: 'string', format: 'date-time' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/notifications': {
+        get: {
+          summary: 'List unread notifications',
+          operationId: 'listNotifications',
+          responses: {
+            '200': {
+              description: 'Unread notifications',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      notifications: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id:        { type: 'string' },
+                            type:      { type: 'string' },
+                            title:     { type: 'string' },
+                            body:      { type: 'string' },
+                            link:      { type: 'string' },
+                            read:      { type: 'boolean' },
+                            createdAt: { type: 'string', format: 'date-time' },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        patch: {
+          summary: 'Mark all notifications as read',
+          operationId: 'markNotificationsRead',
+          responses: {
+            '200': { description: 'Marked as read' },
+          },
+        },
+      },
+      '/api/usage': {
+        get: {
+          summary: 'Get usage statistics',
+          operationId: 'getUsage',
+          parameters: [
+            { name: 'page',  in: 'query', schema: { type: 'integer', default: 1 } },
+            { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } },
+          ],
+          responses: {
+            '200': {
+              description: 'Usage stats including daily breakdown and job history',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      allTime:    { type: 'object' },
+                      thisMonth:  { type: 'object' },
+                      today:      { type: 'object' },
+                      dailyChart: { type: 'array', items: { type: 'object' } },
+                      byMode:     { type: 'object' },
+                      quota:      { type: 'object' },
+                      jobs:       { type: 'array', items: { type: 'object' } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/stats': {
+        get: {
+          summary: 'Get platform statistics',
+          operationId: 'getStats',
+          responses: {
+            '200': {
+              description: 'Platform-wide stats',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      totalGenerations: { type: 'integer' },
+                      totalUsers:       { type: 'integer' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/workspaces': {
+        get: {
+          summary: 'List workspaces',
+          operationId: 'listWorkspaces',
+          responses: {
+            '200': {
+              description: 'User workspaces',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      workspaces: { type: 'array', items: { type: 'object' } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        post: {
+          summary: 'Create a workspace',
+          operationId: 'createWorkspace',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['name'],
+                  properties: {
+                    name: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '201': { description: 'Workspace created' },
+          },
+        },
+      },
+      '/api/preferences': {
+        get: {
+          summary: 'Get user preferences',
+          operationId: 'getPreferences',
+          responses: {
+            '200': {
+              description: 'User preferences',
+              content: {
+                'application/json': {
+                  schema: { type: 'object' },
+                },
+              },
+            },
+          },
+        },
+        patch: {
+          summary: 'Update user preferences',
+          operationId: 'updatePreferences',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: { type: 'object' },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Preferences updated' },
+          },
+        },
+      },
+      '/api/webhooks/user': {
+        get: {
+          summary: 'List user webhooks',
+          operationId: 'listWebhooks',
+          responses: {
+            '200': {
+              description: 'User-defined webhooks',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      webhooks: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id:              { type: 'string' },
+                            url:             { type: 'string', format: 'uri' },
+                            events:          { type: 'string', description: 'Comma-separated event list' },
+                            active:          { type: 'boolean' },
+                            lastStatus:      { type: 'string' },
+                            lastTriggeredAt: { type: 'string', format: 'date-time' },
+                            createdAt:       { type: 'string', format: 'date-time' },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        post: {
+          summary: 'Create a webhook',
+          operationId: 'createWebhook',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['url', 'events'],
+                  properties: {
+                    url:    { type: 'string', format: 'uri' },
+                    events: { type: 'string', description: 'Comma-separated event names, e.g. "generation.complete,job.failed"' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'Webhook created',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      webhook: { type: 'object' },
+                      secret:  { type: 'string', description: 'HMAC secret — shown once' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/referrals': {
+        get: {
+          summary: 'Get referral code and list',
+          operationId: 'getReferrals',
+          responses: {
+            '200': {
+              description: 'Referral info',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      code:      { type: 'string', description: 'User referral code' },
+                      referrals: { type: 'array', items: { type: 'object' } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        post: {
+          summary: 'Process a referral code',
+          operationId: 'processReferral',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['code'],
+                  properties: {
+                    code: { type: 'string', description: 'Referral code from cookie' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '200': { description: 'Referral processed' },
+            '400': { description: 'Invalid or already used code' },
+          },
+        },
+      },
     },
   };
 

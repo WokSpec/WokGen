@@ -905,6 +905,7 @@ export async function POST(req: NextRequest) {
         const isTransient =
           isSkipProvider ||
           statusCode === 503 || statusCode === 429 || statusCode === 504 ||
+          (statusCode >= 520 && statusCode <= 530) || // Cloudflare edge errors
           (err instanceof Error && /timeout|loading|unavailable|rate.?limit/i.test(err.message));
         if (!isTransient && !isContentFilter) {
           // Hard failure (auth error, bad request, etc.) — don't try fallbacks

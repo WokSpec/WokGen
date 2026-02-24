@@ -69,33 +69,53 @@ export async function pollinationsGenerate(
   }
 
   const timeoutMs = _config.timeoutMs ?? TIMEOUT_MS;
+  const MAX_RETRIES = 2;
 
   let imageBuffer: ArrayBuffer;
-  let contentType: string;
+  let contentType = 'image/jpeg';
+  let lastErr: unknown;
 
-  try {
-    const res = await fetchWithTimeout(
-      url.toString(),
-      { redirect: 'follow' },
-      timeoutMs,
-    );
-
-    if (!res.ok) {
-      throw Object.assign(
-        new Error(`Pollinations returned HTTP ${res.status}`),
-        { statusCode: res.status },
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetchWithTimeout(
+        url.toString(),
+        { redirect: 'follow' },
+        timeoutMs,
       );
-    }
 
-    contentType = res.headers.get('content-type') ?? 'image/jpeg';
-    imageBuffer = await res.arrayBuffer();
-  } catch (err) {
-    if (err instanceof Error && err.name === 'AbortError') {
-      const pe: ProviderError = new Error(`Request timed out after ${timeoutMs / 1000}s`);
-      pe.provider = 'pollinations';
-      throw pe;
+      if (!res.ok) {
+        // Cloudflare/origin 5xx — retry with backoff before giving up
+        if (res.status >= 500 && attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, 2_000 * (attempt + 1)));
+          continue;
+        }
+        const pe: ProviderError = new Error(`Pollinations returned HTTP ${res.status}`) as ProviderError;
+        pe.provider = 'pollinations';
+        pe.statusCode = res.status;
+        if (res.status >= 500) pe.skipProvider = true;
+        throw pe;
+      }
+
+      contentType = res.headers.get('content-type') ?? 'image/jpeg';
+      imageBuffer = await res.arrayBuffer();
+      break; // success
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        const pe: ProviderError = new Error(`Request timed out after ${timeoutMs / 1000}s`) as ProviderError;
+        pe.provider = 'pollinations';
+        if (attempt < MAX_RETRIES) { lastErr = pe; continue; }
+        throw pe;
+      }
+      if ((err as ProviderError).provider === 'pollinations' && attempt < MAX_RETRIES) {
+        lastErr = err;
+        continue;
+      }
+      throw err;
     }
-    throw err;
+  }
+
+  if (!imageBuffer!) {
+    throw lastErr ?? Object.assign(new Error('Pollinations: all retry attempts failed'), { provider: 'pollinations', skipProvider: true });
   }
 
   // Convert to base64 data URL

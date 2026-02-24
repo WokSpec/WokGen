@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import ToolShell from '@/components/tools/ToolShell';
+import 'tldraw/tldraw.css';
 
 export default function Page() {
   return (

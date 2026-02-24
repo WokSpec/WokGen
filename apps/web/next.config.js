@@ -91,7 +91,7 @@ const nextConfig = {
   // Instrumentation hook for OpenTelemetry when OTEL_EXPORTER_OTLP_ENDPOINT is set
   // ---------------------------------------------------------------------------
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
+    serverComponentsExternalPackages: ['@prisma/client', 'prisma', 'edge-tts', 'ws'],
     instrumentationHook: true,
   },
 
@@ -176,7 +176,7 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: blob: https://*.replicate.delivery https://*.fal.run https://*.fal.ai https://storage.googleapis.com https://*.together.xyz https://*.together.ai https://*.huggingface.co https://cdn-lfs.huggingface.co https://lh3.googleusercontent.com https://avatars.githubusercontent.com",
               "media-src 'self' blob: https://*.elevenlabs.io https://*.together.ai https://*.fal.run",
-              "connect-src 'self' https://*.vercel-insights.com https://*.upstash.io https://api.stripe.com",
+      "connect-src 'self' https://*.vercel-insights.com https://*.upstash.io https://api.stripe.com wss://speech.platform.bing.com",
               "frame-src 'none'",
               "object-src 'none'",
               "base-uri 'self'",

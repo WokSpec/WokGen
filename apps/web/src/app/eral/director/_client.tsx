@@ -21,12 +21,18 @@ const MODE_STUDIOS: Record<string, string> = {
   emoji: '/emoji/studio', uiux: '/uiux/studio', voice: '/voice/studio', text: '/text/studio',
 };
 
-const EXAMPLE_BRIEFS = [
-  'Top-down dungeon crawler game, dark fantasy, NES 16-color pixel art style, 8-bit feel',
-  'Mobile match-3 puzzle game, bright candy colors, cute cartoon style, iOS/Android',
-  'Minimalist SaaS startup brand, tech industry, clean modern aesthetic, purple + white palette',
-  'Retro platformer game, inspired by SNES era, colorful pixel art, 16-bit, forest biome',
-];
+const PROJECT_TYPES = [
+  { id: 'platformer',  label: 'Platformer',       desc: '2D side-scrolling game assets' },
+  { id: 'rpg',         label: 'RPG',               desc: 'Top-down role-playing game kit' },
+  { id: 'brand',       label: 'Brand Identity',    desc: 'Logo, colors, social assets' },
+  { id: 'product',     label: 'Product Launch',    desc: 'Landing page + marketing visuals' },
+  { id: 'content',     label: 'Content Campaign',  desc: 'Social posts + thumbnails' },
+  { id: 'app',         label: 'App UI Kit',        desc: 'Component library + screens' },
+  { id: 'puzzle',      label: 'Puzzle Game',       desc: 'Tile-based casual game assets' },
+  { id: 'other',       label: 'Other',             desc: 'Describe your own project type' },
+] as const;
+
+
 
 // ─── Plan item card ───────────────────────────────────────────────────────────
 
@@ -136,14 +142,15 @@ function PlanItemCard({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function EralDirectorClient() {
-  const [brief, setBrief]         = useState('');
-  const [mode, setMode]           = useState('');
-  const [count, setCount]         = useState(8);
-  const [plan, setPlan]           = useState<PlanItem[] | null>(null);
+  const [brief, setBrief]           = useState('');
+  const [projectType, setProjectType] = useState('');
+  const [mode, setMode]             = useState('');
+  const [count, setCount]           = useState(8);
+  const [plan, setPlan]             = useState<PlanItem[] | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [executing, setExecuting] = useState(false);
-  const [progress, setProgress]   = useState(0);
-  const [error, setError]         = useState('');
+  const [executing, setExecuting]   = useState(false);
+  const [progress, setProgress]     = useState(0);
+  const [error, setError]           = useState('');
 
   const generatePlan = async () => {
     if (!brief.trim()) { setError('Describe your project first.'); return; }
@@ -237,6 +244,61 @@ export default function EralDirectorClient() {
 
   const approvedCount = plan?.filter(p => p.approved !== false).length ?? 0;
   const doneCount     = plan?.filter(p => p.status === 'done').length ?? 0;
+  const failedCount   = plan?.filter(p => p.status === 'failed').length ?? 0;
+
+  const rerunFailed = async () => {
+    if (!plan) return;
+    const failed = plan.filter(p => p.status === 'failed');
+    if (!failed.length) return;
+    // Reset failed items to pending
+    setPlan(prev => prev?.map(p => p.status === 'failed' ? { ...p, status: 'pending' } : p) ?? null);
+    setExecuting(true);
+    for (let i = 0; i < failed.length; i++) {
+      const item = failed[i];
+      setPlan(prev => prev?.map(p => p.id === item.id ? { ...p, status: 'running' } : p) ?? null);
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: item.mode, tool: item.tool, prompt: item.prompt, size: item.size, style: item.style }),
+        });
+        const d = await res.json();
+        if (!res.ok || !d.jobId) throw new Error('generation failed');
+        let jobResult: { status: string; resultUrl?: string } | null = null;
+        for (let poll = 0; poll < 30; poll++) {
+          await new Promise(r => setTimeout(r, 2000));
+          const jr = await fetch(`/api/jobs/${d.jobId}`).then(r => r.ok ? r.json() : null).catch(() => null);
+          if (jr?.job?.status === 'succeeded') { jobResult = { status: 'succeeded', resultUrl: jr.job.resultUrl }; break; }
+          if (jr?.job?.status === 'failed')    { jobResult = { status: 'failed' }; break; }
+        }
+        if (jobResult?.status === 'succeeded') {
+          setPlan(prev => prev?.map(p => p.id === item.id ? { ...p, status: 'done', jobId: d.jobId, resultUrl: jobResult?.resultUrl } : p) ?? null);
+        } else {
+          setPlan(prev => prev?.map(p => p.id === item.id ? { ...p, status: 'failed' } : p) ?? null);
+        }
+      } catch {
+        setPlan(prev => prev?.map(p => p.id === item.id ? { ...p, status: 'failed' } : p) ?? null);
+      }
+    }
+    setExecuting(false);
+  };
+
+  const exportManifest = () => {
+    if (!plan) return;
+    const manifest = {
+      projectType,
+      brief,
+      generatedAt: new Date().toISOString(),
+      assets: plan
+        .filter(p => p.status === 'done')
+        .map(p => ({ id: p.id, label: p.label, mode: p.mode, tool: p.tool, prompt: p.prompt, style: p.style, jobId: p.jobId, resultUrl: p.resultUrl })),
+    };
+    const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'director-manifest.json'; a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="director-page">
@@ -252,6 +314,23 @@ export default function EralDirectorClient() {
       {!plan ? (
         /* Brief input */
         <div className="director-brief">
+          {/* Project type selector */}
+          <div className="director-brief__field">
+            <label className="director-brief__label">Project type</label>
+            <div className="director-type-grid">
+              {PROJECT_TYPES.map(pt => (
+                <button
+                  key={pt.id}
+                  className={`director-type-card ${projectType === pt.id ? 'director-type-card--active' : ''}`}
+                  onClick={() => setProjectType(pt.id)}
+                >
+                  <span className="director-type-card__label">{pt.label}</span>
+                  <span className="director-type-card__desc">{pt.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="director-brief__field">
             <label className="director-brief__label">Describe your project *</label>
             <textarea
@@ -263,15 +342,6 @@ export default function EralDirectorClient() {
             />
           </div>
 
-          <div className="director-brief__examples">
-            <span className="director-brief__examples-label">Examples:</span>
-            {EXAMPLE_BRIEFS.map((ex, i) => (
-              <button key={i} className="director-brief__example" onClick={() => setBrief(ex)}>
-                {ex.slice(0, 50)}…
-              </button>
-            ))}
-          </div>
-
           <div className="director-brief__options">
             <div className="director-brief__option">
               <label>Mode focus</label>
@@ -280,7 +350,6 @@ export default function EralDirectorClient() {
                 <option value="pixel">Pixel art</option>
                 <option value="business">Business</option>
                 <option value="vector">Vector</option>
-                <option value="emoji">Emoji</option>
                 <option value="uiux">UI/UX</option>
                 <option value="voice">Voice</option>
                 <option value="text">Text</option>
@@ -325,6 +394,16 @@ export default function EralDirectorClient() {
               {!executing && doneCount < approvedCount && (
                 <button className="btn btn--primary" onClick={executePlan} disabled={approvedCount === 0}>
                   {doneCount > 0 ? `Continue (${approvedCount - doneCount} left)` : `Execute ${approvedCount} assets`}
+                </button>
+              )}
+              {!executing && failedCount > 0 && (
+                <button className="btn btn--ghost btn--sm" onClick={rerunFailed}>
+                  Retry {failedCount} failed
+                </button>
+              )}
+              {doneCount > 0 && (
+                <button className="btn btn--ghost btn--sm" onClick={exportManifest} title="Download manifest.json">
+                  Export manifest
                 </button>
               )}
               <button className="btn btn--ghost btn--sm" onClick={() => { setPlan(null); setProgress(0); }}>

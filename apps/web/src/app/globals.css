@@ -9082,3 +9082,40 @@ select:focus-visible {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ── Cycle 14: Director project type selector ─────────────────────────────── */
+.director-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.director-type-card {
+  background: #0d0d1a;
+  border: 1px solid #252538;
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.director-type-card:hover {
+  border-color: #5555aa;
+  background: #12122a;
+}
+.director-type-card--active {
+  border-color: var(--accent);
+  background: rgba(167,139,250,0.08);
+}
+.director-type-card__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.director-type-card__desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}

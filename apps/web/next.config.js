@@ -120,7 +120,26 @@ const nextConfig = {
   // Webpack customisation
   // ---------------------------------------------------------------------------
   webpack(config, { isServer }) {
-    // Exclude server-only Prisma files from the client bundle
+    const path = require('path');
+    const webpack = require('webpack');
+
+    if (isServer) {
+      // edge-tts ships TypeScript source — must be external so webpack never bundles it
+      const existingExternals = Array.isArray(config.externals) ? config.externals : [];
+      config.externals = [...existingExternals, 'edge-tts', 'ws'];
+    }
+
+    // Stub onnxruntime-web on both client and server — @imgly/background-removal
+    // loads it dynamically at runtime via WebAssembly; its .mjs chunks cause
+    // Terser "import/export outside module" errors when webpack tries to bundle them.
+    config.plugins = config.plugins ?? [];
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /onnxruntime-web/,
+        path.resolve(__dirname, 'src/lib/stubs/onnxruntime-stub.js')
+      )
+    );
+
     if (!isServer) {
       config.resolve = config.resolve ?? {};
       config.resolve.fallback = {

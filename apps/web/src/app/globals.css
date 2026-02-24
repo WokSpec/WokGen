@@ -9119,3 +9119,120 @@ select:focus-visible {
   font-size: 11px;
   color: var(--text-muted);
 }
+
+/* ── Cycle 18: Universal Studio Components ────────────────────────────────── */
+.studio-result-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.studio-result-image-wrap {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0a0a18;
+  border: 1px solid #252538;
+}
+.studio-result-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+}
+.studio-result-placeholder {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px dashed #303050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.studio-result-placeholder-text {
+  font-size: 12px;
+  color: var(--text-disabled);
+}
+.studio-result-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.studio-result-badge {
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.studio-result-badge--provider { border-color: #303050; color: var(--text-muted); }
+.studio-result-badge--time     { border-color: #303050; color: var(--text-muted); }
+.studio-result-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Generation progress */
+.studio-generating {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.studio-generating-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.studio-generating-stage {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-disabled);
+}
+.studio-generating-stage--done { color: var(--text-muted); }
+.studio-generating-stage--done .studio-generating-stage-dot { background: #34d399; }
+.studio-generating-stage--active { color: var(--text); }
+.studio-generating-stage--active .studio-generating-stage-dot {
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+.studio-generating-stage-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #303050;
+  flex-shrink: 0;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Studio empty state */
+.studio-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 12px;
+  color: var(--text-disabled);
+}
+.studio-empty-icon { opacity: 0.4; }
+.studio-empty-text { font-size: 13px; margin: 0; }
+.studio-empty-example {
+  background: none;
+  border: 1px solid #252538;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.studio-empty-example:hover {
+  border-color: var(--accent);
+  background: rgba(167,139,250,0.06);
+}

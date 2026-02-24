@@ -9,7 +9,7 @@ import BorderRadiusTool from '@/components/tools/BorderRadiusTool';
 
 export default function Page() {
   return (
-    <ToolShell id="border-radius" label="Border Radius Visualizer" description="Interactive border-radius builder with individual corner sliders. Live preview and copy CSS." icon="⬛">
+    <ToolShell id="border-radius" label="Border Radius Visualizer" description="Interactive border-radius builder with individual corner sliders. Live preview and copy CSS." icon="BR">
       <BorderRadiusTool />
     </ToolShell>
   );

@@ -13,7 +13,7 @@ export default function Page() {
       id="favicon"
       label="Favicon Generator"
       description="Generate favicon.ico and PNG variants from any image."
-      icon="⭐"
+      icon="FAV"
     >
       <FaviconTool />
     </ToolShell>

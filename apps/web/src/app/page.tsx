@@ -189,6 +189,48 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* WokAPI section */}
+      <section className="homepage-wokapi">
+        <div className="homepage-section-inner">
+          <div className="homepage-wokapi-grid">
+            <div className="homepage-wokapi-left">
+              <div className="homepage-eyebrow-pill">For Developers</div>
+              <h2 className="homepage-section-title">
+                Build with <span className="gradient-text">WokAPI.</span>
+              </h2>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: '1.5rem', maxWidth: '420px' }}>
+                Programmatic access to every WokGen tool. Generate assets, remove backgrounds, and chat with Eral 7c from your own app.
+              </p>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <a className="homepage-cta-primary" href="/developers">View WokAPI docs</a>
+                <a className="homepage-cta-ghost" href="/account/api-keys">Get API key</a>
+              </div>
+            </div>
+            <div className="homepage-wokapi-right">
+              <div className="homepage-code-block">
+                <div className="homepage-code-header">
+                  <span className="homepage-code-dot"></span>
+                  <span className="homepage-code-dot"></span>
+                  <span className="homepage-code-dot"></span>
+                  <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>@wokspec/sdk</span>
+                </div>
+                <pre className="homepage-code-body"><code>{`import WokGen from '@wokspec/sdk';
+
+const wok = new WokGen({ apiKey: 'wok_...' });
+
+const asset = await wok.generate({
+  prompt: 'pixel art wizard, 32x32',
+  mode: 'pixel',
+});
+
+console.log(asset.url);
+// → https://cdn.wokgen.io/...`}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Eral Spotlight ───────────────────────────────────────────── */}
       <section className="homepage-eral">
         <div className="homepage-section-inner">

@@ -19444,3 +19444,56 @@ select:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
+
+/* ─── Homepage WokAPI section ─────────────────────────────────────── */
+.homepage-wokapi {
+  padding: 5rem 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.homepage-wokapi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 960px;
+  margin: 0 auto;
+}
+@media (max-width: 720px) {
+  .homepage-wokapi-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+.homepage-wokapi-left {}
+.homepage-wokapi-right {}
+.homepage-code-block {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+.homepage-code-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+}
+.homepage-code-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+}
+.homepage-code-body {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.8);
+  overflow-x: auto;
+}
+.homepage-code-body code {
+  color: inherit;
+  background: none;
+  font-size: inherit;
+}

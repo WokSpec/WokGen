@@ -1,4 +1,6 @@
 'use client';
+
+import { useEffect, useRef } from 'react';
 import ToolShell from '@/components/tools/ToolShell';
 
 export default function Page() {
@@ -9,23 +11,42 @@ export default function Page() {
       description="Open-source infinite canvas powered by tldraw. Shapes, arrows, sticky notes, freehand drawing. Auto-saves to your browser."
       icon="🖊️"
     >
-      <TldrawBoard />
+      <WhiteboardTool />
     </ToolShell>
   );
 }
 
-function TldrawBoard() {
+function WhiteboardTool() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    let unmountFn: (() => void) | undefined;
+
+    async function init() {
+      const container = containerRef.current;
+      if (!container || !mounted) return;
+      const { Tldraw } = await import('tldraw');
+      const { createRoot } = await import('react-dom/client');
+      const { createElement } = await import('react');
+      if (!mounted) return;
+      const root = createRoot(container);
+      root.render(
+        createElement(Tldraw, {
+          persistenceKey: 'wokgen-whiteboard',
+        } as Parameters<typeof Tldraw>[0])
+      );
+      unmountFn = () => root.unmount();
+    }
+
+    init();
+    return () => { mounted = false; unmountFn?.(); };
+  }, []);
+
   return (
-    <div className="whiteboard-placeholder">
-      <div className="tool-shell-soon">
-        <div className="tool-shell-soon-icon">🖊️</div>
-        <h2 className="tool-shell-soon-title">Whiteboard Loading</h2>
-        <p className="tool-shell-soon-desc">
-          The infinite whiteboard uses tldraw (MIT licensed). Install it with:<br/>
-          <code>npm install tldraw --prefix apps/web --legacy-peer-deps</code><br/><br/>
-          Then this component will load the full tldraw editor with localStorage persistence.
-        </p>
-      </div>
-    </div>
+    <div
+      ref={containerRef}
+      style={{ width: '100%', height: '75vh', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-subtle)' }}
+    />
   );
 }

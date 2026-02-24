@@ -900,16 +900,25 @@ export async function POST(req: NextRequest) {
         }
         
         // Continue the chain only for transient failures (503, 429, 504/timeout)
+        // OR when the provider signals it should be skipped (e.g. credit depleted)
+        const isSkipProvider = (err as { skipProvider?: boolean }).skipProvider === true;
         const isTransient =
+          isSkipProvider ||
           statusCode === 503 || statusCode === 429 || statusCode === 504 ||
           (err instanceof Error && /timeout|loading|unavailable|rate.?limit/i.test(err.message));
         if (!isTransient && !isContentFilter) {
           // Hard failure (auth error, bad request, etc.) — don't try fallbacks
           throw err;
         }
+        if (isSkipProvider) {
+          logger.warn({ provider: candidateProvider, err: errorMsg },
+            `[generate] ${candidateProvider} skipped (credit/quota depleted), trying next`
+          );
+        } else {
         logger.warn({ provider: candidateProvider, err: errorMsg },
           `[generate] ${candidateProvider} transient error (${statusCode}), trying next`
         );
+        }
       }
     }
 

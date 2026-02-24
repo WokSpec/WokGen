@@ -132,6 +132,15 @@ export async function huggingfaceGenerate(
     const err = new Error(`HuggingFace API error: ${detail}`) as ProviderError;
     err.provider   = 'huggingface';
     err.statusCode = res.status;
+    // Credit depleted / payment required — skip this provider, try next in chain
+    if (
+      res.status === 402 ||
+      /credit.{0,30}(balance|depleted|exhausted)/i.test(detail) ||
+      /purchase.{0,30}(credit|pre-paid)/i.test(detail) ||
+      /subscribe.{0,30}(PRO|plan)/i.test(detail)
+    ) {
+      err.skipProvider = true;
+    }
     throw err;
   }
 

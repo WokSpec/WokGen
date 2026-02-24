@@ -224,6 +224,8 @@ export interface ProviderError extends Error {
   providerJobId?: string;
   jobId?: string;
   statusCode?: number;
+  /** When true: this provider should be skipped and the next tried (e.g. credit depleted, quota exceeded) */
+  skipProvider?: boolean;
 }
 
 // ---------------------------------------------------------------------------

@@ -2,6 +2,44 @@ import { NextRequest } from 'next/server';
 import { checkSsrf } from '@/lib/ssrf-check';
 import { checkRateLimit, getRateLimitKey } from '@/lib/rate-limiter';
 
+/** Scrape via Firecrawl when API key is configured. Returns enriched result with markdown. */
+async function scrapeWithFirecrawl(url: string) {
+  const apiKey = process.env.FIRECRAWL_API_KEY;
+  if (!apiKey) return null;
+
+  const res = await fetch('https://api.firecrawl.dev/v1/scrape', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, formats: ['markdown', 'links', 'metadata'] }),
+    signal: AbortSignal.timeout(20_000),
+  });
+
+  if (!res.ok) return null;
+  const json = await res.json();
+  if (!json.success || !json.data) return null;
+
+  const { markdown, links: rawLinks, metadata } = json.data;
+  const base = new URL(url);
+
+  const links: Array<{ url: string; text: string; type: 'internal' | 'external' }> =
+    (rawLinks || []).slice(0, 200).map((href: string) => {
+      try {
+        const abs = new URL(href, base).toString();
+        return { url: abs, text: '', type: new URL(abs).hostname === base.hostname ? 'internal' : 'external' };
+      } catch { return null; }
+    }).filter(Boolean);
+
+  return {
+    title: metadata?.title || '',
+    description: metadata?.description || '',
+    meta: { 'og:image': metadata?.ogImage || '', statusCode: String(metadata?.statusCode || '') },
+    links,
+    images: metadata?.ogImage ? [{ url: metadata.ogImage, alt: '' }] : [],
+    markdown,
+    source: 'firecrawl' as const,
+  };
+}
+
 export async function POST(req: NextRequest) {
   const rl = checkRateLimit(getRateLimitKey(req, 'link-scraper'), 20, 60_000);
   if (!rl.ok) {
@@ -31,6 +69,12 @@ export async function POST(req: NextRequest) {
     const ssrf = checkSsrf(url);
     if (!ssrf.ok) {
       return Response.json({ error: 'URL not allowed' }, { status: 403 });
+    }
+
+    // Try Firecrawl first if API key is configured
+    const firecrawlResult = await scrapeWithFirecrawl(url).catch(() => null);
+    if (firecrawlResult) {
+      return Response.json(firecrawlResult);
     }
 
     const controller = new AbortController();
@@ -109,6 +153,7 @@ export async function POST(req: NextRequest) {
       meta,
       links: links.slice(0, 200),
       images: images.slice(0, 100),
+      source: 'basic' as const,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Unknown error';

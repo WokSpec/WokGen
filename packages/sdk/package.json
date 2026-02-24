@@ -1,0 +1,12 @@
+{
+  "name": "@wokgen/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for the WokGen API",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc"
+  },
+  "license": "MIT"
+}

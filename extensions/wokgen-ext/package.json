@@ -1,0 +1,14 @@
+{
+  "name": "@wokspec/wokgen-ext",
+  "version": "0.1.0",
+  "description": "WokGen browser extension — bring AI tools to any page",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "build:firefox": "vite build --mode firefox"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

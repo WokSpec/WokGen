@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WokGen</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="popup-header">
+      <div class="popup-wordmark">
+        <span class="wok">Wok</span><span class="gen">Gen</span>
+      </div>
+      <a href="https://wokgen.wokspec.org" target="_blank" class="popup-open-btn">Open</a>
+    </header>
+    <nav class="popup-nav">
+      <a href="https://wokgen.wokspec.org/tools" target="_blank" class="popup-nav-item">Tools</a>
+      <a href="https://wokgen.wokspec.org/studio" target="_blank" class="popup-nav-item">Studio</a>
+      <a href="https://wokgen.wokspec.org/tools/background-remover" target="_blank" class="popup-nav-item">BG Remove</a>
+    </nav>
+    <div class="popup-tools">
+      <div class="popup-section-title">Quick Tools</div>
+      <div class="popup-tool-grid">
+        <a href="https://wokgen.wokspec.org/tools/image-converter" target="_blank" class="popup-tool">
+          <span class="popup-tool-icon">CV</span>
+          <span>Converter</span>
+        </a>
+        <a href="https://wokgen.wokspec.org/tools/background-remover" target="_blank" class="popup-tool">
+          <span class="popup-tool-icon">BG</span>
+          <span>BG Remove</span>
+        </a>
+        <a href="https://wokgen.wokspec.org/tools/color-palette" target="_blank" class="popup-tool">
+          <span class="popup-tool-icon">CLR</span>
+          <span>Colors</span>
+        </a>
+        <a href="https://wokgen.wokspec.org/tools/og-analyzer" target="_blank" class="popup-tool">
+          <span class="popup-tool-icon">OG</span>
+          <span>OG Check</span>
+        </a>
+        <a href="https://wokgen.wokspec.org/tools/link-scraper" target="_blank" class="popup-tool">
+          <span class="popup-tool-icon">SCR</span>
+          <span>Scraper</span>
+        </a>
+        <a href="https://wokgen.wokspec.org/tools" target="_blank" class="popup-tool popup-tool-more">
+          <span class="popup-tool-icon">...</span>
+          <span>All Tools</span>
+        </a>
+      </div>
+    </div>
+    <div class="popup-analyze" id="analyze-section">
+      <div class="popup-section-title">Analyze this page</div>
+      <button class="popup-analyze-btn" id="analyze-btn">Scan with Eral 7c</button>
+    </div>
+    <footer class="popup-footer">
+      <a href="https://wokgen.wokspec.org/login" target="_blank" id="auth-link">Sign in to WokGen</a>
+      <span class="popup-footer-dot">·</span>
+      <a href="https://wokspec.org" target="_blank">WokSpec</a>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

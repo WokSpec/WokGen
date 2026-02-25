@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 import { requireAdmin, isAdminResponse } from '@/lib/admin';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  try {
   const adminResult = await requireAdmin();
   if (isAdminResponse(adminResult)) return adminResult;
 
@@ -20,7 +23,7 @@ export async function GET() {
     toolCounts,
     activeUserRows,
     recentSignups,
-  ] = await Promise.all([
+  ] = await dbQuery(Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { createdAt: { gte: since7d } } }),
     prisma.job.count(),
@@ -40,7 +43,7 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
       select: { id: true, email: true, name: true, createdAt: true },
     }),
-  ]);
+  ]));
 
   const topTools = toolCounts.map(row => ({
     tool:  row.tool,
@@ -62,4 +65,8 @@ export async function GET() {
     })),
     generatedAt: now.toISOString(),
   });
+  } catch (err) {
+    log.error({ err }, 'GET /api/admin/metrics failed');
+    return API_ERRORS.INTERNAL();
+  }
 }

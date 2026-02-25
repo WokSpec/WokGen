@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  try {
   const spec = {
     openapi: '3.1.0',
     info: {
@@ -644,4 +647,8 @@ export async function GET() {
   return NextResponse.json(spec, {
     headers: { 'Access-Control-Allow-Origin': '*' },
   });
+  } catch (err) {
+    log.error({ err }, 'GET /api/openapi failed');
+    return API_ERRORS.INTERNAL();
+  }
 }

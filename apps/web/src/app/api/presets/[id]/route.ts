@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,14 +11,19 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const preset = await prisma.generationPreset.findUnique({ where: { id: params.id } });
-  if (!preset || preset.userId !== session.user.id) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    const preset = await dbQuery(prisma.generationPreset.findUnique({ where: { id: params.id } }));
+    if (!preset || preset.userId !== session.user.id) {
+      return API_ERRORS.NOT_FOUND('Preset');
+    }
+
+    await dbQuery(prisma.generationPreset.delete({ where: { id: params.id } }));
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    log.error({ err }, 'DELETE /api/presets/[id] failed');
+    return API_ERRORS.INTERNAL();
   }
-
-  await prisma.generationPreset.delete({ where: { id: params.id } });
-  return NextResponse.json({ ok: true });
 }

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
 import { z } from 'zod';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,41 +19,51 @@ const CreatePresetSchema = z.object({
 
 // GET /api/presets — list user's generation presets
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const presets = await prisma.generationPreset.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: 'desc' },
-    take: MAX_PRESETS,
-  });
+    const presets = await dbQuery(prisma.generationPreset.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: 'desc' },
+      take: MAX_PRESETS,
+    }));
 
-  return NextResponse.json({ presets });
+    return NextResponse.json({ presets });
+  } catch (err) {
+    log.error({ err }, 'GET /api/presets failed');
+    return API_ERRORS.INTERNAL();
+  }
 }
 
 // POST /api/presets — create a generation preset
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const count = await prisma.generationPreset.count({ where: { userId: session.user.id } });
-  if (count >= MAX_PRESETS) {
-    return NextResponse.json({ error: `Maximum ${MAX_PRESETS} presets allowed.` }, { status: 400 });
+    const count = await dbQuery(prisma.generationPreset.count({ where: { userId: session.user.id } }));
+    if (count >= MAX_PRESETS) {
+      return API_ERRORS.BAD_REQUEST(`Maximum ${MAX_PRESETS} presets allowed.`);
+    }
+
+    let body: unknown;
+    try { body = await req.json(); } catch { return API_ERRORS.BAD_REQUEST('Invalid JSON'); }
+
+    const parsed = CreatePresetSchema.safeParse(body);
+    if (!parsed.success) {
+      return API_ERRORS.BAD_REQUEST(parsed.error.issues[0]?.message ?? 'Invalid request.');
+    }
+
+    const { name, mode, prompt, params, brandKitId } = parsed.data;
+
+    const preset = await dbQuery(prisma.generationPreset.create({
+      data: { userId: session.user.id, name, mode, prompt, params: params ? JSON.parse(JSON.stringify(params)) : undefined, brandKitId: brandKitId ?? undefined },
+    }));
+
+    return NextResponse.json({ preset }, { status: 201 });
+  } catch (err) {
+    log.error({ err }, 'POST /api/presets failed');
+    return API_ERRORS.INTERNAL();
   }
-
-  const body = await req.json().catch(() => null);
-  if (!body) return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
-
-  const parsed = CreatePresetSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid request.' }, { status: 400 });
-  }
-
-  const { name, mode, prompt, params, brandKitId } = parsed.data;
-
-  const preset = await prisma.generationPreset.create({
-    data: { userId: session.user.id, name, mode, prompt, params: params ? JSON.parse(JSON.stringify(params)) : undefined, brandKitId: brandKitId ?? undefined },
-  });
-
-  return NextResponse.json({ preset }, { status: 201 });
 }

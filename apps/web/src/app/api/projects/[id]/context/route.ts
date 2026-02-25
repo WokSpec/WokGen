@@ -1,32 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 
 // GET /api/projects/[id]/context — returns project brief + brand kit for studio context injection
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const [brief, brandKit, project] = await Promise.all([
-    prisma.projectBrief.findUnique({ where: { projectId: params.id } }),
-    prisma.brandKit.findFirst({ where: { projectId: params.id, userId: session.user.id } }),
-    prisma.project.findFirst({
-      where: { id: params.id, userId: session.user.id },
-      select: { name: true },
-    }),
-  ]);
+    const [brief, brandKit, project] = await Promise.all([
+      dbQuery(prisma.projectBrief.findUnique({ where: { projectId: params.id } })),
+      dbQuery(prisma.brandKit.findFirst({ where: { projectId: params.id, userId: session.user.id } })),
+      dbQuery(prisma.project.findFirst({
+        where:  { id: params.id, userId: session.user.id },
+        select: { name: true },
+      })),
+    ]);
 
-  if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    if (!project) return API_ERRORS.NOT_FOUND('Project');
 
-  return NextResponse.json({
-    projectName:  project.name,
-    projectType:  brief?.projectType ?? null,
-    artStyle:     brief?.artStyle ?? null,
-    brandName:    brief?.brandName ?? null,
-    briefContent: brief?.content?.slice(0, 600) ?? null,
-    palette:      brandKit?.paletteJson ? JSON.parse(brandKit.paletteJson) : null,
-    primaryColor: brandKit?.paletteJson
-      ? (JSON.parse(brandKit.paletteJson)[0] as { hex?: string })?.hex ?? null
-      : null,
-  });
+    let palette: unknown = null;
+    let primaryColor: string | null = null;
+    if (brandKit?.paletteJson) {
+      try {
+        const parsed = JSON.parse(brandKit.paletteJson) as Array<{ hex?: string }>;
+        palette = parsed;
+        primaryColor = parsed[0]?.hex ?? null;
+      } catch { /* malformed palette — ignore */ }
+    }
+
+    return NextResponse.json({
+      projectName:  project.name,
+      projectType:  brief?.projectType ?? null,
+      artStyle:     brief?.artStyle ?? null,
+      brandName:    brief?.brandName ?? null,
+      briefContent: brief?.content?.slice(0, 600) ?? null,
+      palette,
+      primaryColor,
+    });
+  } catch (err) {
+    log.error({ err, projectId: params.id }, 'GET /api/projects/[id]/context failed');
+    return API_ERRORS.INTERNAL();
+  }
 }

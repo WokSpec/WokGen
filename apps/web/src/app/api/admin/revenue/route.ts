@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,8 +22,9 @@ const PLAN_PRICE_CENTS: Record<string, number> = {
 // Returns MRR estimate from active subscriptions.
 // ---------------------------------------------------------------------------
 export async function GET() {
+  try {
   const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
   if (!ADMIN_EMAIL || session.user.email !== ADMIN_EMAIL) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -29,13 +32,13 @@ export async function GET() {
   const now = new Date();
 
   // Active subscriptions (not expired)
-  const subs = await prisma.subscription.findMany({
+  const subs = await dbQuery(prisma.subscription.findMany({
     where: {
       planId:          { not: 'free' },
       currentPeriodEnd: { gte: now },
     },
     select: { planId: true },
-  });
+  }));
 
   let mrr = 0;
   const byPlan: Record<string, { count: number; revenue: number }> = {};
@@ -54,4 +57,8 @@ export async function GET() {
     byPlan,
     generatedAt: now.toISOString(),
   });
+  } catch (err) {
+    log.error({ err }, 'GET /api/admin/revenue failed');
+    return API_ERRORS.INTERNAL();
+  }
 }

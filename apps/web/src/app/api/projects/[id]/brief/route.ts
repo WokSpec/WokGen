@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
 import { auth } from '@/lib/auth';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // GET   /api/projects/[id]/brief   — get project brief
@@ -12,14 +14,19 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const project = await prisma.project.findFirst({ where: { id: params.id, userId: session.user.id } });
-  if (!project) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
+    const project = await dbQuery(prisma.project.findFirst({ where: { id: params.id, userId: session.user.id } }));
+    if (!project) return API_ERRORS.NOT_FOUND('Project');
 
-  const brief = await prisma.projectBrief.findUnique({ where: { projectId: params.id } });
-  return NextResponse.json({ brief: brief ?? null });
+    const brief = await dbQuery(prisma.projectBrief.findUnique({ where: { projectId: params.id } }));
+    return NextResponse.json({ brief: brief ?? null });
+  } catch (err) {
+    log.error({ err }, 'GET /api/projects/[id]/brief failed');
+    return API_ERRORS.INTERNAL();
+  }
 }
 
 export async function PUT(
@@ -37,34 +44,41 @@ export async function PATCH(
 }
 
 async function upsertBrief(req: NextRequest, projectId: string, partial: boolean) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const project = await prisma.project.findFirst({ where: { id: projectId, userId: session.user.id } });
-  if (!project) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
+    const project = await dbQuery(prisma.project.findFirst({ where: { id: projectId, userId: session.user.id } }));
+    if (!project) return API_ERRORS.NOT_FOUND('Project');
 
-  const body = await req.json().catch(() => ({}));
-  const {
-    genre, artStyle, paletteJson, moodBoard,
-    brandName, industry, colorHex, styleGuide, pinnedStyle,
-  } = body;
+    let rawBody: unknown;
+    try { rawBody = await req.json(); } catch { return API_ERRORS.BAD_REQUEST('Invalid JSON'); }
+    const body = rawBody as Record<string, unknown>;
+    const {
+      genre, artStyle, paletteJson, moodBoard,
+      brandName, industry, colorHex, styleGuide, pinnedStyle,
+    } = body;
 
-  const data: Record<string, unknown> = {};
-  if (!partial || genre        !== undefined) data.genre        = genre        ?? null;
-  if (!partial || artStyle     !== undefined) data.artStyle     = artStyle     ?? null;
-  if (!partial || paletteJson  !== undefined) data.paletteJson  = paletteJson  !== undefined ? JSON.stringify(paletteJson) : null;
-  if (!partial || moodBoard    !== undefined) data.moodBoard    = moodBoard    !== undefined ? JSON.stringify(moodBoard)   : null;
-  if (!partial || brandName    !== undefined) data.brandName    = brandName    ?? null;
-  if (!partial || industry     !== undefined) data.industry     = industry     ?? null;
-  if (!partial || colorHex     !== undefined) data.colorHex     = colorHex     ?? null;
-  if (!partial || styleGuide   !== undefined) data.styleGuide   = styleGuide   ?? null;
-  if (!partial || pinnedStyle  !== undefined) data.pinnedStyle  = pinnedStyle  !== undefined ? JSON.stringify(pinnedStyle) : null;
+    const data: Record<string, unknown> = {};
+    if (!partial || genre        !== undefined) data.genre        = genre        ?? null;
+    if (!partial || artStyle     !== undefined) data.artStyle     = artStyle     ?? null;
+    if (!partial || paletteJson  !== undefined) data.paletteJson  = paletteJson  !== undefined ? JSON.stringify(paletteJson) : null;
+    if (!partial || moodBoard    !== undefined) data.moodBoard    = moodBoard    !== undefined ? JSON.stringify(moodBoard)   : null;
+    if (!partial || brandName    !== undefined) data.brandName    = brandName    ?? null;
+    if (!partial || industry     !== undefined) data.industry     = industry     ?? null;
+    if (!partial || colorHex     !== undefined) data.colorHex     = colorHex     ?? null;
+    if (!partial || styleGuide   !== undefined) data.styleGuide   = styleGuide   ?? null;
+    if (!partial || pinnedStyle  !== undefined) data.pinnedStyle  = pinnedStyle  !== undefined ? JSON.stringify(pinnedStyle) : null;
 
-  const brief = await prisma.projectBrief.upsert({
-    where:  { projectId },
-    create: { projectId, ...data },
-    update: data,
-  });
+    const brief = await dbQuery(prisma.projectBrief.upsert({
+      where:  { projectId },
+      create: { projectId, ...data },
+      update: data,
+    }));
 
-  return NextResponse.json({ brief });
+    return NextResponse.json({ brief });
+  } catch (err) {
+    log.error({ err }, `${partial ? 'PATCH' : 'PUT'} /api/projects/[id]/brief failed`);
+    return API_ERRORS.INTERNAL();
+  }
 }

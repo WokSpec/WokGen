@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 import { requireAdmin, isAdminResponse } from '@/lib/admin';
 
 export const dynamic = 'force-dynamic';
@@ -14,6 +16,7 @@ export const dynamic = 'force-dynamic';
 //   search?  string  email prefix search
 // ---------------------------------------------------------------------------
 export async function GET(req: NextRequest) {
+  try {
   const adminResult = await requireAdmin();
   if (isAdminResponse(adminResult)) return adminResult;
 
@@ -24,7 +27,7 @@ export async function GET(req: NextRequest) {
   const search = searchParams.get('search') ?? undefined;
 
   // Fetch users with their subscription plan and job count
-  const users = await prisma.user.findMany({
+  const users = await dbQuery(prisma.user.findMany({
     take: limit,
     skip: offset,
     orderBy: { createdAt: 'desc' },
@@ -46,7 +49,7 @@ export async function GET(req: NextRequest) {
         select: { createdAt: true },
       },
     },
-  });
+  }));
 
   const rows = users
     .filter(u => !plan || (u.subscription?.planId ?? 'free') === plan)
@@ -61,4 +64,8 @@ export async function GET(req: NextRequest) {
     }));
 
   return NextResponse.json({ users: rows, total: rows.length });
+  } catch (err) {
+    log.error({ err }, 'GET /api/admin/users failed');
+    return API_ERRORS.INTERNAL();
+  }
 }

@@ -10,7 +10,8 @@ import { checkRateLimit } from '@/lib/rate-limit';
 import { checkSsrf } from '@/lib/ssrf-check';
 import { z } from 'zod';
 import { validateBody } from '@/lib/validate';
-import { withErrorHandler } from '@/lib/api-handler';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 
 const VectorizeSchema = z.object({
   imageUrl:    z.string().url('Must be a valid URL').optional(),
@@ -20,11 +21,12 @@ const VectorizeSchema = z.object({
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-export const POST = withErrorHandler(async (req) => {
+export async function POST(req: NextRequest) {
+  try {
   // Auth check
   const session = await auth();
   if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    return API_ERRORS.UNAUTHORIZED();
   }
 
   // Rate limit: 20 vectorizations per hour per user
@@ -102,4 +104,8 @@ export const POST = withErrorHandler(async (req) => {
 
   const svgContent = await vecRes.text();
   return NextResponse.json({ svg: svgContent, contentType: 'image/svg+xml' });
-});
+  } catch (err) {
+    log.error({ err }, 'POST /api/tools/vectorize failed');
+    return API_ERRORS.INTERNAL();
+  }
+}

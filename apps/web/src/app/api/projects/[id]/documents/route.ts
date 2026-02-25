@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 import { z } from 'zod';
 
 // ---------------------------------------------------------------------------
@@ -8,73 +10,88 @@ import { z } from 'zod';
 // POST /api/projects/[id]/documents — create a new document
 // ---------------------------------------------------------------------------
 
+const MAX_DOCS_PER_PROJECT = 100;
+
 const CreateSchema = z.object({
   title:    z.string().min(1).max(200).default('Untitled'),
   template: z.enum(['gdd', 'brand', 'content', 'spec', 'release']).nullable().optional(),
-  content:  z.string().max(500000).optional(),
+  content:  z.string().max(500_000).optional(),
 });
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const project = await prisma.project.findFirst({
-    where: { id: params.id, userId: session.user.id },
-    select: { id: true },
-  });
-  if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    const project = await dbQuery(prisma.project.findFirst({
+      where: { id: params.id, userId: session.user.id },
+      select: { id: true },
+    }));
+    if (!project) return API_ERRORS.NOT_FOUND('Project');
 
-  const docs = await prisma.document.findMany({
-    where: { projectId: params.id },
-    orderBy: { updatedAt: 'desc' },
-    select: { id: true, title: true, template: true, emoji: true, createdAt: true, updatedAt: true },
-  });
+    const docs = await dbQuery(prisma.document.findMany({
+      where:   { projectId: params.id, userId: session.user.id },
+      orderBy: { updatedAt: 'desc' },
+      select:  { id: true, title: true, template: true, createdAt: true, updatedAt: true },
+    }));
 
-  return NextResponse.json({ documents: docs });
+    return NextResponse.json({ documents: docs });
+  } catch (err) {
+    log.error({ err, projectId: params.id }, 'GET /api/projects/[id]/documents failed');
+    return API_ERRORS.INTERNAL();
+  }
 }
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const project = await prisma.project.findFirst({
-    where: { id: params.id, userId: session.user.id },
-    select: { id: true },
-  });
-  if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    const project = await dbQuery(prisma.project.findFirst({
+      where: { id: params.id, userId: session.user.id },
+      select: { id: true },
+    }));
+    if (!project) return API_ERRORS.NOT_FOUND('Project');
 
-  const body = await req.json().catch(() => ({}));
-  const parsed = CreateSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    // Enforce document limit
+    const count = await dbQuery(prisma.document.count({
+      where: { projectId: params.id, userId: session.user.id },
+    }));
+    if (count >= MAX_DOCS_PER_PROJECT) {
+      return API_ERRORS.BAD_REQUEST(`Document limit of ${MAX_DOCS_PER_PROJECT} per project reached`);
+    }
 
-  const { title, template, content } = parsed.data;
-  const starterContent = content ?? getTemplateContent(template ?? null);
+    let body: unknown;
+    try { body = await req.json(); } catch { return API_ERRORS.BAD_REQUEST('Invalid JSON'); }
 
-  const doc = await prisma.document.create({
-    data: {
-      projectId: params.id,
-      userId: session.user.id,
-      title,
-      template: template ?? null,
-      content: starterContent,
-      emoji: getTemplateEmoji(template ?? null),
-    },
-  });
+    const parsed = CreateSchema.safeParse(body);
+    if (!parsed.success) return API_ERRORS.VALIDATION(parsed.error.issues[0]?.message ?? 'Invalid request');
 
-  return NextResponse.json({ document: doc }, { status: 201 });
-}
+    const { title, template, content } = parsed.data;
+    const starterContent = content ?? getTemplateContent(template ?? null);
 
-function getTemplateEmoji(template: string | null): string {
-  const map: Record<string, string> = {
-    gdd: '📋', brand: '🎨', content: '📅', spec: '⚙️', release: '🚀',
-  };
-  return map[template ?? ''] ?? '📄';
+    const doc = await dbQuery(prisma.document.create({
+      data: {
+        projectId: params.id,
+        userId:    session.user.id,
+        title,
+        template:  template ?? null,
+        content:   starterContent,
+      },
+      select: { id: true, title: true, template: true, createdAt: true, updatedAt: true },
+    }));
+
+    return NextResponse.json({ document: doc }, { status: 201 });
+  } catch (err) {
+    log.error({ err, projectId: params.id }, 'POST /api/projects/[id]/documents failed');
+    return API_ERRORS.INTERNAL();
+  }
 }
 
 function getTemplateContent(template: string | null): string {

@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 import { requireAdmin, isAdminResponse } from '@/lib/admin';
 import { cache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  try {
   // Guard: must be authenticated and admin
   const adminResult = await requireAdmin();
   if (isAdminResponse(adminResult)) return adminResult;
@@ -30,7 +33,7 @@ export async function GET() {
     standardJobs,
     recentJobs,
     providerFailures,
-  ] = await Promise.all([
+  ] = await dbQuery(Promise.all([
     prisma.user.count(),
     prisma.job.groupBy({
       by: ['userId'],
@@ -57,7 +60,7 @@ export async function GET() {
       where: { status: 'failed', createdAt: { gte: since24h } },
       _count: true,
     }),
-  ]);
+  ]));
 
   const byPlan: Record<string, number> = {};
   for (const row of planCounts) {
@@ -108,4 +111,8 @@ export async function GET() {
   };
   await cache.set(CACHE_KEY, responseBody, 300); // 5 min TTL
   return NextResponse.json(responseBody);
+  } catch (err) {
+    log.error({ err }, 'GET /api/admin/stats failed');
+    return API_ERRORS.INTERNAL();
+  }
 }

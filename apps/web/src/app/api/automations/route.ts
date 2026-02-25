@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import { prisma, dbQuery } from '@/lib/db';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 import { z } from 'zod';
 import { checkSsrf } from '@/lib/ssrf-check';
 
@@ -30,60 +32,70 @@ const CreateAutomationSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const limit = Math.min(Number(req.nextUrl.searchParams.get('limit') ?? '20'), 50);
+    const limit = Math.min(Number(req.nextUrl.searchParams.get('limit') ?? '20'), 50);
 
-  const automations = await prisma.automation.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: 'desc' },
-    take: limit,
-  });
+    const automations = await dbQuery(prisma.automation.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    }));
 
-  return NextResponse.json({ automations });
+    return NextResponse.json({ automations });
+  } catch (err) {
+    log.error({ err }, 'GET /api/automations failed');
+    return API_ERRORS.INTERNAL();
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
-  const rawBody = await req.json().catch(() => null);
-  if (!rawBody) return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
+    let rawBody: unknown;
+    try { rawBody = await req.json(); } catch { return API_ERRORS.BAD_REQUEST('Invalid JSON'); }
 
-  const parsed = CreateAutomationSchema.safeParse(rawBody);
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid request body.' }, { status: 400 });
-  }
-
-  const { name, schedule, targetType, targetValue, messageTemplate } = parsed.data;
-
-  if (!isValidCron(schedule)) return NextResponse.json({ error: 'Invalid cron expression' }, { status: 400 });
-
-  if (targetType === 'webhook' && targetValue) {
-    const ssrf = checkSsrf(targetValue, true);
-    if (!ssrf.ok) {
-      return NextResponse.json({ error: `Invalid webhook URL: ${ssrf.reason}` }, { status: 400 });
+    const parsed = CreateAutomationSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return API_ERRORS.BAD_REQUEST(parsed.error.issues[0]?.message ?? 'Invalid request body.');
     }
+
+    const { name, schedule, targetType, targetValue, messageTemplate } = parsed.data;
+
+    if (!isValidCron(schedule)) return API_ERRORS.BAD_REQUEST('Invalid cron expression');
+
+    if (targetType === 'webhook' && targetValue) {
+      const ssrf = checkSsrf(targetValue, true);
+      if (!ssrf.ok) {
+        return API_ERRORS.BAD_REQUEST(`Invalid webhook URL: ${ssrf.reason}`);
+      }
+    }
+
+    // Enforce per-user limit
+    const count = await dbQuery(prisma.automation.count({ where: { userId: session.user.id } }));
+    if (count >= MAX_AUTOMATIONS) {
+      return API_ERRORS.BAD_REQUEST(`Max ${MAX_AUTOMATIONS} automations per account`);
+    }
+
+    const automation = await dbQuery(prisma.automation.create({
+      data: {
+        userId:          session.user.id,
+        name:            name.trim(),
+        schedule:        schedule.trim(),
+        targetType:      targetType ?? 'email',
+        targetValue:     targetValue?.trim() || null,
+        messageTemplate: messageTemplate.trim(),
+        enabled:         true,
+      },
+    }));
+
+    return NextResponse.json({ automation }, { status: 201 });
+  } catch (err) {
+    log.error({ err }, 'POST /api/automations failed');
+    return API_ERRORS.INTERNAL();
   }
-
-  // Enforce per-user limit
-  const count = await prisma.automation.count({ where: { userId: session.user.id } });
-  if (count >= MAX_AUTOMATIONS) {
-    return NextResponse.json({ error: `Max ${MAX_AUTOMATIONS} automations per account` }, { status: 400 });
-  }
-
-  const automation = await prisma.automation.create({
-    data: {
-      userId:          session.user.id,
-      name:            name.trim(),
-      schedule:        schedule.trim(),
-      targetType:      targetType ?? 'email',
-      targetValue:     targetValue?.trim() || null,
-      messageTemplate: messageTemplate.trim(),
-      enabled:         true,
-    },
-  });
-
-  return NextResponse.json({ automation }, { status: 201 });
 }

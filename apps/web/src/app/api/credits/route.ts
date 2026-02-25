@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
-import { withErrorHandler } from '@/lib/api-handler';
+import { prisma, dbQuery } from '@/lib/db';
+import { API_ERRORS } from '@/lib/api-response';
+import { log } from '@/lib/logger';
 
 /**
  * GET /api/credits
@@ -9,19 +10,20 @@ import { withErrorHandler } from '@/lib/api-handler';
  * Returns the authenticated user's full credit balance + plan info.
  * Used by the account dashboard and studio credit widget.
  */
-export const GET = withErrorHandler(async () => {
+export async function GET() {
+  try {
   const session = await auth();
   if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    return API_ERRORS.UNAUTHORIZED();
   }
 
-  const [user, subscription] = await Promise.all([
+  const [user, subscription] = await dbQuery(Promise.all([
     prisma.user.findUnique({ where: { id: session.user.id } }),
     prisma.subscription.findUnique({
       where:   { userId: session.user.id },
       include: { plan: true },
     }),
-  ]);
+  ]));
 
   const plan             = subscription?.plan;
   const monthlyAlloc     = plan?.creditsPerMonth ?? 0;
@@ -40,4 +42,8 @@ export const GET = withErrorHandler(async () => {
     periodEnd:         subscription?.currentPeriodEnd?.toISOString() ?? null,
     stripeCustomerId:  subscription?.stripeCustomerId ?? null,
   });
-});
+  } catch (err) {
+    log.error({ err }, 'GET /api/credits failed');
+    return API_ERRORS.INTERNAL();
+  }
+}

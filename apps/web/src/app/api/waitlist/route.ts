@@ -17,23 +17,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
   }
 
-  // Store as a simple GalleryAsset or custom model — use a workaround: store in a
-  // dedicated table via raw SQL if the WaitlistEntry model doesn't exist yet,
-  // otherwise fall back to logging only (schema migration needed).
   try {
-    // Try to upsert into WaitlistEntry if model exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = prisma as any;
-    if (db.waitlistEntry) {
-      await db.waitlistEntry.upsert({
-        where: { email },
-        update: { mode, updatedAt: new Date() },
-        create: { email, mode, createdAt: new Date(), updatedAt: new Date() },
-      });
-    }
-  } catch {
-    // Table may not exist yet — log and continue (non-fatal)
-    logger.info({ email, mode }, '[waitlist] signup');
+    // Use raw SQL so this works before/after prisma generate.
+    // The WaitlistEntry table is defined in schema.prisma and created on `prisma db push`.
+    await prisma.$executeRaw`
+      INSERT INTO "WaitlistEntry" (id, email, mode, "createdAt", "updatedAt")
+      VALUES (gen_random_uuid()::text, ${email}, ${mode ?? null}, now(), now())
+      ON CONFLICT (email) DO UPDATE SET mode = EXCLUDED.mode, "updatedAt" = now()
+    `;
+  } catch (err) {
+    logger.error({ email, mode, err }, '[waitlist] db error');
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

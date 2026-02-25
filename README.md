@@ -36,10 +36,28 @@ It is **not** a generic image generator. It is a purpose-built factory.
 | **Pixel** | Game sprites, tilesets, animations, HUD elements | ✅ Live |
 | **Business** | Logos, brand kits, slide visuals, banners | ✅ Live |
 | **UI/UX** | React/HTML components, landing pages, dashboards | ✅ Live |
-| **Vector** | SVG icons, illustration sets, design systems | 🔜 Soon |
-| **Emoji** | Emoji packs, sticker sets, platform reactions | 🔜 Soon |
-| **Voice** | AI voice generation | 🔜 Soon |
-| **Text** | LLM-powered text generation | 🔜 Soon |
+| **Vector** | SVG icons, illustration sets, design systems | ✅ Live |
+| **Emoji** | Emoji packs, sticker sets, platform reactions | ✅ Live |
+| **Voice** | AI voice generation (ElevenLabs, OpenAI TTS, HF Kokoro) | ✅ Live |
+| **Text** | LLM-powered text generation (Groq, Cerebras, Together) | ✅ Live |
+
+## Standalone Tools (no auth required)
+
+| Tool | Description |
+|------|-------------|
+| **Ideogram** | Text-to-image via Ideogram API |
+| **Recraft** | Icon & vector generation via Recraft API |
+| **Skybox** | 360° panorama / skybox generation (Blockade Labs) |
+| **Text-to-3D** | 3D model generation via Meshy |
+| **Transcribe** | Audio transcription via AssemblyAI |
+| **Vectorize** | Raster → SVG via Vectorizer.AI |
+| **BG Remove** | Background removal |
+| **Link Scraper** | Extract metadata / content from URLs (Firecrawl) |
+| **Media Downloader** | Download media from URLs |
+| **Favicon Extractor** | Extract favicons from any domain |
+| **OG Analyzer** | Preview Open Graph tags |
+| **Website Palette** | Extract color palettes from websites |
+| **Exa Search** | Semantic web search via Exa AI |
 
 ## Repository Layout
 

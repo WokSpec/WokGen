@@ -33,6 +33,19 @@ jobs:
       - name: Lint
         run: cd apps/web && npx eslint --max-warnings 0 'src/**/*.{ts,tsx}' || true
 
+  storybook:
+    name: Storybook Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - name: Build Storybook
+        run: cd apps/web && npm run build-storybook
+
   secret-scan:
     name: Secret Scan
     runs-on: ubuntu-latest

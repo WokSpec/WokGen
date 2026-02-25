@@ -33,6 +33,9 @@ pnpm-debug.log*
 # Vercel
 .vercel
 
+# Storybook
+storybook-static/
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts

@@ -35,7 +35,7 @@
     "@tiptap/starter-kit": "^2.10.4",
     "@auth/prisma-adapter": "^2.11.1",
     "@aws-sdk/client-s3": "^3.995.0",
-    "@aws-sdk/s3-presigned-post": "^3.995.0",
+    "@aws-sdk/s3-presigned-post": "^3.997.0",
     "@aws-sdk/s3-request-presigner": "^3.995.0",
     "@huggingface/inference": "^4.13.12",
     "@imgly/background-removal": "^1.7.0",

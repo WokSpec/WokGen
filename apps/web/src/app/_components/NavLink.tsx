@@ -22,6 +22,7 @@ export function NavLink({
       target={external ? '_blank' : undefined}
       rel={external ? 'noopener noreferrer' : undefined}
       className={`nav-link ${active ? 'nav-link-active' : ''}`}
+      aria-current={active ? 'page' : undefined}
     >
       {children}
     </Link>

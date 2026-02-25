@@ -255,6 +255,7 @@ export function NavAuth() {
           display: flex; align-items: center; gap: 0.4rem;
           background: none; border: 1px solid transparent; border-radius: 6px;
           padding: 0.2rem 0.4rem 0.2rem 0.25rem;
+          min-height: 44px;
           cursor: pointer; transition: border-color 0.12s, background 0.12s;
           color: var(--text-muted, #888);
         }
@@ -308,6 +309,7 @@ export function NavAuth() {
         .nav-user-item {
           display: flex; align-items: center; gap: 0.5rem;
           padding: 0.5rem 0.875rem; font-size: 0.82rem;
+          min-height: 44px;
           color: var(--text-muted, #888); text-decoration: none;
           background: none; border: none; text-align: left; cursor: pointer; width: 100%;
           transition: background 0.1s, color 0.1s;

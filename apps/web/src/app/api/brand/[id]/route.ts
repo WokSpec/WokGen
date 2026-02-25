@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
 import { cache } from '@/lib/cache';
+import { withErrorHandler } from '@/lib/api-handler';
 
 // ---------------------------------------------------------------------------
 // GET    /api/brand/[id]   — get one kit
@@ -13,24 +14,20 @@ async function getKit(id: string, userId: string) {
   return prisma.brandKit.findFirst({ where: { id, userId } });
 }
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export const GET = withErrorHandler(async (_req: NextRequest, ctx) => {
+  const id = ctx?.params?.id ?? '';
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
-  const kit = await getKit(params.id, session.user.id);
+  const kit = await getKit(id, session.user.id);
   if (!kit) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
   return NextResponse.json({ kit });
-}
+});
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export const PATCH = withErrorHandler(async (req: NextRequest, ctx) => {
+  const id = ctx?.params?.id ?? '';
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
-  const existing = await getKit(params.id, session.user.id);
+  const existing = await getKit(id, session.user.id);
   if (!existing) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
 
   const body = await req.json().catch(() => ({}));
@@ -45,20 +42,18 @@ export async function PATCH(
   if (mood        !== undefined) data.mood        = mood;
   if (projectId   !== undefined) data.projectId   = projectId;
 
-  const kit = await prisma.brandKit.update({ where: { id: params.id }, data });
+  const kit = await prisma.brandKit.update({ where: { id }, data });
   await cache.del(`brand:${session.user.id}`);
   return NextResponse.json({ kit });
-}
+});
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export const DELETE = withErrorHandler(async (_req: NextRequest, ctx) => {
+  const id = ctx?.params?.id ?? '';
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
-  const existing = await getKit(params.id, session.user.id);
+  const existing = await getKit(id, session.user.id);
   if (!existing) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
-  await prisma.brandKit.delete({ where: { id: params.id } });
+  await prisma.brandKit.delete({ where: { id } });
   await cache.del(`brand:${session.user.id}`);
   return NextResponse.json({ ok: true });
-}
+});

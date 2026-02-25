@@ -91,6 +91,7 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               className={`mobile-nav-item${pathname === item.href || pathname?.startsWith(item.href + '/') ? ' mobile-nav-item--active' : ''}`}
+              onClick={() => setOpen(false)}
             >
               {item.label}
             </Link>
@@ -109,13 +110,14 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               className={`mobile-nav-item${pathname === item.href || pathname?.startsWith(item.href + '/') ? ' mobile-nav-item--active' : ''}`}
+              onClick={() => setOpen(false)}
             >
               {item.label}
             </Link>
           ))}
 
           <div className="mobile-nav-section-divider" />
-          <Link href="/support" className="mobile-nav-item">Support</Link>
+          <Link href="/support" className="mobile-nav-item" onClick={() => setOpen(false)}>Support</Link>
         </nav>
 
         <div className="mobile-nav-drawer-footer">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { withErrorHandler } from '@/lib/api-handler';
 
 // ---------------------------------------------------------------------------
 // PATCH  /api/automations/[id]  — update automation (name, enabled, template…)
@@ -16,11 +17,12 @@ async function guardOwner(id: string, userId: string) {
   return auto;
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export const PATCH = withErrorHandler(async (req: NextRequest, ctx) => {
+  const id = ctx?.params?.id ?? '';
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const auto = await guardOwner(params.id, session.user.id);
+  const auto = await guardOwner(id, session.user.id);
   if (!auto) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const body = await req.json().catch(() => ({}));
@@ -33,17 +35,18 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (typeof body.targetValue     === 'string')  data.targetValue     = body.targetValue || null;
   if (typeof body.messageTemplate === 'string')  data.messageTemplate = body.messageTemplate.trim();
 
-  const updated = await prisma.automation.update({ where: { id: params.id }, data });
+  const updated = await prisma.automation.update({ where: { id }, data });
   return NextResponse.json({ automation: updated });
-}
+});
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export const DELETE = withErrorHandler(async (_req: NextRequest, ctx) => {
+  const id = ctx?.params?.id ?? '';
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const auto = await guardOwner(params.id, session.user.id);
+  const auto = await guardOwner(id, session.user.id);
   if (!auto) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  await prisma.automation.delete({ where: { id: params.id } });
+  await prisma.automation.delete({ where: { id } });
   return NextResponse.json({ ok: true });
-}
+});

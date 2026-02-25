@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withErrorHandler } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -9,11 +10,11 @@ export const dynamic = 'force-dynamic';
 // Returns a single public gallery asset by ID.
 // Used for /community/[id] shareable asset pages.
 // ---------------------------------------------------------------------------
-export async function GET(
+export const GET = withErrorHandler(async (
   _req: NextRequest,
-  { params }: { params: { id: string } },
-) {
-  const { id } = params;
+  ctx,
+) => {
+  const id = ctx?.params?.id ?? '';
 
   if (!id) {
     return NextResponse.json({ error: 'Asset ID is required' }, { status: 400 });
@@ -50,4 +51,4 @@ export async function GET(
   }, {
     headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate=600' },
   });
-}
+});

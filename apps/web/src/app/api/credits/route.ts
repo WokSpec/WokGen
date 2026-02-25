@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { withErrorHandler } from '@/lib/api-handler';
 
 /**
  * GET /api/credits
@@ -8,7 +9,7 @@ import { prisma } from '@/lib/db';
  * Returns the authenticated user's full credit balance + plan info.
  * Used by the account dashboard and studio credit widget.
  */
-export async function GET() {
+export const GET = withErrorHandler(async () => {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -39,4 +40,4 @@ export async function GET() {
     periodEnd:         subscription?.currentPeriodEnd?.toISOString() ?? null,
     stripeCustomerId:  subscription?.stripeCustomerId ?? null,
   });
-}
+});

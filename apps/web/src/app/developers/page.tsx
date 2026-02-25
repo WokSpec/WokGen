@@ -64,21 +64,25 @@ export default function DevelopersPage() {
 
       {/* SDK */}
       <section style={{ marginBottom: '3rem' }}>
-        <h2 style={{ fontSize: '1.375rem', fontWeight: 700, marginBottom: '0.5rem' }}>WokSDK</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', fontSize: '0.9375rem' }}>TypeScript-first client for WokAPI. Works in Node.js, browser, and edge runtimes. Generate your API key at <Link href="/account/api-keys" style={{ color: '#a78bfa' }}>account/api-keys</Link>.</p>
-        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '10px', padding: '1.25rem 1.5rem', fontFamily: 'monospace', fontSize: '0.875rem', lineHeight: 1.9, overflowX: 'auto' }}>
-          <div style={{ color: 'var(--text-muted)', marginBottom: '0.25rem' }}>{`// Install: npm install @wokspec/sdk`}</div>
-          <div><span style={{ color: '#60a5fa' }}>import</span> {`{ WokGen }`} <span style={{ color: '#60a5fa' }}>from</span> <span style={{ color: '#a78bfa' }}>&apos;@wokspec/sdk&apos;</span>;</div>
+        <h2 style={{ fontSize: '1.375rem', fontWeight: 700, marginBottom: '0.5rem' }}>TypeScript SDK</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', fontSize: '0.9375rem' }}>
+          Zero-dependency TypeScript SDK. Works in Node.js, Deno, and modern browsers.{' '}
+          <a href="/sdk/wokgen.ts" download style={{ color: '#a78bfa' }}>Download wokgen.ts</a>
+          {' '}or use the v1 REST API directly.
+        </p>
+        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '4px', padding: '1.25rem 1.5rem', fontFamily: 'monospace', fontSize: '0.875rem', lineHeight: 1.9, overflowX: 'auto' }}>
+          <div style={{ color: 'var(--text-muted)', marginBottom: '0.25rem' }}>{`// Copy wokgen.ts into your project (no npm install needed)`}</div>
+          <div><span style={{ color: '#60a5fa' }}>import</span> {`{ WokGenClient }`} <span style={{ color: '#60a5fa' }}>from</span> <span style={{ color: '#a78bfa' }}>&apos;./wokgen&apos;</span>;</div>
           <br />
-          <div><span style={{ color: '#60a5fa' }}>const</span> wok = <span style={{ color: '#60a5fa' }}>new</span> <span style={{ color: '#34d399' }}>WokGen</span>({`{ apiKey: 'wok_your_key_here' }`});</div>
+          <div><span style={{ color: '#60a5fa' }}>const</span> client = <span style={{ color: '#60a5fa' }}>new</span> <span style={{ color: '#34d399' }}>WokGenClient</span>({`{ apiKey: 'wok_your_key_here' }`});</div>
           <br />
-          <div><span style={{ color: '#60a5fa' }}>const</span> asset = <span style={{ color: '#60a5fa' }}>await</span> wok.<span style={{ color: '#34d399' }}>generate</span>({`{`}</div>
-          <div style={{ paddingLeft: '1.5rem' }}>prompt: <span style={{ color: '#a78bfa' }}>&apos;a pixel art spaceship in space&apos;</span>,</div>
+          <div><span style={{ color: '#60a5fa' }}>const</span> result = <span style={{ color: '#60a5fa' }}>await</span> client.<span style={{ color: '#34d399' }}>generate</span>({`{`}</div>
+          <div style={{ paddingLeft: '1.5rem' }}>prompt: <span style={{ color: '#a78bfa' }}>&apos;pixel art spaceship, 32x32&apos;</span>,</div>
           <div style={{ paddingLeft: '1.5rem' }}>mode: <span style={{ color: '#a78bfa' }}>&apos;pixel&apos;</span>,</div>
-          <div style={{ paddingLeft: '1.5rem' }}>quality: <span style={{ color: '#a78bfa' }}>&apos;hd&apos;</span>,</div>
+          <div style={{ paddingLeft: '1.5rem' }}>size: <span style={{ color: '#f59e0b' }}>512</span>,</div>
           <div>{`})`};</div>
           <br />
-          <div style={{ color: 'var(--text-muted)' }}>{`console.log(asset.url); // https://...`}</div>
+          <div style={{ color: 'var(--text-muted)' }}>console.log(result.resultUrl); <span style={{ color: 'var(--text-faint, rgba(255,255,255,0.2))' }}>{`// https://cdn.wokgen.io/...`}</span></div>
         </div>
       </section>
 

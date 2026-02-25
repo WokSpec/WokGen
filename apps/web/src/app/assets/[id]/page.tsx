@@ -147,7 +147,7 @@ export default async function AssetPage({ params }: Props) {
             </a>
             <AssetShareButton shareUrl={shareUrl} />
             <a
-              href={`/pixel/studio?prompt=${encodeURIComponent(asset.prompt)}`}
+              href={`/studio?type=${asset.job?.mode?.split('_')[0] ?? 'pixel'}&prompt=${encodeURIComponent(asset.prompt)}`}
               className="btn btn--ghost"
             >
               ↻ Remix in Studio

@@ -187,7 +187,7 @@ export default function UnifiedStudioClient({ type }: Props) {
     <div className="wok-studio-shell">
       {/* ── Type rail ────────────────────────────────────────────────────── */}
       <nav className="wok-studio-rail" aria-label="Studio type">
-        <div className="wok-studio-rail__wordmark">WS</div>
+        <div className="wok-studio-rail__wordmark" title="WokGen Studio">WG</div>
         <div className="wok-studio-rail__items">
           {STUDIO_TYPES.map(({ id, abbr, label, description }) => (
             <button

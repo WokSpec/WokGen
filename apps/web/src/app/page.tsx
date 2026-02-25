@@ -20,68 +20,62 @@ export const metadata: Metadata = {
 const MODES = [
   {
     id: 'pixel',
-    label: 'Pixel',
+    label: 'Pixel Art',
     accent: '#a78bfa',
-    status: 'live' as const,
+    status: 'live',
     tagline: 'For game developers',
     highlights: ['Sprites & Characters', 'Tilesets & Scenes', 'GIF Animations'],
-    studioCta: '/pixel/studio',
   },
   {
     id: 'business',
-    label: 'Business',
+    label: 'Brand',
     accent: '#60a5fa',
-    status: 'live' as const,
+    status: 'live',
     tagline: 'For brands and teams',
     highlights: ['Brand Logos & Kits', 'Social Banners', 'Web Hero Images'],
-    studioCta: '/business/studio',
   },
   {
     id: 'vector',
     label: 'Vector',
     accent: '#34d399',
-    status: 'beta' as const,
+    status: 'live',
     tagline: 'For design systems',
     highlights: ['SVG Icon Packs', 'Illustration Sets', 'UI Kits'],
-    studioCta: '/vector/studio',
   },
   {
     id: 'uiux',
     label: 'UI/UX',
     accent: '#f472b6',
-    status: 'live' as const,
+    status: 'live',
     tagline: 'For product teams',
     highlights: ['React Components', 'Tailwind Sections', 'Page Templates'],
-    studioCta: '/uiux/studio',
   },
   {
     id: 'voice',
     label: 'Voice',
     accent: '#f59e0b',
-    status: 'beta' as const,
-    tagline: 'Speech & Audio Generation',
+    status: 'live',
+    tagline: 'Speech & Audio',
     highlights: ['Character Narration', 'Game NPC Dialogue', 'Podcast Intros'],
-    studioCta: '/voice/studio',
   },
   {
-    id: 'text',
-    label: 'Text',
+    id: 'code',
+    label: 'Code',
     accent: '#10b981',
-    status: 'beta' as const,
-    tagline: 'AI Copywriting Engine',
-    highlights: ['Brand Headlines', 'Blog Posts', 'Ad Copy'],
-    studioCta: '/text/studio',
+    status: 'live',
+    tagline: 'AI code generation',
+    highlights: ['React Components', 'SQL Queries', 'Documentation'],
   },
-] as const;
+];
 
 const TOOL_CATEGORIES = [
-  { icon: 'img', name: 'Image Tools',   count: 8, examples: ['Background Remover', 'Image Resizer', 'Format Converter'] },
-  { icon: 'dev', name: 'Dev Tools',      count: 6, examples: ['JSON Toolkit', 'CSS Generator', 'Color Palette'] },
-  { icon: 'game', name: 'Game Dev',       count: 5, examples: ['Sprite Packer', 'Tileset Slicer', 'Pixel Upscaler'] },
-  { icon: 'design', name: 'Design',         count: 5, examples: ['SVG Editor', 'Font Pairer', 'Gradient Builder'] },
-  { icon: 'crypto', name: 'Crypto / Web3',  count: 4, examples: ['NFT Metadata', 'QR Generator', 'Contract ABI'] },
-  { icon: 'audio', name: 'Audio',          count: 3, examples: ['Waveform Viewer', 'BPM Detector', 'Audio Trimmer'] },
-] as const;
+  { icon: 'img', name: 'Image Tools',     count: 12, examples: ['Background Remover', 'Image Resizer', 'Format Converter'] },
+  { icon: 'dev', name: 'Dev Tools',        count: 14, examples: ['JSON Toolkit', 'CSS Generator', 'Regex Tester'] },
+  { icon: 'game', name: 'Game Dev',         count: 8,  examples: ['Sprite Packer', 'Tilemap Builder', 'Asset Manifest'] },
+  { icon: 'design', name: 'Design',           count: 10, examples: ['Color Palette', 'Font Pairer', 'Gradient Builder'] },
+  { icon: 'text', name: 'Text & Business', count: 8,  examples: ['README Generator', 'Changelog Writer', 'Word Counter'] },
+  { icon: 'audio', name: 'Audio & Media',    count: 4,  examples: ['Waveform Viewer', 'Transcriber', 'Media Downloader'] },
+];
 
 export default function HomePage() {
   return (
@@ -98,19 +92,18 @@ export default function HomePage() {
         <div className="homepage-hero-inner">
           <div className="homepage-hero-eyebrow">
             <span className="homepage-eyebrow-dot" />
-            <span>AI asset generation platform</span>
+            <span>The AI platform for builders</span>
           </div>
           <h1 className="homepage-h1">
-            Build anything.<br />
-            <span className="gradient-text">Free forever.</span>
+            One studio.<br />
+            <span className="gradient-text">Everything you need.</span>
           </h1>
           <p className="homepage-hero-sub">
-            One studio. Every creative mode.<br />
-            60+ free browser tools. No paywalls.
+            Generate assets, manage projects, and plan everything with Eral 7c — your AI creative director. Free to start.
           </p>
           <div className="homepage-hero-ctas">
-            <Link href="/pixel/studio" className="homepage-cta-primary">
-              Start Creating →
+            <Link href="/studio" className="homepage-cta-primary">
+              Open Studio →
             </Link>
             <Link href="/community" className="homepage-cta-ghost">
               Browse Gallery
@@ -120,18 +113,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Modes Showcase ───────────────────────────────────────────── */}
+      {/* ── Studio Capabilities ──────────────────────────────────────── */}
       <section className="homepage-modes">
         <div className="homepage-section-inner">
           <div className="homepage-section-head">
             <h2 className="homepage-section-title">WokGen Studio</h2>
-            <p className="homepage-section-sub">One platform. Six modes. Every creative asset you need.</p>
+            <p className="homepage-section-sub">One platform. Every asset type. Pixel art, brand kits, vectors, UI, voice, and code — all in one place.</p>
           </div>
           <div className="homepage-modes-grid">
             {MODES.map(mode => (
               <Link
                 key={mode.id}
-                href={mode.studioCta}
+                href={`/studio?type=${mode.id}`}
                 className="homepage-mode-card"
                 style={{ '--mode-accent': mode.accent } as React.CSSProperties}
               >
@@ -147,7 +140,7 @@ export default function HomePage() {
                     <li key={h}>{h}</li>
                   ))}
                 </ul>
-                <span className="homepage-mode-cta">Open Mode →</span>
+                <span className="homepage-mode-cta">Open in Studio →</span>
               </Link>
             ))}
           </div>
@@ -231,7 +224,7 @@ console.log(asset.url);
             <div className="homepage-eral-left">
               <div className="homepage-eyebrow-pill">AI Creative Director</div>
               <h2 className="homepage-section-title">
-                Meet Eral, your<br />
+                Meet <strong>Eral 7c</strong>, your<br />
                 <span className="gradient-text">AI creative director.</span>
               </h2>
               <ul className="homepage-eral-bullets">

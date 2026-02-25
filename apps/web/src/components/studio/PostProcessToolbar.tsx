@@ -193,7 +193,7 @@ export function PostProcessToolbar({ imageUrl, prompt: _prompt, mode, onResult }
         </button>
 
         <a
-          href={`/pixel/studio?imageUrl=${encodeURIComponent(imageUrl)}`}
+          href={`/studio?type=${mode === 'pixel' ? 'pixel' : mode}&imageUrl=${encodeURIComponent(imageUrl)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white/90 hover:border-white/20 transition-all"

@@ -6,16 +6,12 @@ import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Home' },
-  { href: '/pixel/studio', label: 'Pixel mode' },
-  { href: '/business/studio', label: 'Business mode' },
-  { href: '/vector/studio', label: 'Vector mode' },
-  { href: '/uiux/studio', label: 'UI/UX mode' },
-  { href: '/voice/studio', label: 'Voice mode' },
-  { href: '/text/studio', label: 'Text mode' },
+  { href: '/studio', label: 'Studio' },
+  { href: '/projects', label: 'Projects' },
   { href: '/tools', label: 'Tools' },
+  { href: '/eral', label: 'Eral 7c' },
   { href: '/community', label: 'Community' },
-  { href: '/eral', label: 'Eral' },
-  { href: '/docs', label: 'Docs' },
+  { href: '/developers', label: 'Developers' },
   { href: '/support', label: 'Support' },
 ];
 
@@ -85,8 +81,7 @@ export function MobileNav() {
         </div>
 
         <nav className="mobile-nav-drawer-nav">
-          <div className="mobile-nav-section-label">Modes</div>
-          {NAV_ITEMS.filter(item => item.href.includes('/studio')).map((item) => (
+          {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -96,28 +91,6 @@ export function MobileNav() {
               {item.label}
             </Link>
           ))}
-
-          <div className="mobile-nav-section-divider" />
-          <div className="mobile-nav-section-label">Explore</div>
-          {[
-            { href: '/tools', label: 'Tools' },
-            { href: '/community', label: 'Community' },
-            { href: '/eral', label: 'Eral' },
-            { href: '/docs', label: 'Docs' },
-            { href: '/open-source', label: 'Open Source' },
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`mobile-nav-item${pathname === item.href || pathname?.startsWith(item.href + '/') ? ' mobile-nav-item--active' : ''}`}
-              onClick={() => setOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
-
-          <div className="mobile-nav-section-divider" />
-          <Link href="/support" className="mobile-nav-item" onClick={() => setOpen(false)}>Support</Link>
         </nav>
 
         <div className="mobile-nav-drawer-footer">

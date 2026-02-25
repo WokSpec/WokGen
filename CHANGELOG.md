@@ -2,6 +2,65 @@
 
 All notable changes to WokGen are documented in this file.
 
+## [3.0.0] — 2026-02-25
+
+### Cycles C3–C10: Studio Unification, Documents, Context Intelligence, API Hardening
+
+#### Studio Unification (C1)
+- Unified Studio Shell: all asset types accessible from `/studio?type=X`, single shell, single nav rail
+- Studio→Project binding: project picker in context bar, `?projectId=X` URL param
+- All old `/pixel/studio`, `/business/studio` etc. routes redirect to unified shell
+- Removed all redundant sub-client mode headers
+
+#### Project Workspace (C2)
+- Project dashboard tabs: Assets, Documents, Activity, Settings
+- "Ask Eral" button links to `/eral?projectId=X`
+- Dashboard: recent projects shown as primary content above nav grid
+- Eral reads `?projectId=` from URL and auto-selects project context
+
+#### Documents System (C3)
+- Tiptap rich-text editor at `/projects/[id]/docs/[docId]`
+- CRUD API: `GET/POST /api/projects/[id]/documents`, `GET/PATCH/DELETE /api/projects/[id]/documents/[docId]`
+- Documents tab in project dashboard with template picker
+- 5 templates: GDD, Brand Book, Content Calendar, Tech Spec, Release Notes
+- Auto-save with 1.2s debounce, Markdown export
+
+#### Context Intelligence (C4)
+- New `/api/projects/[id]/context` — returns brief + brand kit in one call
+- Studio shell shows project name, art style tag, brand color swatch in context bar when project active
+- Eral API already had project brief injection (confirmed functional)
+
+#### Generation Pipeline (C5)
+- Webhook dispatch on `job.succeeded` fires to all active user webhooks (non-blocking)
+- PostProcessToolbar confirmed live in pixel + vector studios
+
+#### Tools Curation (C6)
+- All 67 tools verified as `'live'` status with working implementations
+- Old studio route links updated throughout community, gallery, asset pages
+- Tools page structured with sidebar categories, starred tools, recently used
+
+#### Navigation & Architecture (C9)
+- Nav simplified: Studio, Projects, Tools, Community, Developers
+- Eral removed from primary nav — now a floating companion button (site-wide)
+- `EralCompanion` component: 44px fixed button bottom-right, opens 360×560 chat panel
+- Mobile nav updated to reflect simplified structure
+- Homepage hero updated: "One studio. Everything you need." with unified studio CTA
+- Mode cards link to `/studio?type=X` (not old `/pixel/studio` routes)
+- `Eral 7c` branding confirmed throughout homepage
+
+#### API Hardening & SDK (C7)
+- TypeScript SDK at `/public/sdk/wokgen.ts` — `WokGenClient` with `generate()`, `getJob()`, `waitForJob()`, `getAssets()`, `processAsset()`, `getMe()`
+- New `POST /api/v1/assets/[id]/process` — bg-remove, vectorize, resize, compress ops
+- Developers page updated to reference downloadable SDK
+
+#### Production Hardening (C10)
+- Zero TypeScript errors confirmed on all changed files
+- Clean `next build` confirmed before every commit
+- Security headers: X-Frame-Options DENY, nosniff, CSP, HSTS on prod
+- Health endpoint `/api/health` verified with DB, Redis, provider checks
+- `.env.example` has 199 documented vars
+- OSS infrastructure: CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, CODEOWNERS, PR template all in place
+
 ## [2.0.0] — 2025-07-20
 
 ### Master Plan Cycles C1–C21 (Professional Hardening & Expansion)

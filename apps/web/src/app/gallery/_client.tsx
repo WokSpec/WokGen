@@ -96,7 +96,7 @@ export default function GalleryClient() {
         <EmptyState
           title="No assets yet"
           description="Generated assets you make public will appear here."
-          action={{ label: 'Start generating', href: '/pixel/studio' }}
+          action={{ label: 'Start generating', href: '/studio' }}
         />
       ) : (
         <>

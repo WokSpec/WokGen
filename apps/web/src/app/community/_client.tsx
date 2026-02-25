@@ -207,7 +207,7 @@ function AssetModal({
 
   const remixHref = asset.mode
     ? `/${asset.mode}/studio?prompt=${encodeURIComponent(asset.prompt)}`
-    : `/pixel/studio?prompt=${encodeURIComponent(asset.prompt)}`;
+    : `/studio?type=pixel&prompt=${encodeURIComponent(asset.prompt)}`;
 
   return (
     <div
@@ -447,9 +447,9 @@ function EmptyState({ search }: { search: string }) {
         Be the first to share. Generate something in a studio and enable &ldquo;Share to Gallery&rdquo;.
       </p>
       <div className="community-empty-cta-row">
-        <Link href="/pixel/studio" className="community-empty-link community-empty-link--pixel">Pixel Mode</Link>
-        <Link href="/business/studio" className="community-empty-link community-empty-link--business">Business Mode</Link>
-        <Link href="/uiux/studio" className="community-empty-link community-empty-link--uiux">UI/UX Mode</Link>
+        <Link href="/studio?type=pixel" className="community-empty-link community-empty-link--pixel">Pixel Studio</Link>
+        <Link href="/studio?type=business" className="community-empty-link community-empty-link--business">Brand Studio</Link>
+        <Link href="/studio?type=uiux" className="community-empty-link community-empty-link--uiux">UI/UX Studio</Link>
       </div>
     </div>
   );
@@ -694,7 +694,7 @@ export default function CommunityClient() {
                   Public by default
                 </button>
               )}
-              <Link href="/pixel/studio" className="community-create-link">✦ Create</Link>
+              <Link href="/studio" className="community-create-link">✦ Create</Link>
             </div>
           </div>
 

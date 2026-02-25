@@ -16,6 +16,11 @@ import { Toaster } from 'sonner';
 import { PageLoadingBar } from '@/components/PageLoadingBar';
 import ThemeToggle from '@/components/ThemeToggle';
 
+const EralCompanion = nextDynamic(
+  () => import('@/components/EralCompanion').then((m) => ({ default: m.EralCompanion })),
+  { ssr: false },
+);
+
 const EralVoiceButton = nextDynamic(
   () => import('@/components/eral-voice-button').then((m) => ({ default: m.EralVoiceButton })),
   { ssr: false },
@@ -128,14 +133,10 @@ function NavBar() {
       {/* Nav links — hidden on mobile (MobileNav handles mobile) */}
         <div className="nav-links-desktop">
           <NavLink href="/studio">Studio</NavLink>
+          <NavLink href="/projects">Projects</NavLink>
           <NavLink href="/tools">Tools</NavLink>
           <NavLink href="/community">Community</NavLink>
-          <NavLink href="/eral">
-            <span className="nav-eral-badge">Eral</span>
-          </NavLink>
           <NavLink href="/developers">Developers</NavLink>
-          <NavLink href="/open-source">Open Source</NavLink>
-          <NavLink href="/support">Support</NavLink>
         </div>
 
       {/* Right side */}
@@ -186,6 +187,7 @@ export default function RootLayout({
           <main id="main-content" style={{ flex: 1 }}>{children}</main>
           <Footer />
           <EralVoiceButton />
+          <EralCompanion />
           <CommandPalette />
           <KeyboardShortcuts />
           <OnboardingGate />

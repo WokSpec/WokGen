@@ -119,6 +119,7 @@ export default function TextTo3DPage() {
             {result.thumbnailUrl && (
               <div style={{ position: 'relative', width: '100%', maxHeight: '320px', minHeight: '200px', background: 'rgba(0,0,0,0.3)' }}>
                 <Image src={result.thumbnailUrl} alt="3D model preview" fill className="object-contain" sizes="(max-width: 768px) 100vw, 600px" />
+              </div>
             )}
             <div style={{ padding: '1.25rem' }}>
               <div style={{ fontWeight: 600, marginBottom: '0.875rem' }}>Download 3D Model</div>

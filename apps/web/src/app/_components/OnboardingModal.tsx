@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 // ---------------------------------------------------------------------------
 // WokGen Onboarding Modal — 4-step first-login flow
@@ -223,8 +224,9 @@ export default function OnboardingModal({ onComplete }: Props) {
             {genError && <p className="onboard-error">{genError}</p>}
             {genResult ? (
               <div className="onboard-result">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={genResult} alt="Generated result" className="onboard-result-img" />
+                <div className="onboard-result-img" style={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
+                  <Image src={genResult} alt="Generated result" fill className="object-cover" unoptimized sizes="400px" />
+                </div>
                 <button className="btn-primary onboard-cta" onClick={goToStep3}>
                   Next
                 </button>

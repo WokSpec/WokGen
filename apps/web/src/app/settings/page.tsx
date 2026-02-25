@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import Image from 'next/image';
 import NotificationSettingsClient from './_client';
 
 export const metadata: Metadata = {
@@ -23,8 +24,7 @@ export default async function SettingsPage() {
           <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Profile</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem' }}>
             {session.user.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={session.user.image} alt={session.user.name || 'Avatar'} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)' }} />
+              <Image src={session.user.image} alt={session.user.name || 'Avatar'} width={56} height={56} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)' }} />
             ) : (
               <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(167,139,250,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.25rem', color: '#a78bfa' }}>
                 {(session.user.name || session.user.email || 'U')[0].toUpperCase()}

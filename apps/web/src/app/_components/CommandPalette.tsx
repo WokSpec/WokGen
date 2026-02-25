@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Command } from 'cmdk';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 
 // ---------------------------------------------------------------------------
@@ -127,8 +128,7 @@ export default function CommandPalette() {
                     onSelect={() => runCommand(`/assets/${r.id}`)}
                   >
                     <div className="cmdk-item-thumb">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={r.resultUrl} alt="" width={32} height={32} />
+                      <Image src={r.resultUrl} alt="" width={32} height={32} style={{ objectFit: 'cover' }} />
                     </div>
                     <div className="cmdk-item-text">
                       <span className="cmdk-item-label">{r.prompt.slice(0, 50)}</span>

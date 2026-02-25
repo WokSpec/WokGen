@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 
 const ASPECT_RATIOS = [
   { value: 'ASPECT_1_1', label: '1:1 Square' },
@@ -79,7 +80,9 @@ export default function IdeogramPage() {
         {error && <p style={{ marginTop: '0.875rem', color: '#f87171', fontSize: '0.875rem' }}>{error}</p>}
         {result?.url && (
           <div style={{ marginTop: '1.5rem' }}>
-            <img src={result.url} alt={result.prompt} style={{ width: '100%', maxWidth: '600px', borderRadius: '10px', border: '1px solid var(--border)', display: 'block' }} />
+            <div style={{ position: 'relative', width: '100%', maxWidth: '600px', aspectRatio: '1', borderRadius: '10px', border: '1px solid var(--border)', overflow: 'hidden' }}>
+              <Image src={result.url} alt={result.prompt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 600px" />
+            </div>
             <div style={{ marginTop: '0.875rem', display: 'flex', gap: '0.625rem' }}>
               <a href={result.url} download="ideogram.png" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem', textDecoration: 'none' }}>Download</a>
             </div>

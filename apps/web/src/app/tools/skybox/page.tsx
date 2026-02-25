@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 
 const STYLES = [
   { value: 'fantasy-landscape', label: 'Fantasy Landscape' },
@@ -113,7 +114,9 @@ export default function SkyboxPage() {
 
         {result?.fileUrl && (
           <div style={{ marginTop: '1.5rem', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
-            <img src={result.fileUrl} alt="360° panorama" style={{ width: '100%', objectFit: 'cover', display: 'block' }} />
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '2/1' }}>
+              <Image src={result.fileUrl} alt="360° panorama" fill className="object-cover" sizes="100vw" />
+            </div>
             <div style={{ padding: '1rem', display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
               <a href={result.fileUrl} download="skybox-panorama.jpg" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem', textDecoration: 'none' }}>Download HDR</a>
               {result.depthMapUrl && (

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 
 const STYLES = [
   { value: 'digital_illustration', label: 'Digital Illustration' },
@@ -80,7 +81,9 @@ export default function RecraftPage() {
           <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
             {images.map((url, i) => (
               <div key={i} style={{ border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
-                <img src={url} alt={`Generated ${i + 1}`} style={{ width: '100%', display: 'block' }} />
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
+                  <Image src={url} alt={`Generated ${i + 1}`} fill className="object-cover" sizes="(max-width: 640px) 100vw, 260px" />
+                </div>
                 <div style={{ padding: '0.75rem' }}>
                   <a href={url} download={`recraft-${i + 1}.png`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ display: 'block', padding: '0.375rem', fontSize: '0.8125rem', textAlign: 'center', textDecoration: 'none' }}>Download</a>
                 </div>

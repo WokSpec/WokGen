@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -291,7 +292,9 @@ function AssetLightbox({ job, onClose }: { job: Job; onClose: () => void }) {
         <button className="lightbox__close" onClick={onClose} aria-label="Close">&times;</button>
         <div className="lightbox__image-wrap">
           {job.resultUrl ? (
-            <img src={job.resultUrl} alt={job.prompt.slice(0, 80)} className="lightbox__image" />
+            <div className="lightbox__image" style={{ position: 'relative', width: '100%', height: '100%' }}>
+              <Image src={job.resultUrl} alt={job.prompt.slice(0, 80)} fill className="object-contain" sizes="(max-width: 1024px) 100vw, 80vw" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" />
+            </div>
           ) : (
             <div className="lightbox__placeholder">No image</div>
           )}
@@ -733,7 +736,7 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
                   return (
                     <div key={r.id} className="project-rel-row">
                       <div className="project-rel-row__asset">
-                        {from?.resultUrl && <img src={from.resultUrl} alt="" className="project-rel-row__thumb" />}
+                        {from?.resultUrl && <div className="project-rel-row__thumb" style={{ position: 'relative' }}><Image src={from.resultUrl} alt="" fill className="object-cover" sizes="64px" /></div>}
                         <span className="project-rel-row__prompt">{from?.prompt.slice(0, 40)}…</span>
                       </div>
                       <span
@@ -743,7 +746,7 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
                         ──{REL_LABELS[r.type]}──▶
                       </span>
                       <div className="project-rel-row__asset">
-                        {to?.resultUrl && <img src={to.resultUrl} alt="" className="project-rel-row__thumb" />}
+                        {to?.resultUrl && <div className="project-rel-row__thumb" style={{ position: 'relative' }}><Image src={to.resultUrl} alt="" fill className="object-cover" sizes="64px" /></div>}
                         <span className="project-rel-row__prompt">{to?.prompt.slice(0, 40)}…</span>
                       </div>
                     </div>

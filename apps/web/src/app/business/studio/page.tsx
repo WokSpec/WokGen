@@ -6,6 +6,7 @@
 import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import type {
   BusinessTool,
   BusinessStyle,
@@ -1041,8 +1042,9 @@ function BusinessStudioInner() {
               const labels = ['Logo Mark', 'Brand Banner', 'Profile Image', 'OG Meta'];
               return r.resultUrl ? (
                 <div key={i} className="biz-brandkit-cell">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={r.resultUrl} alt={labels[i]} className="biz-brandkit-img" />
+                  <div className="biz-brandkit-img" style={{ position: 'relative', aspectRatio: '1' }}>
+                    <Image src={r.resultUrl} alt={labels[i]} fill className="object-cover" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" sizes="300px" />
+                  </div>
                   <div className="biz-brandkit-footer">
                     <span className="biz-brandkit-label">{labels[i]}</span>
                     <button
@@ -1233,8 +1235,9 @@ function BusinessStudioInner() {
             >
               {item.resultUrl
                 ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.resultUrl} alt="" className="studio-history-thumb biz-history-thumb" />
+                    <div className="studio-history-thumb biz-history-thumb" style={{ position: 'relative' }}>
+                      <Image src={item.resultUrl} alt="" fill className="object-cover" sizes="48px" />
+                    </div>
                   )
                 : <div className="studio-history-thumb studio-history-thumb--empty">⬛</div>
               }

@@ -102,7 +102,12 @@ npm install --legacy-peer-deps
 
 # 3. Configure environment
 cp apps/web/.env.example apps/web/.env.local
-# Edit apps/web/.env.local — see docs/ENV.md for all variables
+# Edit apps/web/.env.local:
+#   - Set DATABASE_URL (Neon free tier or local Postgres)
+#   - Set AUTH_SECRET (openssl rand -base64 32)
+#   - Set GROQ_API_KEY (free at console.groq.com) for Eral AI + Text studio
+#   - Set AUTH_GITHUB_ID/SECRET for GitHub login
+# See docs/ENV.md for all variables
 
 # 4. Initialize database
 cd apps/web && npx prisma db push && cd ../..

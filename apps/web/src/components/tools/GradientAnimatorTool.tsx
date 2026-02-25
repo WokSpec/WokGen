@@ -105,7 +105,7 @@ export default function GradientAnimatorTool() {
             style={{ marginTop: '0.75rem' }}
             onClick={() => setPlaying(!playing)}
           >
-            {playing ? '⏸ Pause' : '▶ Play'}
+            {playing ? 'Pause' : 'Play'}
           </button>
         </div>
 

@@ -201,9 +201,9 @@ export default function SnippetsTool() {
           </select>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button className="btn-ghost-xs" onClick={exportAll} title="Export all">⬇ Export</button>
+          <button className="btn-ghost-xs" onClick={exportAll} title="Export all">Export</button>
           <label className="btn-ghost-xs" title="Import JSON">
-            ⬆ Import
+            Import
             <input type="file" accept=".json" onChange={importJson} style={{ display: 'none' }} />
           </label>
           <button className="btn-primary btn-sm" onClick={startNew}>+ New Snippet</button>

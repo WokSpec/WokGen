@@ -50,7 +50,7 @@ const ERAL_RL_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
 // ─── System prompt ──────────────────────────────────────────────────────────
 
-const ERAL_SYSTEM_PROMPT = `You are Eral 7c, the AI companion built by WokSpec for the WokGen platform.
+const ERAL_SYSTEM_PROMPT = `You are Eral 7c, WokGen Studio's AI creative companion. You help with creative direction, copywriting, strategy, and code.
 
 WokSpec is a creative technology company. WokGen is their multi-engine AI asset generation platform at wokgen.wokspec.org, offering:
 - WokGen Pixel: Sprites, tilesets, animations for game developers
@@ -470,6 +470,10 @@ export async function POST(req: NextRequest) {
   let userPrefsContext = '';
   let personalityModifier = '';
   if (userId) {
+    const userRecord = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } }).catch(() => null);
+    if (userRecord?.name) {
+      userPrefsContext += `\n\n[User's name: ${userRecord.name}]`;
+    }
     const userPrefs = await prisma.userPreference.findUnique({ where: { userId } }).catch(() => null);
     if (userPrefs) {
       const recentModePrefs: string[] = [];
@@ -620,6 +624,7 @@ export async function POST(req: NextRequest) {
     projectContext,
     notesSection,
     webContext,
+    '\n\nKeep responses focused. Use markdown for structure when helpful.',
   ].join('').trim();
 
   const history = conv.isNew ? [] : await fetchHistory(conv.id);

@@ -210,7 +210,7 @@ export default function AudioTool() {
   };
 
   const TABS: { id: Tab; label: string }[] = [
-    { id: 'waveform', label: '〰 Waveform' },
+    { id: 'waveform', label: 'Waveform' },
     { id: 'fileinfo', label: 'File Info' },
     { id: 'gif', label: 'GIF Frames' },
   ];
@@ -397,7 +397,7 @@ export default function AudioTool() {
             <div className="audio-gif-preview">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={gifPreview} alt="Animated GIF preview" className="audio-gif-img" />
-              <button className="btn-primary" onClick={downloadGif} style={{ marginTop: '0.75rem' }}>⬇ Download GIF</button>
+              <button className="btn-primary" onClick={downloadGif} style={{ marginTop: '0.75rem' }}>Download GIF</button>
             </div>
           )}
         </div>

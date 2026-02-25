@@ -227,7 +227,7 @@ export default function SpritePackerTool() {
                 <span className="sprite-preview-size">{packed.width}×{packed.height}px · {packed.items.length} sprites</span>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button className="btn-ghost-xs" onClick={exportManifest}>Export manifest</button>
-                  <button className="btn-secondary btn-sm" onClick={exportPng}>⬇ Export PNG</button>
+                  <button className="btn-secondary btn-sm" onClick={exportPng}>Export PNG</button>
                 </div>
               </div>
               <div className="sprite-canvas-wrap">

@@ -47,7 +47,7 @@ function ToolCard({ tool, starred, onStar, onVisit }: ToolCardProps) {
             title={starred ? 'Remove from starred' : 'Star this tool'}
             aria-label={starred ? 'Unstar' : 'Star'}
           >
-            {starred ? '★' : '☆'}
+            <Star size={13} fill={starred ? 'currentColor' : 'none'} />
           </button>
         </div>
       </div>

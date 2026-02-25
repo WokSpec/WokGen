@@ -156,7 +156,7 @@ export default function PixelEditorTool() {
         <div className="pixel-tool-group">
           {([
             ['pencil', '', 'Draw'],
-            ['eraser', '⬜', 'Erase'],
+            ['eraser', '', 'Erase'],
             ['fill', '', 'Fill'],
             ['eyedropper', '', 'Pick Color'],
           ] as [Tool, string, string][]).map(([t, icon, label]) => (

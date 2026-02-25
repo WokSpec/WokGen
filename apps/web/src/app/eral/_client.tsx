@@ -58,7 +58,7 @@ declare global {
 // Types
 // ---------------------------------------------------------------------------
 
-type ModelVariant = 'eral-7c' | 'eral-mini' | 'eral-code' | 'eral-creative';
+type ModelVariant = 'eral-7c' | 'eral-speed' | 'eral-code' | 'eral-creative';
 
 interface Message {
   id: string;
@@ -100,10 +100,10 @@ interface EralMemory {
 // ---------------------------------------------------------------------------
 
 const MODEL_OPTIONS: { value: ModelVariant; label: string; desc: string }[] = [
-  { value: 'eral-7c',       label: 'Eral 7c',       desc: 'Best overall · 70B · all 7 capabilities' },
-  { value: 'eral-mini',     label: 'Eral Mini',     desc: 'Fast · 8B · quick answers & chat' },
-  { value: 'eral-code',     label: 'Eral Code',     desc: 'DeepSeek · code, debugging, scaffolding' },
-  { value: 'eral-creative', label: 'Eral Creative', desc: 'Mixtral · copywriting, creative writing' },
+  { value: 'eral-7c',       label: 'Eral 7c',   desc: 'Best overall · 70B · all 7 capabilities' },
+  { value: 'eral-speed',    label: 'Speed',      desc: 'Fast · Cerebras · quick answers & chat' },
+  { value: 'eral-code',     label: 'Code',       desc: 'DeepSeek · code, debugging, scaffolding' },
+  { value: 'eral-creative', label: 'Creative',   desc: 'Mixtral · copywriting, creative writing' },
 ];
 
 const SUGGESTED_PROMPTS: { text: string }[] = [
@@ -371,10 +371,13 @@ function MessageBubble({
     <div className={`eral-msg-row ${isUser ? 'eral-msg-user' : 'eral-msg-assistant'}`}>
       {!isUser && (
         <div className="eral-avatar">
-          <span>AI</span>
+          <span style={{ fontSize: 9, fontWeight: 700, color: '#818cf8', letterSpacing: '-0.5px' }}>7c</span>
         </div>
       )}
       <div className="eral-bubble-wrap">
+        {!isUser && (
+          <span className="eral-msg-label">Eral 7c</span>
+        )}
         <div className={`eral-bubble ${isUser ? 'eral-bubble-user' : 'eral-bubble-assistant'}`}>
           {isUser ? (
             <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{msg.content}</p>

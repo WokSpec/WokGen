@@ -222,7 +222,7 @@ export default function ImageConverterTool() {
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               {hasDone && (
                 <button className="btn-ghost" style={{ fontSize: '0.8rem', padding: '0.3rem 0.75rem' }} onClick={downloadAll} disabled={isZipping}>
-                  {isZipping ? 'Zipping…' : '⬇ Download All (.zip)'}
+                  {isZipping ? 'Zipping…' : 'Download All (.zip)'}
                 </button>
               )}
               <button className="btn-ghost" style={{ fontSize: '0.8rem', padding: '0.3rem 0.75rem' }} onClick={clearAll}>

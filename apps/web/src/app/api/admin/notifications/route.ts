@@ -14,24 +14,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isAdminResponse } from '@/lib/admin';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
+import {
+  type NotifyEventType,
+  type DiscordNotifyConfig,
+  readDiscordConfig,
+} from '@/lib/notifications/discord';
 
 export const dynamic = 'force-dynamic';
 
-export type NotifyEventType = 'levelUp' | 'jobComplete' | 'newGalleryAsset' | 'errorAlert';
-
-export interface DiscordNotifyConfig {
-  levelUp:         { webhookUrl: string; enabled: boolean };
-  jobComplete:     { webhookUrl: string; enabled: boolean };
-  newGalleryAsset: { webhookUrl: string; enabled: boolean };
-  errorAlert:      { webhookUrl: string; enabled: boolean };
-}
-
-const DEFAULT_CONFIG: DiscordNotifyConfig = {
-  levelUp:         { webhookUrl: '', enabled: false },
-  jobComplete:     { webhookUrl: '', enabled: false },
-  newGalleryAsset: { webhookUrl: '', enabled: false },
-  errorAlert:      { webhookUrl: '', enabled: false },
-};
+// Re-export types for consumers that import from this route (legacy compat)
+export type { NotifyEventType, DiscordNotifyConfig };
 
 const EVENT_LABELS: Record<NotifyEventType, string> = {
   levelUp:         'Level Up',
@@ -44,17 +36,7 @@ const EVENT_LABELS: Record<NotifyEventType, string> = {
 // Helper: read config from the admin user's stats field
 // ---------------------------------------------------------------------------
 async function readConfig(userId: string): Promise<DiscordNotifyConfig> {
-  const prefs = await prisma.userPreference.findUnique({
-    where:  { userId },
-    select: { stats: true },
-  });
-  if (!prefs?.stats) return DEFAULT_CONFIG;
-  try {
-    const stats = JSON.parse(prefs.stats) as Record<string, unknown>;
-    return (stats.discordNotifyConfig as DiscordNotifyConfig) ?? DEFAULT_CONFIG;
-  } catch {
-    return DEFAULT_CONFIG;
-  }
+  return readDiscordConfig(userId);
 }
 
 // ---------------------------------------------------------------------------
@@ -172,34 +154,4 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
-// ---------------------------------------------------------------------------
-// Exported helper: send a Discord notification for a given event type
-// (used by other API routes to trigger notifications)
-// ---------------------------------------------------------------------------
-export async function sendDiscordNotification(
-  eventType: NotifyEventType,
-  adminUserId: string,
-  embed: {
-    title: string;
-    description?: string;
-    color?: number;
-    fields?: Array<{ name: string; value: string; inline?: boolean }>;
-  },
-): Promise<void> {
-  const config = await readConfig(adminUserId);
-  const channelConfig = config[eventType];
-  if (!channelConfig.enabled || !channelConfig.webhookUrl) return;
 
-  try {
-    await fetch(channelConfig.webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        embeds: [{ ...embed, timestamp: new Date().toISOString(), footer: { text: 'WokGen' } }],
-      }),
-      signal: AbortSignal.timeout(5_000),
-    });
-  } catch {
-    // Non-fatal — notification delivery is best-effort
-  }
-}

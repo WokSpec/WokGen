@@ -9,7 +9,6 @@ import { NavLink } from './_components/NavLink';
 import { Footer } from './_components/Footer';
 import { NavAuth } from './_components/NavAuth';
 import { Providers } from './_components/Providers';
-import { ModeSwitcher } from './_components/ModeSwitcher';
 import { MobileNav } from './_components/MobileNav';
 import { Breadcrumb } from './_components/Breadcrumb';
 import { Toaster } from 'sonner';
@@ -18,11 +17,6 @@ import ThemeToggle from '@/components/ThemeToggle';
 
 const EralCompanion = nextDynamic(
   () => import('@/components/EralCompanion').then((m) => ({ default: m.EralCompanion })),
-  { ssr: false },
-);
-
-const EralVoiceButton = nextDynamic(
-  () => import('@/components/eral-voice-button').then((m) => ({ default: m.EralVoiceButton })),
   { ssr: false },
 );
 
@@ -183,10 +177,8 @@ export default function RootLayout({
           <a href="#main-content" className="skip-to-content">Skip to content</a>
           <NavBar />
           <Breadcrumb />
-          <ModeSwitcher />
           <main id="main-content" style={{ flex: 1 }}>{children}</main>
           <Footer />
-          <EralVoiceButton />
           <EralCompanion />
           <CommandPalette />
           <KeyboardShortcuts />

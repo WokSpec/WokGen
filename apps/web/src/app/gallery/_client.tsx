@@ -141,7 +141,8 @@ export default function GalleryClient() {
           onClick={() => setSelectedAsset(null)}
         >
           <div
-            className="max-w-2xl w-full bg-zinc-900 rounded-2xl overflow-hidden border border-white/10"
+            className="max-w-2xl w-full rounded overflow-hidden border border-white/10"
+              style={{ background: 'var(--bg-elevated)' }}
             onClick={e => e.stopPropagation()}
           >
             <div className="relative aspect-square">

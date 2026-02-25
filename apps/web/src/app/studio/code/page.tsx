@@ -148,7 +148,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
               placeholder="A pricing table with 3 tiers, feature comparison, and CTA buttons..."
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white/80 placeholder:text-white/20 resize-none focus:outline-none focus:border-white/30 min-h-32"
+              className="flex-1 border p-3 text-sm resize-none focus:outline-none min-h-32"
+              style={{ background: 'var(--surface-raised)', borderColor: 'var(--border)', color: 'var(--text)', borderRadius: 'var(--radius)' }}
               onKeyDown={e => {
                 if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) generate();
               }}
@@ -158,7 +159,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
             <button
               onClick={() => generate()}
               disabled={isGenerating || !prompt.trim()}
-              className="w-full py-2.5 bg-blue-500 hover:bg-blue-400 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+              className="w-full py-2.5 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+              style={{ background: 'var(--accent)', color: '#000', borderRadius: 'var(--radius)' }}
             >
               {isGenerating ? (
                 <><IconLoader2 /> Generating...</>

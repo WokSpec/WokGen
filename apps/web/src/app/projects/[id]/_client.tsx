@@ -398,20 +398,20 @@ function DocumentsPanel({
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
             {[
-              { key: 'gdd',     label: 'GDD',           emoji: '📋' },
-              { key: 'brand',   label: 'Brand Book',    emoji: '🎨' },
-              { key: 'content', label: 'Content Plan',  emoji: '📅' },
-              { key: 'spec',    label: 'Tech Spec',     emoji: '⚙️' },
-              { key: 'release', label: 'Release Notes', emoji: '🚀' },
+              { key: 'gdd',     label: 'GDD'           },
+              { key: 'brand',   label: 'Brand Book'    },
+              { key: 'content', label: 'Content Plan'  },
+              { key: 'spec',    label: 'Tech Spec'     },
+              { key: 'release', label: 'Release Notes' },
             ].map(t => (
               <button
                 key={t.key}
                 className="btn btn--ghost btn--sm"
                 onClick={() => createDoc(t.key)}
                 disabled={creating}
-                style={{ fontSize: '0.72rem', gap: '4px', display: 'flex', alignItems: 'center' }}
+                style={{ fontSize: '0.72rem' }}
               >
-                {t.emoji} {t.label}
+                {t.label}
               </button>
             ))}
           </div>
@@ -437,7 +437,9 @@ function DocumentsPanel({
                 transition: 'border-color 0.1s',
               }}
             >
-              <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>{doc.emoji ?? '📄'}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              </svg>
               <span style={{ fontSize: '0.82rem', color: 'var(--text-primary)', fontWeight: 500, flex: 1 }}>
                 {doc.title}
               </span>

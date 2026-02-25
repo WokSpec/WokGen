@@ -108,7 +108,7 @@ const PERMISSION_COLORS: Record<string, string> = {
 
 export default function ChopsticksPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <div className="max-w-4xl mx-auto px-6 py-16 space-y-14">
 
         {/* Hero */}
@@ -129,7 +129,7 @@ export default function ChopsticksPage() {
             </Link>
             <Link
               href="/studio"
-              className="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-semibold px-5 py-2.5 rounded-lg transition text-sm"
+              className="inline-flex items-center gap-2 bg-[var(--surface-raised)] hover:bg-zinc-700 text-[var(--text)] font-semibold px-5 py-2.5 rounded-lg transition text-sm"
             >
               Open Studio
             </Link>
@@ -137,16 +137,16 @@ export default function ChopsticksPage() {
         </div>
 
         {/* Setup */}
-        <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6 space-y-3">
+        <section className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 space-y-3">
           <h2 className="text-lg font-semibold">Setup</h2>
           <p className="text-zinc-400 text-sm">
             Chopsticks uses Discord&apos;s Interactions Endpoint (webhook-based, no persistent bot connection required).
           </p>
           <ol className="list-decimal list-inside text-sm text-zinc-400 space-y-1.5">
             <li>Go to the <a href="https://discord.com/developers/applications" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Discord Developer Portal</a> and create an Application.</li>
-            <li>Under <strong className="text-zinc-200">Bot</strong>, copy the Bot Token → set <code className="bg-zinc-800 px-1 py-0.5 rounded text-xs">DISCORD_BOT_TOKEN</code>.</li>
-            <li>Under <strong className="text-zinc-200">General Information</strong>, copy the Public Key → set <code className="bg-zinc-800 px-1 py-0.5 rounded text-xs">DISCORD_PUBLIC_KEY</code>.</li>
-            <li>Set <strong className="text-zinc-200">Interactions Endpoint URL</strong> to <code className="bg-zinc-800 px-1 py-0.5 rounded text-xs">https://your-domain/api/discord/interactions</code>.</li>
+            <li>Under <strong className="text-[var(--text)]">Bot</strong>, copy the Bot Token → set <code className="bg-[var(--surface-raised)] px-1 py-0.5 rounded text-xs">DISCORD_BOT_TOKEN</code>.</li>
+            <li>Under <strong className="text-[var(--text)]">General Information</strong>, copy the Public Key → set <code className="bg-[var(--surface-raised)] px-1 py-0.5 rounded text-xs">DISCORD_PUBLIC_KEY</code>.</li>
+            <li>Set <strong className="text-[var(--text)]">Interactions Endpoint URL</strong> to <code className="bg-[var(--surface-raised)] px-1 py-0.5 rounded text-xs">https://your-domain/api/discord/interactions</code>.</li>
             <li>Register slash commands via the Discord API using the commands listed below.</li>
           </ol>
         </section>
@@ -158,7 +158,7 @@ export default function ChopsticksPage() {
             {COMMANDS.map((cmd) => (
               <div
                 key={cmd.syntax}
-                className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 space-y-3"
+                className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] p-5 space-y-3"
               >
                 {/* Header row */}
                 <div className="flex flex-wrap items-start gap-3">
@@ -173,14 +173,14 @@ export default function ChopsticksPage() {
                 </div>
 
                 {/* Description */}
-                <p className="text-zinc-300 text-sm">{cmd.description}</p>
+                <p className="text-[var(--text-secondary)] text-sm">{cmd.description}</p>
 
                 {/* Args table */}
                 {cmd.args.length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="text-zinc-500 text-left border-b border-zinc-800">
+                        <tr className="text-[var(--text-muted)] text-left border-b border-[var(--border)]">
                           <th className="pb-1.5 pr-4 font-medium">Argument</th>
                           <th className="pb-1.5 pr-4 font-medium">Type</th>
                           <th className="pb-1.5 pr-4 font-medium">Required</th>
@@ -191,9 +191,9 @@ export default function ChopsticksPage() {
                         {cmd.args.map((arg) => (
                           <tr key={arg.name} className="text-zinc-400">
                             <td className="py-1.5 pr-4">
-                              <code className="text-zinc-300 font-mono">{arg.name}</code>
+                              <code className="text-[var(--text-secondary)] font-mono">{arg.name}</code>
                             </td>
-                            <td className="py-1.5 pr-4 text-zinc-500">{arg.type}</td>
+                            <td className="py-1.5 pr-4 text-[var(--text-muted)]">{arg.type}</td>
                             <td className="py-1.5 pr-4">
                               {arg.required
                                 ? <span className="text-red-400">required</span>
@@ -210,8 +210,8 @@ export default function ChopsticksPage() {
 
                 {/* Example */}
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-zinc-500">Example:</span>
-                  <code className="text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded font-mono">{cmd.example}</code>
+                  <span className="text-[var(--text-muted)]">Example:</span>
+                  <code className="text-[var(--text-secondary)] bg-[var(--surface-raised)] px-2 py-0.5 rounded font-mono">{cmd.example}</code>
                 </div>
               </div>
             ))}
@@ -219,14 +219,14 @@ export default function ChopsticksPage() {
         </section>
 
         {/* Architecture note */}
-        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-2">
-          <h2 className="text-base font-semibold text-zinc-300">Architecture</h2>
-          <p className="text-sm text-zinc-500">
+        <section className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/50 p-5 space-y-2">
+          <h2 className="text-base font-semibold text-[var(--text-secondary)]">Architecture</h2>
+          <p className="text-sm text-[var(--text-muted)]">
             Chopsticks uses Discord&apos;s <strong className="text-zinc-400">Interactions Endpoint</strong> pattern —
             a pure HTTP webhook with no persistent WebSocket connection. Discord POSTs to
-            <code className="bg-zinc-800 px-1 py-0.5 rounded text-xs mx-1">/api/discord/interactions</code>
+            <code className="bg-[var(--surface-raised)] px-1 py-0.5 rounded text-xs mx-1">/api/discord/interactions</code>
             when a slash command is used. Signatures are verified using Ed25519 before any command is processed.
-            Long-running commands (like <code className="bg-zinc-800 px-1 py-0.5 rounded text-xs">/generate</code>)
+            Long-running commands (like <code className="bg-[var(--surface-raised)] px-1 py-0.5 rounded text-xs">/generate</code>)
             use deferred responses (type 5) with follow-up webhooks.
           </p>
         </section>

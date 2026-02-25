@@ -103,14 +103,14 @@ export default function AdminNotificationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-zinc-400">Loading notification config…</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-10">
+    <div className="min-h-screen p-6 md:p-10">
       <div className="max-w-3xl mx-auto space-y-8">
 
         {/* Header */}
@@ -132,16 +132,16 @@ export default function AdminNotificationsPage() {
             return (
               <div
                 key={type}
-                className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 space-y-4"
+                className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] p-5 space-y-4"
               >
                 {/* Title row */}
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{meta.icon}</span>
-                      <span className="font-semibold text-zinc-100">{meta.label}</span>
+                      <span className="font-semibold text-[var(--text)]">{meta.label}</span>
                     </div>
-                    <p className="text-xs text-zinc-500 mt-0.5">{meta.desc}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">{meta.desc}</p>
                   </div>
 
                   {/* Enabled toggle */}
@@ -151,7 +151,7 @@ export default function AdminNotificationsPage() {
                     className={`
                       relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent
                       transition-colors duration-200 focus:outline-none
-                      ${ch.enabled ? 'bg-indigo-500' : 'bg-zinc-700'}
+                      ${ch.enabled ? 'bg-indigo-500' : 'bg-[var(--surface-raised)]'}
                     `}
                     aria-label={ch.enabled ? 'Disable' : 'Enable'}
                   >
@@ -172,8 +172,8 @@ export default function AdminNotificationsPage() {
                     value={ch.webhookUrl}
                     onChange={(e) => updateChannel(type, 'webhookUrl', e.target.value)}
                     className="
-                      flex-1 rounded-lg bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm
-                      text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500
+                      flex-1 rounded-lg bg-[var(--surface-raised)] border border-[var(--border)] px-3 py-2 text-sm
+                      placeholder-zinc-500 focus:outline-none focus:border-indigo-500
                       focus:ring-1 focus:ring-indigo-500 transition
                     "
                   />
@@ -184,8 +184,8 @@ export default function AdminNotificationsPage() {
                     className={`
                       shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition
                       ${canTest
-                        ? 'bg-zinc-700 hover:bg-zinc-600 text-zinc-100 cursor-pointer'
-                        : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}
+                        ? 'bg-[var(--surface-raised)] hover:bg-zinc-600 cursor-pointer'
+                        : 'bg-[var(--surface-raised)] text-[var(--text-faint)] cursor-not-allowed'}
                       ${ts === 'sending' ? 'animate-pulse' : ''}
                     `}
                   >
@@ -220,7 +220,7 @@ export default function AdminNotificationsPage() {
         </div>
 
         {/* Usage hint */}
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 text-xs text-zinc-500 space-y-1">
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)]/50 p-4 text-xs text-[var(--text-muted)] space-y-1">
           <p className="font-semibold text-zinc-400">How to create a Discord Webhook URL:</p>
           <ol className="list-decimal list-inside space-y-0.5">
             <li>Open Discord → go to the channel you want notifications in</li>

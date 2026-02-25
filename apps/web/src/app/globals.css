@@ -66,7 +66,7 @@
 
   /* Layout */
   --nav-height:          50px;
-  --mode-switcher-height: 41px;   /* sticky bar below nav */
+  --mode-switcher-height: 0px;   /* mode switcher removed — no sub-nav bar */
   --sidebar-width: 64px;
   --panel-width:  380px;
 

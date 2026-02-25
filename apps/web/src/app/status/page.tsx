@@ -39,7 +39,7 @@ function statusLabel(p: ProviderStatus): { label: string; cls: string } {
 }
 
 function statusEmoji(p: ProviderStatus) {
-  if (!p.configured) return '⬜';
+  if (!p.configured) return '—';
   if (!p.available)  return 'DOWN';
   if (p.degraded)    return 'DEGRADED';
   return 'OK';

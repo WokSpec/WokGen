@@ -18,7 +18,7 @@ const S = {
   btn: {
     position: 'fixed' as const,
     bottom: 24,
-    right: 80,
+    right: 24,
     zIndex: 9998,
     width: 44,
     height: 44,
@@ -36,7 +36,7 @@ const S = {
   panel: (open: boolean) => ({
     position: 'fixed' as const,
     bottom: 80,
-    right: 80,
+    right: 24,
     zIndex: 9997,
     width: 360,
     height: 560,

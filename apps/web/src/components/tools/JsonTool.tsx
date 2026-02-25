@@ -212,13 +212,36 @@ export default function JsonTool() {
               </button>
             )}
           </div>
-          <textarea
-            className="json-textarea output"
-            value={output}
-            readOnly
-            placeholder="Output will appear here…"
-            spellCheck={false}
-          />
+          {output ? (
+            <div style={{ display: 'flex', fontFamily: 'monospace', fontSize: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', overflow: 'hidden', maxHeight: '384px', overflowY: 'auto', background: 'rgba(0,0,0,0.2)' }}>
+              <div style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.2)', padding: '0.75rem 0.5rem', textAlign: 'right', userSelect: 'none', minWidth: '3rem', lineHeight: '1.25rem' }}>
+                {output.split('\n').map((_, i) => (
+                  <div key={i}>{i + 1}</div>
+                ))}
+              </div>
+              <pre style={{ flex: 1, padding: '0.75rem', margin: 0, color: 'rgba(255,255,255,0.8)', lineHeight: '1.25rem', overflowX: 'auto', whiteSpace: 'pre' }}>{output}</pre>
+            </div>
+          ) : (
+            <textarea
+              className="json-textarea output"
+              value=""
+              readOnly
+              placeholder="Output will appear here…"
+              spellCheck={false}
+            />
+          )}
+          {/* Stat bar */}
+          {parsedData !== null && output && (
+            <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', paddingTop: '0.5rem' }}>
+              {typeof parsedData === 'object' && parsedData !== null && !Array.isArray(parsedData) && (
+                <span>{Object.keys(parsedData as object).length} top-level keys</span>
+              )}
+              {Array.isArray(parsedData) && <span>{(parsedData as unknown[]).length} items</span>}
+              <span>{JSON.stringify(parsedData).length} chars</span>
+              <span>{output.split('\n').length} lines</span>
+              <span>{Array.isArray(parsedData) ? 'array' : typeof parsedData}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

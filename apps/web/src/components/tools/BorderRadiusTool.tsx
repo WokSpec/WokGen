@@ -16,7 +16,7 @@ export default function BorderRadiusTool() {
   const max = unit === 'px' ? 100 : 50;
 
   const setAll = (val: number) => { setTl(val); setTr(val); setBr(val); setBl(val); };
-  const handle = (setter: (v: number) => void, val: number) => linked ? setAll(val) : setter(val);
+  const handle = (setter: (v: number) => void, val: number) => { if (linked) setAll(val); else setter(val); };
 
   const cssVal = `${tl}${unit} ${tr}${unit} ${br}${unit} ${bl}${unit}`;
   const css = `border-radius: ${cssVal};`;

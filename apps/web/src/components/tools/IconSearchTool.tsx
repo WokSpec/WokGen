@@ -141,13 +141,11 @@ export default function IconSearchTool() {
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 0.4rem', fontSize: '0.7rem', position: 'relative', background: copied === icon.name ? 'var(--accent-primary)' : undefined }}
             onClick={() => copyIcon(icon)}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={copied === icon.name ? '#fff' : 'currentColor'} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              {icon.path.split(' M').map((part, i) => (
-                <path key={i} d={i === 0 ? part : 'M' + part} />
-              ))}
+                    <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={copied === icon.name ? '#fff' : 'currentColor'} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d={icon.path} />
             </svg>
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: copied === icon.name ? '#fff' : undefined }}>
-              {copied === icon.name ? '✓' : icon.name}
+              {copied === icon.name ? 'Copied' : icon.name}
             </span>
           </button>
         ))}

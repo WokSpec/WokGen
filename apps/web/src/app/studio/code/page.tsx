@@ -111,7 +111,7 @@ export default function CodeStudioPage() {
 <script>
   tailwind.config = { darkMode: 'class', theme: { extend: { colors: { zinc: { 950: '#09090b' } } } } }
 <\/script>
-<style>body { background: #09090b; }<\/style>
+<style>body { background: var(--bg); }<\/style>
 </head>
 <body class="dark p-8">
 <div id="root"></div>
@@ -130,7 +130,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
 </html>`;
 
   return (
-    <div className="min-h-screen bg-[#0d0d14] text-white">
+    <div className="min-h-screen text-white" style={{ background: 'var(--bg)' }}>
       <div className="border-b border-white/5 px-6 py-4 flex items-center gap-3">
         <span className="text-blue-400"><IconCode2 size={20} /></span>
         <div>
@@ -239,7 +239,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
                   </div>
                 </div>
               ) : (
-                <div className="flex-1 bg-[#09090b]">
+                <div className="flex-1" style={{ background: 'var(--bg-surface)' }}>
                   <iframe
                     srcDoc={previewHtml}
                     className="w-full h-full border-0"

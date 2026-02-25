@@ -98,10 +98,11 @@ export default function GeneratorsTool() {
   const copy = useCallback(async (text: string) => {
     await navigator.clipboard.writeText(text);
     setCopied(text.slice(0, 20));
-    setTimeout(() => setCopied(null), 1500);
+    setTimeout(() => setCopied(null), 2000);
   }, []);
 
   const now = new Date();
+  const allUuids = uuids.join('\n');
 
   return (
     <div className="gen-tool">
@@ -121,12 +122,12 @@ export default function GeneratorsTool() {
             <label className="gen-label">Count</label>
             <input className="tool-input-sm" type="number" min={1} max={100} value={uuidCount} onChange={e => setUuidCount(+e.target.value)} />
             <button className="btn-primary" onClick={() => setUuids(Array.from({length: uuidCount}, genUUID))}>Generate</button>
-            {uuids.length > 0 && <button className="btn-ghost" onClick={() => copy(uuids.join('\n'))}>Copy All</button>}
+            {uuids.length > 0 && <button className="btn-ghost" onClick={() => copy(allUuids)}>{copied === allUuids.slice(0,20) ? 'Copied!' : 'Copy All'}</button>}
           </div>
           {uuids.map((u, i) => (
             <div key={i} className="gen-item">
               <code className="gen-value">{u}</code>
-              <button className="btn-ghost-xs" onClick={() => copy(u)}>{copied === u.slice(0,20) ? '✓' : 'Copy'}</button>
+              <button className="btn-ghost-xs" onClick={() => copy(u)}>{copied === u.slice(0,20) ? 'Copied!' : 'Copy'}</button>
             </div>
           ))}
         </div>
@@ -151,7 +152,7 @@ export default function GeneratorsTool() {
           {pw && (
             <div className="gen-pw-result">
               <code className="gen-pw-value">{pw}</code>
-              <button className="btn-ghost-xs" onClick={() => copy(pw)}>{copied === pw.slice(0,20) ? '✓ Copied' : 'Copy'}</button>
+              <button className="btn-ghost-xs" onClick={() => copy(pw)}>{copied === pw.slice(0,20) ? 'Copied!' : 'Copy'}</button>
               <div className="gen-entropy">
                 Entropy: {entropy(pw).toFixed(0)} bits
                 <span className={`gen-entropy-badge ${entropy(pw) < 40 ? 'weak' : entropy(pw) < 80 ? 'fair' : 'strong'}`}>
@@ -172,7 +173,7 @@ export default function GeneratorsTool() {
               <button key={u} className={`json-mode-btn${loremUnit === u ? ' active' : ''}`} onClick={() => setLoremUnit(u)}>{u}</button>
             ))}
             <button className="btn-primary" onClick={() => setLoremText(lorem(loremCount, loremUnit))}>Generate</button>
-            {loremText && <button className="btn-ghost" onClick={() => copy(loremText)}>Copy</button>}
+            {loremText && <button className="btn-ghost" onClick={() => copy(loremText)}>{copied === loremText.slice(0,20) ? 'Copied!' : 'Copy'}</button>}
           </div>
           {loremText && <div className="gen-lorem-output">{loremText}</div>}
         </div>
@@ -182,10 +183,10 @@ export default function GeneratorsTool() {
       {tab === 'timestamp' && (
         <div className="gen-section gen-ts">
           <div className="gen-ts-current">
-            <div className="gen-ts-row"><span className="gen-label">Unix (s)</span><code>{Math.floor(now.getTime()/1000)}</code><button className="btn-ghost-xs" onClick={() => copy(String(Math.floor(now.getTime()/1000)))}>Copy</button></div>
-            <div className="gen-ts-row"><span className="gen-label">Unix (ms)</span><code>{now.getTime()}</code><button className="btn-ghost-xs" onClick={() => copy(String(now.getTime()))}>Copy</button></div>
-            <div className="gen-ts-row"><span className="gen-label">ISO 8601</span><code>{now.toISOString()}</code><button className="btn-ghost-xs" onClick={() => copy(now.toISOString())}>Copy</button></div>
-            <div className="gen-ts-row"><span className="gen-label">RFC 2822</span><code>{now.toUTCString()}</code><button className="btn-ghost-xs" onClick={() => copy(now.toUTCString())}>Copy</button></div>
+            <div className="gen-ts-row"><span className="gen-label">Unix (s)</span><code>{Math.floor(now.getTime()/1000)}</code><button className="btn-ghost-xs" onClick={() => copy(String(Math.floor(now.getTime()/1000)))}>{copied === String(Math.floor(now.getTime()/1000)).slice(0,20) ? 'Copied!' : 'Copy'}</button></div>
+            <div className="gen-ts-row"><span className="gen-label">Unix (ms)</span><code>{now.getTime()}</code><button className="btn-ghost-xs" onClick={() => copy(String(now.getTime()))}>{copied === String(now.getTime()).slice(0,20) ? 'Copied!' : 'Copy'}</button></div>
+            <div className="gen-ts-row"><span className="gen-label">ISO 8601</span><code>{now.toISOString()}</code><button className="btn-ghost-xs" onClick={() => copy(now.toISOString())}>{copied === now.toISOString().slice(0,20) ? 'Copied!' : 'Copy'}</button></div>
+            <div className="gen-ts-row"><span className="gen-label">RFC 2822</span><code>{now.toUTCString()}</code><button className="btn-ghost-xs" onClick={() => copy(now.toUTCString())}>{copied === now.toUTCString().slice(0,20) ? 'Copied!' : 'Copy'}</button></div>
           </div>
           <div className="gen-row" style={{marginTop:'1rem'}}>
             <label className="gen-label">Convert timestamp</label>

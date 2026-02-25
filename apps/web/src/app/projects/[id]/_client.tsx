@@ -323,8 +323,8 @@ function AssetLightbox({ job, onClose }: { job: Job; onClose: () => void }) {
 // ─── Activity Feed ────────────────────────────────────────────────────────────
 
 const ACTIVITY_ICONS: Record<string, string> = {
-  generate: '→', comment: '»', export: '↓', member_join: '+',
-  brief_update: '»', batch: '□', like: '♥',
+  generate: 'Gen', comment: 'Com', export: 'Exp', member_join: '+',
+  brief_update: 'Upd', batch: 'Batch', like: 'Like',
 };
 
 function timeAgo(iso: string): string {
@@ -356,7 +356,12 @@ function DocumentsPanel({
       if (res.ok) {
         const { document: doc } = await res.json();
         window.location.href = `/projects/${projectId}/docs/${doc.id}`;
+      } else {
+        const d = await res.json().catch(() => null);
+        toast.error(d?.error ?? 'Failed to create document');
       }
+    } catch (e) {
+      toast.error('Network error while creating document');
     } finally {
       setCreating(false);
     }
@@ -598,15 +603,30 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
   const [extractedPalette, setExtractedPalette]   = useState<{hex:string;name:string;ratio:number}[]|null>(null);
   const [documents, setDocuments]     = useState<{ id: string; title: string; emoji: string | null; updatedAt: string }[]>([]);
   const [docsLoaded, setDocsLoaded]   = useState(false);
+  const [error, setError]             = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const res = await fetch(`/api/projects/${projectId}/assets`);
-    if (res.ok) {
-      const d = await res.json();
-      setJobs(d.jobs ?? []);
-      setRels(d.relationships ?? []);
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/assets`);
+      if (!res.ok) {
+        const d = await res.json().catch(() => null);
+        setError(d?.error ?? 'Failed to load project assets');
+        setJobs([]);
+        setRels([]);
+      } else {
+        const d = await res.json();
+        setJobs(d.jobs ?? []);
+        setRels(d.relationships ?? []);
+      }
+    } catch (e) {
+      setError('Network error while loading assets');
+      setJobs([]);
+      setRels([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [projectId]);
 
   useEffect(() => { load(); }, [load]);
@@ -769,6 +789,7 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
       </div>
 
       <div className="project-dashboard__body">
+        {error && <div style={{ padding: '1rem', color: 'var(--color-danger, #ef4444)' }}>Error: {error}</div>}
         {/* Left: main content */}
         <div className="project-dashboard__main">
           {view === 'settings' ? (

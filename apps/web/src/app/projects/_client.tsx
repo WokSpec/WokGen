@@ -36,17 +36,29 @@ const BLUR_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB
 export default function ProjectsClient() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sort, setSort] = useState<string>('updated');
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await fetch('/api/projects');
-    if (res.ok) {
-      const d = await res.json();
-      setProjects(d.projects ?? []);
+    setError(null);
+    try {
+      const res = await fetch('/api/projects');
+      if (!res.ok) {
+        const d = await res.json().catch(() => null);
+        setError(d?.error ?? 'Failed to load projects');
+        setProjects([]);
+      } else {
+        const d = await res.json();
+        setProjects(d.projects ?? []);
+      }
+    } catch (e) {
+      setError('Network error while loading projects');
+      setProjects([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -66,8 +78,8 @@ export default function ProjectsClient() {
   return (
     <div className="projects-page">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-        <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#e2e8f0' }}>Projects</h1>
-        <Link href="/pixel/studio" style={{ background: '#4f8ef7', color: '#fff', padding: '8px 16px', borderRadius: 6, textDecoration: 'none', fontSize: 14 }}>
+        <h1 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text-primary)' }}>Projects</h1>
+        <Link href="/projects/new" style={{ background: '#4f8ef7', color: '#fff', padding: '8px 16px', borderRadius: 6, textDecoration: 'none', fontSize: 14 }}>
           + New project
         </Link>
       </div>
@@ -94,11 +106,13 @@ export default function ProjectsClient() {
         </select>
       </div>
 
-      {filtered.length === 0 ? (
+      {error ? (
+        <div style={{ color: 'var(--color-danger, #ef4444)', padding: '1rem' }}>Error loading projects: {error}</div>
+      ) : filtered.length === 0 ? (
         <EmptyState
           title={searchQuery ? 'No matching projects' : 'No projects yet'}
           description={searchQuery ? 'Try a different search.' : 'No projects yet. Create your first project.'}
-          action={!searchQuery ? { label: 'Create project', href: '/pixel/studio' } : undefined}
+          action={!searchQuery ? { label: 'Create project', href: '/projects/new' } : undefined}
         />
       ) : (
         <div style={{ display: 'grid', gap: '1rem' }}>

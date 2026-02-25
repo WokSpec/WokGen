@@ -32,8 +32,8 @@ export default function TypeScaleTool() {
 
   const ratio = RATIOS[ratioIdx].value;
   const sizes = STEPS.map(s => {
-    const px = Math.round(base * Math.pow(ratio, s.exp) * 100) / 100;
-    const rem = Math.round(px / 16 * 1000) / 1000;
+    const px = Math.round(base * Math.pow(ratio, s.exp) * 100) / 100; // base * ratio^exp
+    const rem = Math.round((px / 16) * 1000) / 1000;
     return { ...s, px, rem };
   });
 
@@ -78,7 +78,7 @@ export default function TypeScaleTool() {
       </div>
 
       <button className="btn-primary" style={{ marginTop: '1.5rem' }} onClick={copyCss}>
-        {copied ? '✓ Copied!' : 'Copy CSS variables'}
+        {copied ? 'Copied!' : 'Copy CSS variables'}
       </button>
     </div>
   );

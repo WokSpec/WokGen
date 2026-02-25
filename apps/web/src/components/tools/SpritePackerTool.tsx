@@ -73,9 +73,17 @@ export default function SpritePackerTool() {
       img.onload = () => {
         newSprites.push({ id: crypto.randomUUID(), name: f.name.replace(/\.[^.]+$/, ''), img, w: img.width, h: img.height, x: 0, y: 0 });
         loaded++;
+        URL.revokeObjectURL(url);
         if (loaded === files.length) {
           setSprites(prev => [...prev, ...newSprites]);
-          URL.revokeObjectURL(url);
+        }
+      };
+      img.onerror = () => {
+        loaded++;
+        URL.revokeObjectURL(url);
+        console.error('Failed to load image', f.name);
+        if (loaded === files.length) {
+          setSprites(prev => [...prev, ...newSprites]);
         }
       };
       img.src = url;
@@ -182,7 +190,7 @@ export default function SpritePackerTool() {
                   <img src={s.img.src} alt={s.name} className="sprite-list-thumb" />
                   <span className="sprite-list-name">{s.name}</span>
                   <span className="sprite-list-size">{s.w}×{s.h}</span>
-                  <button className="sprite-list-del" onClick={() => removeSprite(s.id)}>✕</button>
+                  <button className="sprite-list-del" onClick={() => removeSprite(s.id)}>Remove</button>
                 </div>
               ))}
             </div>
@@ -237,7 +245,7 @@ export default function SpritePackerTool() {
               <div className="css-gen-output" style={{ marginTop: '0.75rem' }}>
                 <div className="json-panel-header">
                   <span className="json-panel-label">Manifest — {format}</span>
-                  <button className="btn-ghost-xs" onClick={copyManifest}>{manifestCopied ? '✓ Copied' : 'Copy'}</button>
+                  <button className="btn-ghost-xs" onClick={copyManifest}>{manifestCopied ? 'Copied' : 'Copy'}</button>
                 </div>
                 <pre className="css-gen-code" style={{ maxHeight: '200px', overflow: 'auto', fontSize: '0.72rem' }}>
                   {getManifest()}

@@ -147,7 +147,7 @@ export default function InvoiceGeneratorTool() {
                 <td className="inv-table__subtotal">${fmt(item.quantity * item.unitPrice)}</td>
                 <td className="no-print">
                   {items.length > 1 && (
-                    <button className="inv-table__del" onClick={() => removeItem(item.id)} title="Remove">✕</button>
+                    <button className="inv-table__del" onClick={() => removeItem(item.id)} title="Remove">Remove</button>
                   )}
                 </td>
               </tr>

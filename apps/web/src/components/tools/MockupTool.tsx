@@ -199,7 +199,7 @@ export default function MockupTool() {
           onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) loadFile(f); }}
         >
           {screenshot ? (
-            <p className="tool-dropzone-text">✓ Screenshot loaded — click to change</p>
+            <p className="tool-dropzone-text">Screenshot loaded — click to change</p>
           ) : (
             <>
               <p className="tool-dropzone-text">Drop your screenshot here</p>
@@ -210,7 +210,7 @@ export default function MockupTool() {
         </div>
 
         <button className="btn-primary" onClick={generate} disabled={!screenshot}>
-          → Generate Mockup
+          Generate Mockup
         </button>
       </div>
 
@@ -220,7 +220,7 @@ export default function MockupTool() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={result} alt="Mockup" className="mockup-result-img" />
           <div className="bgr-actions" style={{marginTop:'1rem'}}>
-            <a href={result} download={`${frame}-mockup.png`} className="btn-primary">↓ Download PNG (1200px)</a>
+            <a href={result} download={`${frame}-mockup.png`} className="btn-primary">Download PNG (1200px)</a>
             <button className="btn-ghost" onClick={() => setResult(null)}>Generate New</button>
           </div>
         </div>

@@ -250,7 +250,7 @@ export default function AudioTool() {
             <div className="pdf-file-item pdf-selected-file">
               <span className="pdf-file-name">{waveFile.name}</span>
               <span className="pdf-file-size">{formatBytes(waveFile.size)}</span>
-              <button className="pdf-file-remove" onClick={() => { setWaveFile(null); setWaveDrawn(false); setWaveError(''); }}>✕</button>
+              <button className="pdf-file-remove" onClick={() => { setWaveFile(null); setWaveDrawn(false); setWaveError(''); }}>Remove</button>
             </div>
           )}
 
@@ -290,7 +290,7 @@ export default function AudioTool() {
             <div className="pdf-file-item pdf-selected-file">
               <span className="pdf-file-name">{infoFile.name}</span>
               <span className="pdf-file-size">{formatBytes(infoFile.size)}</span>
-              <button className="pdf-file-remove" onClick={() => { setInfoFile(null); setAudioInfo(null); setInfoError(''); }}>✕</button>
+              <button className="pdf-file-remove" onClick={() => { setInfoFile(null); setAudioInfo(null); setInfoError(''); }}>Remove</button>
             </div>
           )}
 
@@ -345,7 +345,7 @@ export default function AudioTool() {
                     className="pdf-file-remove"
                     onClick={() => setGifFiles(prev => prev.filter((_, j) => j !== i))}
                     title="Remove"
-                  >✕</button>
+                  >Remove</button>
                 </li>
               ))}
             </ul>

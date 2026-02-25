@@ -5,13 +5,15 @@ import { useState, useMemo } from 'react';
 // ── Color math helpers ────────────────────────────────────────────────────
 
 function hexToRgb(hex: string): [number,number,number] | null {
-  const m = hex.replace('#','').match(/^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+  const clean = hex.replace('#','');
+  const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean;
+  const m = full.match(/^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
   if (!m) return null;
   return [parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)];
 }
 
 function rgbToHex(r: number, g: number, b: number) {
-  return '#' + [r,g,b].map(v => Math.round(v).toString(16).padStart(2,'0')).join('');
+  return '#' + [r,g,b].map(v => Math.round(v).toString(16).padStart(2,'0')).join('').toLowerCase();
 }
 
 function rgbToHsl(r: number, g: number, b: number): [number,number,number] {
@@ -56,11 +58,11 @@ function contrast(r1:number,g1:number,b1:number,r2:number,g2:number,b2:number) {
 
 function harmonies(h: number, s: number, l: number) {
   return {
-    complementary: [[h+180, s, l]],
-    triadic:       [[h+120, s, l],[h+240, s, l]],
-    analogous:     [[h+30, s, l],[h-30, s, l]],
-    split:         [[h+150, s, l],[h+210, s, l]],
-    tetradic:      [[h+90, s, l],[h+180, s, l],[h+270, s, l]],
+    complementary: [[(h+180)%360, s, l]],
+    triadic:       [[(h+120)%360, s, l],[(h+240)%360, s, l]],
+    analogous:     [[(h+30)%360, s, l],[(h-30+360)%360, s, l]],
+    split:         [[(h+150)%360, s, l],[(h+210)%360, s, l]],
+    tetradic:      [[(h+90)%360, s, l],[(h+180)%360, s, l],[(h+270)%360, s, l]],
   };
 }
 
@@ -133,7 +135,7 @@ export default function ColorTool() {
             <div key={label} className="color-value-row" onClick={() => copy(val)}>
               <span className="color-value-label">{label}</span>
               <code className="color-value">{val}</code>
-              <span className="color-copy-hint">{copied === val ? '✓' : 'copy'}</span>
+              <span className="color-copy-hint">{copied === val ? 'Copied' : 'Copy'}</span>
             </div>
           ))}
         </div>

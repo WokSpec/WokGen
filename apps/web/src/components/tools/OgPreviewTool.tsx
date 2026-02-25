@@ -21,11 +21,11 @@ const LIMITS: Record<Platform, { title: number; description: number }> = {
 };
 
 const PLATFORM_LABELS: Record<Platform, string> = {
-  twitter:  '𝕏 Twitter / X',
-  facebook: 'f Facebook',
-  linkedin: 'in LinkedIn',
+  twitter:  'Twitter',
+  facebook: 'Facebook',
+  linkedin: 'LinkedIn',
   discord:  'Discord',
-  slack:    '# Slack',
+  slack:    'Slack',
 };
 
 function truncate(s: string, n: number) {
@@ -185,7 +185,7 @@ export default function OgPreviewTool() {
   const copyTags = async () => {
     await navigator.clipboard.writeText(metaTags);
     setCopiedTags(true);
-    setTimeout(() => setCopiedTags(false), 1500);
+    setTimeout(() => setCopiedTags(false), 2000);
   };
 
   const lim = LIMITS[platform];
@@ -222,7 +222,7 @@ export default function OgPreviewTool() {
             <input className="og-input" value={fields.url} onChange={set('url')} placeholder="https://example.com/page" />
           </div>
           <button className="btn-primary og-copy-btn" onClick={copyTags}>
-            {copiedTags ? '✓ Copied!' : 'Copy Meta Tags'}
+            {copiedTags ? 'Copied!' : 'Copy Meta Tags'}
           </button>
           <pre className="og-meta-preview">{metaTags}</pre>
         </div>

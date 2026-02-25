@@ -61,8 +61,8 @@ export default function AspectRatioTool() {
   const simplified = simplify(width, height);
   const closest = closestStd(width, height);
 
-  const derivedHeight = width && height ? Math.round(fixWidth / ratio) : 0;
-  const derivedWidth = width && height ? Math.round(fixHeight * ratio) : 0;
+  const derivedHeight = width ? Math.round(fixWidth / (width / height || 1)) : 0;
+  const derivedWidth = height ? Math.round(fixHeight * (width / height || 1)) : 0;
 
   return (
     <div className="tool-panel">
@@ -102,7 +102,7 @@ export default function AspectRatioTool() {
                     }}
                     title={isClosest ? 'Closest match' : ''}
                   >
-                    {r.label}{isClosest ? ' ✓' : ''}
+                    {r.label}
                   </button>
                 );
               })}

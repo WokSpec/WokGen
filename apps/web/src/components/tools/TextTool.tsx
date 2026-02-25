@@ -70,7 +70,7 @@ export default function TextTool() {
   const copy = async () => {
     await navigator.clipboard.writeText(output || text);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -147,7 +147,7 @@ export default function TextTool() {
         {/* Single-run modes */}
         {(mode === 'slug' || mode === 'dedup' || mode === 'extract') && (
           <button className="btn-primary text-run-btn" onClick={() => run()}>
-            {mode === 'slug' ? '→ Generate Slug' : mode === 'dedup' ? '→ Remove Duplicates' : '→ Extract'}
+            {mode === 'slug' ? 'Generate Slug' : mode === 'dedup' ? 'Remove Duplicates' : 'Extract'}
           </button>
         )}
 
@@ -156,7 +156,7 @@ export default function TextTool() {
           <div className="json-panel">
             <div className="json-panel-header">
               <span className="json-panel-label">Output</span>
-              <button className="btn-ghost-xs" onClick={copy}>{copied ? '✓ Copied' : 'Copy'}</button>
+              <button className="btn-ghost-xs" onClick={copy}>{copied ? 'Copied!' : 'Copy'}</button>
             </div>
             <textarea className="json-textarea output" value={output} readOnly rows={6} />
           </div>

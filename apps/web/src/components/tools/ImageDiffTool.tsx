@@ -29,12 +29,12 @@ export default function ImageDiffTool() {
     const onUp = () => setDragging(false);
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
-    window.addEventListener('touchmove', onTouch);
+    window.addEventListener('touchmove', onTouch, { passive: true });
     window.addEventListener('touchend', onUp);
     return () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
-      window.removeEventListener('touchmove', onTouch);
+      window.removeEventListener('touchmove', onTouch as EventListener);
       window.removeEventListener('touchend', onUp);
     };
   }, [dragging, updateSlider]);
@@ -94,7 +94,7 @@ export default function ImageDiffTool() {
 
             {/* Divider line */}
             <div className="imgdiff-divider" style={{ left: `${sliderPos}%` }}>
-              <div className="imgdiff-handle">⟷</div>
+              <div className="imgdiff-handle">||</div>
             </div>
 
             {/* Labels */}
@@ -104,7 +104,7 @@ export default function ImageDiffTool() {
 
           <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <input type="range" min={0} max={100} value={sliderPos} onChange={e => setSliderPos(Number(e.target.value))} style={{ flex: 1 }} />
-            <button className="btn-ghost" style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }} onClick={reset}>↩ Reset</button>
+            <button className="btn-ghost" style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }} onClick={reset}>Reset</button>
           </div>
         </>
       )}

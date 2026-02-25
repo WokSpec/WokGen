@@ -175,7 +175,7 @@ function EralCompanionInner() {
         setMessages(prev => [...prev, { role: 'assistant', content: 'Something went wrong. Try again.', id: `err-${Date.now()}` }]);
       }
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Could not reach Eral.', id: `err-${Date.now()}` }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Could not reach Eral 7c.', id: `err-${Date.now()}` }]);
     } finally {
       setLoading(false);
     }
@@ -206,7 +206,7 @@ function EralCompanionInner() {
             style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', padding: '3px 6px',
               border: '1px solid rgba(255,255,255,0.08)', borderRadius: 3, transition: 'color 0.1s' }}
           >
-            Full view →
+            Full view
           </a>
           <button
             onClick={() => setOpen(false)}
@@ -222,7 +222,7 @@ function EralCompanionInner() {
         <div style={S.msgList}>
           {messages.length === 0 && (
             <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>
-              <div style={{ fontSize: 22, marginBottom: 8 }}>✦</div>
+              <div style={{ fontSize: 22, marginBottom: 8 }}>Eral 7c</div>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>Eral 7c</div>
               <div>Your AI creative director.</div>
               <div>Ask about your project, get help generating assets, or brainstorm ideas.</div>
@@ -248,7 +248,7 @@ function EralCompanionInner() {
           <textarea
             style={S.input}
             rows={2}
-            placeholder="Ask Eral anything…"
+            placeholder="Ask Eral 7c anything…"
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={onKey}

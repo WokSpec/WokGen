@@ -77,7 +77,7 @@ body, p, li, td {
   const copy = async () => {
     await navigator.clipboard.writeText(css);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -181,7 +181,7 @@ body, p, li, td {
           <div className="css-gen-output">
             <div className="json-panel-header">
               <span className="json-panel-label">CSS</span>
-              <button className="btn-ghost-xs" onClick={copy}>{copied ? '✓ Copied' : 'Copy'}</button>
+              <button className="btn-ghost-xs" onClick={copy}>{copied ? 'Copied' : 'Copy'}</button>
             </div>
             <pre className="css-gen-code">{css}</pre>
           </div>

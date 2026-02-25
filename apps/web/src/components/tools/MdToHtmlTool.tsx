@@ -107,7 +107,7 @@ export default function MdToHtmlTool() {
   const copy = () => {
     navigator.clipboard.writeText(html).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      setTimeout(() => setCopied(false), 2000);
     });
   };
 
@@ -130,7 +130,7 @@ export default function MdToHtmlTool() {
               <button className={`md2h-tool__tab ${tab === 'preview' ? 'active' : ''}`} onClick={() => setTab('preview')}>Preview</button>
               <button className={`md2h-tool__tab ${tab === 'code' ? 'active' : ''}`} onClick={() => setTab('code')}>HTML Code</button>
             </div>
-            <button className="btn btn-sm" onClick={copy}>{copied ? '✓ Copied' : 'Copy HTML'}</button>
+            <button className="btn btn-sm" onClick={copy}>{copied ? 'Copied!' : 'Copy HTML'}</button>
           </div>
           {tab === 'preview' ? (
             <div className="md2h-tool__preview" dangerouslySetInnerHTML={{ __html: html }} />

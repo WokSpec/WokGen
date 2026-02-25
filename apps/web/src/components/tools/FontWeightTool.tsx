@@ -49,7 +49,7 @@ export default function FontWeightTool() {
     const css = `font-family: '${fontName}', sans-serif;\nfont-weight: ${weight};`;
     navigator.clipboard.writeText(css);
     setCopied(weight);
-    setTimeout(() => setCopied(null), 1500);
+    setTimeout(() => setCopied(null), 2000);
   };
 
   const importUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@${WEIGHTS.join(';')}&display=swap`;
@@ -114,7 +114,7 @@ export default function FontWeightTool() {
               style={{ fontSize: '0.75rem', padding: '0.15rem 0.45rem', flexShrink: 0 }}
               onClick={() => copyDecl(w)}
             >
-              {copied === w ? '✓' : 'Copy'}
+              {copied === w ? 'Copied' : 'Copy'}
             </button>
           </div>
         ))}

@@ -173,11 +173,11 @@ export default function SocialResizeTool() {
 
             <div className="gen-row" style={{marginTop:'1.5rem'}}>
               <button className="btn-primary" onClick={exportAll} disabled={exporting || !presets.some(p => p.selected)}>
-                {exporting ? 'Generating…' : '→ Generate'}
+                {exporting ? 'Generating…' : 'Generate'}
               </button>
               {results.length > 0 && (
                 <button className="btn-ghost" onClick={downloadAll}>
-                  ↓ Download ZIP ({results.length})
+                  Download ZIP ({results.length})
                 </button>
               )}
             </div>
@@ -197,7 +197,7 @@ export default function SocialResizeTool() {
                       <span className="social-result-label">{r.label}</span>
                       <span className="social-result-dims">{r.w}×{r.h}</span>
                     </div>
-                    <a href={r.url} download={`${r.platform}-${r.label}-${r.w}x${r.h}.png`} className="btn-ghost-xs">↓</a>
+                    <a href={r.url} download={`${r.platform}-${r.label.replace(/\s+/g, '-')}-${r.w}x${r.h}.png`} className="btn-ghost-xs">Download</a>
                   </div>
                 ))}
               </div>

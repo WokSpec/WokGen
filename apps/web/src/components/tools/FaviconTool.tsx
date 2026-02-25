@@ -127,7 +127,7 @@ export default function FaviconTool() {
           tabIndex={0}
           onKeyDown={e => e.key === 'Enter' && inputRef.current?.click()}
         >
-          <div className="tool-dropzone-icon">↑</div>
+          <div className="tool-dropzone-icon">Upload</div>
           <p className="tool-dropzone-text">Drop your logo or image here</p>
           <p className="tool-dropzone-sub">PNG · SVG · JPG · WebP — square images work best</p>
           <p className="tool-dropzone-private">100% client-side — nothing uploaded</p>
@@ -177,7 +177,7 @@ export default function FaviconTool() {
                     style={{ fontSize: '0.8rem', padding: '0.3rem 0.75rem' }}
                     onClick={() => downloadSingle(size, name)}
                   >
-                    ↓ Save
+                    Save
                   </button>
                 </div>
               </div>

@@ -193,7 +193,7 @@ export default function PixelEditorTool() {
 
         <div className="pixel-tool-group pixel-tool-group-right">
           <button className="btn-ghost" onClick={clear}>Clear</button>
-          <button className="btn-primary" onClick={exportPng}>↓ Export PNG</button>
+          <button className="btn-primary" onClick={exportPng}>Export PNG</button>
         </div>
       </div>
 

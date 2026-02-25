@@ -14,10 +14,21 @@ interface GalleryAsset {
   mode: string;
   tool: string;
   createdAt: string;
+  rarity?: string;
 }
 
 const PAGE_SIZE = 24;
 const BLUR_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+// simple debounce for search input
+function useDebounced(value: string, delay = 300) {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setV(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return v;
+}
 
 export default function GalleryClient() {
   const [assets, setAssets] = useState<GalleryAsset[]>([]);
@@ -25,6 +36,7 @@ export default function GalleryClient() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedQuery = useDebounced(searchQuery, 350);
   const [modeFilter, setModeFilter] = useState<string>('all');
   const [selectedAsset, setSelectedAsset] = useState<GalleryAsset | null>(null);
 
@@ -36,7 +48,9 @@ export default function GalleryClient() {
     if (opts.cursor) params.set('cursor', opts.cursor);
     if (opts.search.trim()) params.set('search', opts.search.trim());
     if (opts.mode !== 'all') params.set('mode', opts.mode);
-    const res = await fetch(`/api/gallery?${params}`);
+    // support new search endpoint if used
+    const endpoint = opts.search.trim() ? `/api/gallery/search?${params}` : `/api/gallery?${params}`;
+    const res = await fetch(endpoint);
     if (res.ok) {
       const d = await res.json();
       const newAssets: GalleryAsset[] = d.assets ?? [];
@@ -50,8 +64,8 @@ export default function GalleryClient() {
   // Reset and fetch on filter change
   useEffect(() => {
     setCursor(null);
-    fetchAssets({ search: searchQuery, mode: modeFilter, reset: true });
-  }, [searchQuery, modeFilter, fetchAssets]);
+    fetchAssets({ search: debouncedQuery, mode: modeFilter, reset: true });
+  }, [debouncedQuery, modeFilter, fetchAssets]);
 
   // Load more when sentinel is visible
   useEffect(() => {

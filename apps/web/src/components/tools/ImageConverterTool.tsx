@@ -50,7 +50,7 @@ async function convertFile(file: File, format: OutputFormat, quality: number): P
           resolve({ blob, url: URL.createObjectURL(blob) });
         },
         format,
-        format === 'image/png' || format === 'image/gif' ? undefined : quality / 100
+        format === 'image/png' || format === 'image/gif' ? 1.0 : Math.max(0, Math.min(1, quality / 100))
       );
     };
     img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('Failed to load image')); };
@@ -258,10 +258,10 @@ export default function ImageConverterTool() {
                 {cf.status === 'error' && <span className="img-conv-badge error">Error: {cf.error}</span>}
                 {cf.status === 'done' && cf.downloadUrl && (
                   <a href={cf.downloadUrl} download={cf.name} className="btn-primary" style={{ fontSize: '0.8rem', padding: '0.3rem 0.75rem' }}>
-                    ↓ Save
+                    Save
                   </a>
                 )}
-                <button className="btn-ghost" style={{ fontSize: '0.8rem', padding: '0.3rem 0.5rem' }} onClick={() => removeFile(cf.id)}>✕</button>
+                <button className="btn-ghost" style={{ fontSize: '0.8rem', padding: '0.3rem 0.5rem' }} onClick={() => removeFile(cf.id)}>Remove</button>
               </div>
             </div>
           ))}

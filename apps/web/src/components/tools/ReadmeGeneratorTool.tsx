@@ -178,7 +178,7 @@ export default function ReadmeGeneratorTool() {
                 {copied ? 'Copied!' : 'Copy'}
               </button>
               <button className="btn-primary" onClick={download} style={{ fontSize: 12 }}>
-                ↓ Download
+                Download
               </button>
             </div>
           </div>

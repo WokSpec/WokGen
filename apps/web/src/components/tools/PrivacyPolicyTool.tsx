@@ -115,11 +115,12 @@ export default function PrivacyPolicyTool() {
 
   const generate = () => setPolicy(generatePolicy(form));
 
-  const copy = () => {
-    navigator.clipboard.writeText(policy).then(() => {
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(policy);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
   };
 
   const download = () => {
@@ -182,7 +183,7 @@ export default function PrivacyPolicyTool() {
           <div className="pp-tool__output-header">
             <span className="pp-tool__output-title">Generated Policy</span>
             <div className="pp-tool__output-btns">
-              <button className="btn btn-sm" onClick={copy}>{copied ? '✓ Copied' : 'Copy'}</button>
+              <button className="btn btn-sm" onClick={copy}>{copied ? 'Copied!' : 'Copy'}</button>
               <button className="btn btn-sm" onClick={download}>Download .txt</button>
             </div>
           </div>

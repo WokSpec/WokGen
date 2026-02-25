@@ -105,7 +105,7 @@ export default function SnippetsTool() {
   const copySnippet = async (s: Snippet) => {
     await navigator.clipboard.writeText(s.code);
     setCopied(s.id);
-    setTimeout(() => setCopied(null), 1500);
+    setTimeout(() => setCopied(null), 2000);
   };
 
   const exportAll = () => {
@@ -135,7 +135,7 @@ export default function SnippetsTool() {
     return (
       <div className="snippets-editor">
         <div className="snippets-editor-header">
-          <button className="btn-ghost-xs" onClick={() => { setView('list'); setEditing(null); }}>← Back</button>
+          <button className="btn-ghost-xs" onClick={() => { setView('list'); setEditing(null); }}>Back</button>
           <h3 className="snippets-editor-title">{editing.id ? 'Edit Snippet' : 'New Snippet'}</h3>
           <button className="btn-primary btn-sm" onClick={saveSnippet}>Save</button>
         </div>
@@ -229,7 +229,7 @@ export default function SnippetsTool() {
                 </div>
                 <div style={{ display: 'flex', gap: '0.25rem' }}>
                   <button className="tilemap-tool-btn" onClick={() => copySnippet(s)} title="Copy">
-                    {copied === s.id ? '✓' : 'Copy'}
+                    {copied === s.id ? 'Copied!' : 'Copy'}
                   </button>
                   <button className="tilemap-tool-btn" onClick={() => startEdit(s)} title="Edit">Edit</button>
                   <button className="tilemap-tool-btn" onClick={() => deleteSnippet(s.id)} title="Delete">Delete</button>

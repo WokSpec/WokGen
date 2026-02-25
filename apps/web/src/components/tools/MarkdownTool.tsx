@@ -17,9 +17,9 @@ const TOOLBAR = [
   { label: 'Link',  title: 'Link',        wrap: ['[', '](url)'],  placeholder: 'link text' },
   { label: 'Img',   title: 'Image',       wrap: ['![', '](url)'], placeholder: 'alt text' },
   { label: '```',  title: 'Code Block',  block: true,            placeholder: 'code' },
-  { label: '—',    title: 'Quote',       prefix: '> ',           placeholder: undefined },
-  { label: '≡',    title: 'List',        prefix: '- ',           placeholder: undefined },
-  { label: '⊞',    title: 'Table',       table: true },
+  { label: 'Quote',    title: 'Quote',       prefix: '> ',           placeholder: undefined },
+  { label: 'List',     title: 'List',        prefix: '- ',           placeholder: undefined },
+  { label: 'Table',    title: 'Table',       table: true },
 ] as const;
 
 const EXAMPLE = `# Hello, Markdown!
@@ -102,13 +102,13 @@ export default function MarkdownTool() {
   const copyHtml = useCallback(async () => {
     await navigator.clipboard.writeText(html);
     setCopied('html');
-    setTimeout(() => setCopied(null), 1500);
+    setTimeout(() => setCopied(null), 2000);
   }, [html]);
 
   const copyMd = useCallback(async () => {
     await navigator.clipboard.writeText(md);
     setCopied('md');
-    setTimeout(() => setCopied(null), 1500);
+    setTimeout(() => setCopied(null), 2000);
   }, [md]);
 
   const words = wordCount(md);
@@ -177,10 +177,10 @@ export default function MarkdownTool() {
         <span>{chars} char{chars !== 1 ? 's' : ''}</span>
         <div className="md-statusbar-spacer" />
         <button className="btn-ghost-xs" onClick={copyMd}>
-          {copied === 'md' ? '✓ Copied' : 'Copy Markdown'}
+          {copied === 'md' ? 'Copied!' : 'Copy Markdown'}
         </button>
         <button className="btn-ghost-xs" onClick={copyHtml}>
-          {copied === 'html' ? '✓ Copied' : 'Copy HTML'}
+          {copied === 'html' ? 'Copied!' : 'Copy HTML'}
         </button>
       </div>
     </div>

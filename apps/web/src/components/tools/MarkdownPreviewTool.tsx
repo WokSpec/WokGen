@@ -11,9 +11,9 @@ A **bold** statement and _italic_ text.
 - Copy output
 
 ### Code example
-    const hello = "world";
-    console.log(hello);
-
+~~~js
+const hello = "world";
+~~~
 
 > Blockquote text here.
 

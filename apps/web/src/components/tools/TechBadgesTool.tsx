@@ -74,11 +74,12 @@ export default function TechBadgesTool() {
   const selectedTechs = TECH_LIST.filter(t => selected.includes(t.id));
   const markdown = selectedTechs.map(markdownBadge).join(' ');
 
-  const copy = () => {
-    navigator.clipboard.writeText(markdown).then(() => {
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(markdown);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+    } catch {}
   };
 
   return (

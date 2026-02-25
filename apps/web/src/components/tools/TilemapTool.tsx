@@ -293,7 +293,7 @@ export default function TilemapTool() {
                 </button>
                 <span className="tilemap-layer-name">{l.name}</span>
                 {layers.length > 1 && (
-                  <button className="tilemap-layer-del" onClick={e => { e.stopPropagation(); removeLayer(l.id); }}>✕</button>
+                  <button className="tilemap-layer-del" onClick={e => { e.stopPropagation(); removeLayer(l.id); }}>Delete</button>
                 )}
               </div>
             ))}

@@ -88,11 +88,12 @@ export default function ChangelogWriterTool() {
     setOutput(renderChangelog(cat, version, date));
   };
 
-  const copy = () => {
-    navigator.clipboard.writeText(output).then(() => {
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(output);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
   };
 
   const download = () => {
@@ -137,7 +138,7 @@ export default function ChangelogWriterTool() {
           <div className="cl-tool__output-header">
             <span className="cl-tool__output-title">Generated CHANGELOG.md Entry</span>
             <div className="cl-tool__output-btns">
-              <button className="btn btn-sm" onClick={copy}>{copied ? '✓ Copied' : 'Copy'}</button>
+              <button className="btn btn-sm" onClick={copy}>{copied ? 'Copied!' : 'Copy'}</button>
               <button className="btn btn-sm" onClick={download}>Download .md</button>
             </div>
           </div>

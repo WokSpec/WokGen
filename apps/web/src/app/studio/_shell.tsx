@@ -108,7 +108,7 @@ function ProjectPicker({ projectId, onSelect }: {
         <span className="wok-proj-trigger__label">
           {active ? active.name : 'No project'}
         </span>
-        <span className="wok-proj-trigger__caret">▾</span>
+        <span className="wok-proj-trigger__caret">v</span>
       </button>
       {open && (
         <div className="wok-proj-dropdown">
@@ -120,7 +120,7 @@ function ProjectPicker({ projectId, onSelect }: {
             No project
           </button>
           {loading ? (
-            <div className="wok-proj-loading">Loading…</div>
+            <div className="wok-proj-loading">Loading...</div>
           ) : projects.length === 0 ? (
             <div className="wok-proj-loading">
               <a href="/projects" style={{ color: '#41a6f6', textDecoration: 'none', fontSize: '0.7rem' }}>
@@ -261,7 +261,7 @@ export default function UnifiedStudioClient({ type }: Props) {
           flex-direction: column;
           width: 52px;
           flex-shrink: 0;
-          background: #09090f;
+          background: var(--bg-surface);
           border-right: 1px solid rgba(255,255,255,0.06);
           padding: 12px 0;
           gap: 2px;
@@ -342,7 +342,7 @@ export default function UnifiedStudioClient({ type }: Props) {
           gap: 12px;
           height: 32px;
           padding: 0 12px;
-          background: #09090f;
+          background: var(--bg-surface);
           border-bottom: 1px solid rgba(255,255,255,0.05);
           flex-shrink: 0;
         }

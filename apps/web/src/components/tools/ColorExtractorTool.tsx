@@ -5,7 +5,7 @@ import { useState, useRef, useCallback } from 'react';
 type RGB = [number, number, number];
 
 function rgbToHex([r, g, b]: RGB) {
-  return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+  return '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('').toLowerCase();
 }
 
 function colorDist([r1, g1, b1]: RGB, [r2, g2, b2]: RGB) {
@@ -134,7 +134,7 @@ export default function ColorExtractorTool() {
               return (
                 <button key={i} className="colorext-swatch" style={{ background: hex }} onClick={() => copyHex(hex)} title={`Copy ${hex}`}>
                   <span className="colorext-swatch-label" style={{ color: dark ? '#000' : '#fff' }}>
-                    {copiedHex === hex ? '✓' : hex}
+                    {copiedHex === hex ? 'Copied' : hex}
                   </span>
                 </button>
               );

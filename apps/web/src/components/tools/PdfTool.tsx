@@ -221,7 +221,7 @@ export default function PdfTool() {
                     className="pdf-file-remove"
                     onClick={() => setMergeFiles(prev => prev.filter((_, j) => j !== i))}
                     title="Remove"
-                  >✕</button>
+                  >Remove</button>
                 </li>
               ))}
             </ul>
@@ -269,7 +269,7 @@ export default function PdfTool() {
             <div className="pdf-file-item pdf-selected-file">
               <span className="pdf-file-name">{extractFile.name}</span>
               <span className="pdf-file-size">{formatBytes(extractFile.size)}</span>
-              <button className="pdf-file-remove" onClick={() => { setExtractFile(null); setExtractError(''); }}>✕</button>
+              <button className="pdf-file-remove" onClick={() => { setExtractFile(null); setExtractError(''); }}>Remove</button>
             </div>
           )}
 
@@ -322,7 +322,7 @@ export default function PdfTool() {
             <div className="pdf-file-item pdf-selected-file">
               <span className="pdf-file-name">{infoFile.name}</span>
               <span className="pdf-file-size">{formatBytes(infoFile.size)}</span>
-              <button className="pdf-file-remove" onClick={() => { setInfoFile(null); setInfoData(null); setInfoError(''); }}>✕</button>
+              <button className="pdf-file-remove" onClick={() => { setInfoFile(null); setInfoData(null); setInfoError(''); }}>Remove</button>
             </div>
           )}
 

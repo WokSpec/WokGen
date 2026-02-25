@@ -12,6 +12,16 @@
 import type { ProviderConfig, GenerateParams, GenerateResult, ProviderError } from './types';
 
 const HORDE_API = 'https://stablehorde.net/api/v2';
+
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
 // Anonymous key — works but low queue priority. Set STABLE_HORDE_KEY for better priority.
 const ANON_KEY = '0000000000';
 

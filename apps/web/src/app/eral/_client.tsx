@@ -1288,7 +1288,7 @@ export function EralPage({ userId }: { userId?: string }) {
             {[
               { icon: '✦', label: 'Generate', prompt: 'Generate a pixel art ' },
               { icon: '◉', label: 'Transcribe', prompt: 'Transcribe this audio or help me write a script for ' },
-              { icon: ''Cut'', label: 'Remove BG', prompt: 'Help me remove the background from an image of ' },
+              { icon: 'Cut', label: 'Remove BG', prompt: 'Help me remove the background from an image of ' },
               { icon: '⌕', label: 'Search Web', prompt: 'Search for the latest information about ' },
               { icon: '⤴', label: 'Analyze URL', prompt: 'Analyze this URL for me: ' },
               { icon: '+', label: 'New Project', prompt: 'Help me plan a new project for ' },

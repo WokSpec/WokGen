@@ -29,8 +29,8 @@ type StudioType = (typeof STUDIO_TYPES)[number]['id'];
 
 // ── Lazy-load each studio client ─────────────────────────────────────────────
 
-const PixelClient    = dynamic(() => import('@/app/studio/_client'),    { ssr: false });
-const VectorClient   = dynamic(() => import('@/app/studio/_client'),   { ssr: false });
+const PixelClient    = dynamic(() => import('@/app/pixel/studio/_client'),    { ssr: false });
+const VectorClient   = dynamic(() => import('@/app/vector/studio/_client'),   { ssr: false });
 const BusinessClient = dynamic(() => import('@/app/business/studio/_client'), { ssr: false });
 const UIUXClient     = dynamic(() => import('@/app/uiux/studio/_client'),     { ssr: false });
 const VoiceClient    = dynamic(() => import('@/app/voice/studio/_client'),    { ssr: false });

@@ -211,6 +211,16 @@ function buildNegativePrompt(extra?: string): string {
   return base.join(', ');
 }
 
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function submitToQueue(
   model: string,
   input: Record<string, unknown>,
@@ -218,14 +228,14 @@ async function submitToQueue(
 ): Promise<{ request_id: string }> {
   const url = `https://queue.fal.run/${model}`;
 
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     method: 'POST',
     headers: {
       Authorization: `Key ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(input),
-  });
+  }, 60_000);
 
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
@@ -248,11 +258,12 @@ async function pollQueue(
   let backoff = 1_500;
 
   while (Date.now() < deadline) {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `https://queue.fal.run/${model}/requests/${requestId}/status`,
       {
         headers: { Authorization: `Key ${apiKey}` },
       },
+      Math.min(60_000, deadline - Date.now()),
     );
 
     if (!res.ok) {
@@ -297,11 +308,12 @@ async function fetchResult(
   requestId: string,
   apiKey: string,
 ): Promise<FalResult> {
-  const res = await fetch(
+  const res = await fetchWithTimeout(
     `https://queue.fal.run/${model}/requests/${requestId}`,
     {
       headers: { Authorization: `Key ${apiKey}` },
     },
+    60_000,
   );
 
   if (!res.ok) {

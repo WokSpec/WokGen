@@ -3691,7 +3691,7 @@ function StudioInner() {
             <p className="pixel-studio-section-label mb-2">Tools</p>
             <div className="space-y-0.5">
               {[
-                { label: 'Background Remover', href: '/tools/background-remover', icon: ''Cut'' },
+                { label: 'Background Remover', href: '/tools/background-remover', icon: 'Cut' },
                 { label: 'Vectorize', href: '/tools/vectorize', icon: '⬡' },
                 { label: 'Image Resize', href: '/tools/image-resize', icon: '⤡' },
                 { label: 'Image Compress', href: '/tools/image-compress', icon: '⊡' },

@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server';
 import { checkSsrf } from '@/lib/ssrf-check';
+import { checkRateLimit, getRateLimitKey } from '@/lib/rate-limiter';
+import { checkRateLimit as checkRateLimitPersist } from '@/lib/rate-limit';
+import { auth } from '@/lib/auth';
 
 function normalizeHex(raw: string): string | null {
   const hex = raw.replace('#', '');

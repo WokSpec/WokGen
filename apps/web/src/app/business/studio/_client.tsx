@@ -588,30 +588,6 @@ function BusinessStudioInner() {
       {/* ────────────────────────────── LEFT PANEL ──────────────────────────── */}
       <aside className="studio-sidebar">
 
-        {/* Mode identifier */}
-        <div className="studio-mode-header" style={{ '--mode-accent': '#60a5fa' } as React.CSSProperties}>
-          <span className="studio-mode-label">Business mode</span>
-          <QuotaBadge />
-          <a
-            href="/pixel/studio"
-            style={{
-              marginLeft: 'auto',
-              fontSize: '0.7rem',
-              color: 'var(--text-faint, #555)',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem',
-              transition: 'color 0.15s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-muted)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-faint, #555)')}
-            title="Switch to Pixel mode"
-          >
-            Pixel
-          </a>
-        </div>
-
         {showWizard ? (
           <BrandWizard onGenerate={handleWizardGenerate} />
         ) : (<>

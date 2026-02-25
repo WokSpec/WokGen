@@ -266,52 +266,6 @@ function VoiceStudioInner() {
         fontFamily: 'var(--font-sans, system-ui)',
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          borderBottom: '1px solid var(--surface-border)',
-          padding: '16px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: 'var(--surface)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Link href="/voice" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: 13 }}>
-            ← Voice
-          </Link>
-          <span style={{ color: 'var(--text-muted)' }}>/</span>
-          <span style={{ fontSize: 14, fontWeight: 600 }}>Voice mode</span>
-          <span
-            style={{
-              fontSize: 11,
-              padding: '2px 8px',
-              borderRadius: 4,
-              background: `${ACCENT}22`,
-              border: `1px solid ${ACCENT}44`,
-              color: ACCENT,
-              fontWeight: 600,
-            }}
-          >
-            ElevenLabs
-          </span>
-        </div>
-        <Link
-          href="/voice/gallery"
-          style={{
-            fontSize: 13,
-            color: 'var(--text-muted)',
-            textDecoration: 'none',
-            padding: '6px 12px',
-            borderRadius: 6,
-            border: '1px solid var(--surface-border)',
-          }}
-        >
-          Gallery →
-        </Link>
-      </div>
-
       {/* Main layout */}
       <div
         style={{ minHeight: 'calc(100vh - 60px)' }}

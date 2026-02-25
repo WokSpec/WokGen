@@ -3278,9 +3278,6 @@ function StudioInner() {
           style={{ borderBottom: '1px solid var(--surface-border)' }}
         >
           <div className="pixel-studio-panel-header__title">
-            <h1 className="text-sm font-semibold" style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
-              Pixel Studio
-            </h1>
           </div>
           <div className="pixel-studio-panel-header__actions">
             <ProviderBadge provider={provider} />

@@ -7,16 +7,17 @@
  * Each studio client is loaded on demand — no rewrite of existing studio logic.
  *
  * URL: /studio?type=pixel | vector | uiux | voice | business | code
+ *        &projectId=<id> (optional — scopes generation to a project)
  */
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 
 // ── Studio type definitions ──────────────────────────────────────────────────
 
 const STUDIO_TYPES = [
-  { id: 'pixel',    label: 'Pixel',    abbr: 'PX', description: 'Game assets & sprites' },
+  { id: 'pixel',    label: 'Pixel',    abbr: 'PX', description: 'Sprites & pixel art' },
   { id: 'vector',   label: 'Vector',   abbr: 'VC', description: 'Icons & illustrations' },
   { id: 'business', label: 'Brand',    abbr: 'BR', description: 'Logos & brand kits' },
   { id: 'uiux',     label: 'UI/UX',    abbr: 'UI', description: 'Components & mockups' },
@@ -47,6 +48,101 @@ function StudioContent({ type }: { type: StudioType }) {
   }
 }
 
+// ── Project picker ───────────────────────────────────────────────────────────
+
+interface Project { id: string; name: string; mode: string }
+
+function ProjectPicker({ projectId, onSelect }: {
+  projectId: string | null;
+  onSelect: (id: string | null) => void;
+}) {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Fetch projects when opening
+  const handleOpen = async () => {
+    setOpen(o => !o);
+    if (projects.length === 0) {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/projects?limit=20');
+        if (res.ok) {
+          const data = await res.json();
+          setProjects(data.projects ?? []);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const active = projects.find(p => p.id === projectId);
+
+  return (
+    <div ref={ref} className="wok-proj-picker">
+      <button
+        className={`wok-proj-trigger${open ? ' --open' : ''}`}
+        onClick={handleOpen}
+        title={active ? `Project: ${active.name}` : 'No project selected'}
+        aria-label="Select project context"
+      >
+        <span className="wok-proj-trigger__icon">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <rect x="0" y="0" width="4.5" height="4.5" rx="1" fill="currentColor" opacity="0.8"/>
+            <rect x="5.5" y="0" width="4.5" height="4.5" rx="1" fill="currentColor" opacity="0.5"/>
+            <rect x="0" y="5.5" width="4.5" height="4.5" rx="1" fill="currentColor" opacity="0.5"/>
+            <rect x="5.5" y="5.5" width="4.5" height="4.5" rx="1" fill="currentColor" opacity="0.3"/>
+          </svg>
+        </span>
+        <span className="wok-proj-trigger__label">
+          {active ? active.name : 'No project'}
+        </span>
+        <span className="wok-proj-trigger__caret">▾</span>
+      </button>
+      {open && (
+        <div className="wok-proj-dropdown">
+          <button
+            className={`wok-proj-option${!projectId ? ' --active' : ''}`}
+            onClick={() => { onSelect(null); setOpen(false); }}
+          >
+            <span className="wok-proj-option__dot" />
+            No project
+          </button>
+          {loading ? (
+            <div className="wok-proj-loading">Loading…</div>
+          ) : projects.length === 0 ? (
+            <div className="wok-proj-loading">
+              <a href="/projects" style={{ color: '#41a6f6', textDecoration: 'none', fontSize: '0.7rem' }}>
+                Create a project →
+              </a>
+            </div>
+          ) : projects.map(p => (
+            <button
+              key={p.id}
+              className={`wok-proj-option${p.id === projectId ? ' --active' : ''}`}
+              onClick={() => { onSelect(p.id); setOpen(false); }}
+            >
+              <span className="wok-proj-option__dot --filled" />
+              {p.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Unified shell ────────────────────────────────────────────────────────────
 
 interface Props {
@@ -55,9 +151,16 @@ interface Props {
 
 export default function UnifiedStudioClient({ type }: Props) {
   const router = useRouter();
+  const params = useSearchParams();
+  const projectId = params.get('projectId');
 
   const navigate = (t: StudioType) => {
-    router.push(`/studio?type=${t}`);
+    const proj = params.get('projectId');
+    router.push(`/studio?type=${t}${proj ? `&projectId=${proj}` : ''}`);
+  };
+
+  const setProject = (id: string | null) => {
+    router.push(`/studio?type=${type}${id ? `&projectId=${id}` : ''}`);
   };
 
   return (
@@ -84,6 +187,20 @@ export default function UnifiedStudioClient({ type }: Props) {
 
       {/* ── Studio content ───────────────────────────────────────────────── */}
       <div className="wok-studio-content">
+        {/* Project context bar */}
+        <div className="wok-studio-ctx-bar">
+          <ProjectPicker projectId={projectId} onSelect={setProject} />
+          {projectId && (
+            <a
+              href={`/projects/${projectId}`}
+              className="wok-studio-ctx-link"
+              title="Open project workspace"
+            >
+              Open workspace →
+            </a>
+          )}
+        </div>
+
         <Suspense fallback={
           <div className="wok-studio-loading">
             <div className="wok-studio-loading__spinner" />
@@ -181,6 +298,102 @@ export default function UnifiedStudioClient({ type }: Props) {
           flex-direction: column;
         }
 
+        /* Context bar */
+        .wok-studio-ctx-bar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          height: 32px;
+          padding: 0 12px;
+          background: #09090f;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          flex-shrink: 0;
+        }
+
+        .wok-studio-ctx-link {
+          font-size: 0.65rem;
+          color: rgba(255,255,255,0.25);
+          text-decoration: none;
+          margin-left: auto;
+          transition: color 0.1s;
+        }
+        .wok-studio-ctx-link:hover { color: #41a6f6; }
+
+        /* Project picker */
+        .wok-proj-picker {
+          position: relative;
+        }
+
+        .wok-proj-trigger {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 3px 6px;
+          border-radius: 3px;
+          color: rgba(255,255,255,0.35);
+          font-size: 0.68rem;
+          font-weight: 500;
+          transition: background 0.1s, color 0.1s;
+        }
+        .wok-proj-trigger:hover,
+        .wok-proj-trigger.--open {
+          background: rgba(255,255,255,0.05);
+          color: rgba(255,255,255,0.7);
+        }
+
+        .wok-proj-trigger__icon { display: flex; align-items: center; }
+        .wok-proj-trigger__label { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .wok-proj-trigger__caret { font-size: 0.55rem; opacity: 0.5; }
+
+        .wok-proj-dropdown {
+          position: absolute;
+          top: calc(100% + 4px);
+          left: 0;
+          z-index: 50;
+          min-width: 180px;
+          background: #13131f;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 3px;
+          padding: 4px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .wok-proj-option {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+          padding: 6px 8px;
+          background: none;
+          border: none;
+          border-radius: 2px;
+          cursor: pointer;
+          font-size: 0.72rem;
+          color: rgba(255,255,255,0.5);
+          text-align: left;
+          transition: background 0.1s, color 0.1s;
+        }
+        .wok-proj-option:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
+        .wok-proj-option.--active { color: #41a6f6; }
+
+        .wok-proj-option__dot {
+          width: 5px; height: 5px;
+          border-radius: 9999px;
+          border: 1px solid rgba(255,255,255,0.2);
+          flex-shrink: 0;
+        }
+        .wok-proj-option__dot.--filled { background: #41a6f6; border-color: #41a6f6; }
+
+        .wok-proj-loading {
+          padding: 8px;
+          font-size: 0.68rem;
+          color: rgba(255,255,255,0.3);
+          text-align: center;
+        }
+
         /* Loading state */
         .wok-studio-loading {
           flex: 1;
@@ -202,3 +415,4 @@ export default function UnifiedStudioClient({ type }: Props) {
     </div>
   );
 }
+

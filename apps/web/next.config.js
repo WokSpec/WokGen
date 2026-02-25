@@ -117,6 +117,10 @@ const nextConfig = {
       { source: '/uiux/studio',     destination: '/studio?type=uiux',     permanent: false },
       { source: '/voice/studio',    destination: '/studio?type=voice',    permanent: false },
       { source: '/business/studio', destination: '/studio?type=business', permanent: false },
+      // Removed/consolidated routes
+      { source: '/studio/tools',    destination: '/tools',                permanent: false },
+      { source: '/text/studio',     destination: '/eral',                 permanent: false },
+      { source: '/text/studio/:path*', destination: '/eral',              permanent: false },
     ];
   },
 

@@ -1,16 +1,19 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { auth } from '@/lib/auth';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  const rl = await checkRateLimit(`exa:${ip}`, 20, 60_000);
+  const rlKey = session?.user?.id ? `exa:user:${session.user.id}` : `exa:ip:${ip}`;
+  const rl = await checkRateLimit(rlKey, session?.user?.id ? 30 : 20, session?.user?.id ? 3_600_000 : 60_000);
   if (!rl.allowed) return API_ERRORS.RATE_LIMITED();
 
   const apiKey = process.env.EXA_API_KEY;
-  if (!apiKey) return apiError('Exa API not configured. Add EXA_API_KEY to your environment.', 'NOT_CONFIGURED', 503);
+  if (!apiKey) return apiError({ message: 'Exa API not configured. Add EXA_API_KEY to your environment.', code: 'NOT_CONFIGURED', status: 503 });
 
   const body = await req.json().catch(() => null);
   if (!body?.query?.trim()) return API_ERRORS.BAD_REQUEST('query is required');

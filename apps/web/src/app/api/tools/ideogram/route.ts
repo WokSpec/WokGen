@@ -7,12 +7,21 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
 import { auth } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session?.user) return apiError(API_ERRORS.UNAUTHORIZED);
+  if (!session?.user) return API_ERRORS.UNAUTHORIZED();
+
+  const rl = await checkRateLimit(`ideogram:${session.user.id}`, 20, 3_600_000);
+  if (!rl.allowed) {
+    return Response.json({ error: 'Rate limit exceeded. Please try again later.' }, {
+      status: 429,
+      headers: { 'Retry-After': String(rl.retryAfter ?? 60) },
+    });
+  }
 
   const apiKey = process.env.IDEOGRAM_API_KEY;
   if (!apiKey) {
@@ -24,7 +33,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => null);
-  if (!body?.prompt?.trim()) return apiError(API_ERRORS.BAD_REQUEST);
+  if (!body?.prompt?.trim()) return API_ERRORS.BAD_REQUEST('prompt is required');
 
   const { prompt, negativePrompt = '', aspectRatio = 'ASPECT_1_1', model = 'V_2', styleType = 'AUTO', magicPrompt = 'AUTO' } = body;
 
@@ -51,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   const data = await res.json();
   const image = data.data?.[0];
-  if (!image) return apiError(API_ERRORS.INTERNAL);
+  if (!image) return API_ERRORS.INTERNAL();
 
   return apiSuccess({
     url: image.url,

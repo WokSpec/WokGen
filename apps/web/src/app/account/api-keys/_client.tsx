@@ -175,7 +175,10 @@ export default function ApiKeysClient() {
         <div className="apikeys-loading">Loading keys…</div>
       ) : keys.length === 0 ? (
         <div className="apikeys-empty">
-          <p>No API keys yet.</p>
+          <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          </div>
+          <p style={{ fontWeight: 500, marginBottom: '0.25rem' }}>No API keys yet</p>
           <p className="apikeys-empty-sub">Create a key to start using the WokGen API programmatically.</p>
         </div>
       ) : (

@@ -7,12 +7,25 @@
  */
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
+import { auth } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
 const MESHY_BASE = 'https://api.meshy.ai';
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
+
+  const rl = await checkRateLimit(`text-to-3d:${session.user.id}`, 5, 3_600_000);
+  if (!rl.allowed) {
+    return Response.json({ error: 'Rate limit exceeded. Please try again later.' }, {
+      status: 429,
+      headers: { 'Retry-After': String(rl.retryAfter ?? 60) },
+    });
+  }
+
   const apiKey = process.env.MESHY_API_KEY;
   if (!apiKey) {
     return apiError({
@@ -23,7 +36,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => null);
-  if (!body?.prompt?.trim()) return apiError(API_ERRORS.BAD_REQUEST);
+  if (!body?.prompt?.trim()) return API_ERRORS.BAD_REQUEST('prompt is required');
 
   const { prompt, artStyle = 'realistic', negativePrompt = '', topology = 'quad', targetPolycount = 30000 } = body;
 
@@ -55,13 +68,13 @@ export async function GET(req: NextRequest) {
   if (!apiKey) return apiError({ code: 'NOT_CONFIGURED', message: 'MESHY_API_KEY not set', status: 503 });
 
   const taskId = req.nextUrl.searchParams.get('taskId');
-  if (!taskId) return apiError(API_ERRORS.BAD_REQUEST);
+  if (!taskId) return API_ERRORS.BAD_REQUEST('taskId is required');
 
   const res = await fetch(`${MESHY_BASE}/v2/text-to-3d/${taskId}`, {
     headers: { 'Authorization': `Bearer ${apiKey}` },
   });
 
-  if (!res.ok) return apiError(API_ERRORS.INTERNAL);
+  if (!res.ok) return API_ERRORS.INTERNAL();
   const data = await res.json();
 
   return apiSuccess({

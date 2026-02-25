@@ -23,6 +23,7 @@ import SfxBrowser from '@/components/sfx-browser';
 import { CanvasPresets } from '@/components/studio/CanvasPresets';
 import { StylePresetGrid } from '@/components/studio/StylePresetGrid';
 import { GenerationHistory, type GenHistoryEntry } from '@/components/studio/GenerationHistory';
+import { BrandContextSelector } from '@/components/studio/BrandContextSelector';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -2490,6 +2491,34 @@ function StudioInner() {
     return null;
   });
 
+  // Brand context
+  const [brandKitId, setBrandKitId] = useState<string | null>(null);
+
+  // Generation presets
+  const [genPresets, setGenPresets] = useState<Array<{ id: string; name: string; prompt: string; params?: Record<string, unknown> }>>([]);
+  const [showGenPresets, setShowGenPresets] = useState(false);
+  const loadGenPresets = useCallback(async () => {
+    try {
+      const res = await fetch('/api/presets');
+      if (res.ok) { const d = await res.json(); setGenPresets(d.presets ?? []); }
+    } catch { /* ignore */ }
+  }, []);
+  const saveGenPreset = useCallback(async () => {
+    const name = window.prompt('Preset name:');
+    if (!name?.trim()) return;
+    await fetch('/api/presets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.trim(), mode: activeTool, prompt }),
+    });
+    loadGenPresets();
+  }, [activeTool, prompt, loadGenPresets]);
+  const deleteGenPreset = useCallback(async (id: string) => {
+    await fetch(`/api/presets/${id}`, { method: 'DELETE' });
+    setGenPresets(prev => prev.filter(p => p.id !== id));
+  }, []);
+  useEffect(() => { loadGenPresets(); }, [loadGenPresets]);
+
   // Generation intelligence controls
   const [assetCategory, setAssetCategory] = useState<import('@/lib/prompt-builder').AssetCategory>('none');
   const [pixelEra, setPixelEra]           = useState<import('@/lib/prompt-builder').PixelEra>('none');
@@ -2838,6 +2867,7 @@ function StudioInner() {
         seed:           seedValue,
         variantIndex,
         ...(activeWorkspaceId ? { projectId: activeWorkspaceId } : {}),
+        ...(brandKitId && !activeWorkspaceId ? { brandKitId } : {}),
         ...(apiKeys[provider] ? { apiKey: apiKeys[provider] } : {}),
         ...(provider === 'comfyui' ? { comfyuiHost } : {}),
         extra: {
@@ -3235,6 +3265,11 @@ function StudioInner() {
           />
         </div>
 
+        {/* Brand context selector */}
+        <div className="px-4 pb-2 flex-shrink-0">
+          <BrandContextSelector value={brandKitId} onChange={setBrandKitId} />
+        </div>
+
         {/* Canvas Presets accordion */}
         <div className="flex-shrink-0" style={{ borderBottom: '1px solid var(--surface-border)' }}>
           <CanvasPresets currentSize={size} onSelect={setSize} />
@@ -3247,6 +3282,48 @@ function StudioInner() {
             value={stylePreset}
             onChange={(id) => handlePresetSelect(id as StylePreset)}
           />
+        </div>
+
+        {/* Generation Presets */}
+        <div className="flex-shrink-0 px-4 py-2" style={{ borderBottom: '1px solid var(--surface-border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+               onClick={() => setShowGenPresets(v => !v)}>
+            <p className="pixel-studio-section-label" style={{ margin: 0 }}>Generation Presets</p>
+            <span style={{ fontSize: 11, opacity: 0.6 }}>{showGenPresets ? '▲' : '▼'}</span>
+          </div>
+          {showGenPresets && (
+            <div style={{ marginTop: 6 }}>
+              {genPresets.length === 0 && (
+                <p style={{ fontSize: 11, opacity: 0.5, margin: '4px 0' }}>No presets saved yet.</p>
+              )}
+              {genPresets.map(p => (
+                <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                  <button
+                    onClick={() => setPrompt(p.prompt)}
+                    style={{ flex: 1, textAlign: 'left', fontSize: 11, padding: '3px 6px',
+                             background: 'var(--surface-2)', border: '1px solid var(--surface-border)',
+                             borderRadius: 4, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    title={p.prompt}
+                  >
+                    {p.name}
+                  </button>
+                  <button onClick={() => deleteGenPreset(p.id)}
+                          style={{ fontSize: 10, padding: '2px 5px', background: 'transparent',
+                                   border: '1px solid var(--surface-border)', borderRadius: 4, cursor: 'pointer', opacity: 0.6 }}>
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={saveGenPreset}
+                style={{ width: '100%', fontSize: 11, padding: '3px 0', marginTop: 4,
+                         background: 'var(--accent, #7c3aed)', color: '#fff', border: 'none',
+                         borderRadius: 4, cursor: 'pointer' }}
+              >
+                + Save current prompt
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Tool form */}

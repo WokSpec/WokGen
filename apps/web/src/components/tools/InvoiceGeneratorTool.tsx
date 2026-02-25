@@ -174,7 +174,7 @@ export default function InvoiceGeneratorTool() {
       </div>
 
       <div className="no-print inv-tool__actions">
-        <button className="btn btn-primary" onClick={handlePrint}>🖨️ Generate PDF / Print</button>
+        <button className="btn btn-primary" onClick={handlePrint}>Generate PDF / Print</button>
       </div>
 
       <style>{`

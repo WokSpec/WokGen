@@ -62,7 +62,7 @@ export default function WebsitePaletteTool() {
             {loading ? 'Extracting...' : 'Extract'}
           </button>
         </div>
-        {error && <p style={{ color: '#f87171', marginTop: 8 }}>{error}</p>}
+        {error && <div style={{ marginTop: 8, padding: '8px 12px', borderRadius: 6, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', fontSize: 13 }}>{error.includes('Network') ? 'Network error — check your connection and try again.' : error}</div>}
       </div>
 
       {done && colors.length === 0 && (

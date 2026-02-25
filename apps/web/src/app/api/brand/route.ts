@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
 import { cache } from '@/lib/cache';
 import { z } from 'zod';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 // ---------------------------------------------------------------------------
 // GET  /api/brand   — list user's brand kits
@@ -44,6 +45,14 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+
+  const rl = await checkRateLimit(`brand-create:${session.user.id}`, 20, 86_400_000);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: 'Rate limit exceeded. Please try again later.' }, {
+      status: 429,
+      headers: { 'Retry-After': String(rl.retryAfter ?? 3600) },
+    });
+  }
 
   const rawBody = await req.json().catch(() => null);
   if (!rawBody) return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });

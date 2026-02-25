@@ -26,9 +26,9 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   /// Top-up HD credits (never expire, bought via credit packs)
-  hdTopUpCredits      Int @default(0)
+  hdTopUpCredits Int @default(0)
   /// Monthly HD credits consumed this billing period (reset on period renewal)
-  hdMonthlyUsed       Int @default(0)
+  hdMonthlyUsed  Int @default(0)
 
   /// Whether new generations default to public (community gallery opt-in)
   publicGenerationsDefault Boolean @default(false)
@@ -37,31 +37,32 @@ model User {
   isAdmin Boolean @default(false)
 
   /// Standard (free-tier) images generated today — atomic daily quota counter
-  stdGenToday  Int     @default(0)
+  stdGenToday Int     @default(0)
   /// UTC date YYYY-MM-DD of the current stdGenToday window (resets at midnight UTC)
-  stdGenDate   String?
+  stdGenDate  String?
 
-  accounts           Account[]
-  sessions           Session[]
-  jobs               Job[]
-  projects           Project[]
-  subscription       Subscription?
-  usagePeriods       UsagePeriod[]
-  eralConversations  EralConversation[]
-  preference         UserPreference?
-  sfxJobs            SfxJob[]
-  automations        Automation[]
-  apiKeys            ApiKey[]
-  onboarding         OnboardingState?
-  brandKits          BrandKit[]
-  projectMembers     ProjectMember[]
-  assetComments      AssetComment[]
-  activityEvents     ActivityEvent[]
-  notifications      Notification[]
-  webhooks           Webhook[]
-  referralsGiven     Referral[] @relation("ReferralsGiven")
-  referralsReceived  Referral[] @relation("ReferralsReceived")
-  eralNotes          EralNote[]
+  accounts          Account[]
+  sessions          Session[]
+  jobs              Job[]
+  projects          Project[]
+  subscription      Subscription?
+  usagePeriods      UsagePeriod[]
+  eralConversations EralConversation[]
+  preference        UserPreference?
+  sfxJobs           SfxJob[]
+  automations       Automation[]
+  apiKeys           ApiKey[]
+  onboarding        OnboardingState?
+  brandKits         BrandKit[]
+  projectMembers    ProjectMember[]
+  assetComments     AssetComment[]
+  activityEvents    ActivityEvent[]
+  notifications     Notification[]
+  webhooks          Webhook[]
+  referralsGiven    Referral[]         @relation("ReferralsGiven")
+  referralsReceived Referral[]         @relation("ReferralsReceived")
+  eralNotes         EralNote[]
+  generationPresets GenerationPreset[]
 }
 
 model Account {
@@ -105,13 +106,13 @@ model VerificationToken {
 // ---------------------------------------------------------------------------
 
 model Plan {
-  id                String  @id   // "free" | "plus" | "pro" | "max"
-  name              String
-  priceUsdCents     Int           // 0 | 200 | 600 | 1500
-  creditsPerMonth   Int           // 0 | 100 | 500 | 2000 (HD Replicate credits)
+  id              String  @id // "free" | "plus" | "pro" | "max"
+  name            String
+  priceUsdCents   Int // 0 | 200 | 600 | 1500
+  creditsPerMonth Int // 0 | 100 | 500 | 2000 (HD Replicate credits)
   /// true = Pollinations unlimited; false = Replicate with monthly HD credits
-  isUnlimitedStd    Boolean @default(true)
-  stripePriceId     String?       // set after Stripe products are created
+  isUnlimitedStd  Boolean @default(true)
+  stripePriceId   String? // set after Stripe products are created
 
   subscriptions Subscription[]
 }
@@ -155,63 +156,63 @@ model UsagePeriod {
 // Job — tracks a single generation request through its lifecycle
 // ---------------------------------------------------------------------------
 model Job {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
   /// Optional owner — null for anonymous / self-hosted requests
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   /// Tool that created this job: generate | animate | rotate | inpaint | scene
-  tool      String   @default("generate")
+  tool String @default("generate")
 
   /// Lifecycle: pending → running → succeeded | failed
-  status    String   @default("pending")
+  status String @default("pending")
 
   /// Provider that ran the job: replicate | fal | together | comfyui
-  provider  String   @default("replicate")
+  provider String @default("replicate")
 
   // ---- Inputs ---------------------------------------------------------------
   prompt    String
   negPrompt String?
 
   /// Width in pixels (canonical export size: 32 | 64 | 128 | 256 | 512)
-  width     Int      @default(512)
-  height    Int      @default(512)
+  width  Int @default(512)
+  height Int @default(512)
 
   /// Deterministic seed; null = random
-  seed      Int?
+  seed Int?
 
   /// JSON-encoded extra params per tool (e.g. { "style": "rpg", "steps": 20 })
-  params    String?
+  params String?
 
   /// ComfyUI hardware preset used: "lowmem" | "standard" | "hq"
   comfyPreset String?
 
   // ---- Outputs --------------------------------------------------------------
   /// Primary result URL (single image tools)
-  resultUrl   String?
+  resultUrl String?
 
   /// JSON-encoded array of URLs (multi-output tools: rotate, scenes)
-  resultUrls  String?
+  resultUrls String?
 
   /// Error message when status = "failed"
-  error       String?
+  error String?
 
   // ---- Metadata -------------------------------------------------------------
   /// Whether this job is visible in the public gallery
-  isPublic    Boolean  @default(false)
+  isPublic Boolean @default(false)
 
   /// Optional display title set by the user after generation
-  title       String?
+  title String?
 
   /// JSON-encoded tags list for gallery search
-  tags        String?
+  tags String?
 
   /// ISO-8601 timestamp string of external provider prediction (for polling)
   providerJobId String?
 
   /// Product line that created this job: pixel | business | vector | uiux
-  mode      String   @default("pixel")
+  mode String @default("pixel")
 
   /// Optional project this job belongs to
   projectId String?
@@ -221,13 +222,13 @@ model Job {
   paletteJson String? @db.Text
 
   /// User thumbs-up (1) or thumbs-down (-1) rating on this result
-  userRating  Int?
+  userRating Int?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // A job can optionally produce a persisted gallery asset
-  asset       GalleryAsset?
+  asset GalleryAsset?
 
   // Asset relationships where this job is the source or target
   assetRelFrom AssetRelationship[] @relation("RelFrom")
@@ -252,46 +253,46 @@ model Job {
 // GalleryAsset — a finalised, curated asset promoted from a Job
 // ---------------------------------------------------------------------------
 model GalleryAsset {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  jobId     String   @unique
-  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId String @unique
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   /// Human-readable title
-  title     String?
+  title String?
 
   /// Primary image URL (hosted by provider CDN or data: URI for local)
-  imageUrl  String
+  imageUrl String
 
   /// Thumbnail URL (same as imageUrl if not separately generated)
-  thumbUrl  String?
+  thumbUrl String?
 
   /// Canonical export size used for generation
-  size      Int      @default(512)
+  size Int @default(512)
 
   /// Tool that generated it
-  tool      String   @default("generate")
+  tool String @default("generate")
 
   /// Provider used
-  provider  String   @default("replicate")
+  provider String @default("replicate")
 
   /// Original prompt
-  prompt    String
+  prompt String
 
   /// JSON-encoded tags
-  tags      String?
+  tags String?
 
   /// Rarity label from spec.json rarities (optional, set by user or pipeline)
-  rarity    String?
+  rarity String?
 
   /// Whether visible in the public gallery
-  isPublic  Boolean  @default(true)
+  isPublic Boolean @default(true)
 
   /// SHA-256 of the image bytes (for dedup)
-  hash      String?
+  hash String?
 
   /// Product line: pixel | business | vector | uiux
-  mode      String   @default("pixel")
+  mode String @default("pixel")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -308,30 +309,30 @@ model GalleryAsset {
 // Mode is immutable after creation. A job can belong to one project.
 // ---------------------------------------------------------------------------
 model Project {
-  id          String   @id @default(cuid())
-  userId      String
+  id     String @id @default(cuid())
+  userId String
 
   /// Product line: pixel | business | vector | uiux (immutable after creation)
-  mode        String
+  mode String
 
   name        String
   description String?
 
   /// JSON-encoded mode-specific project settings
-  settings    String?
+  settings String?
 
-  isArchived  Boolean  @default(false)
+  isArchived Boolean @default(false)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobs         Job[]
-  brief        ProjectBrief?
-  brandKit     BrandKit[]
-  members      ProjectMember[]
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs          Job[]
+  brief         ProjectBrief?
+  brandKit      BrandKit[]
+  members       ProjectMember[]
   relationships AssetRelationship[]
-  activity     ActivityEvent[]
+  activity      ActivityEvent[]
 
   @@index([userId, mode])
   @@index([userId, isArchived])
@@ -346,7 +347,7 @@ model EralConversation {
   id        String        @id @default(cuid())
   userId    String?
   title     String?
-  mode      String?       // context: which WokGen mode it was opened in
+  mode      String? // context: which WokGen mode it was opened in
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   messages  EralMessage[]
@@ -358,7 +359,7 @@ model EralConversation {
 model EralMessage {
   id             String           @id @default(cuid())
   conversationId String
-  role           String           // 'user' | 'assistant' | 'system'
+  role           String // 'user' | 'assistant' | 'system'
   content        String           @db.Text
   modelUsed      String?
   durationMs     Int?
@@ -373,38 +374,38 @@ model EralMessage {
 // ---------------------------------------------------------------------------
 
 model UserPreference {
-  id        String   @id @default(cuid())
-  userId    String
+  id     String @id @default(cuid())
+  userId String
 
   // Per-mode style preferences (JSON: { stylePreset, size, tool, useHD, etc. })
-  pixelPrefs    String?  @db.Text
-  businessPrefs String?  @db.Text
-  vectorPrefs   String?  @db.Text
-  uiuxPrefs     String?  @db.Text
-  voicePrefs    String?  @db.Text
-  textPrefs     String?  @db.Text
+  pixelPrefs    String? @db.Text
+  businessPrefs String? @db.Text
+  vectorPrefs   String? @db.Text
+  uiuxPrefs     String? @db.Text
+  voicePrefs    String? @db.Text
+  textPrefs     String? @db.Text
 
   // Eral preferences
-  eralDefaultModel    String?  @default("eral-7c")
-  eralPersonality     String?  @default("balanced")  // balanced | technical | creative | concise
-  eralMemory          String?  @db.Text  // JSON array of remembered facts [{ key, value, savedAt }]
-  eralContext         String?  @db.Text  // JSON: { projectType, mainTool, stylePreference } from intro questions
+  eralDefaultModel String? @default("eral-7c")
+  eralPersonality  String? @default("balanced") // balanced | technical | creative | concise
+  eralMemory       String? @db.Text // JSON array of remembered facts [{ key, value, savedAt }]
+  eralContext      String? @db.Text // JSON: { projectType, mainTool, stylePreference } from intro questions
 
   // Favorite prompts (JSON array)
-  favoritePrompts String?  @db.Text
+  favoritePrompts String? @db.Text
 
   // Notification settings (booleans as JSON or individual flags)
-  notifyEmailJobDone  Boolean @default(true)
-  notifyEmailComment  Boolean @default(true)
-  notifyEmailDigest   Boolean @default(false)
-  notifyInAppQuota    Boolean @default(true)
-  notifyInAppLevelUp  Boolean @default(true)
+  notifyEmailJobDone Boolean @default(true)
+  notifyEmailComment Boolean @default(true)
+  notifyEmailDigest  Boolean @default(false)
+  notifyInAppQuota   Boolean @default(true)
+  notifyInAppLevelUp Boolean @default(true)
   // Admin: notification routing channel — 'email' | 'webhook' | 'both' | 'none'
-  notifyAdminChannel  String? @default("email")
-  notifyWebhookUrl    String?  @db.Text
+  notifyAdminChannel String? @default("email")
+  notifyWebhookUrl   String? @db.Text
 
   // Usage stats (JSON: { totalGenerations, successRate, lastActive })
-  stats           String?  @db.Text
+  stats String? @db.Text
 
   onboardingStep     Int     @default(0)
   onboardingComplete Boolean @default(false)
@@ -422,8 +423,8 @@ model UserPreference {
 /// Used as DB fallback when Redis is unavailable.
 model GuestUsage {
   ip    String
-  date  String  // YYYY-MM-DD UTC
-  count Int     @default(0)
+  date  String // YYYY-MM-DD UTC
+  count Int    @default(0)
 
   @@id([ip, date])
   @@index([date])
@@ -468,7 +469,7 @@ model AssetRelationship {
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   fromJob Job     @relation("RelFrom", fields: [fromJobId], references: [id], onDelete: Cascade)
-  toJob   Job     @relation("RelTo",   fields: [toJobId],   references: [id], onDelete: Cascade)
+  toJob   Job     @relation("RelTo", fields: [toJobId], references: [id], onDelete: Cascade)
 
   @@unique([fromJobId, toJobId, type])
   @@index([projectId])
@@ -476,27 +477,27 @@ model AssetRelationship {
 
 /// Project-level creative brief — drives Eral asset director suggestions
 model ProjectBrief {
-  id          String   @id @default(cuid())
-  projectId   String   @unique
+  id        String @id @default(cuid())
+  projectId String @unique
 
   // Free-text project brief for Eral context (Cycle 16)
-  content     String?  @db.Text
-  projectType String?  // platformer | rpg | brand | product | content | app | puzzle | other
+  content     String? @db.Text
+  projectType String? // platformer | rpg | brand | product | content | app | puzzle | other
 
   // Game project fields
-  genre       String?  // dungeon_crawler | platformer | top_down_rpg | city_builder
-  artStyle    String?  // nes_16color | snes_32color | gb_monochrome | modern_pixel
-  paletteJson String?  @db.Text  // JSON: [{hex, name}]
-  moodBoard   String?  @db.Text  // JSON: [imageUrl]
+  genre       String? // dungeon_crawler | platformer | top_down_rpg | city_builder
+  artStyle    String? // nes_16color | snes_32color | gb_monochrome | modern_pixel
+  paletteJson String? @db.Text // JSON: [{hex, name}]
+  moodBoard   String? @db.Text // JSON: [imageUrl]
 
   // Brand project fields
-  brandName   String?
-  industry    String?
-  colorHex    String?  // primary brand color
-  styleGuide  String?  @db.Text
+  brandName  String?
+  industry   String?
+  colorHex   String? // primary brand color
+  styleGuide String? @db.Text
 
   // Pinned style snapshot (JSON: full preset config)
-  pinnedStyle String?  @db.Text
+  pinnedStyle String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -506,16 +507,16 @@ model ProjectBrief {
 
 /// Persistent brand kit — palette, typography direction, style guide
 model BrandKit {
-  id          String   @id @default(cuid())
-  userId      String
-  projectId   String?
+  id        String  @id @default(cuid())
+  userId    String
+  projectId String?
 
   name        String
   /// JSON: [{hex, name, role}]
-  paletteJson String   @db.Text
+  paletteJson String  @db.Text
   /// JSON: {primary, secondary, scale}
-  typography  String?  @db.Text
-  styleGuide  String?  @db.Text
+  typography  String? @db.Text
+  styleGuide  String? @db.Text
   industry    String?
   mood        String?
 
@@ -531,15 +532,15 @@ model BrandKit {
 
 /// Team membership for a project
 model ProjectMember {
-  id            String   @id @default(cuid())
-  projectId     String
-  userId        String?  // nullable for pending invites
+  id           String   @id @default(cuid())
+  projectId    String
+  userId       String? // nullable for pending invites
   /// owner | editor | viewer
-  role          String   @default("viewer")
-  invitedBy     String?
-  inviteToken   String?  @unique // token for accepting pending invites
-  inviteStatus  String?  @default("pending") // pending | accepted | declined
-  createdAt     DateTime @default(now())
+  role         String   @default("viewer")
+  invitedBy    String?
+  inviteToken  String?  @unique // token for accepting pending invites
+  inviteStatus String?  @default("pending") // pending | accepted | declined
+  createdAt    DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user    User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -565,7 +566,7 @@ model AssetTag {
 
 /// Activity feed event for a project
 model ActivityEvent {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   projectId String
   userId    String?
   /// generate | comment | like | export | member_join | brief_update | batch
@@ -599,20 +600,19 @@ model AssetComment {
   @@index([jobId, createdAt])
 }
 
-
 /// Scheduled automation — send a message or trigger an action on a cron schedule
 model Automation {
-  id        String  @id @default(cuid())
-  userId    String
+  id     String @id @default(cuid())
+  userId String
 
-  name      String
-  enabled   Boolean @default(true)
+  name    String
+  enabled Boolean @default(true)
 
   /// cron expression: "0 9 * * 1" = every Monday 9am UTC
-  schedule  String
+  schedule String
 
   /// Target type: 'email' | 'webhook' | 'in_app'
-  targetType  String @default("email")
+  targetType String @default("email")
 
   /// Webhook URL or email address depending on targetType
   targetValue String? @db.Text
@@ -621,7 +621,7 @@ model Automation {
   messageTemplate String @db.Text
 
   /// Last time this automation ran
-  lastRunAt   DateTime?
+  lastRunAt DateTime?
 
   /// Last run result: 'ok' | 'error'
   lastRunStatus String?
@@ -660,13 +660,13 @@ model ApiKey {
 }
 
 model OnboardingState {
-  id     String @id @default(cuid())
-  userId String @unique
-  step   Int    @default(0)
-  useCase String?
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  step        Int       @default(0)
+  useCase     String?
   completedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -726,7 +726,7 @@ model Referral {
   creditsAwarded Int      @default(0)
   createdAt      DateTime @default(now())
 
-  referrer User @relation("ReferralsGiven",    fields: [referrerId],     references: [id], onDelete: Cascade)
+  referrer User @relation("ReferralsGiven", fields: [referrerId], references: [id], onDelete: Cascade)
   referred User @relation("ReferralsReceived", fields: [referredUserId], references: [id], onDelete: Cascade)
 
   @@index([referrerId])
@@ -747,8 +747,8 @@ model EralNote {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tags  EralNoteTag[]
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags EralNoteTag[]
 
   @@index([userId, pinned])
   @@index([userId, updatedAt])
@@ -763,4 +763,23 @@ model EralNoteTag {
 
   @@unique([noteId, tag])
   @@index([tag])
+}
+
+// ---------------------------------------------------------------------------
+// GenerationPreset — saved parameter sets for quick generation
+// ---------------------------------------------------------------------------
+model GenerationPreset {
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  mode       String
+  prompt     String   @db.Text
+  params     Json?
+  brandKitId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

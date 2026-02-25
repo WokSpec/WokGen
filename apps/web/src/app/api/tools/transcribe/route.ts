@@ -6,6 +6,8 @@
  */
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
+import { auth } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -13,6 +15,17 @@ export const maxDuration = 120;
 const ASMBL_BASE = 'https://api.assemblyai.com';
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
+
+  const rl = await checkRateLimit(`transcribe:${session.user.id}`, 10, 3_600_000);
+  if (!rl.allowed) {
+    return Response.json({ error: 'Rate limit exceeded. Please try again later.' }, {
+      status: 429,
+      headers: { 'Retry-After': String(rl.retryAfter ?? 60) },
+    });
+  }
+
   const apiKey = process.env.ASSEMBLYAI_API_KEY;
   if (!apiKey) {
     return apiError({
@@ -23,7 +36,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => null);
-  if (!body?.audioUrl?.trim() && !body?.audioBase64) return apiError(API_ERRORS.BAD_REQUEST);
+  if (!body?.audioUrl?.trim() && !body?.audioBase64) return API_ERRORS.BAD_REQUEST('audioUrl or audioBase64 is required');
 
   const { audioUrl, speakerLabels = true, autoChapters = false, entityDetection = true, sentimentAnalysis = false } = body;
 

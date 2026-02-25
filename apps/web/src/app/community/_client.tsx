@@ -760,7 +760,13 @@ export default function CommunityClient() {
       <div className="community-main">
         {error && (
           <div className="community-error-banner">
-            <span className="community-error-message">Failed to load: {error}</span>
+            <span className="community-error-message">
+              {error.includes('401') || error.includes('403')
+                ? 'Please sign in to continue.'
+                : error.includes('429') || error.includes('Rate limit')
+                ? 'Too many requests. Please wait a moment.'
+                : 'Unable to load content. Please try again.'}
+            </span>
             <button onClick={() => fetchAssets(null, true)} className="community-retry-btn">Retry</button>
           </div>
         )}

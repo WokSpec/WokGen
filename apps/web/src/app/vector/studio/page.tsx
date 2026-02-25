@@ -10,6 +10,7 @@ import WorkspaceSelector from '@/app/_components/WorkspaceSelector';
 import { EralSidebar } from '@/app/_components/EralSidebar';
 import { QuotaBadge } from '@/components/quota-badge';
 import { ColorPalette } from '@/components/color-palette';
+import { BrandContextSelector } from '@/components/studio/BrandContextSelector';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -156,6 +157,9 @@ function VectorStudioInner() {
     return null;
   });
 
+  // Brand context
+  const [brandKitId, setBrandKitId] = useState<string | null>(null);
+
   // ── Generation state ─────────────────────────────────────────────────────
   const [jobStatus, setJobStatus]     = useState<JobStatus>('idle');
   const [results, setResults]         = useState<GenerationResult[]>([]);
@@ -234,6 +238,7 @@ function VectorStudioInner() {
       negPrompt: 'blurry, photorealistic, complex background, messy, rough, sketch',
       size,
       ...(activeWorkspaceId ? { projectId: activeWorkspaceId } : {}),
+      ...(brandKitId && !activeWorkspaceId ? { brandKitId } : {}),
     };
 
     try {
@@ -287,7 +292,7 @@ function VectorStudioInner() {
       stopTimer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prompt, activeTool, preset, iconSize, illustSize, bgMode, colorHint, useHD, isPublic, batchCount, activeWorkspaceId, jobStatus]);
+  }, [prompt, activeTool, preset, iconSize, illustSize, bgMode, colorHint, useHD, isPublic, batchCount, activeWorkspaceId, brandKitId, jobStatus]);
 
   // ── Load history on mount ─────────────────────────────────────────────────
   useEffect(() => {
@@ -431,6 +436,11 @@ function VectorStudioInner() {
             activeWorkspaceId={activeWorkspaceId}
             onChange={setActiveWorkspaceId}
           />
+        </div>
+
+        {/* Brand context selector */}
+        <div className="studio-control-section" style={{ paddingTop: 6, paddingBottom: 0 }}>
+          <BrandContextSelector value={brandKitId} onChange={setBrandKitId} />
         </div>
 
         {/* Prompt */}

@@ -95,5 +95,6 @@ export default function RecraftPage() {
         )}
       </div>
     </div>
+    </ToolShell>
   );
 }

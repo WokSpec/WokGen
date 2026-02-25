@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
+import ToolShell from '@/components/tools/ToolShell';
 
 const ASPECT_RATIOS = [
   { value: 'ASPECT_1_1', label: '1:1 Square' },
@@ -46,7 +47,8 @@ export default function IdeogramPage() {
   }
 
   return (
-    <div className="tool-page-root">
+    <ToolShell id="ideogram" label="Ideogram" description="Generate images where text renders correctly, powered by Ideogram AI." icon="ID">
+      <div className="tool-page-root">
       <div className="tool-page-header">
         <h1 className="tool-page-title">Ideogram — Text in Images</h1>
         <p className="tool-page-desc">Generate images where text actually renders correctly. Posters, logos, banners — powered by Ideogram V2.</p>
@@ -90,5 +92,6 @@ export default function IdeogramPage() {
         )}
       </div>
     </div>
+    </ToolShell>
   );
 }

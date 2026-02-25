@@ -4,7 +4,7 @@
  * API: https://www.recraft.ai/docs
  * Key: RECRAFT_API_KEY (get free at https://www.recraft.ai/)
  */
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
 import { auth } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
@@ -23,6 +23,10 @@ const STYLES = [
 ];
 
 export async function POST(req: NextRequest) {
+  if (!process.env.RECRAFT_API_KEY) {
+    return NextResponse.json({ error: 'This tool is not configured on this server.' }, { status: 503 });
+  }
+
   const session = await auth();
   if (!session?.user) return API_ERRORS.UNAUTHORIZED();
 

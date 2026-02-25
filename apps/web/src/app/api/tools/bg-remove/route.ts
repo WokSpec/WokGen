@@ -27,6 +27,10 @@ export const POST = withErrorHandler(async (req) => {
   const userId = session?.user?.id ?? null;
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
 
+  // If a projectId is provided the user must be authenticated
+  // (prevent anonymous activity events tied to projects)
+  const authRequired = false;
+
   // Quota check: free/guest users get 3 bg-remove operations per day
   try {
     const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
@@ -65,6 +69,10 @@ export const POST = withErrorHandler(async (req) => {
   if (bodyError) return bodyError;
 
   const { imageUrl, imageBase64, projectId } = body;
+
+  if (projectId && !userId) {
+    return API_ERRORS.UNAUTHORIZED();
+  }
 
   // SSRF protection for imageUrl
   if (imageUrl) {
@@ -110,7 +118,7 @@ export const POST = withErrorHandler(async (req) => {
       return NextResponse.json({ resultBase64, mimeType: 'image/png' });
     } catch (err) {
       logger.error({ err }, '[bg-remove] base64 path failed');
-      return NextResponse.json({ error: 'Background removal failed' }, { status: 500 });
+      return API_ERRORS.INTERNAL('Background removal failed');
     }
   }
 
@@ -118,7 +126,7 @@ export const POST = withErrorHandler(async (req) => {
   const result = await removeBackground(imageUrl!);
 
   if (!result) {
-    return NextResponse.json({ error: 'Background removal failed' }, { status: 502 });
+    return API_ERRORS.INTERNAL('Background removal failed');
   }
 
   const resultBase64 = result.replace(/^data:[^;]+;base64,/, '');

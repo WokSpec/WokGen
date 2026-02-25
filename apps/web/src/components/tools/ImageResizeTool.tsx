@@ -81,13 +81,25 @@ export default function ImageResizeTool() {
   };
 
   const doResize = useCallback(() => {
+    setError(null);
     const img = imgRef.current;
-    if (!img || !width || !height) return;
+    if (!img) {
+      setError('No image loaded');
+      return;
+    }
+    if (!width || !height) {
+      setError('Invalid dimensions');
+      return;
+    }
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      setError('Canvas not available');
+      return;
+    }
+    setIsLoading(true);
 
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, width, height);
@@ -109,11 +121,16 @@ export default function ImageResizeTool() {
     }
 
     canvas.toBlob(blob => {
-      if (!blob) return;
+      if (!blob) {
+        setError('Failed to create image');
+        setIsLoading(false);
+        return;
+      }
       if (resultUrl) URL.revokeObjectURL(resultUrl);
       setResultUrl(URL.createObjectURL(blob));
-    }, 'image/png');
-  }, [imgRef, width, height, fitMode, resultUrl]);
+      setIsLoading(false);
+    }, outputFormat, outputFormat === 'image/png' ? undefined : quality / 100);
+  }, [imgRef, width, height, fitMode, resultUrl, outputFormat, quality]);
 
   const reset = () => {
     if (originalUrl) URL.revokeObjectURL(originalUrl);
@@ -155,6 +172,8 @@ export default function ImageResizeTool() {
 
       {originalUrl && (
         <>
+          {error && <div className="img-resize-error">Error: {error}</div>}
+          {isLoading && <div className="img-resize-loading">Processing…</div>}
           {/* Presets */}
           <div className="img-resize-presets">
             <span className="img-conv-label">Presets</span>
@@ -229,12 +248,39 @@ export default function ImageResizeTool() {
             </div>
           </div>
 
+          {/* Output format */}
+          <div className="img-conv-format-row">
+            <span className="img-conv-label">Output format</span>
+            <div className="img-conv-format-btns">
+              {(['image/png','image/jpeg','image/webp'] as const).map(fmt => (
+                <button
+                  key={fmt}
+                  className={`img-conv-fmt-btn${outputFormat === fmt ? ' active' : ''}`}
+                  onClick={() => setOutputFormat(fmt)}
+                >
+                  {fmt === 'image/png' ? 'PNG' : fmt === 'image/jpeg' ? 'JPG' : 'WebP'}
+                </button>
+              ))}
+            </div>
+            {outputFormat !== 'image/png' && (
+              <div className="img-conv-quality-row">
+                <span className="img-conv-label">Quality</span>
+                <input type="range" min={0} max={100} value={quality} onChange={e => setQuality(Number(e.target.value))} />
+                <span className="img-conv-quality-val">{quality}%</span>
+              </div>
+            )}
+          </div>
+
+          {originalSize > 10 * 1024 * 1024 && (
+            <div className="img-resize-warning">Warning: image &gt; 10MB — processing may be slow or fail in some browsers.</div>
+          )}
+
           {/* Result preview */}
           {resultUrl && (
             <div className="img-resize-result">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={resultUrl} alt="Resized" className="img-resize-preview" />
-              <p className="img-resize-result-info">{width}×{height}px PNG</p>
+              <p className="img-resize-result-info">{width}×{height}px {outputFormat === 'image/png' ? 'PNG' : outputFormat === 'image/jpeg' ? 'JPG' : 'WebP'}</p>
             </div>
           )}
 
@@ -244,8 +290,8 @@ export default function ImageResizeTool() {
               Resize to {width}×{height}
             </button>
             {resultUrl && (
-              <a href={resultUrl} download={`${fileName}-${width}x${height}.png`} className="btn-primary">
-                ↓ Download PNG
+              <a href={resultUrl} download={`${fileName}-${width}x${height}.${outputFormat === 'image/png' ? 'png' : outputFormat === 'image/jpeg' ? 'jpg' : 'webp'}`} className="btn-primary">
+                ↓ Download {outputFormat === 'image/png' ? 'PNG' : outputFormat === 'image/jpeg' ? 'JPG' : 'WebP'}
               </a>
             )}
             <button className="btn-ghost" onClick={reset}>

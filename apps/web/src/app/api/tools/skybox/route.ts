@@ -5,7 +5,7 @@
  *
  * Creates immersive 360° equirectangular images for games, VR, 3D scenes.
  */
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
 import { auth } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
@@ -30,6 +30,10 @@ const SKYBOX_STYLES: Record<string, number> = {
 };
 
 export async function POST(req: NextRequest) {
+  if (!process.env.SKYBOX_API_KEY) {
+    return NextResponse.json({ error: 'This tool is not configured on this server.' }, { status: 503 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 
@@ -95,6 +99,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  if (!process.env.SKYBOX_API_KEY) {
+    return NextResponse.json({ error: 'This tool is not configured on this server.' }, { status: 503 });
+  }
+
   const apiKey = process.env.SKYBOX_API_KEY;
   if (!apiKey) return apiError({ code: 'NOT_CONFIGURED', message: 'SKYBOX_API_KEY not set', status: 503 });
 

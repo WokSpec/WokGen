@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import ToolShell from '@/components/tools/ToolShell';
 
 function formatSrtTime(ms: number) {
   const totalSeconds = Math.floor(ms / 1000);
@@ -69,7 +70,8 @@ export default function TranscribePage() {
   }
 
   return (
-    <div className="tool-page-root">
+    <ToolShell id="transcribe" label="Audio Transcription" description="Transcribe audio with speaker labels, entity detection, and sentiment analysis — powered by AssemblyAI Universal-2." icon="TR">
+      <div className="tool-page-root">
       <div className="tool-page-header">
         <h1 className="tool-page-title">Audio Transcription</h1>
         <p className="tool-page-desc">Transcribe audio with speaker labels, entity detection, and sentiment analysis — powered by AssemblyAI Universal-2.</p>
@@ -170,5 +172,6 @@ export default function TranscribePage() {
         )}
       </div>
     </div>
+    </ToolShell>
   );
 }

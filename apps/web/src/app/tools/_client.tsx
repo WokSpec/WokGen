@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Star } from 'lucide-react';
 import { TOOLS, TAG_LABELS } from '@/lib/tools-registry';
 import type { ToolTag, ToolDef } from '@/lib/tools-registry';
 import TutorialOverlay, { useTutorial, TOOLS_TUTORIAL } from '@/components/TutorialOverlay';

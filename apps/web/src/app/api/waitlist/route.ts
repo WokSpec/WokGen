@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { log as logger } from '@/lib/logger';
+import { checkRateLimit, getRateLimitKey } from '@/lib/rate-limiter';
 
 export async function POST(req: NextRequest) {
+  const rl = checkRateLimit(getRateLimitKey(req, 'waitlist'), 10, 60 * 60 * 1000);
+  if (!rl.ok) {
+    return NextResponse.json({ error: 'Too many requests. Try again in an hour.' }, { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } });
+  }
+
   let email: string | undefined;
   let mode: string | undefined;
   try {

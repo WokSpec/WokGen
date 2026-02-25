@@ -19,6 +19,20 @@ function rgbToHex(r: number, g: number, b: number): string {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  const rl = checkRateLimit(getRateLimitKey(req, 'website-palette'), 20, 60_000);
+  if (!rl.ok) {
+    return Response.json({ error: 'Too many requests. Try again in a minute.' }, {
+      status: 429,
+      headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) },
+    });
+  }
+  if (session?.user?.id) {
+    const userRl = await checkRateLimitPersist(`website-palette:${session.user.id}`, 20, 3_600_000);
+    if (!userRl.allowed) {
+      return Response.json({ error: 'Rate limit exceeded.' }, { status: 429, headers: { 'Retry-After': String(userRl.retryAfter ?? 60) } });
+    }
+  }
   try {
     const { url } = await req.json();
     if (!url || typeof url !== 'string') {

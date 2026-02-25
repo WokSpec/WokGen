@@ -86,7 +86,7 @@ async function tryModel(
   t0: number,
 ): Promise<GenerateResult> {
   // Submit generation job
-  const submitRes = await fetch(`${HORDE_API}/generate/async`, {
+  const submitRes = await fetchWithTimeout(`${HORDE_API}/generate/async`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ async function tryModel(
       censor_nsfw: true,
       slow_workers: true, // use slower workers too (more availability)
     }),
-  });
+  }, 60_000);
 
   if (!submitRes.ok) {
     const body = await submitRes.text().catch(() => '');
@@ -134,9 +134,9 @@ async function tryModel(
   while (Date.now() < deadline) {
     await new Promise(r => setTimeout(r, 3_000));
 
-    const checkRes = await fetch(`${HORDE_API}/generate/check/${id}`, {
+    const checkRes = await fetchWithTimeout(`${HORDE_API}/generate/check/${id}`, {
       headers: { 'apikey': apiKey, 'Client-Agent': 'WokGen:1.1.0:contact@wokgen.ai' },
-    });
+    }, Math.min(60_000, deadline - Date.now()));
 
     if (!checkRes.ok) continue; // transient check failure, keep polling
 
@@ -159,9 +159,9 @@ async function tryModel(
     if (!check.done) continue;
 
     // Retrieve result
-    const statusRes = await fetch(`${HORDE_API}/generate/status/${id}`, {
+    const statusRes = await fetchWithTimeout(`${HORDE_API}/generate/status/${id}`, {
       headers: { 'apikey': apiKey, 'Client-Agent': 'WokGen:1.1.0:contact@wokgen.ai' },
-    });
+    }, 60_000);
 
     if (!statusRes.ok) {
       const pe = new Error(`Stable Horde status fetch failed (${statusRes.status})`) as ProviderError;

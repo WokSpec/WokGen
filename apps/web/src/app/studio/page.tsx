@@ -61,6 +61,14 @@ const MODES = [
     status: 'live' as const,
     tags: ['Copywriting', 'Dialogue', 'Content'],
   },
+  {
+    id: 'code',
+    label: 'Code',
+    href: '/studio/code',
+    description: 'Describe a UI component and get production-ready React + Tailwind code instantly.',
+    status: 'live' as const,
+    tags: ['React', 'Tailwind', 'Components'],
+  },
 ] as const;
 
 export default function StudioHub() {

@@ -38,6 +38,7 @@ const QUICK_COMMANDS: { label: string; path: string }[] = [
   { label: 'Business mode',  path: '/business/studio' },
   { label: 'Voice mode',     path: '/voice/studio'    },
   { label: 'Text mode',      path: '/text/studio'     },
+  { label: 'Code Studio',    path: '/studio/code'     },
   { label: 'My Gallery',      path: '/pixel/gallery'   },
   { label: 'Asset Library',   path: '/library'         },
   { label: 'Pricing',         path: '/pricing'         },

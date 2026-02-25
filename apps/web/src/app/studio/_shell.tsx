@@ -145,6 +145,16 @@ function ProjectPicker({ projectId, onSelect }: {
 
 // ── Unified shell ────────────────────────────────────────────────────────────
 
+interface ProjectContext {
+  projectName: string;
+  projectType: string | null;
+  artStyle: string | null;
+  brandName: string | null;
+  briefContent: string | null;
+  palette: { hex: string; name: string; role: string }[] | null;
+  primaryColor: string | null;
+}
+
 interface Props {
   type: StudioType;
 }
@@ -153,6 +163,16 @@ export default function UnifiedStudioClient({ type }: Props) {
   const router = useRouter();
   const params = useSearchParams();
   const projectId = params.get('projectId');
+  const [ctx, setCtx] = useState<ProjectContext | null>(null);
+
+  // Fetch project context when projectId is set
+  useEffect(() => {
+    if (!projectId) { setCtx(null); return; }
+    fetch(`/api/projects/${projectId}/context`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setCtx(d as ProjectContext); })
+      .catch(() => {});
+  }, [projectId]);
 
   const navigate = (t: StudioType) => {
     const proj = params.get('projectId');
@@ -190,6 +210,23 @@ export default function UnifiedStudioClient({ type }: Props) {
         {/* Project context bar */}
         <div className="wok-studio-ctx-bar">
           <ProjectPicker projectId={projectId} onSelect={setProject} />
+          {ctx && (
+            <div className="wok-studio-ctx-meta">
+              {ctx.projectName && (
+                <span className="wok-studio-ctx-tag">{ctx.projectName}</span>
+              )}
+              {ctx.primaryColor && (
+                <span
+                  className="wok-studio-ctx-swatch"
+                  title={`Brand color: ${ctx.primaryColor}`}
+                  style={{ background: ctx.primaryColor }}
+                />
+              )}
+              {ctx.artStyle && (
+                <span className="wok-studio-ctx-tag wok-studio-ctx-tag--faint">{ctx.artStyle}</span>
+              )}
+            </div>
+          )}
           {projectId && (
             <a
               href={`/projects/${projectId}`}
@@ -318,6 +355,33 @@ export default function UnifiedStudioClient({ type }: Props) {
           transition: color 0.1s;
         }
         .wok-studio-ctx-link:hover { color: #41a6f6; }
+
+        .wok-studio-ctx-meta {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .wok-studio-ctx-tag {
+          font-size: 0.62rem;
+          font-weight: 600;
+          letter-spacing: 0.03em;
+          color: rgba(255,255,255,0.45);
+          padding: 1px 5px;
+          background: rgba(255,255,255,0.06);
+          border-radius: 2px;
+          white-space: nowrap;
+          max-width: 100px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .wok-studio-ctx-tag--faint { color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.03); }
+        .wok-studio-ctx-swatch {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          flex-shrink: 0;
+          border: 1px solid rgba(255,255,255,0.15);
+        }
 
         /* Project picker */
         .wok-proj-picker {

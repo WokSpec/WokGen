@@ -6,6 +6,7 @@ import { log as logger } from '@/lib/logger';
 import { checkSsrf } from '@/lib/ssrf-check';
 import { z } from 'zod';
 import { withErrorHandler, dbQuery } from '@/lib/api-handler';
+import { validateBody } from '@/lib/validate';
 
 const BgRemoveSchema = z.object({
   imageUrl:    z.string().url('Must be a valid URL').optional(),

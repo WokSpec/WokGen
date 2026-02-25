@@ -2,6 +2,15 @@
 
 <!-- Short description of what this PR does -->
 
+## Type of change
+
+- [ ] ✨ Feature (new functionality)
+- [ ] 🐛 Bug fix
+- [ ] 📝 Documentation
+- [ ] 🔒 Security fix
+- [ ] ♻️ Refactor (no behaviour change)
+- [ ] 🔧 Chore / dependency update
+
 ## Which area does it affect?
 
 - [ ] Pixel mode
@@ -19,22 +28,24 @@
 - [ ] Platform-wide (API, middleware, etc.)
 - [ ] CI/CD / deployment
 
-## Type of change
+## Testing checklist
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Refactor
-- [ ] Tuning (quality profiles, prompt chains, negative banks)
-- [ ] Documentation
-- [ ] Chore
-
-## Checklist
-
+- [ ] All existing tests pass (`npm test` or equivalent)
 - [ ] TypeScript passes clean (`cd apps/web && npx tsc --noEmit`)
+- [ ] No emoji characters introduced in source code or prompts
+- [ ] No deployment was triggered manually (CI handles deploys)
 - [ ] No secrets, API keys, or credentials in the diff
-- [ ] Mode README updated if mode behavior changed (`modes/{mode}/README.md`)
+- [ ] Mode README updated if mode behaviour changed (`modes/{mode}/README.md`)
 - [ ] Prisma migration included if schema changed (`npx prisma migrate dev`)
-- [ ] Documentation updated if behavior changed
+- [ ] Documentation updated if behaviour changed
+
+## Screenshots (UI changes)
+
+<!-- If this PR changes any UI, paste before/after screenshots below. Delete section if not applicable. -->
+
+| Before | After |
+|--------|-------|
+|        |       |
 
 ## Related issue
 

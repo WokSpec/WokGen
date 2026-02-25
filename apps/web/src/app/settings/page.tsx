@@ -44,7 +44,7 @@ export default async function SettingsPage() {
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>WokGen uses OAuth-only authentication — no passwords to manage or leak.</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
             {([
-              { id: 'github', label: 'GitHub', icon: '⬡' },
+              { id: 'github', label: 'GitHub', icon: 'GH' },
               { id: 'google', label: 'Google', icon: 'G' },
             ] as const).map(provider => (
               <div key={provider.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', border: '1px solid var(--border)', borderRadius: '8px', background: 'rgba(255,255,255,0.02)' }}>
@@ -89,7 +89,7 @@ export default async function SettingsPage() {
             <button
               type="submit"
               style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '8px', color: '#f87171', fontSize: '0.875rem', cursor: 'pointer', fontFamily: 'inherit' }}
-              onClick={(e) => { if (!confirm('Are you absolutely sure? All your data will be permanently deleted.')) e.preventDefault(); }}
+            
             >
               Delete Account
             </button>

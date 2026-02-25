@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { checkSsrf } from '@/lib/ssrf-check';
+import { deliverWebhook } from '@/lib/webhook-delivery';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,16 +24,16 @@ export async function POST(
   if (!ssrf.ok) return NextResponse.json({ error: `Blocked: ${ssrf.reason}` }, { status: 400 });
 
   try {
-    const res = await fetch(webhook.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-WokGen-Event': 'test' },
-      body: JSON.stringify({ type: 'test', userId, sentAt: new Date().toISOString() }),
+    const result = await deliverWebhook({
+      url: webhook.url,
+      secret: webhook.secret,
+      payload: { type: 'test', userId, sentAt: new Date().toISOString() },
     });
     await prisma.webhook.update({
       where: { id: webhook.id },
-      data: { lastStatus: res.ok ? 'ok' : `${res.status}`, lastTriggeredAt: new Date() },
+      data: { lastStatus: result.ok ? 'ok' : `${result.status}`, lastTriggeredAt: new Date() },
     });
-    return NextResponse.json({ ok: res.ok, status: res.status });
+    return NextResponse.json({ ok: result.ok, status: result.status, deliveryId: result.deliveryId });
   } catch (err: unknown) {
     const msg = (err as Error).message;
     await prisma.webhook.update({
@@ -42,3 +43,4 @@ export async function POST(
     return NextResponse.json({ error: msg }, { status: 502 });
   }
 }
+

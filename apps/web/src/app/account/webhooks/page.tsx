@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { relativeTime } from '@/lib/format';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,13 +23,6 @@ const ALL_EVENTS = [
   { id: 'quota.exceeded', label: 'Quota Exceeded' },
 ];
 
-function timeAgo(iso: string) {
-  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (s < 60)    return `${s}s ago`;
-  if (s < 3600)  return `${Math.floor(s / 60)}m ago`;
-  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
-  return new Date(iso).toLocaleDateString();
-}
 
 // ─── Add Webhook Form ─────────────────────────────────────────────────────────
 
@@ -168,7 +162,7 @@ function WebhookCard({ wh, onRefresh }: { wh: Webhook; onRefresh: () => void }) 
         <div className="webhook-card__info">
           {wh.lastDeliveredAt ? (
             <span className={`webhook-card__last-delivery ${wh.lastStatus === 'failed' ? 'webhook-card__last-delivery--failed' : ''}`}>
-              Last delivery: {timeAgo(wh.lastDeliveredAt)}
+              Last delivery: {relativeTime(wh.lastDeliveredAt)}
               {wh.lastStatus === 'failed' ? ' ✗ failed' : ' ✓ ok'}
             </span>
           ) : (

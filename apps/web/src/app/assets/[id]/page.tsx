@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
+import { formatDate } from '@/lib/format';
 import type { Metadata } from 'next';
 
 // ---------------------------------------------------------------------------
@@ -132,7 +133,7 @@ export default async function AssetPage({ params }: Props) {
               <span>Seed {asset.job.seed}</span>
             )}
             <span>by {author}</span>
-            <span>{new Date(asset.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+            <span>{formatDate(asset.createdAt)}</span>
           </div>
 
           {/* Actions */}

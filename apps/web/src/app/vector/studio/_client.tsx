@@ -721,6 +721,8 @@ function VectorStudioInner() {
             {displayResult?.resultUrl && jobStatus !== 'running' && (
               <>
                 <div
+                  key={displayResult.resultUrl}
+                  className="generated-result-enter"
                   style={{
                     position: 'relative',
                     display: 'flex',

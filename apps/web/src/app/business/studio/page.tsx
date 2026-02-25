@@ -1084,7 +1084,7 @@ function BusinessStudioInner() {
             )}
             {displayResult?.resultUrl && jobStatus !== 'running' && (
               <>
-                <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                <div key={displayResult.resultUrl} className="generated-result-enter" style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={displayUrl ?? displayResult.resultUrl}

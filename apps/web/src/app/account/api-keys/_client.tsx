@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { relativeTime, formatDate } from '@/lib/format';
 
 interface ApiKey {
   id:           string;
@@ -13,13 +14,6 @@ interface ApiKey {
   createdAt:    string;
 }
 
-function timeAgo(iso: string) {
-  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (s < 60)   return `${s}s ago`;
-  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
-  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
-  return new Date(iso).toLocaleDateString();
-}
 
 const SCOPE_OPTIONS = ['generate', 'read', 'projects', 'brand', 'eral'];
 const EXPIRY_OPTIONS = [
@@ -216,8 +210,8 @@ export default function ApiKeysClient() {
                     ))}
                   </td>
                   <td>{k.requestCount.toLocaleString()}</td>
-                  <td>{k.lastUsedAt ? timeAgo(k.lastUsedAt) : 'Never'}</td>
-                  <td>{k.expiresAt ? new Date(k.expiresAt).toLocaleDateString() : 'Never'}</td>
+                  <td>{k.lastUsedAt ? relativeTime(k.lastUsedAt) : 'Never'}</td>
+                  <td>{k.expiresAt ? formatDate(k.expiresAt) : 'Never'}</td>
                   <td>
                     <button className="apikeys-revoke" onClick={() => handleRevoke(k.id)}>
                       Revoke

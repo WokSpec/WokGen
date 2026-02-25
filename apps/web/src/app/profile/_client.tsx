@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Props {
   user: { id: string; name: string | null; email: string | null; image: string | null; createdAt: string };
@@ -72,7 +73,7 @@ export default function ProfileClient({ user, plan, hdCredits, stats, recentJobs
         <div className="profile-hero-inner">
           <div className="profile-avatar-wrap">
             {user.image ? (
-              <img src={user.image} alt={user.name ?? 'Avatar'} className="profile-avatar" width={72} height={72} />
+              <Image src={user.image} alt={user.name ?? 'Avatar'} width={72} height={72} className="profile-avatar" style={{ borderRadius: '50%', objectFit: 'cover' }} />
             ) : (
               <div className="profile-avatar profile-avatar--initials">{initial}</div>
             )}
@@ -134,8 +135,8 @@ export default function ProfileClient({ user, plan, hdCredits, stats, recentJobs
             <div className="profile-recents-grid">
               {recentJobs.map(job => (
                 <div key={job.id} className="profile-recent-card">
-                  <div className="profile-recent-thumb">
-                    <img src={job.resultUrl} alt={job.prompt} className="profile-recent-img" loading="lazy" />
+                  <div className="profile-recent-thumb" style={{ position: 'relative' }}>
+                    <Image src={job.resultUrl} alt={job.prompt} fill className="profile-recent-img object-cover" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" sizes="160px" />
                     {job.isHD && <span className="profile-recent-hd">HD</span>}
                     <span className="profile-recent-mode">{MODE_LABELS[job.mode] ?? job.mode}</span>
                   </div>

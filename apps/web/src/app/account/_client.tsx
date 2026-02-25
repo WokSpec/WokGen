@@ -2,6 +2,7 @@
 
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState, useCallback } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -75,8 +76,7 @@ function ProfileTab({ user }: { user: Props['user'] }) {
     <div className="acct-section">
       <div className="acct-profile-row">
         {user.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={user.image} alt={user.name ?? ''} className="acct-avatar" />
+          <Image src={user.image} alt={user.name ?? ''} width={64} height={64} className="acct-avatar" />
         ) : (
           <div className="acct-avatar acct-avatar--initials">{initials}</div>
         )}

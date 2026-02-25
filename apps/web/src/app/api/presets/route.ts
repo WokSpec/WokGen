@@ -47,8 +47,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid request.' }, { status: 400 });
   }
 
+  const { name, mode, prompt, params, brandKitId } = parsed.data;
+
   const preset = await prisma.generationPreset.create({
-    data: { userId: session.user.id, ...parsed.data },
+    data: { userId: session.user.id, name, mode, prompt, params: params ? JSON.parse(JSON.stringify(params)) : undefined, brandKitId: brandKitId ?? undefined },
   });
 
   return NextResponse.json({ preset }, { status: 201 });

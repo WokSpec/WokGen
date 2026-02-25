@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
         {user.image ? (
-          <img src={user.image} alt="" style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.08)' }} />
+          <Image src={user.image} alt="" width={48} height={48} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.08)' }} />
         ) : (
           <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(167,139,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.125rem', color: '#a78bfa', border: '2px solid rgba(167,139,250,0.2)' }}>
             {initial}

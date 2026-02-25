@@ -74,6 +74,14 @@ const nextConfig = {
         protocol: 'http',
         hostname: 'host.docker.internal',
       },
+      // OAuth provider avatars (Google, GitHub)
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
+      // Tool API image CDNs
+      { protocol: 'https', hostname: '**.recraft.ai' },
+      { protocol: 'https', hostname: '**.meshy.ai' },
+      { protocol: 'https', hostname: '**.blockadelabs.com' },
+      { protocol: 'https', hostname: '**.ideogram.ai' },
     ],
     // Pixel art assets look best uncompressed — keep quality high
     formats: ['image/webp', 'image/avif'],

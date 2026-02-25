@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Props {
   params: Promise<{ username: string }>;
@@ -54,8 +55,7 @@ export default async function UserProfilePage({ params }: Props) {
         <div className="profile-header__inner">
           <div className="profile-header__avatar-wrap">
             {user.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.image} alt={user.name ?? ''} className="profile-header__avatar" width={80} height={80} />
+              <Image src={user.image} alt={user.name ?? ''} width={80} height={80} className="profile-header__avatar" style={{ borderRadius: '50%', objectFit: 'cover' }} />
             ) : (
               <div className="profile-header__avatar profile-header__avatar--initials">{initial}</div>
             )}

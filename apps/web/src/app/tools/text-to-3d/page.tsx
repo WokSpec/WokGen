@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 
 const ART_STYLES = [
   { value: 'realistic', label: 'Realistic' },
@@ -114,9 +115,10 @@ export default function TextTo3DPage() {
         )}
 
         {result && (
-          <div style={{ marginTop: '1.5rem', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
+              <div style={{ marginTop: '1.5rem', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
             {result.thumbnailUrl && (
-              <img src={result.thumbnailUrl} alt="3D model preview" style={{ width: '100%', maxHeight: '320px', objectFit: 'contain', background: 'rgba(0,0,0,0.3)' }} />
+              <div style={{ position: 'relative', width: '100%', maxHeight: '320px', minHeight: '200px', background: 'rgba(0,0,0,0.3)' }}>
+                <Image src={result.thumbnailUrl} alt="3D model preview" fill className="object-contain" sizes="(max-width: 768px) 100vw, 600px" />
             )}
             <div style={{ padding: '1.25rem' }}>
               <div style={{ fontWeight: 600, marginBottom: '0.875rem' }}>Download 3D Model</div>

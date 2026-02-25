@@ -474,6 +474,8 @@ function ConvItem({
 // Main Eral page client component
 // ---------------------------------------------------------------------------
 
+interface Project { id: string; name: string; }
+
 export function EralPage() {
   const router = useRouter();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -488,6 +490,8 @@ export function EralPage() {
   const [actionConfirmation, setActionConfirmation] = useState<string | null>(null);
   const [wapLog, setWapLog] = useState<WAPLogEntry[]>([]);
   const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
 
   // ── Director Mode & Panel ──────────────────────────────────────────────────
   const [directorMode, setDirectorMode] = useState(false);
@@ -524,6 +528,13 @@ export function EralPage() {
     }
     setConversationsLoaded(true);
     setMemory(loadMemory());
+    // Restore project selection from sessionStorage
+    const storedProject = sessionStorage.getItem('eral-project');
+    if (storedProject) setSelectedProjectId(storedProject);
+    // Fetch user projects
+    fetch('/api/projects').then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.projects) setProjects(d.projects as Project[]);
+    }).catch(() => {});
   }, []);
 
   // Persist to localStorage whenever conversations change
@@ -625,6 +636,7 @@ export function EralPage() {
           conversationId: undefined, // use local-only for now
           modelVariant: model,
           stream: true,
+          context: { projectId: selectedProjectId || undefined, mode: 'eral' },
         }),
       });
 
@@ -1018,6 +1030,26 @@ export function EralPage() {
           </div>
 
           <div style={{ flex: 1 }} />
+
+          {/* Project selector */}
+          {projects.length > 0 && (
+            <select
+              value={selectedProjectId || ''}
+              onChange={e => {
+                const val = e.target.value || null;
+                setSelectedProjectId(val);
+                if (val) sessionStorage.setItem('eral-project', val);
+                else sessionStorage.removeItem('eral-project');
+              }}
+              className="eral-project-select"
+              title="Select project context"
+            >
+              <option value="">No project context</option>
+              {projects.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          )}
 
           {/* Director Mode toggle */}
           <button

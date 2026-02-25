@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Asset Library | WokGen',
@@ -73,10 +74,9 @@ function AssetCard({ asset }: { asset: { id: string; imageUrl: string; thumbUrl:
   const displayUrl = asset.thumbUrl ?? asset.imageUrl;
   return (
     <div style={{ border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden', background: 'rgba(255,255,255,0.02)' }}>
-      <div style={{ aspectRatio: '1', overflow: 'hidden', background: 'rgba(0,0,0,0.3)' }}>
+      <div style={{ aspectRatio: '1', overflow: 'hidden', background: 'rgba(0,0,0,0.3)', position: 'relative' }}>
         {displayUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={displayUrl} alt={asset.prompt?.slice(0, 60) || 'Asset'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+          <Image src={displayUrl} alt={asset.prompt?.slice(0, 60) || 'Asset'} fill className="object-cover" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px" />
         )}
       </div>
       <div style={{ padding: '0.75rem' }}>

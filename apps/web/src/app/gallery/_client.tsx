@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { useInView } from 'react-intersection-observer';
 import { EmptyState } from '@/app/_components/EmptyState';
 
@@ -69,8 +70,8 @@ export default function GalleryClient() {
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1rem' }}>
             {assets.map(a => (
-              <div key={a.id} style={{ background: '#1a1a2e', borderRadius: 8, overflow: 'hidden' }}>
-                <img src={a.thumbUrl ?? a.imageUrl} alt={a.prompt.slice(0, 60)} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} loading="lazy" />
+              <div key={a.id} style={{ background: '#1a1a2e', borderRadius: 8, overflow: 'hidden', position: 'relative', aspectRatio: '1' }}>
+                <Image src={a.thumbUrl ?? a.imageUrl} alt={a.prompt.slice(0, 60)} fill className="object-cover" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 160px" />
               </div>
             ))}
           </div>

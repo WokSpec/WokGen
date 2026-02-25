@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -106,8 +107,8 @@ function PlanItemCard({
 
       {/* Result preview */}
       {item.resultUrl && (
-        <div className="director-item__preview">
-          <img src={item.resultUrl} alt={item.label} className="director-item__preview-img" />
+        <div className="director-item__preview" style={{ position: 'relative', minHeight: '120px' }}>
+          <Image src={item.resultUrl} alt={item.label} fill className="director-item__preview-img object-cover" sizes="200px" />
         </div>
       )}
 

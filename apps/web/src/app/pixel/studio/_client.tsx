@@ -1460,6 +1460,10 @@ function GenerateForm({
   refImageUrl,
   setRefImageUrl,
   refImageInputRef,
+  maskUrl,
+  setMaskUrl,
+  mapSize,
+  setMapSize,
   seed,
   setSeed,
   lockSeed,
@@ -1527,6 +1531,10 @@ function GenerateForm({
   refImageUrl: string | null;
   setRefImageUrl: (v: string | null) => void;
   refImageInputRef: React.RefObject<HTMLInputElement>;
+  maskUrl: string | null;
+  setMaskUrl: (v: string | null) => void;
+  mapSize: string;
+  setMapSize: (v: string) => void;
   seed: string;
   setSeed: (v: string) => void;
   lockSeed: boolean;
@@ -2206,6 +2214,53 @@ function GenerateForm({
                 </div>
               )}
               <p className="form-hint mt-1">Upload a front-facing sprite to maintain consistency across {directionCount} views.</p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Mask upload (inpaint tool) */}
+      {toolControls.showMaskUpload && (
+        <>
+          <SectionHeader>Mask Image</SectionHeader>
+          <div className="p-4">
+            <p className="form-hint mb-2">Upload a black/white mask. White = areas to inpaint.</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = ev => setMaskUrl(ev.target?.result as string);
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="text-xs text-white/50 file:mr-2 file:text-xs file:bg-white/10 file:border-0 file:text-white/70 file:px-2 file:py-1 file:rounded"
+            />
+            {maskUrl && <img src={maskUrl} alt="Mask preview" className="mt-2 w-20 h-20 object-cover rounded opacity-70" />}
+          </div>
+        </>
+      )}
+
+      {/* Map size (scene/tileset tool) */}
+      {toolControls.showMapSize && (
+        <>
+          <SectionHeader>Grid Size</SectionHeader>
+          <div className="p-4">
+            <div className="flex items-center gap-2">
+              <label className="text-xs" style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Grid size</label>
+              <select
+                value={mapSize}
+                onChange={e => setMapSize(e.target.value)}
+                style={{ fontSize: '0.75rem', background: 'var(--surface-overlay)', border: '1px solid var(--surface-border)', borderRadius: 4, padding: '2px 8px', color: 'var(--text-secondary)' }}
+              >
+                <option value="2x2">2×2</option>
+                <option value="4x4">4×4</option>
+                <option value="8x8">8×8</option>
+                <option value="16x16">16×16</option>
+              </select>
             </div>
           </div>
         </>
@@ -2929,6 +2984,8 @@ function StudioInner() {
         extra: {
           ...((activeTool as string) === 'animate' ? { animationType, animFrameCount, animFps, animLoop, animOutputFormat } : {}),
           ...((activeTool as string) === 'rotate'  ? { directionCount, refImageUrl: refImageUrl ?? undefined } : {}),
+          ...((activeTool as string) === 'inpaint' ? { maskUrl: maskUrl ?? undefined } : {}),
+          ...((activeTool as string) === 'scene'   ? { mapSize } : {}),
         },
       });
 
@@ -3422,6 +3479,10 @@ function StudioInner() {
           refImageUrl={refImageUrl}
           setRefImageUrl={setRefImageUrl}
           refImageInputRef={refImageInputRef}
+          maskUrl={maskUrl}
+          setMaskUrl={setMaskUrl}
+          mapSize={mapSize}
+          setMapSize={setMapSize}
           seed={seed}
           setSeed={setSeed}
           lockSeed={lockSeed}
@@ -3653,11 +3714,13 @@ function StudioInner() {
                     borderColor: useHD ? '#f59e0b' : 'var(--surface-border, #2a2a2a)',
                     background:  useHD ? 'rgba(245,158,11,.12)' : 'transparent',
                     color:       useHD ? '#f59e0b' : 'var(--text-muted, #666)',
-                    cursor: 'pointer',
+                    cursor: (!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0) ? 'not-allowed' : 'pointer',
                     fontWeight: useHD ? 600 : 400,
+                    opacity: (!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0) ? 0.4 : 1,
                   }}
                   onClick={() => setUseHD(true)}
-                  title="Uses HD credits (Replicate). Requires Plus plan or top-up pack."
+                  disabled={!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0}
+                  title={(!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0) ? `HD requires credits. ${hdBalance.monthly + hdBalance.topUp} remaining.` : 'Uses HD credits (Replicate). Requires Plus plan or top-up pack.'}
                 >
                   HD
                 </button>

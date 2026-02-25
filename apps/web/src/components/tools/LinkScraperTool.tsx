@@ -45,13 +45,40 @@ export default function LinkScraperTool() {
     navigator.clipboard.writeText(items.join('\n'));
   }
 
-  function exportJson() {
-    if (!result) return;
-    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+  function downloadBlob(content: string, filename: string, type: string) {
+    const blob = new Blob([content], { type });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'scraped-data.json';
+    a.download = filename;
     a.click();
+  }
+
+  function exportJson() {
+    if (!result) return;
+    downloadBlob(JSON.stringify(result, null, 2), 'scraped-data.json', 'application/json');
+  }
+
+  function exportLinks(format: 'csv' | 'md') {
+    if (!result) return;
+    if (format === 'csv') {
+      const csv = 'text,url,type\n' + result.links.map((l: { text: string; url: string; type: string }) =>
+        `"${(l.text || '').replace(/"/g, '""')}","${l.url}","${l.type}"`
+      ).join('\n');
+      downloadBlob(csv, 'links.csv', 'text/csv');
+    } else {
+      const md = result.links.map((l: { text: string; url: string }) =>
+        `- [${l.text || l.url}](${l.url})`
+      ).join('\n');
+      downloadBlob(md, 'links.md', 'text/markdown');
+    }
+  }
+
+  function getLinkBadge(url: string): string | null {
+    if (url.includes('github.com')) return 'GitHub';
+    if (url.includes('twitter.com') || url.includes('x.com')) return 'Twitter';
+    if (url.endsWith('.pdf')) return 'PDF';
+    if (url.endsWith('.zip') || url.endsWith('.tar.gz') || url.endsWith('.exe')) return 'Download';
+    return null;
   }
 
   const filteredLinks = result?.links.filter(l =>
@@ -154,16 +181,23 @@ export default function LinkScraperTool() {
 
           {/* Images Tab */}
           {activeTab === 'images' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '0.5rem' }}>
-              {filteredImages.map((img, i) => (
-                <div key={i} style={{ border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden', background: 'rgba(255,255,255,0.02)' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img.url} alt={img.alt || ''} style={{ width: '100%', height: '90px', objectFit: 'cover', display: 'block' }} loading="lazy" />
-                  <a href={img.url} target="_blank" rel="noopener noreferrer" download style={{ display: 'block', padding: '0.375rem 0.5rem', fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'none' }}>
-                    {img.url.split('/').pop()?.split('?')[0] || 'image'}
-                  </a>
-                </div>
-              ))}
+            <div>
+              <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>{filteredImages.length} image{filteredImages.length !== 1 ? 's' : ''} found</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '0.5rem' }}>
+                {filteredImages.map((img, i) => (
+                  <div key={i} style={{ border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden', background: 'rgba(255,255,255,0.02)' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img.url} alt={img.alt || ''} style={{ width: '100%', height: '90px', objectFit: 'cover', display: 'block' }} loading="lazy" />
+                    <button
+                      onClick={() => navigator.clipboard.writeText(img.url)}
+                      title="Copy URL"
+                      style={{ display: 'block', width: '100%', padding: '0.375rem 0.5rem', fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                    >
+                      {img.url.split('/').pop()?.split('?')[0] || 'image'}
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

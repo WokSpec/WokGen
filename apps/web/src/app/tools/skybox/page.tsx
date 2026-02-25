@@ -1,6 +1,5 @@
 'use client';
-import { useState } from 'react';
-import Image from 'next/image';
+import { useState, useEffect, useRef } from 'react';
 
 const STYLES = [
   { value: 'fantasy-landscape', label: 'Fantasy Landscape' },
@@ -22,6 +21,41 @@ export default function SkyboxPage() {
   const [result, setResult] = useState<any>(null);
   const [polling, setPolling] = useState(false);
   const [error, setError] = useState('');
+  const viewerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!document.querySelector('link[href*="pannellum"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css';
+      document.head.appendChild(link);
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js';
+      document.head.appendChild(script);
+    }
+  }, []);
+
+  const panoramaUrl = result?.fileUrl || null;
+
+  useEffect(() => {
+    if (!panoramaUrl || !viewerRef.current || typeof window === 'undefined') return;
+    const init = () => {
+      if (!(window as any).pannellum) {
+        setTimeout(init, 100);
+        return;
+      }
+      (window as any).pannellum.viewer(viewerRef.current, {
+        type: 'equirectangular',
+        panorama: panoramaUrl,
+        autoLoad: true,
+        autoRotate: -1,
+        showControls: true,
+        mouseZoom: true,
+      });
+    };
+    init();
+  }, [panoramaUrl]);
 
   async function generate() {
     if (!prompt.trim()) return;
@@ -83,12 +117,22 @@ export default function SkyboxPage() {
               style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.625rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.9375rem', outline: 'none' }}
             />
           </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Style</label>
-            <select value={style} onChange={e => setStyle(e.target.value)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.625rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.875rem', outline: 'none' }}>
-              {STYLES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-            </select>
-          </div>
+        </div>
+        <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Style</label>
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {STYLES.map(s => (
+            <button
+              key={s.value}
+              onClick={() => setStyle(s.value)}
+              className={`px-3 py-2 rounded-lg border text-xs text-left transition-all ${
+                style === s.value
+                  ? 'border-white/40 bg-white/10 text-white'
+                  : 'border-white/10 text-white/40 hover:border-white/20'
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
         </div>
         <button onClick={generate} disabled={loading || !prompt.trim() || polling} className="btn btn-primary" style={{ padding: '0.625rem 1.5rem' }}>
           {loading || polling ? 'Generating...' : 'Generate 360° Panorama'}
@@ -113,15 +157,24 @@ export default function SkyboxPage() {
         )}
 
         {result?.fileUrl && (
-          <div style={{ marginTop: '1.5rem', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '2/1' }}>
-              <Image src={result.fileUrl} alt="360° panorama" fill className="object-cover" sizes="100vw" />
-            </div>
-            <div style={{ padding: '1rem', display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
-              <a href={result.fileUrl} download="skybox-panorama.jpg" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem', textDecoration: 'none' }}>Download HDR</a>
-              {result.depthMapUrl && (
-                <a href={result.depthMapUrl} download="skybox-depth.png" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem', textDecoration: 'none' }}>Depth Map</a>
-              )}
+          <div className="rounded-xl overflow-hidden border border-white/10" style={{ marginTop: '1.5rem' }}>
+            <div ref={viewerRef} style={{ width: '100%', height: 400 }} />
+            <div style={{ padding: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.3)' }}>
+              <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>Click and drag to look around</p>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <a href={result.fileUrl} download="skybox-panorama.jpg"
+                   className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-white/70"
+                   style={{ textDecoration: 'none' }}>
+                  Download Panorama
+                </a>
+                {result.depthMapUrl && (
+                  <a href={result.depthMapUrl} download="skybox-depth.jpg"
+                     className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-white/70"
+                     style={{ textDecoration: 'none' }}>
+                    Depth Map
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         )}

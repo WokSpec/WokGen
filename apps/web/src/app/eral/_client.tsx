@@ -418,6 +418,16 @@ function MessageBubble({
             {msg.wap.confirmation}
           </div>
         )}
+        {!isUser && !isStreaming && msg.isError && msg.retryText && onFollowUp && (
+          <button
+            onClick={() => onFollowUp(msg.retryText!)}
+            style={{ marginTop: 6, fontSize: 12, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4 }}
+            onMouseOver={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
+            onMouseOut={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
+          >
+            ↺ Retry
+          </button>
+        )}
         {followUps.length > 0 && (
           <div className="eral-followup-chips">
             {followUps.map((s) => (
@@ -629,6 +639,8 @@ export function EralPage() {
     const abort = new AbortController();
     abortRef.current = abort;
 
+    const conv = conversations.find((c) => c.id === currentConvId);
+
     try {
       const res = await fetch('/api/eral/chat', {
         method: 'POST',
@@ -636,7 +648,7 @@ export function EralPage() {
         signal: abort.signal,
         body: JSON.stringify({
           message: directorMode ? DIRECTOR_SYSTEM_PROMPT + text.trim() : text.trim(),
-          conversationId: undefined, // use local-only for now
+          conversationId: conv?.serverId,
           modelVariant: model,
           stream: true,
           context: { projectId: selectedProjectId || undefined, mode: 'eral' },
@@ -646,6 +658,12 @@ export function EralPage() {
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Request failed' }));
         throw new Error(err.error ?? `HTTP ${res.status}`);
+      }
+
+      // Capture server-side conversation ID from response header
+      const serverConvId = res.headers.get('X-Conversation-Id');
+      if (serverConvId && !conv?.serverId) {
+        updateConv(currentConvId, (c) => ({ ...c, serverId: serverConvId }));
       }
 
       const reader = res.body!.getReader();
@@ -736,6 +754,8 @@ export function EralPage() {
         role: 'assistant',
         content: `${(err as Error).message ?? 'Something went wrong. Please try again.'}`,
         createdAt: Date.now(),
+        isError: true,
+        retryText: text.trim(),
       };
       updateConv(currentConvId, (c) => ({
         ...c,
@@ -748,7 +768,7 @@ export function EralPage() {
       abortRef.current = null;
       inputRef.current?.focus();
     }
-  }, [loading, activeId, model, updateConv, directorMode, memory]);
+  }, [loading, activeId, model, updateConv, directorMode, memory, conversations]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -1457,8 +1477,8 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
             disabled={callState === 'processing'}
             style={{
               width: 72, height: 72, borderRadius: '50%',
-              background: callState === 'listening' ? 'Listening…' :
-                          callState === 'speaking' ? 'Speaking' : 'Call',
+              background: callState === 'listening' ? '#dc2626' :
+                          callState === 'speaking' ? '#7c3aed' : 'transparent',
               border: '2px solid rgba(129,140,248,0.4)',
               cursor: callState === 'processing' ? 'default' : 'pointer',
               fontSize: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',

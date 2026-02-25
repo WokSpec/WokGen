@@ -90,6 +90,7 @@ export default function JsonTool() {
   const [convertTarget, setConvertTarget] = useState<string>('yaml');
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [parsedData, setParsedData] = useState<unknown>(null);
 
   const run = useCallback(() => {
     if (!input.trim()) {
@@ -100,6 +101,7 @@ export default function JsonTool() {
     try {
       const parsed = JSON.parse(input);
       setError(null);
+      setParsedData(parsed);
 
       if (mode === 'format') {
         setOutput(JSON.stringify(parsed, null, 2));
@@ -117,8 +119,14 @@ export default function JsonTool() {
         setOutput(target.convert(parsed));
       }
     } catch (e) {
-      const msg = e instanceof SyntaxError ? e.message : String(e);
-      setError(`Invalid JSON: ${msg}`);
+      if (e instanceof SyntaxError) {
+        const match = e.message.match(/line (\d+)/i) || e.message.match(/position (\d+)/i);
+        const suffix = match ? ` (line ${match[1]})` : '';
+        setError(`Invalid JSON${suffix}: ${e.message}`);
+      } else {
+        setError(`Invalid JSON: ${String(e)}`);
+      }
+      setParsedData(null);
       setOutput('');
     }
   }, [input, mode, convertTarget]);

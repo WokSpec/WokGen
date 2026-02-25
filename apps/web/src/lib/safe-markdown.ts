@@ -37,6 +37,19 @@ export function safeMarkdown(raw: string): string {
   // 3. Inline code
   html = html.replace(/`([^`]+)`/g, '<code class="eral-inline-code">$1</code>');
 
+  // 3a. Links: [text](url)
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">$1</a>');
+
+  // 3b. Tables: | header | ... |
+  html = html.replace(/\|(.+)\|\n\|[-| :]+\|\n((?:\|.+\|\n?)+)/g, (_match, header, rows) => {
+    const headerCells = header.split('|').filter(Boolean).map((h: string) => `<th class="px-3 py-2 text-left text-xs font-medium text-white/60 border-b border-white/10">${h.trim()}</th>`).join('');
+    const bodyRows = rows.trim().split('\n').map((row: string) => {
+      const cells = row.split('|').filter(Boolean).map((c: string) => `<td class="px-3 py-2 text-sm border-b border-white/5">${c.trim()}</td>`).join('');
+      return `<tr>${cells}</tr>`;
+    }).join('');
+    return `<div class="overflow-x-auto my-3"><table class="w-full text-sm"><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>`;
+  });
+
   // 4. Bold
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 

@@ -1,6 +1,5 @@
 'use client';
-import { useState } from 'react';
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 const ART_STYLES = [
   { value: 'realistic', label: 'Realistic' },
@@ -8,6 +7,14 @@ const ART_STYLES = [
   { value: 'low-poly', label: 'Low Poly' },
   { value: 'sculpture', label: 'Sculpture' },
   { value: 'pbr', label: 'PBR Material' },
+];
+
+const progressMessages = [
+  'Processing your description...',
+  'Generating 3D geometry...',
+  'Applying textures and materials...',
+  'Finalizing model...',
+  'Almost ready...',
 ];
 
 export default function TextTo3DPage() {
@@ -18,6 +25,27 @@ export default function TextTo3DPage() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
   const [polling, setPolling] = useState(false);
+  const [progressStep, setProgressStep] = useState(0);
+
+  const isGenerating = loading || polling;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!document.querySelector('script[src*="model-viewer"]')) {
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js';
+      document.head.appendChild(script);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isGenerating) return;
+    const interval = setInterval(() => {
+      setProgressStep(s => (s + 1) % progressMessages.length);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [isGenerating]);
 
   async function generate() {
     if (!prompt.trim()) return;
@@ -97,7 +125,7 @@ export default function TextTo3DPage() {
           <div style={{ marginTop: '1.5rem', padding: '1.25rem', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '10px', background: 'rgba(167,139,250,0.05)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid rgba(167,139,250,0.3)', borderTopColor: '#a78bfa', animation: 'spin 600ms linear infinite', flexShrink: 0 }} />
             <div>
-              <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>Generating 3D model...</div>
+              <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{progressMessages[progressStep]}</div>
               <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Meshy AI is building your model. This takes 1–3 minutes.</div>
             </div>
           </div>
@@ -114,25 +142,52 @@ export default function TextTo3DPage() {
           </div>
         )}
 
-        {result && (
-              <div style={{ marginTop: '1.5rem', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
-            {result.thumbnailUrl && (
-              <div style={{ position: 'relative', width: '100%', maxHeight: '320px', minHeight: '200px', background: 'rgba(0,0,0,0.3)' }}>
-                <Image src={result.thumbnailUrl} alt="3D model preview" fill className="object-contain" sizes="(max-width: 768px) 100vw, 600px" />
-              </div>
-            )}
-            <div style={{ padding: '1.25rem' }}>
-              <div style={{ fontWeight: 600, marginBottom: '0.875rem' }}>Download 3D Model</div>
-              <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
-                {result.modelUrls && Object.entries(result.modelUrls).filter(([, v]) => v).map(([fmt, url]) => (
-                  <a key={fmt} href={url as string} download target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', textDecoration: 'none', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
-                    {fmt}
-                  </a>
-                ))}
-              </div>
+        {result && (() => {
+          const glbUrl = result.modelUrls?.glb || null;
+          const fbxUrl = result.modelUrls?.fbx || null;
+          const objUrl = result.modelUrls?.obj || null;
+          return (
+            <div style={{ marginTop: '1.5rem' }}>
+              {glbUrl ? (
+                <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black"
+                     style={{ minHeight: 400 }}>
+                  {/* @ts-expect-error model-viewer is a web component */}
+                  <model-viewer
+                    src={glbUrl}
+                    alt="3D model preview"
+                    auto-rotate
+                    camera-controls
+                    shadow-intensity="1"
+                    style={{ width: '100%', height: '400px', background: 'transparent' }}
+                    camera-orbit="45deg 55deg 2.5m"
+                    exposure="0.5"
+                  />
+                  <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center">
+                    <p className="text-xs text-white/40">Drag to rotate • Scroll to zoom • Right-click to pan</p>
+                    <div className="flex gap-2">
+                      {glbUrl && <a href={glbUrl} download className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-white/70">GLB</a>}
+                      {fbxUrl && <a href={fbxUrl} download className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-white/70">FBX</a>}
+                      {objUrl && <a href={objUrl} download className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-white/70">OBJ</a>}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
+                  <div style={{ padding: '1.25rem' }}>
+                    <div style={{ fontWeight: 600, marginBottom: '0.875rem' }}>Download 3D Model</div>
+                    <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
+                      {result.modelUrls && Object.entries(result.modelUrls).filter(([, v]) => v).map(([fmt, url]) => (
+                        <a key={fmt} href={url as string} download target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', textDecoration: 'none', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
+                          {fmt}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       <div className="tool-section" style={{ marginTop: '1.5rem' }}>

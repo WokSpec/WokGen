@@ -18,16 +18,20 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body?.query?.trim()) return API_ERRORS.BAD_REQUEST('query is required');
 
+  const exaBody: Record<string, unknown> = {
+    query: body.query,
+    num_results: body.numResults || 10,
+    use_autoprompt: true,
+    text: { max_characters: 800 },
+    highlights: { num_sentences: 2, highlights_per_url: 1 },
+  };
+  if (body.startPublishedDate) exaBody.start_published_date = body.startPublishedDate;
+  if (body.category) exaBody.category = body.category;
+
   const res = await fetch('https://api.exa.ai/search', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: body.query,
-      num_results: body.numResults || 10,
-      use_autoprompt: true,
-      text: { max_characters: 800 },
-      highlights: { num_sentences: 2, highlights_per_url: 1 },
-    }),
+    body: JSON.stringify(exaBody),
   });
 
   if (!res.ok) return API_ERRORS.INTERNAL();

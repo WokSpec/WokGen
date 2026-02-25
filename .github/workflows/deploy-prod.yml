@@ -1,9 +1,9 @@
 name: Deploy WokGen to Vercel (prod)
 
+# MANUAL ONLY — never auto-trigger on push.
+# Rationale: Vercel free tier = 100 deploys/day.
+# Run locally via: bash scripts/predeploy.sh
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:

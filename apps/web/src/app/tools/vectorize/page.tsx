@@ -138,7 +138,7 @@ export default function VectorizePage() {
               </button>
             </div>
             {/* Rendered SVG + code side by side */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.875rem' }}>
               <div style={{ border: '1px solid var(--border)', borderRadius: '10px', padding: '1rem', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '180px' }}
                 dangerouslySetInnerHTML={{ __html: svg }}
               />

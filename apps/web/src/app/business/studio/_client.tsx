@@ -199,6 +199,12 @@ function BusinessStudioInner() {
   const [bgRemoving, setBgRemoving]           = useState(false);
   const [displayUrl, setDisplayUrl]           = useState<string | null>(null);
 
+  // ── Brand Copy panel ─────────────────────────────────────────────────────
+  const [showCopyPanel, setShowCopyPanel]     = useState(false);
+  const [copyLoading, setCopyLoading]         = useState(false);
+  const [copyError, setCopyError]             = useState<string | null>(null);
+  const [brandCopy, setBrandCopy]             = useState<{ taglines: string[]; pitch: string; bio: string } | null>(null);
+
   // ── Brand Wizard state ────────────────────────────────────────────────────
   const [showWizard, setShowWizard]         = useState(() => !searchParams.get('prompt'));
   const [wizardData, setWizardData]         = useState<BrandWizardData | null>(null);
@@ -506,6 +512,68 @@ function BusinessStudioInner() {
     } catch { toastError('BG removal failed'); }
     finally { setBgRemoving(false); }
   }, [toastError, toastSuccess]);
+
+  // ── Export brand kit as JSON ─────────────────────────────────────────────
+  const handleExportBrandKitJson = useCallback(() => {
+    const imageUrls = brandKitResults
+      .map((r, i) => ({ label: ['Logo Mark', 'Brand Banner', 'Profile Image', 'OG Meta'][i], url: r.resultUrl }))
+      .filter(r => r.url);
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      brandName:  wizardData?.brandName ?? '',
+      prompt,
+      style,
+      mood,
+      industry:       industry || undefined,
+      colorDirection: colorDirection || undefined,
+      primaryColor:   wizardData?.primaryColor ?? undefined,
+      moods:          wizardData?.moods ?? undefined,
+      imageUrls,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `brand-kit-${(wizardData?.brandName || prompt).replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 30)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toastSuccess('Brand kit exported');
+  }, [brandKitResults, wizardData, prompt, style, mood, industry, colorDirection]);
+
+  // ── Generate brand copy via Eral ─────────────────────────────────────────
+  const handleGenerateCopy = useCallback(async () => {
+    if (!prompt.trim()) return;
+    setCopyLoading(true);
+    setCopyError(null);
+    setBrandCopy(null);
+    const brandContext = [
+      `Brand: ${wizardData?.brandName || prompt}`,
+      `Industry: ${wizardData?.industry || industry || 'general'}`,
+      `Style: ${style}, Mood: ${mood}`,
+      colorDirection ? `Colors: ${colorDirection}` : '',
+    ].filter(Boolean).join('\n');
+    const userMessage = `Generate brand copy for the following brand:\n${brandContext}\n\nRespond in this exact format:\nTAGLINES:\n1. [tagline]\n2. [tagline]\n3. [tagline]\n\nELEVATOR PITCH:\n[2-3 sentence pitch]\n\nSOCIAL BIO:\n[1 sentence social media bio under 160 chars]`;
+    try {
+      const res = await fetch('/api/eral/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage, modelVariant: 'eral-mini', stream: false }),
+      });
+      const data = await res.json() as { reply?: string; error?: string };
+      if (!res.ok || !data.reply) { setCopyError(data.error ?? 'Generation failed'); return; }
+      // Parse the structured response
+      const text = data.reply;
+      const taglinesMatch = text.match(/TAGLINES:\n([\s\S]*?)(?:\n\n|$)/);
+      const pitchMatch    = text.match(/ELEVATOR PITCH:\n([\s\S]*?)(?:\n\n|$)/);
+      const bioMatch      = text.match(/SOCIAL BIO:\n([\s\S]*?)(?:\n\n|$)/);
+      const taglines = taglinesMatch
+        ? taglinesMatch[1].split('\n').map(l => l.replace(/^\d+\.\s*/, '').trim()).filter(Boolean)
+        : [];
+      const pitch = pitchMatch ? pitchMatch[1].trim() : '';
+      const bio   = bioMatch   ? bioMatch[1].trim()   : '';
+      setBrandCopy({ taglines, pitch, bio });
+    } catch { setCopyError('Copy generation failed'); }
+    finally   { setCopyLoading(false); }
+  }, [prompt, wizardData, style, mood, industry, colorDirection]);
 
   return (
     <div className="studio-layout">

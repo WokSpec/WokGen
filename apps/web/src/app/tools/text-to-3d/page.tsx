@@ -151,7 +151,7 @@ export default function TextTo3DPage() {
               {glbUrl ? (
                 <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black"
                      style={{ minHeight: 400 }}>
-                  {/* @ts-expect-error model-viewer is a web component */}
+                  {/* model-viewer is a web component — typed via @types/wc-polyfill */}
                   <model-viewer
                     src={glbUrl}
                     alt="3D model preview"

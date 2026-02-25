@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { prisma } from '@/lib/db';
 import { log as logger } from '@/lib/logger';
 import { withErrorHandler, dbQuery } from '@/lib/api-handler';
+import { deliverWebhook } from '@/lib/webhook-delivery';
 import {
   generate,
   resolveProviderConfig,
@@ -1019,6 +1020,26 @@ export const POST = withErrorHandler(async (req) => {
 
     // Update user generation stats (non-blocking)
     if (!isSelfHosted && authedUserId) {
+      // Fire registered webhooks for job.succeeded (non-blocking)
+      prisma.webhook.findMany({
+        where: { userId: authedUserId, active: true, events: { contains: 'job.succeeded' } },
+        select: { url: true, secret: true },
+      }).then(hooks => {
+        for (const hook of hooks) {
+          deliverWebhook({
+            url: hook.url,
+            secret: hook.secret,
+            payload: {
+              type: 'job.succeeded',
+              jobId: job?.id,
+              resultUrl: result.resultUrl ?? null,
+              mode: resolvedMode,
+              prompt: String(prompt).trim(),
+              ts: Date.now(),
+            },
+          }).catch(() => {});
+        }
+      }).catch(() => {});
       prisma.userPreference.upsert({
         where: { userId: authedUserId },
         create: {

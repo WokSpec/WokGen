@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { removeBackground } from '@/lib/bg-remove';
 import { prisma } from '@/lib/db';
 import { log as logger } from '@/lib/logger';
+import { checkSsrf } from '@/lib/ssrf-check';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -76,6 +77,14 @@ export async function POST(req: NextRequest) {
       { error: 'Provide either imageUrl or imageBase64' },
       { status: 400 }
     );
+  }
+
+  // SSRF protection for imageUrl
+  if (imageUrl) {
+    const ssrfResult = checkSsrf(imageUrl);
+    if (!ssrfResult.ok) {
+      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
+    }
   }
 
   if (imageBase64) {

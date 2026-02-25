@@ -219,8 +219,8 @@ async function getOrCreateConversation(
   mode: string | undefined,
 ): Promise<{ id: string; isNew: boolean }> {
   if (conversationId) {
-    const existing = await prisma.eralConversation.findUnique({
-      where: { id: conversationId },
+    const existing = await prisma.eralConversation.findFirst({
+      where: { id: conversationId, userId: userId ?? null },
     });
     if (existing) return { id: existing.id, isNew: false };
   }

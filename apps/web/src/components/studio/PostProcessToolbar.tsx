@@ -142,6 +142,8 @@ export function PostProcessToolbar({ imageUrl, prompt: _prompt, mode, onResult }
     navigator.clipboard.writeText(imageUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      // Clipboard access denied — fail silently
     });
   };
 

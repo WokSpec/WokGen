@@ -2080,6 +2080,46 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           text-align: center;
         }
 
+        /* Capabilities strip */
+        .eral-caps-strip {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          justify-content: center;
+          margin-top: 10px;
+        }
+        .eral-cap-chip {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 4px 10px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 20px;
+          color: rgba(255,255,255,0.55);
+          font-size: 11px;
+          cursor: pointer;
+          transition: background 0.15s, border-color 0.15s, color 0.15s;
+          white-space: nowrap;
+        }
+        .eral-cap-chip:hover:not(:disabled) {
+          background: rgba(129,140,248,0.1);
+          border-color: rgba(129,140,248,0.3);
+          color: #c7d2fe;
+        }
+        .eral-cap-chip:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+        .eral-cap-chip-icon {
+          font-size: 12px;
+          line-height: 1;
+        }
+        .eral-cap-chip-label {
+          font-size: 11px;
+          font-weight: 500;
+        }
+
         /* Conversation skeleton */
         .eral-conv-skeleton {
           height: 28px;

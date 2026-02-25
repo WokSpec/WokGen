@@ -3,10 +3,20 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const USE_CASES = [
+  { value: 'pixel',    label: 'Pixel / Illustration' },
+  { value: 'business', label: 'Business / Marketing' },
+  { value: 'vector',   label: 'Vector / Logo' },
+  { value: 'uiux',     label: 'UI/UX Design' },
+  { value: 'voice',    label: 'Voice / Audio' },
+  { value: 'text',     label: 'Text / Copy' },
+] as const;
+
 export default function NewProjectClient({ name, brief }: { name: string; brief: string }) {
   const router = useRouter();
   const [projectName, setProjectName] = useState(name);
   const [projectBrief, setProjectBrief] = useState(brief);
+  const [useCase, setUseCase] = useState<string>('pixel');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +30,7 @@ export default function NewProjectClient({ name, brief }: { name: string; brief:
       const res = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: projectName.trim(), description: projectBrief.trim() }),
+        body: JSON.stringify({ name: projectName.trim(), description: projectBrief.trim(), mode: useCase }),
       });
       if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to create project');
       const data = await res.json();
@@ -47,6 +57,20 @@ export default function NewProjectClient({ name, brief }: { name: string; brief:
             required
             style={{ width: '100%', padding: '8px 12px', borderRadius: 6, background: '#1a1a2e', border: '1px solid #2d2d4e', color: '#e2e8f0', fontSize: 14, boxSizing: 'border-box' }}
           />
+        </div>
+        <div>
+          <label style={{ display: 'block', fontSize: 13, color: '#94a3b8', marginBottom: 4 }}>
+            Use case
+          </label>
+          <select
+            value={useCase}
+            onChange={e => setUseCase(e.target.value)}
+            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, background: '#1a1a2e', border: '1px solid #2d2d4e', color: '#e2e8f0', fontSize: 14, boxSizing: 'border-box' }}
+          >
+            {USE_CASES.map(uc => (
+              <option key={uc.value} value={uc.value}>{uc.label}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label style={{ display: 'block', fontSize: 13, color: '#94a3b8', marginBottom: 4 }}>

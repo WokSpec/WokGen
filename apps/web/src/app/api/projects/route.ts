@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { isSupportedMode } from '@/lib/modes';
 import { z } from 'zod';
 import { withErrorHandler, dbQuery } from '@/lib/api-handler';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 // ---------------------------------------------------------------------------
 // GET /api/projects — list user's projects
@@ -27,6 +28,7 @@ export const GET = withErrorHandler(async (req) => {
   const mode       = searchParams.get('mode') ?? undefined;
   const archived   = searchParams.get('archived') === 'true';
   const limit      = Math.min(Number(searchParams.get('limit') ?? '20'), 50);
+  const page       = Math.max(Number(searchParams.get('page') ?? '1'), 1);
 
   const projects = await dbQuery(prisma.project.findMany({
     where: {
@@ -36,6 +38,7 @@ export const GET = withErrorHandler(async (req) => {
     },
     orderBy: { updatedAt: 'desc' },
     take: limit,
+    skip: (page - 1) * limit,
     include: {
       _count: { select: { jobs: true } },
       jobs: {
@@ -55,7 +58,7 @@ export const GET = withErrorHandler(async (req) => {
     jobs: undefined,
   }));
 
-  return NextResponse.json({ projects: projectsWithAssets });
+  return NextResponse.json({ projects: projectsWithAssets, page, limit });
 });
 
 export const POST = withErrorHandler(async (req) => {
@@ -69,6 +72,15 @@ export const POST = withErrorHandler(async (req) => {
     rawBody = await req.json();
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
+  }
+
+  // Rate limit: 20 new projects per user per day
+  const rl = await checkRateLimit(`projects:create:${session.user.id}`, 20, 24 * 60 * 60 * 1000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Project creation limit reached. Try again tomorrow.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter ?? 86400) } },
+    );
   }
 
   const parsed = CreateProjectSchema.safeParse(rawBody);

@@ -108,7 +108,7 @@ export default function LinkScraperTool() {
             style={{ flex: 1 }}
           />
           <button className="btn btn-primary" onClick={handleScrape} disabled={loading || !url.trim()}>
-            {loading ? 'Scraping...' : 'Scrape'}
+            {loading ? <><span style={{marginRight:8}}>⏳</span>Scraping...</> : 'Scrape'}
           </button>
         </div>
       </div>

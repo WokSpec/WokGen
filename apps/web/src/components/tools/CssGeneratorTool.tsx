@@ -63,9 +63,13 @@ export default function CssGeneratorTool() {
   }, [tab, gType, gAngle, gStops, shX, shY, shBlur, shSpread, shColor, shInset, glBlur, glSat, glBg, glBorder, brTl, brTr, brBr, brBl]);
 
   const copy = async () => {
-    await navigator.clipboard.writeText(css);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(css);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
   };
 
   const gradientPreview = useMemo(() => {
@@ -112,7 +116,7 @@ export default function CssGeneratorTool() {
                   <input className="tool-input-sm" value={s.color} onChange={e => setGStops(p => p.map((x, j) => j===i ? {...x, color: e.target.value} : x))} />
                   <input type="range" min={0} max={100} value={s.pos} onChange={e => setGStops(p => p.map((x, j) => j===i ? {...x, pos: +e.target.value} : x))} className="gen-slider" />
                   <span className="gen-label">{s.pos}%</span>
-                  {gStops.length > 2 && <button className="btn-ghost-xs" onClick={() => setGStops(p => p.filter((_,j) => j!==i))}>✕</button>}
+                  {gStops.length > 2 && <button className="btn-ghost-xs" onClick={() => setGStops(p => p.filter((_,j) => j!==i))}>Remove</button>}
                 </div>
               ))}
               {gStops.length < 6 && <button className="btn-ghost" onClick={() => setGStops(p => [...p, { color: '#ffffff', pos: 100 }])}>+ Add Stop</button>}

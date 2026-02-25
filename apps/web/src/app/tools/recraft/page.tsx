@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
+import ToolShell from '@/components/tools/ToolShell';
 
 const STYLES = [
   { value: 'digital_illustration', label: 'Digital Illustration' },
@@ -45,7 +46,8 @@ export default function RecraftPage() {
   }
 
   return (
-    <div className="tool-page-root">
+    <ToolShell id="recraft" label="Recraft v3" description="Generate brand-quality illustrations, icons, and vector-style images using Recraft v3." icon="RC">
+      <div className="tool-page-root">
       <div className="tool-page-header">
         <h1 className="tool-page-title">Recraft v3</h1>
         <p className="tool-page-desc">Generate brand-quality illustrations, icons, and vector-style images. Recraft v3 excels at consistent, professional creative assets.</p>
@@ -93,5 +95,6 @@ export default function RecraftPage() {
         )}
       </div>
     </div>
+    </ToolShell>
   );
 }

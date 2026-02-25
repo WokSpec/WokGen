@@ -38,7 +38,25 @@ function ToolCard({ tool, starred, onStar, onVisit }: ToolCardProps) {
   return (
     <Link href={tool.href} className="toolhub-card" onClick={() => onVisit(tool.id)}>
       <div className="toolhub-card-top">
-        <span className="toolhub-card-icon" aria-hidden="true">{tool.icon}</span>
+        <span className="toolhub-card-icon" aria-hidden="true">
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: 6,
+              background: '#111827',
+              color: '#fff',
+              fontFamily: 'monospace',
+              fontSize: 12,
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            {String(tool.icon).trim().slice(0, 3)}
+          </span>
+        </span>
       </div>
       <div className="toolhub-card-body">
         <div className="toolhub-card-name">{tool.label}</div>
@@ -47,6 +65,7 @@ function ToolCard({ tool, starred, onStar, onVisit }: ToolCardProps) {
       <div className="toolhub-card-top-right">
         {tool.isNew && <span className="toolhub-card-badge">New</span>}
         <button
+          type="button"
           className={`toolhub-card-star${starred ? ' --starred' : ''}`}
           onClick={e => onStar(tool.id, e)}
           title={starred ? 'Remove from starred' : 'Star this tool'}

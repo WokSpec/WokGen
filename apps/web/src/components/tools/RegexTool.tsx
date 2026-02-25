@@ -23,6 +23,7 @@ interface Match {
   length: number;
   text: string;
   groups: Record<string, string>;
+  captures: string[];
 }
 
 export default function RegexTool() {
@@ -31,7 +32,7 @@ export default function RegexTool() {
   const [testStr, setTestStr] = useState(DEFAULT_TEST);
 
   const { matches, error, segments } = useMemo(() => {
-    if (!pattern) return { matches: [], error: null, segments: [] as Segment[] };
+    if (!pattern) return { matches: [] as Match[], error: null, segments: [] as Segment[] };
     let re: RegExp;
     try {
       re = new RegExp(pattern, flags);
@@ -49,6 +50,7 @@ export default function RegexTool() {
         length: m[0].length,
         text: m[0],
         groups: m.groups ?? {},
+        captures: Array.prototype.slice.call(m, 1) as string[],
       });
       if (!flags.includes('g')) break;
       if (m[0].length === 0) re.lastIndex++; // avoid infinite loop on zero-length match
@@ -104,6 +106,7 @@ export default function RegexTool() {
           { f: 'i', label: 'i — case insensitive' },
           { f: 'm', label: 'm — multiline' },
           { f: 's', label: 's — dotAll' },
+            { f: 'u', label: 'u — unicode' },
         ].map(({ f, label }) => (
           <button
             key={f}
@@ -177,13 +180,20 @@ export default function RegexTool() {
                 <span className="regex-match-num">#{i + 1}</span>
                 <code className="regex-match-text">{m.text}</code>
                 <span className="regex-match-pos">pos {m.index}–{m.index + m.length}</span>
-                {Object.keys(m.groups).length > 0 && (
-                  <span className="regex-match-groups">
-                    {Object.entries(m.groups).map(([k, v]) => (
-                      <span key={k} className="regex-group-tag">{k}: {v}</span>
-                    ))}
-                  </span>
-                )}
+                        {(m.groups && Object.keys(m.groups).length > 0) && (
+                    <span className="regex-match-groups">
+                      {Object.entries(m.groups).map(([k, v]) => (
+                        <span key={k} className="regex-group-tag">{k}: {v}</span>
+                      ))}
+                    </span>
+                  )}
+                  {m.captures && m.captures.length > 0 && (
+                    <span className="regex-match-groups">
+                      {m.captures.map((c, idx) => (
+                        <span key={idx} className="regex-group-tag">#{idx + 1}: {c}</span>
+                      ))}
+                    </span>
+                  )}
               </div>
             ))}
             {matches.length > 50 && (

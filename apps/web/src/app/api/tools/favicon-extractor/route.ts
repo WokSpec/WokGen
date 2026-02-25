@@ -35,13 +35,12 @@ export async function POST(req: NextRequest) {
     // Always add /favicon.ico
     addFavicon('/favicon.ico', 'shortcut icon', undefined, 'image/x-icon');
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
     try {
       const res = await fetch(normalized, {
-        signal: controller.signal,
+        signal: AbortSignal.timeout(15_000),
         headers: { 'User-Agent': 'WokGen-FaviconExtractor/1.0' },
       });
+      if (!res.ok) return Response.json({ error: `Upstream returned ${res.status}` }, { status: 502 });
       const html = await res.text();
 
       // Parse link tags
@@ -57,8 +56,9 @@ export async function POST(req: NextRequest) {
         const type = /type=["']([^"']+)["']/i.exec(attrs)?.[1];
         addFavicon(href, rel, sizes, type);
       }
-    } finally {
-      clearTimeout(timeout);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      return Response.json({ error: `Failed to fetch URL: ${msg}` }, { status: 502 });
     }
 
     return Response.json({ favicons, origin });

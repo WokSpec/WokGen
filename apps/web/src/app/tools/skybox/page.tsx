@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import ToolShell from '@/components/tools/ToolShell';
 
 const STYLES = [
   { value: 'fantasy-landscape', label: 'Fantasy Landscape' },
@@ -100,7 +101,8 @@ export default function SkyboxPage() {
   }
 
   return (
-    <div className="tool-page-root">
+    <ToolShell id="skybox" label="Skybox Generator" description="Generate immersive 360° panoramic backgrounds for games, VR, and 3D scenes using Blockade Labs Skybox AI." icon="SB">
+      <div className="tool-page-root">
       <div className="tool-page-header">
         <h1 className="tool-page-title">Skybox Generator</h1>
         <p className="tool-page-desc">Generate immersive 360° panoramic backgrounds for games, VR, and 3D scenes using Blockade Labs Skybox AI.</p>
@@ -180,5 +182,6 @@ export default function SkyboxPage() {
         )}
       </div>
     </div>
+    </ToolShell>
   );
 }

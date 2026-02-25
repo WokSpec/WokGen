@@ -40,8 +40,8 @@ export default function GradientAnimatorTool() {
       document.head.appendChild(el);
       styleRef.current = el;
     }
-    styleRef.current.textContent = keyframes;
-  }, [keyframes]);
+    styleRef.current.textContent = cssOutput;
+  }, [cssOutput]);
 
   const updateStop = (i: number, key: keyof Stop, val: string | number) =>
     setStops(prev => prev.map((s, idx) => idx === i ? { ...s, [key]: val } : s));
@@ -50,14 +50,20 @@ export default function GradientAnimatorTool() {
     setStops(prev => [...prev, { color: '#ec4899', position: 75 }]);
 
   const removeStop = (i: number) => {
-    if (stops.length <= 2) return;
-    setStops(prev => prev.filter((_, idx) => idx !== i));
+    setStops(prev => {
+      if (prev.length <= 2) return prev;
+      return prev.filter((_, idx) => idx !== i);
+    });
   };
 
-  const copy = () => {
-    navigator.clipboard.writeText(cssOutput);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(cssOutput);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
   };
 
   return (
@@ -95,7 +101,7 @@ export default function GradientAnimatorTool() {
                 onChange={e => updateStop(i, 'position', Number(e.target.value))} style={{ flex: 1 }} />
               <span style={{ fontSize: '0.78rem', width: '3em', textAlign: 'right', flexShrink: 0 }}>{s.position}%</span>
               {stops.length > 2 && (
-                <button className="btn-ghost" style={{ padding: '0.1rem 0.35rem', fontSize: '0.75rem' }} onClick={() => removeStop(i)}>✕</button>
+                <button className="btn-ghost" style={{ padding: '0.1rem 0.35rem', fontSize: '0.75rem' }} onClick={() => removeStop(i)}>Remove</button>
               )}
             </div>
           ))}
@@ -120,7 +126,7 @@ export default function GradientAnimatorTool() {
           />
           <pre className="grad-code" style={{ marginTop: '1rem', fontSize: '0.72rem' }}>{cssOutput}</pre>
           <button className="btn-primary" style={{ marginTop: '0.5rem' }} onClick={copy}>
-            {copied ? '✓ Copied!' : 'Copy CSS'}
+            {copied ? 'Copied!' : 'Copy CSS'}
           </button>
         </div>
       </div>

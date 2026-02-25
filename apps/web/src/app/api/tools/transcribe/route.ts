@@ -4,7 +4,7 @@
  * API: https://www.assemblyai.com/docs
  * Key: ASSEMBLYAI_API_KEY (free tier: 100 hours/month)
  */
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
 import { auth } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
@@ -28,6 +28,10 @@ export const maxDuration = 120;
 const ASMBL_BASE = 'https://api.assemblyai.com';
 
 export async function POST(req: NextRequest) {
+  if (!process.env.ASSEMBLYAI_API_KEY) {
+    return NextResponse.json({ error: 'This tool is not configured on this server.' }, { status: 503 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
 

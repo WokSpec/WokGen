@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import ToolShell from '@/components/tools/ToolShell';
 
 const ART_STYLES = [
   { value: 'realistic', label: 'Realistic' },
@@ -93,7 +94,8 @@ export default function TextTo3DPage() {
   }
 
   return (
-    <div className="tool-page-root">
+    <ToolShell id="text-to-3d" label="Text to 3D" description="Generate 3D models from text descriptions using Meshy AI. Download as GLB, FBX, or OBJ." icon="T3D">
+      <div className="tool-page-root">
       <div className="tool-page-header">
         <h1 className="tool-page-title">Text to 3D</h1>
         <p className="tool-page-desc">Generate 3D models from text descriptions using Meshy AI. Download as GLB, FBX, or OBJ.</p>
@@ -197,5 +199,6 @@ export default function TextTo3DPage() {
         </p>
       </div>
     </div>
+    </ToolShell>
   );
 }

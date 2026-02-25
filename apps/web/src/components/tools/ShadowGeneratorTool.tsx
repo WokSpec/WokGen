@@ -25,9 +25,15 @@ const defaultShadow = (): Shadow => ({
 });
 
 function shadowToCss(s: Shadow, mode: ShadowMode): string {
-  const r = parseInt(s.color.slice(1, 3), 16);
-  const g = parseInt(s.color.slice(3, 5), 16);
-  const b = parseInt(s.color.slice(5, 7), 16);
+  let r = 0, g = 0, b = 0;
+  try {
+    const hex = typeof s.color === 'string' && s.color.startsWith('#') ? s.color : '#000000';
+    r = parseInt(hex.slice(1, 3), 16);
+    g = parseInt(hex.slice(3, 5), 16);
+    b = parseInt(hex.slice(5, 7), 16);
+  } catch (e) {
+    r = g = b = 0;
+  }
   const alpha = (s.opacity / 100).toFixed(2);
   const rgba = `rgba(${r}, ${g}, ${b}, ${alpha})`;
   if (mode === 'text') return `${s.offsetX}px ${s.offsetY}px ${s.blur}px ${rgba}`;
@@ -45,24 +51,37 @@ export default function ShadowGeneratorTool() {
   };
 
   const addShadow = () => {
-    setShadows(prev => [...prev, defaultShadow()]);
-    setActive(shadows.length);
+    setShadows(prev => {
+      const next = [...prev, defaultShadow()];
+      setActive(next.length - 1);
+      return next;
+    });
   };
 
   const removeShadow = (i: number) => {
-    if (shadows.length === 1) return;
-    setShadows(prev => prev.filter((_, idx) => idx !== i));
-    setActive(Math.max(0, active - (i <= active ? 1 : 0)));
+    setShadows(prev => {
+      if (prev.length === 1) return prev;
+      const next = prev.filter((_, idx) => idx !== i);
+      setActive(a => {
+        if (i > a) return a;
+        return Math.max(0, a - 1);
+      });
+      return next;
+    });
   };
 
   const allCss = shadows.map(s => shadowToCss(s, mode)).join(',\n  ');
   const prop = mode === 'box' ? 'box-shadow' : 'text-shadow';
   const cssOutput = `${prop}: ${allCss};`;
 
-  const copy = () => {
-    navigator.clipboard.writeText(cssOutput);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(cssOutput);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
   };
 
   const s = shadows[active] ?? shadows[0];
@@ -164,7 +183,7 @@ export default function ShadowGeneratorTool() {
           </div>
           <pre className="grad-code" style={{ marginTop: '1rem' }}>{cssOutput}</pre>
           <button className="btn-primary" style={{ marginTop: '0.5rem' }} onClick={copy}>
-            {copied ? '✓ Copied!' : 'Copy CSS'}
+            {copied ? 'Copied!' : 'Copy CSS'}
           </button>
         </div>
       </div>

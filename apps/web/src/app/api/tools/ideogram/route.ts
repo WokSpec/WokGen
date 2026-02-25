@@ -4,7 +4,7 @@
  * API: https://developer.ideogram.ai/
  * Key: IDEOGRAM_API_KEY
  */
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
 import { auth } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
@@ -14,6 +14,10 @@ import { withRetry } from '@/lib/retry';
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
+  if (!process.env.IDEOGRAM_API_KEY) {
+    return NextResponse.json({ error: 'This tool is not configured on this server.' }, { status: 503 });
+  }
+
   const session = await auth();
   if (!session?.user) return API_ERRORS.UNAUTHORIZED();
 

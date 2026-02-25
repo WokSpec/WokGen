@@ -106,16 +106,24 @@ export default function ColorPaletteTool() {
   };
 
   const copyColor = async (val: string) => {
-    await navigator.clipboard.writeText(val);
-    setCopied(val);
-    setTimeout(() => setCopied(null), 1200);
+    try {
+      await navigator.clipboard.writeText(val);
+      setCopied(val);
+      setTimeout(() => setCopied(null), 2000);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
   };
 
   const exported = exportColors(colors, format);
   const copyAll = async () => {
-    await navigator.clipboard.writeText(exported);
-    setCopied('__all__');
-    setTimeout(() => setCopied(null), 1500);
+    try {
+      await navigator.clipboard.writeText(exported);
+      setCopied('__all__');
+      setTimeout(() => setCopied(null), 2000);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
   };
 
   return (
@@ -173,7 +181,7 @@ export default function ColorPaletteTool() {
                     onClick={() => copyColor(hex)}
                     title="Click to copy hex"
                   >
-                    {copied === hex && <span className="cp-copied-flash" style={{ color: fg }}>✓</span>}
+                    {copied === hex && <span className="cp-copied-flash" style={{ color: fg }}>Copied!</span>}
                   </div>
                   <div className="cp-swatch-vals">
                     <button className="cp-val-btn" onClick={() => copyColor(hex)} title="Copy HEX">
@@ -205,7 +213,7 @@ export default function ColorPaletteTool() {
                 ))}
               </div>
               <button className="btn-ghost-xs" onClick={copyAll}>
-                {copied === '__all__' ? '✓ Copied!' : 'Copy All'}
+                {copied === '__all__' ? 'Copied!' : 'Copy All'}
               </button>
             </div>
             <pre className="cp-export-code">{exported}</pre>

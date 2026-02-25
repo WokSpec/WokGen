@@ -19,27 +19,45 @@ export default function ImageCompressTool() {
   const [format, setFormat] = useState<CompressFormat>('image/jpeg');
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState('compressed');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const compress = useCallback((img: HTMLImageElement, fmt: CompressFormat, q: number, origSize: number) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.drawImage(img, 0, 0);
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) return;
-        if (compressedUrl) URL.revokeObjectURL(compressedUrl);
-        setCompressedSize(blob.size);
-        setCompressedUrl(URL.createObjectURL(blob));
-      },
-      fmt,
-      q / 100
-    );
+    setError(null);
+    setIsLoading(true);
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        setError('Canvas 2D context not available');
+        setIsLoading(false);
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            setError('Failed to produce image blob');
+            setIsLoading(false);
+            return;
+          }
+          if (compressedUrl) URL.revokeObjectURL(compressedUrl);
+          setCompressedSize(blob.size);
+          setCompressedUrl(URL.createObjectURL(blob));
+          setIsLoading(false);
+        },
+        fmt,
+        q / 100
+      );
+    } catch (err) {
+      setError('Image processing failed');
+      setIsLoading(false);
+    }
   }, [compressedUrl]);
 
   const loadFile = useCallback((file: File) => {
@@ -115,7 +133,7 @@ export default function ImageCompressTool() {
           <span className="img-conv-label">Quality</span>
           <input
             type="range"
-            min={1}
+            min={0}
             max={100}
             value={quality}
             onChange={e => setQuality(Number(e.target.value))}
@@ -124,6 +142,10 @@ export default function ImageCompressTool() {
           <span className="img-conv-quality-val">{quality}%</span>
         </div>
       </div>
+
+      {/* Status */}
+      {error && <div className="img-comp-error">Error: {error}</div>}
+      {isLoading && <div className="img-comp-loading">Processing…</div>}
 
       {/* Drop zone */}
       {!originalUrl && (
@@ -138,12 +160,12 @@ export default function ImageCompressTool() {
           onKeyDown={e => e.key === 'Enter' && inputRef.current?.click()}
         >
           <p className="tool-dropzone-text">Drop an image here or click to browse</p>
-          <p className="tool-dropzone-sub">PNG · JPG · WebP · BMP</p>
+          <p className="tool-dropzone-sub">PNG · JPG · WebP · GIF</p>
           <p className="tool-dropzone-private">100% client-side — nothing uploaded</p>
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept=".png,.jpg,.jpeg,.webp,.gif"
             className="tool-file-input-hidden"
             onChange={e => { const f = e.target.files?.[0]; if (f) loadFile(f); }}
           />

@@ -5,7 +5,7 @@
  *
  * Flow: POST /v2/text-to-3d → get taskId → GET /v2/text-to-3d/{taskId} (poll)
  */
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
 import { log } from '@/lib/logger';
 import { auth } from '@/lib/auth';
@@ -16,6 +16,10 @@ export const runtime = 'nodejs';
 const MESHY_BASE = 'https://api.meshy.ai';
 
 export async function POST(req: NextRequest) {
+  if (!process.env.MESHY_API_KEY) {
+    return NextResponse.json({ error: 'This tool is not configured on this server.' }, { status: 503 });
+  }
+
   try {
     const session = await auth();
     if (!session?.user?.id) return API_ERRORS.UNAUTHORIZED();
@@ -71,6 +75,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  if (!process.env.MESHY_API_KEY) {
+    return NextResponse.json({ error: 'This tool is not configured on this server.' }, { status: 503 });
+  }
+
   try {
     const apiKey = process.env.MESHY_API_KEY;
     if (!apiKey) return apiError({ code: 'NOT_CONFIGURED', message: 'MESHY_API_KEY not set', status: 503 });

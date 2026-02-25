@@ -77,17 +77,17 @@ export async function POST(req: NextRequest) {
     }
 
     // HTML page — fetch and parse for media
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
     let html: string;
     try {
       const res = await fetch(url, {
-        signal: controller.signal,
+        signal: AbortSignal.timeout(15_000),
         headers: { 'User-Agent': 'WokGen-MediaDownloader/1.0' },
       });
+      if (!res.ok) return Response.json({ error: `Upstream returned ${res.status}`, code: 'UPSTREAM_ERROR' }, { status: 502 });
       html = await res.text();
-    } finally {
-      clearTimeout(timeout);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      return Response.json({ error: `Failed to fetch URL: ${msg}`, code: 'FETCH_ERROR' }, { status: 502 });
     }
 
     const media: Array<{ url: string; type: string; filename: string; contentType?: string }> = [];

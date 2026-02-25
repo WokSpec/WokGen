@@ -36,7 +36,26 @@ export default function ToolShell({
 
       {/* Header */}
       <header className="tool-shell-header">
-        <div className="tool-shell-icon" aria-hidden="true">{icon}</div>
+        <div className="tool-shell-icon" aria-hidden="true">
+          <span
+            className="tool-shell-icon-badge"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 40,
+              height: 40,
+              borderRadius: 6,
+              background: '#111827',
+              color: '#fff',
+              fontFamily: 'monospace',
+              fontSize: 12,
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            {String(icon).trim().slice(0, 3)}
+          </span>
+        </div>
         <div className="tool-shell-header-text">
           <h1 className="tool-shell-title">{label}</h1>
           <p className="tool-shell-desc">{description}</p>

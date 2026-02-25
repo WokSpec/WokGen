@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
   if (!apiId || !apiSecret) {
     return NextResponse.json(
-      { error: 'Vectorizer.AI credentials not configured. Add VECTORIZER_API_ID and VECTORIZER_API_SECRET. Free at https://vectorizer.ai/' },
+      { error: 'Vectorizer API is not configured' },
       { status: 503 },
     );
   }

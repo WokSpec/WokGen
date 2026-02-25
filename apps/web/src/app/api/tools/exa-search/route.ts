@@ -24,7 +24,12 @@ export async function POST(req: NextRequest) {
     if (!rl.allowed) return API_ERRORS.RATE_LIMITED();
 
     const apiKey = process.env.EXA_API_KEY;
-    if (!apiKey) return apiError({ message: 'Exa API not configured. Add EXA_API_KEY to your environment.', code: 'NOT_CONFIGURED', status: 503 });
+    if (!apiKey) {
+      return new Response(JSON.stringify({ error: 'Exa API not configured. Add EXA_API_KEY to your environment.', code: 'NOT_CONFIGURED' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     const { data: body, error: bodyError } = await validateBody(req, ExaSearchSchema);
     if (bodyError) return bodyError as Response;

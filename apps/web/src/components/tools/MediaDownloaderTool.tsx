@@ -72,7 +72,7 @@ export default function MediaDownloaderTool() {
             style={{ flex: 1 }}
           />
           <button className="btn btn-primary" onClick={handleFetch} disabled={loading || !url.trim()}>
-            {loading ? 'Fetching...' : 'Fetch Media'}
+            {loading ? <><span style={{marginRight:8}}>⏳</span>Fetching...</> : 'Fetch Media'}
           </button>
         </div>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>

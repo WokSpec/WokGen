@@ -59,7 +59,7 @@ export default function WebsitePaletteTool() {
             onKeyDown={e => e.key === 'Enter' && extract()}
           />
           <button className="btn btn-primary" onClick={extract} disabled={loading}>
-            {loading ? 'Extracting...' : 'Extract'}
+            {loading ? <><span style={{marginRight:8}}>⏳</span>Extracting...</> : 'Extract'}
           </button>
         </div>
         {error && <div style={{ marginTop: 8, padding: '8px 12px', borderRadius: 6, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171', fontSize: 13 }}>{error.includes('Network') ? 'Network error — check your connection and try again.' : error}</div>}

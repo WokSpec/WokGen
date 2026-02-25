@@ -29,14 +29,20 @@ export default function GradientGeneratorTool() {
     setStops(prev => [...prev, { color: '#f59e0b', position: Math.round((prev[prev.length - 1].position + 100) / 2) }]);
 
   const removeStop = (i: number) => {
-    if (stops.length <= 2) return;
-    setStops(prev => prev.filter((_, idx) => idx !== i));
+    setStops(prev => {
+      if (prev.length <= 2) return prev;
+      return prev.filter((_, idx) => idx !== i);
+    });
   };
 
-  const copy = () => {
-    navigator.clipboard.writeText(getCss());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(getCss());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
   };
 
   return (
@@ -76,7 +82,7 @@ export default function GradientGeneratorTool() {
                 onChange={e => updateStop(i, 'position', Number(e.target.value))} style={{ flex: 1 }} />
               <span style={{ fontSize: '0.78rem', width: '3em', textAlign: 'right', flexShrink: 0 }}>{s.position}%</span>
               {stops.length > 2 && (
-                <button className="btn-ghost" style={{ padding: '0.1rem 0.35rem', fontSize: '0.75rem' }} onClick={() => removeStop(i)}>✕</button>
+                <button className="btn-ghost" style={{ padding: '0.1rem 0.35rem', fontSize: '0.75rem' }} onClick={() => removeStop(i)}>Remove</button>
               )}
             </div>
           ))}
@@ -84,7 +90,7 @@ export default function GradientGeneratorTool() {
 
         <div className="grad-output">
           <pre className="grad-code">{getCss()}</pre>
-          <button className="btn-primary" onClick={copy}>{copied ? '✓ Copied!' : 'Copy CSS'}</button>
+          <button className="btn-primary" onClick={copy}>{copied ? 'Copied!' : 'Copy CSS'}</button>
         </div>
       </div>
     </div>

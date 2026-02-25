@@ -185,7 +185,10 @@ function BackgroundRemoverToolInner() {
             />
             {/* Divider line */}
             <div style={{ position: 'absolute', top: 0, bottom: 0, left: `${comparePos}%`, width: '2px', background: 'white', boxShadow: '0 0 6px rgba(0,0,0,0.5)', pointerEvents: 'none', transform: 'translateX(-50%)' }}>
-              <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '28px', height: '28px', background: 'white', borderRadius: '50%', boxShadow: '0 2px 8px rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: '#374151' }}>⟺</div>
+              <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '28px', height: '28px', background: 'white', borderRadius: '50%', boxShadow: '0 2px 8px rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: '#374151' }}>
+                  {/* SVG handle icon replacing raw symbol */}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 7l-4 4 4 4"/><path d="M16 7l4 4-4 4"/></svg>
+                </div>
             </div>
             {/* Labels */}
             <span style={{ position: 'absolute', top: '8px', left: '8px', fontSize: '0.7rem', background: 'rgba(0,0,0,0.55)', color: '#fff', borderRadius: '4px', padding: '2px 6px', pointerEvents: 'none' }}>Original</span>

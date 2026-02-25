@@ -90,20 +90,22 @@ export async function POST(req: NextRequest) {
       return Response.json(firecrawlResult);
     }
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
     let html: string;
     let finalUrl = url;
     try {
       const res = await fetch(url, {
-        signal: controller.signal,
+        signal: AbortSignal.timeout(15_000),
         headers: { 'User-Agent': 'WokGen-LinkScraper/1.0' },
         redirect: 'follow',
       });
+      if (!res.ok) return Response.json({ error: `Upstream returned ${res.status}` }, { status: 502 });
       finalUrl = res.url || url;
+      const ssrfFinal = checkSsrf(finalUrl);
+      if (!ssrfFinal.ok) return Response.json({ error: ssrfFinal.reason }, { status: 403 });
       html = await res.text();
-    } finally {
-      clearTimeout(timeout);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      return Response.json({ error: `Failed to fetch URL: ${msg}` }, { status: 502 });
     }
 
     const base = new URL(finalUrl);

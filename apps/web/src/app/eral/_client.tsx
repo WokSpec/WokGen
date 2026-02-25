@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { safeMarkdown, sanitizeHtml } from '@/lib/safe-markdown';
 import { parseWAPFromResponse, executeWAP, logWAPAction, getWAPLog, type WAPResponse, type WAPLogEntry } from '@/lib/wap';
 
@@ -494,6 +494,7 @@ interface Project { id: string; name: string; }
 
 export function EralPage({ userId }: { userId?: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [model, setModel] = useState<ModelVariant>('eral-7c');
@@ -546,8 +547,10 @@ export function EralPage({ userId }: { userId?: string }) {
     }
     setConversationsLoaded(true);
     setMemory(loadMemory());
+    // Auto-select project from URL param (?projectId=X) — takes priority over sessionStorage
+    const urlProjectId = searchParams.get('projectId');
     // Restore project selection from sessionStorage
-    const storedProject = sessionStorage.getItem('eral-project');
+    const storedProject = urlProjectId ?? sessionStorage.getItem('eral-project');
     if (storedProject) setSelectedProjectId(storedProject);
     // Fetch user projects
     fetch('/api/projects').then(r => r.ok ? r.json() : null).then(d => {

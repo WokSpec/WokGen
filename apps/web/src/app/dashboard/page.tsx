@@ -21,10 +21,16 @@ export default async function DashboardPage() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
 
-  const [generationsToday, generationsMonth, totalAssets] = await Promise.all([
+  const [generationsToday, generationsMonth, totalAssets, recentProjects] = await Promise.all([
     prisma.job.count({ where: { userId, createdAt: { gte: today } } }),
     prisma.job.count({ where: { userId, createdAt: { gte: monthStart } } }),
     prisma.galleryAsset.count({ where: { job: { userId } } }),
+    prisma.project.findMany({
+      where: { userId },
+      orderBy: { updatedAt: 'desc' },
+      take: 4,
+      select: { id: true, name: true, mode: true, updatedAt: true, _count: { select: { jobs: true } } },
+    }),
   ]);
 
   const dailyLimit = DAILY_STD_LIMIT['free'] ?? 100;
@@ -47,6 +53,63 @@ export default async function DashboardPage() {
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>{user.email}</p>
         </div>
       </div>
+
+      {/* Recent projects — primary focus */}
+      {recentProjects.length > 0 && (
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+            <h2 style={{ fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+              Projects
+            </h2>
+            <Link href="/projects" style={{ fontSize: '0.75rem', color: 'var(--text-faint)', textDecoration: 'none' }}>
+              All projects →
+            </Link>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.625rem' }}>
+            {recentProjects.map(p => (
+              <Link
+                key={p.id}
+                href={`/projects/${p.id}`}
+                style={{
+                  display: 'block',
+                  padding: '0.875rem 1rem',
+                  background: 'var(--surface-raised)',
+                  border: '1px solid var(--surface-border)',
+                  borderRadius: 'var(--radius)',
+                  textDecoration: 'none',
+                  transition: 'border-color 0.15s',
+                }}
+              >
+                <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {p.name}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-faint)', display: 'flex', gap: '0.5rem' }}>
+                  <span>{p.mode}</span>
+                  <span>·</span>
+                  <span>{p._count.jobs} assets</span>
+                </div>
+              </Link>
+            ))}
+            <Link
+              href="/projects"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0.875rem 1rem',
+                background: 'transparent',
+                border: '1px dashed var(--surface-border)',
+                borderRadius: 'var(--radius)',
+                textDecoration: 'none',
+                fontSize: '0.75rem',
+                color: 'var(--text-faint)',
+              }}
+            >
+              + New project
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Main grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.875rem', marginBottom: '2rem' }}>

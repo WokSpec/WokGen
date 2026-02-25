@@ -41,9 +41,9 @@ const REL_COLORS: Record<string, string> = {
   tileset_for: '#34d399', same_palette: '#fbbf24', brand_use: '#fb923c',
 };
 
-const MODE_STUDIOS: Record<string, string> = {
-  pixel: '/pixel/studio', business: '/business/studio', vector: '/vector/studio',
-  emoji: '/emoji/studio', uiux: '/uiux/studio', voice: '/voice/studio', text: '/text/studio',
+const MODE_STUDIO_TYPES: Record<string, string> = {
+  pixel: 'pixel', business: 'business', vector: 'vector',
+  emoji: 'pixel', uiux: 'uiux', voice: 'voice', text: 'pixel',
 };
 
 // ─── Asset grid card ─────────────────────────────────────────────────────────
@@ -468,7 +468,7 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
   const [showRelPanel, setShowRelPanel] = useState(false);
   const [showBriefPanel, setShowBriefPanel] = useState(!initialBrief);
   const [exporting, setExporting]     = useState(false);
-  const [view, setView]               = useState<'grid' | 'relationships' | 'activity'>('grid');
+  const [view, setView]               = useState<'grid' | 'relationships' | 'activity' | 'settings'>('grid');
   const [extractingPalette, setExtractingPalette] = useState(false);
   const [extractedPalette, setExtractedPalette]   = useState<{hex:string;name:string;ratio:number}[]|null>(null);
 
@@ -547,7 +547,7 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
     }
   };
 
-  const studioUrl = MODE_STUDIOS[projectMode] ?? '/pixel/studio';
+  const studioUrl = `/studio?type=${MODE_STUDIO_TYPES[projectMode] ?? 'pixel'}&projectId=${projectId}`;
 
   // Relationships for selected asset
   const selectedRels = selectedId
@@ -569,12 +569,6 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
         <div className="project-dashboard__header-actions">
           <button
             className="btn btn--ghost btn--sm"
-            onClick={() => setShowBriefPanel(v => !v)}
-          >
-            {showBriefPanel ? 'Hide brief' : brief ? 'Edit brief' : 'Set brief'}
-          </button>
-          <button
-            className="btn btn--ghost btn--sm"
             onClick={handleExport}
             disabled={exporting || jobs.length === 0}
           >
@@ -588,8 +582,17 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
           >
             ↓ Brand PDF
           </button>
-          <Link href={`${studioUrl}?project=${projectId}`} className="btn btn--primary btn--sm">
-            + Generate
+          <button
+            className="btn btn--ghost btn--sm"
+            onClick={() => setView('settings')}
+          >
+            Settings
+          </button>
+          <Link href={`/eral?projectId=${projectId}`} className="btn btn--ghost btn--sm">
+            Ask Eral
+          </Link>
+          <Link href={studioUrl} className="btn btn--primary btn--sm">
+            Open Studio
           </Link>
         </div>
       </div>
@@ -614,12 +617,20 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
         >
           Activity
         </button>
+        <button
+          className={`project-tab ${view === 'settings' ? 'project-tab--active' : ''}`}
+          onClick={() => setView('settings')}
+        >
+          Settings
+        </button>
       </div>
 
       <div className="project-dashboard__body">
         {/* Left: main content */}
         <div className="project-dashboard__main">
-          {view === 'activity' ? (
+          {view === 'settings' ? (
+            <BriefPanel projectId={projectId} brief={brief} mode={projectMode} onSaved={b => { setBrief(b); setView('grid'); }} />
+          ) : view === 'activity' ? (
             <ActivityFeed projectId={projectId} />
           ) : loading ? (
             <div className="project-skeleton">
@@ -628,7 +639,7 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
           ) : jobs.length === 0 ? (
             <div className="project-empty">
               <p>No assets yet.</p>
-              <Link href={`${studioUrl}?project=${projectId}`} className="btn btn--primary">
+              <Link href={studioUrl} className="btn btn--primary">
                 Generate your first asset
               </Link>
             </div>
@@ -757,17 +768,6 @@ export default function ProjectDashboard({ projectId, projectName, projectMode, 
           )}
         </div>
 
-        {/* Right: brief panel */}
-        {showBriefPanel && (
-          <div className="project-dashboard__sidebar">
-            <BriefPanel
-              projectId={projectId}
-              brief={brief}
-              mode={projectMode}
-              onSaved={(b) => { setBrief(b); }}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

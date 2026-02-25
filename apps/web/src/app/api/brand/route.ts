@@ -67,5 +67,18 @@ export async function POST(req: NextRequest) {
       projectId:   projectId   ?? null,
     },
   });
+
+  if (projectId) {
+    prisma.activityEvent.create({
+      data: {
+        projectId,
+        userId: session.user.id,
+        type: 'brand.created',
+        message: `Brand kit "${name}" created`,
+        refId: kit.id,
+      },
+    }).catch(() => {});
+  }
+
   return NextResponse.json({ kit }, { status: 201 });
 }

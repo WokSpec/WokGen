@@ -63,14 +63,14 @@ export async function POST(req: NextRequest) {
     // Non-critical: allow through if quota check fails
   }
 
-  let body: { imageUrl?: string; imageBase64?: string };
+  let body: { imageUrl?: string; imageBase64?: string; projectId?: string };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { imageUrl, imageBase64 } = body;
+  const { imageUrl, imageBase64, projectId } = body;
 
   if (!imageUrl && !imageBase64) {
     return NextResponse.json(
@@ -117,6 +117,12 @@ export async function POST(req: NextRequest) {
       const resultBuffer = await res.arrayBuffer();
       const resultBase64 = Buffer.from(resultBuffer).toString('base64');
 
+      if (userId && projectId) {
+        prisma.activityEvent.create({ data: { projectId, userId, type: 'tool.used', message: 'Background removed' } }).catch(() => {});
+      }
+      if (userId) {
+        prisma.notification.create({ data: { userId, type: 'tool_complete', title: 'Tool complete', body: 'Background removal finished', read: false } }).catch(() => {});
+      }
       return NextResponse.json({ resultBase64, mimeType: 'image/png' });
     } catch (err) {
       logger.error({ err }, '[bg-remove] base64 path failed');
@@ -133,5 +139,11 @@ export async function POST(req: NextRequest) {
 
   const resultBase64 = result.replace(/^data:[^;]+;base64,/, '');
 
+  if (userId && projectId) {
+    prisma.activityEvent.create({ data: { projectId, userId, type: 'tool.used', message: 'Background removed' } }).catch(() => {});
+  }
+  if (userId) {
+    prisma.notification.create({ data: { userId, type: 'tool_complete', title: 'Tool complete', body: 'Background removal finished', read: false } }).catch(() => {});
+  }
   return NextResponse.json({ resultBase64, mimeType: 'image/png' });
 }

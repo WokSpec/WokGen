@@ -169,17 +169,27 @@ function BriefPanel({ projectId, brief, mode, onSaved }: {
 }) {
   const [form, setForm] = useState<Brief>(brief ?? {});
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const save = async () => {
+  const save = useCallback(async (data: Brief) => {
     setSaving(true);
+    setSaved(false);
     const res = await fetch(`/api/projects/${projectId}/brief`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify(data),
     });
     if (res.ok) { const d = await res.json(); onSaved(d.brief); }
     setSaving(false);
-  };
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }, [projectId, onSaved]);
+
+  const handleBlur = useCallback((latestForm: Brief) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => save(latestForm), 400);
+  }, [save]);
 
   const isGame = ['pixel', 'vector', 'emoji'].includes(mode);
 
@@ -190,7 +200,7 @@ function BriefPanel({ projectId, brief, mode, onSaved }: {
         <>
           <div className="brief-panel__field">
             <label>Genre</label>
-            <select className="input" value={form.genre ?? ''} onChange={e => setForm(f => ({ ...f, genre: e.target.value || undefined }))}>
+            <select className="input" value={form.genre ?? ''} onChange={e => setForm(f => ({ ...f, genre: e.target.value || undefined }))} onBlur={() => handleBlur(form)}>
               <option value="">— not set —</option>
               <option value="dungeon_crawler">Dungeon crawler</option>
               <option value="platformer">Platformer</option>
@@ -203,7 +213,7 @@ function BriefPanel({ projectId, brief, mode, onSaved }: {
           </div>
           <div className="brief-panel__field">
             <label>Art style</label>
-            <select className="input" value={form.artStyle ?? ''} onChange={e => setForm(f => ({ ...f, artStyle: e.target.value || undefined }))}>
+            <select className="input" value={form.artStyle ?? ''} onChange={e => setForm(f => ({ ...f, artStyle: e.target.value || undefined }))} onBlur={() => handleBlur(form)}>
               <option value="">— not set —</option>
               <option value="nes_16color">NES 16-color</option>
               <option value="snes_32color">SNES 32-color</option>
@@ -217,28 +227,35 @@ function BriefPanel({ projectId, brief, mode, onSaved }: {
         <>
           <div className="brief-panel__field">
             <label>Brand name</label>
-            <input className="input" value={form.brandName ?? ''} onChange={e => setForm(f => ({ ...f, brandName: e.target.value }))} placeholder="Acme Inc." />
+            <input className="input" value={form.brandName ?? ''} onChange={e => setForm(f => ({ ...f, brandName: e.target.value }))} onBlur={() => handleBlur(form)} placeholder="Acme Inc." />
           </div>
           <div className="brief-panel__field">
             <label>Industry</label>
-            <input className="input" value={form.industry ?? ''} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} placeholder="SaaS, e-commerce…" />
+            <input className="input" value={form.industry ?? ''} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} onBlur={() => handleBlur(form)} placeholder="SaaS, e-commerce…" />
           </div>
           <div className="brief-panel__field">
             <label>Primary color</label>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <input type="color" value={form.colorHex ?? '#a78bfa'} onChange={e => setForm(f => ({ ...f, colorHex: e.target.value }))} style={{ width: 36, height: 36, border: 'none', background: 'none', cursor: 'pointer' }} />
-              <input className="input" style={{ flex: 1 }} value={form.colorHex ?? ''} onChange={e => setForm(f => ({ ...f, colorHex: e.target.value }))} placeholder="#a78bfa" />
+              <input type="color" value={form.colorHex ?? '#a78bfa'} onChange={e => setForm(f => ({ ...f, colorHex: e.target.value }))} onBlur={() => handleBlur(form)} style={{ width: 36, height: 36, border: 'none', background: 'none', cursor: 'pointer' }} />
+              <input className="input" style={{ flex: 1 }} value={form.colorHex ?? ''} onChange={e => setForm(f => ({ ...f, colorHex: e.target.value }))} onBlur={() => handleBlur(form)} placeholder="#a78bfa" />
             </div>
           </div>
           <div className="brief-panel__field">
             <label>Style guide</label>
-            <textarea className="input" rows={3} value={form.styleGuide ?? ''} onChange={e => setForm(f => ({ ...f, styleGuide: e.target.value }))} placeholder="Minimal, modern, trustworthy…" />
+            <textarea className="input" rows={3} value={form.styleGuide ?? ''} onChange={e => setForm(f => ({ ...f, styleGuide: e.target.value }))} onBlur={() => handleBlur(form)} placeholder="Minimal, modern, trustworthy…" />
           </div>
         </>
       )}
-      <button className="btn btn--primary btn--sm" onClick={save} disabled={saving}>
-        {saving ? 'Saving…' : 'Save brief'}
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <button className="btn btn--primary btn--sm" onClick={() => save(form)} disabled={saving}>
+          {saving ? 'Saving…' : 'Save brief'}
+        </button>
+        {saved && !saving && (
+          <span style={{ color: 'var(--color-success, #22c55e)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            ✓ Saved
+          </span>
+        )}
+      </div>
     </div>
   );
 }

@@ -36,7 +36,14 @@ export async function GET(
     },
   });
 
-  return NextResponse.json({ project, jobs });
+  const recentAssets = await prisma.galleryAsset.findMany({
+    where: { job: { projectId: params.id, userId: session.user.id } },
+    orderBy: { createdAt: 'desc' },
+    take: 12,
+    include: { job: { select: { prompt: true, mode: true } } },
+  });
+
+  return NextResponse.json({ project, jobs, recentAssets });
 }
 
 export async function PATCH(
@@ -69,6 +76,15 @@ export async function PATCH(
       ...(typeof isArchived === 'boolean' ? { isArchived } : {}),
     },
   });
+
+  prisma.activityEvent.create({
+    data: {
+      projectId: params.id,
+      userId: session.user.id,
+      type: 'project.updated',
+      message: `Project updated`,
+    },
+  }).catch(() => {});
 
   return NextResponse.json({ project: updated });
 }

@@ -324,6 +324,7 @@ export async function POST(req: NextRequest) {
     outlineStyle,
     paletteSize,
     projectId,
+    brandKitId,
     isPublic   = false,
     _promptBuilt = false, // studio already built prompt — skip server-side enrichment
     // BYOK fields — only used in self-hosted mode; stripped in hosted mode
@@ -438,6 +439,40 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // --------------------------------------------------------------------------
+  // Brand Kit fetch — runs for ALL modes when projectId or brandKitId provided.
+  // Fetched data is used by business mode's prompt builder and by non-business
+  // modes as a lightweight prompt prefix (colors, mood, industry).
+  // --------------------------------------------------------------------------
+  let brandColorDirection: string | undefined = typeof body.colorDirection === 'string' ? body.colorDirection || undefined : undefined;
+  let brandIndustry:       string | undefined = typeof body.industry       === 'string' ? body.industry       || undefined : undefined;
+  let brandMoodFromKit:    string | undefined;
+
+  const resolvedProjectId  = typeof projectId  === 'string' && projectId  ? projectId  : undefined;
+  const resolvedBrandKitId = typeof brandKitId  === 'string' && brandKitId ? brandKitId : undefined;
+
+  if (resolvedProjectId || resolvedBrandKitId) {
+    try {
+      const kit = resolvedProjectId
+        ? await prisma.brandKit.findFirst({
+            where:  { projectId: resolvedProjectId },
+            select: { paletteJson: true, mood: true, industry: true },
+          })
+        : await prisma.brandKit.findUnique({
+            where:  { id: resolvedBrandKitId },
+            select: { paletteJson: true, mood: true, industry: true },
+          });
+      if (kit) {
+        const palette = JSON.parse(kit.paletteJson || '[]') as { hex?: string; role?: string }[];
+        const primaryColor = palette.find(c => c.role === 'primary' || c.role === 'brand')?.hex
+          ?? palette[0]?.hex;
+        if (primaryColor && !brandColorDirection) brandColorDirection = primaryColor;
+        if (kit.industry  && !brandIndustry)      brandIndustry       = kit.industry;
+        if (kit.mood)                              brandMoodFromKit    = kit.mood;
+      }
+    } catch { /* non-fatal — brand kit fetch failure should not block generation */ }
+  }
+
   if (resolvedMode === 'business') {
     // All business tools map to the standard 'generate' pipeline
     const originalTool = effectiveTool; // capture before override
@@ -450,31 +485,7 @@ export async function POST(req: NextRequest) {
       ? extraRecord.brandKitIndex as 1 | 2 | 3 | 4
       : undefined;
 
-    // ── Brand Kit injection: if projectId is provided, fetch the project's
-    //    brand kit and auto-inject colors, mood, and industry into the prompt.
-    let brandColorDirection: string | undefined = typeof body.colorDirection === 'string' ? body.colorDirection || undefined : undefined;
-    let brandIndustry:       string | undefined = typeof body.industry       === 'string' ? body.industry       || undefined : undefined;
-    let brandMoodOverride:   BusinessMood | undefined = bizMood;
-
-    if (typeof projectId === 'string' && projectId) {
-      try {
-        const kit = await prisma.brandKit.findFirst({
-          where:  { projectId },
-          select: { paletteJson: true, mood: true, industry: true },
-        });
-        if (kit) {
-          // Parse palette JSON → extract primary hex color direction string
-          const palette = JSON.parse(kit.paletteJson || '[]') as { hex?: string; role?: string }[];
-          const primaryColor = palette.find(c => c.role === 'primary' || c.role === 'brand')?.hex
-            ?? palette[0]?.hex;
-          if (primaryColor && !brandColorDirection) {
-            brandColorDirection = primaryColor; // inject primary brand color
-          }
-          if (kit.industry && !brandIndustry)  brandIndustry      = kit.industry;
-          if (kit.mood     && !brandMoodOverride) brandMoodOverride = kit.mood as BusinessMood;
-        }
-      } catch { /* non-fatal — brand kit fetch failure should not block generation */ }
-    }
+    const brandMoodOverride: BusinessMood | undefined = bizMood ?? (brandMoodFromKit as BusinessMood | undefined);
 
     const built = buildBusinessPrompt({
       tool:           bizTool,
@@ -499,6 +510,16 @@ export async function POST(req: NextRequest) {
         effectiveWidth  = built.width;
         effectiveHeight = built.height;
       }
+    }
+  } else if ((resolvedProjectId || resolvedBrandKitId) && (brandColorDirection || brandIndustry || brandMoodFromKit)) {
+    // Non-business modes: prepend a compact brand context hint to the prompt so
+    // mode-specific builders (pixel, vector, etc.) can incorporate brand cues.
+    const hints: string[] = [];
+    if (brandColorDirection) hints.push(`color: ${brandColorDirection}`);
+    if (brandMoodFromKit)    hints.push(`mood: ${brandMoodFromKit}`);
+    if (brandIndustry)       hints.push(`industry: ${brandIndustry}`);
+    if (hints.length > 0 && effectivePrompt) {
+      effectivePrompt = `${effectivePrompt}, brand context: ${hints.join(', ')}`;
     }
   }
 
@@ -1020,6 +1041,20 @@ export async function POST(req: NextRequest) {
           type:    'generate',
           message: `Generated "${effectivePrompt.slice(0, 60)}" with ${resolvedMode}/${effectiveTool}`,
           refId:   job.id,
+        },
+      }).catch(() => {});
+    }
+
+    // Notify authenticated user on successful generation (non-blocking)
+    if (authedUserId) {
+      prisma.notification.create({
+        data: {
+          userId: authedUserId,
+          type: 'generation_complete',
+          title: 'Generation complete',
+          body: 'Your asset is ready',
+          link: job ? `/gallery?job=${job.id}` : '/gallery',
+          read: false,
         },
       }).catch(() => {});
     }

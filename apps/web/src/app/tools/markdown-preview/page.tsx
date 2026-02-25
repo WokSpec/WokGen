@@ -47,7 +47,7 @@ export default function MarkdownPreviewPage() {
         <h1 className="tool-page-title">Markdown Previewer</h1>
         <p className="tool-page-desc">Write Markdown and see a live preview. Runs entirely in your browser.</p>
       </div>
-      <div className="tool-section" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', minHeight: '400px' }}>
+      <div className="tool-section" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', minHeight: '400px' }}>
         <div>
           <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Input</div>
           <textarea value={md} onChange={e => setMd(e.target.value)} style={{ width: '100%', height: '380px', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.875rem', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.875rem', outline: 'none', resize: 'vertical', lineHeight: 1.6 }} />

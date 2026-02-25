@@ -3263,108 +3263,6 @@ function StudioInner() {
   return (
     <div className="studio-layout">
 
-      {/* ── Tool rail (far left) ──────────────────────────────────────────── */}
-      <div
-        className="flex flex-col items-center py-3 gap-1 flex-shrink-0"
-        style={{
-          width: 56,
-          background: 'var(--surface-raised)',
-          borderRight: '1px solid var(--surface-border)',
-        }}
-        data-no-select
-      >
-        {TOOLS.map((tool) => (
-          <button
-            key={tool.id}
-            onClick={() => setActiveTool(tool.id)}
-            className="flex flex-col items-center justify-center gap-1 w-10 h-12 rounded-lg transition-all duration-150"
-            style={{
-              background:
-                activeTool === tool.id ? 'var(--accent-dim)' : 'transparent',
-              border: `1px solid ${activeTool === tool.id ? 'var(--accent-muted)' : 'transparent'}`,
-              color:
-                activeTool === tool.id ? 'var(--accent)' : 'var(--text-disabled)',
-            }}
-            title={`${tool.label} (${tool.kbd})`}
-            aria-label={tool.label}
-            aria-pressed={activeTool === tool.id}
-            onMouseEnter={(e) => {
-              if (activeTool !== tool.id)
-                (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
-            }}
-            onMouseLeave={(e) => {
-              if (activeTool !== tool.id)
-                (e.currentTarget as HTMLElement).style.color = 'var(--text-disabled)';
-            }}
-          >
-            <span style={{ fontSize: 14, lineHeight: 1 }}>{tool.icon}</span>
-            <span style={{ fontSize: '0.52rem', letterSpacing: '0.02em', lineHeight: 1 }}>
-              {tool.shortLabel}
-            </span>
-          </button>
-        ))}
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Switch to Business mode pill */}
-        <Link
-          href="/business/studio"
-          className="flex flex-col items-center justify-center gap-1 w-10 h-12 rounded-lg transition-all duration-150"
-          style={{
-            color: 'var(--text-disabled)',
-            border: '1px solid transparent',
-            textDecoration: 'none',
-            fontSize: '0.52rem',
-            letterSpacing: '0.01em',
-          }}
-          title="Switch to Business mode"
-        >
-          
-          <span>Biz</span>
-        </Link>
-
-        {/* History */}
-        <button
-          className="flex flex-col items-center justify-center gap-1 w-10 h-12 rounded-lg transition-all duration-150"
-          style={{
-            background: showHistory ? 'var(--surface-overlay)' : 'transparent',
-            color: showHistory ? 'var(--text-secondary)' : 'var(--text-disabled)',
-            border: `1px solid ${showHistory ? 'var(--surface-border)' : 'transparent'}`,
-          }}
-          onClick={() => setShowHistory((v) => !v)}
-          title="History"
-          aria-label="History"
-          aria-pressed={showHistory}
-        >
-          ≡
-          <span style={{ fontSize: '0.52rem' }}>History</span>
-        </button>
-
-        {/* Settings — only in self-hosted mode */}
-        {isSelfHosted && (
-        <button
-          className="flex flex-col items-center justify-center gap-1 w-10 h-12 rounded-lg transition-all duration-150 mb-1"
-          style={{
-            color: 'var(--text-disabled)',
-            border: '1px solid transparent',
-          }}
-          onClick={() => setShowSettings(true)}
-          title="Provider settings"
-          aria-label="Open provider settings"
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.color = 'var(--text-disabled)';
-          }}
-        >
-          
-          <span style={{ fontSize: '0.52rem' }}>Config</span>
-        </button>
-        )}
-      </div>
-
       {/* ── Left panel (controls) ─────────────────────────────────────────── */}
       <div
         className="flex flex-col flex-shrink-0 overflow-hidden"
@@ -3380,9 +3278,8 @@ function StudioInner() {
           style={{ borderBottom: '1px solid var(--surface-border)' }}
         >
           <div className="pixel-studio-panel-header__title">
-            <span style={{ fontSize: 16, color: 'var(--accent)' }}>✦</span>
-            <h1 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Pixel mode
+            <h1 className="text-sm font-semibold" style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+              Pixel Studio
             </h1>
           </div>
           <div className="pixel-studio-panel-header__actions">
@@ -3400,7 +3297,79 @@ function StudioInner() {
             >
               Eral
             </button>
+            {/* History toggle */}
+            <button
+              type="button"
+              style={{
+                background: showHistory ? 'rgba(255,255,255,0.06)' : 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: showHistory ? 'var(--text-secondary)' : 'var(--text-disabled)',
+                padding: '0.2rem 0.5rem',
+                fontSize: '0.68rem',
+                fontWeight: 600,
+                letterSpacing: '0.02em',
+              }}
+              onClick={() => setShowHistory((v) => !v)}
+              title="History"
+              aria-label="History"
+            >
+              History
+            </button>
+            {/* Settings — only in self-hosted mode */}
+            {isSelfHosted && (
+              <button
+                type="button"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--text-disabled)',
+                  padding: '0.2rem 0.5rem',
+                  fontSize: '0.68rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.02em',
+                }}
+                onClick={() => setShowSettings(true)}
+                title="Provider settings"
+                aria-label="Open provider settings"
+              >
+                Config
+              </button>
+            )}
           </div>
+        </div>
+
+        {/* Tool tabs */}
+        <div
+          className="flex flex-shrink-0"
+          style={{ borderBottom: '1px solid var(--surface-border)' }}
+        >
+          {TOOLS.map((tool) => (
+            <button
+              key={tool.id}
+              onClick={() => setActiveTool(tool.id)}
+              style={{
+                flex: 1,
+                padding: '0.5rem 0.25rem',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: `2px solid ${activeTool === tool.id ? 'var(--accent)' : 'transparent'}`,
+                color: activeTool === tool.id ? 'var(--text-primary)' : 'var(--text-disabled)',
+                fontSize: '0.7rem',
+                fontWeight: activeTool === tool.id ? 600 : 400,
+                letterSpacing: '0.01em',
+                cursor: 'pointer',
+                transition: 'color 0.12s, border-bottom-color 0.12s',
+                marginBottom: -1,
+              }}
+              title={`${tool.label} (${tool.kbd})`}
+              aria-label={tool.label}
+              aria-pressed={activeTool === tool.id}
+            >
+              {tool.shortLabel}
+            </button>
+          ))}
         </div>
 
         {/* Workspace selector */}

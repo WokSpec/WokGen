@@ -97,8 +97,17 @@ module.exports = {
         128: '32rem',
       },
       borderRadius: {
-        px: '1px',
+        none:  '0px',
+        px:    '1px',
         '2px': '2px',
+        sm:    '2px',
+        DEFAULT: '3px',
+        md:    '3px',
+        lg:    '4px',
+        xl:    '4px',
+        '2xl': '4px',
+        '3xl': '4px',
+        full:  '9999px',
       },
       boxShadow: {
         glow:      '0 0 12px 2px rgba(65,166,246,0.25)',

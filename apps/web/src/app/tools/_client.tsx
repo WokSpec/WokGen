@@ -39,26 +39,21 @@ function ToolCard({ tool, starred, onStar, onVisit }: ToolCardProps) {
     <Link href={tool.href} className="toolhub-card" onClick={() => onVisit(tool.id)}>
       <div className="toolhub-card-top">
         <span className="toolhub-card-icon" aria-hidden="true">{tool.icon}</span>
-        <div className="toolhub-card-top-right">
-          {tool.isNew && <span className="toolhub-card-badge">New</span>}
-          <button
-            className="toolhub-card-star"
-            onClick={e => onStar(tool.id, e)}
-            title={starred ? 'Remove from starred' : 'Star this tool'}
-            aria-label={starred ? 'Unstar' : 'Star'}
-          >
-            <Star size={13} fill={starred ? 'currentColor' : 'none'} />
-          </button>
-        </div>
       </div>
       <div className="toolhub-card-body">
         <div className="toolhub-card-name">{tool.label}</div>
         <p className="toolhub-card-desc">{tool.description}</p>
-        <div className="toolhub-card-tags">
-          {tool.tags.map(tag => (
-            <span key={tag} className="toolhub-card-tag">{TAG_LABELS[tag]}</span>
-          ))}
-        </div>
+      </div>
+      <div className="toolhub-card-top-right">
+        {tool.isNew && <span className="toolhub-card-badge">New</span>}
+        <button
+          className={`toolhub-card-star${starred ? ' --starred' : ''}`}
+          onClick={e => onStar(tool.id, e)}
+          title={starred ? 'Remove from starred' : 'Star this tool'}
+          aria-label={starred ? 'Unstar' : 'Star'}
+        >
+          <Star size={12} fill={starred ? 'currentColor' : 'none'} />
+        </button>
       </div>
     </Link>
   );
@@ -140,6 +135,18 @@ export default function ToolsPage() {
     return list;
   }, [search, activeTag]);
 
+  // Group tools by their first tag when showing "all" without search
+  const grouped = useMemo(() => {
+    if (activeTag || search.trim()) return null;
+    const groups: { tag: ToolTag; label: string; tools: ToolDef[] }[] = [];
+    const tags = SIDEBAR_CATEGORIES.filter(c => c.tag !== null) as { tag: ToolTag; label: string }[];
+    for (const { tag, label } of tags) {
+      const tools = TOOLS.filter(t => t.tags[0] === tag || (t.tags.includes(tag) && !groups.some(g => g.tools.includes(t))));
+      if (tools.length > 0) groups.push({ tag, label, tools });
+    }
+    return groups;
+  }, [activeTag, search]);
+
   const recentTools = recentIds
     .map(id => TOOLS.find(t => t.id === id))
     .filter((t): t is ToolDef => t !== undefined)
@@ -187,7 +194,7 @@ export default function ToolsPage() {
         </div>
 
         {/* Recently Used */}
-        {recentTools.length > 0 && (
+        {recentTools.length > 0 && !search.trim() && (
           <section className="toolhub-section">
             <h2 className="toolhub-section-title">Recently Used</h2>
             <div className="toolhub-grid">
@@ -199,7 +206,7 @@ export default function ToolsPage() {
         )}
 
         {/* Starred */}
-        {starredTools.length > 0 && (
+        {starredTools.length > 0 && !search.trim() && !activeTag && (
           <section className="toolhub-section">
             <h2 className="toolhub-section-title">Starred</h2>
             <div className="toolhub-grid">
@@ -210,28 +217,45 @@ export default function ToolsPage() {
           </section>
         )}
 
-        {/* Main grid */}
-        <section className="toolhub-section">
-          <h2 className="toolhub-section-title">
-            {activeTag ? TAG_LABELS[activeTag] : 'All Tools'}
-            <span className="toolhub-section-count">{filtered.length}</span>
-          </h2>
+        {/* Grouped view (all, no search) */}
+        {grouped ? (
+          grouped.map(({ tag, label, tools }) => (
+            <section key={tag} className="toolhub-section">
+              <h2 className="toolhub-section-title">
+                {label}
+                <span className="toolhub-section-count">{tools.length}</span>
+              </h2>
+              <div className="toolhub-grid">
+                {tools.map(tool => (
+                  <ToolCard key={tool.id} tool={tool} {...cardProps} starred={starredIds.includes(tool.id)} />
+                ))}
+              </div>
+            </section>
+          ))
+        ) : (
+          /* Filtered / searched view */
+          <section className="toolhub-section">
+            <h2 className="toolhub-section-title">
+              {activeTag ? TAG_LABELS[activeTag] : 'Results'}
+              <span className="toolhub-section-count">{filtered.length}</span>
+            </h2>
 
-          {filtered.length === 0 ? (
-            <div className="toolhub-empty">
-              <p>No tools match &ldquo;{search}&rdquo;</p>
-              <button className="btn-ghost" onClick={() => { handleSearchChange(''); handleCategoryChange(null); }}>
-                Clear filters
-              </button>
-            </div>
-          ) : (
-            <div className="toolhub-grid">
-              {filtered.map(tool => (
-                <ToolCard key={tool.id} tool={tool} {...cardProps} starred={starredIds.includes(tool.id)} />
-              ))}
-            </div>
-          )}
-        </section>
+            {filtered.length === 0 ? (
+              <div className="toolhub-empty">
+                <p>No tools match &ldquo;{search}&rdquo;</p>
+                <button className="btn-ghost" onClick={() => { handleSearchChange(''); handleCategoryChange(null); }}>
+                  Clear filters
+                </button>
+              </div>
+            ) : (
+              <div className="toolhub-grid">
+                {filtered.map(tool => (
+                  <ToolCard key={tool.id} tool={tool} {...cardProps} starred={starredIds.includes(tool.id)} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Footer */}
         <footer className="toolhub-footer">

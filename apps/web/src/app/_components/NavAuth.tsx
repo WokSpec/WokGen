@@ -241,7 +241,7 @@ export function NavAuth() {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .nav-auth-skeleton {
           width: 28px; height: 28px; border-radius: 50%;
           background: var(--surface-raised, #1e1e1e);

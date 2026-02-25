@@ -166,14 +166,14 @@ export default function LibraryClient() {
                       href={asset.imageUrl}
                       download
                       className="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded text-white"
-                      onClick={e => e.stopPropagation()}
+                      onClick={(e: React.MouseEvent) => e.stopPropagation()}
                     >
                       Save
                     </a>
                     <Link
                       href={`/pixel/studio?prompt=${encodeURIComponent(asset.prompt)}&mode=${asset.mode}`}
                       className="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded text-white"
-                      onClick={e => e.stopPropagation()}
+                      onClick={(e: React.MouseEvent) => e.stopPropagation()}
                     >
                       Reuse
                     </Link>

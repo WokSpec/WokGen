@@ -1116,7 +1116,7 @@ export function EralPage() {
           {isEmpty ? (
             <div className="eral-empty">
               <div className="eral-empty-logo">
-                <span className="eral-empty-icon"><span style={{fontSize:'24px',opacity:0.5}}>AI</span></span>
+                <span className="eral-empty-icon"><span style={{fontSize:'22px',fontWeight:700,color:'#818cf8',letterSpacing:'-1px',opacity:0.7}}>7c</span></span>
                 <h1 className="eral-empty-title">Eral 7c</h1>
                 <p className="eral-empty-sub">AI companion for creative work · by WokSpec</p>
               </div>
@@ -1183,6 +1183,21 @@ export function EralPage() {
               })()}
               {streamingMsg && (
                 <MessageBubble msg={streamingMsg} isStreaming />
+              )}
+              {loading && !streamingContent && (
+                <div className="eral-msg-row eral-msg-assistant">
+                  <div className="eral-avatar">
+                    <span style={{ fontSize: 9, fontWeight: 700, color: '#818cf8', letterSpacing: '-0.5px' }}>7c</span>
+                  </div>
+                  <div className="eral-bubble-wrap">
+                    <span className="eral-msg-label">Eral 7c</span>
+                    <div className="eral-bubble eral-bubble-assistant">
+                      <div className="eral-typing" aria-label="Eral is thinking">
+                        <span /><span /><span />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </>
           )}

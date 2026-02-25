@@ -47,10 +47,10 @@ export async function POST(req: NextRequest) {
     // Determine if paid
     let isPaid = false;
     if (userId) {
-      const user = await prisma.user.findUnique({
+      const user = await dbQuery(prisma.user.findUnique({
         where: { id: userId },
         include: { subscription: { select: { planId: true, status: true } } },
-      });
+      }));
       isPaid = ['plus', 'pro', 'max'].includes(user?.subscription?.planId ?? 'free') && user?.subscription?.status === 'active';
     }
 
@@ -143,4 +143,4 @@ export async function POST(req: NextRequest) {
     prisma.notification.create({ data: { userId, type: 'tool_complete', title: 'Tool complete', body: 'Background removal finished', read: false } }).catch(() => {});
   }
   return NextResponse.json({ resultBase64, mimeType: 'image/png' });
-}
+});

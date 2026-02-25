@@ -10,6 +10,7 @@ import { checkRateLimit } from '@/lib/rate-limit';
 import { checkSsrf } from '@/lib/ssrf-check';
 import { z } from 'zod';
 import { validateBody } from '@/lib/validate';
+import { withErrorHandler } from '@/lib/api-handler';
 
 const VectorizeSchema = z.object({
   imageUrl:    z.string().url('Must be a valid URL').optional(),
@@ -19,7 +20,7 @@ const VectorizeSchema = z.object({
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-export async function POST(req: NextRequest) {
+export const POST = withErrorHandler(async (req) => {
   // Auth check
   const session = await auth();
   if (!session?.user?.id) {
@@ -101,4 +102,4 @@ export async function POST(req: NextRequest) {
 
   const svgContent = await vecRes.text();
   return NextResponse.json({ svg: svgContent, contentType: 'image/svg+xml' });
-}
+});

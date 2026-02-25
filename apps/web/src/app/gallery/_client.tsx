@@ -100,8 +100,8 @@ export default function GalleryClient() {
       {assets.length === 0 && !loading ? (
         <EmptyState
           title="No assets yet"
-          description="Generated assets you make public will appear here."
-          action={{ label: 'Start generating', href: '/pixel/studio' }}
+          description="Generate your first image in Pixel Studio and it will appear here."
+          action={{ label: 'Open Pixel Studio', href: '/pixel/studio' }}
         />
       ) : (
         <>

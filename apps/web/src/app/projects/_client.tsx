@@ -97,7 +97,7 @@ export default function ProjectsClient() {
       {filtered.length === 0 ? (
         <EmptyState
           title={searchQuery ? 'No matching projects' : 'No projects yet'}
-          description={searchQuery ? 'Try a different search.' : 'Create a project to organize your generated assets.'}
+          description={searchQuery ? 'Try a different search.' : 'No projects yet. Create your first project.'}
           action={!searchQuery ? { label: 'Create project', href: '/pixel/studio' } : undefined}
         />
       ) : (

@@ -492,7 +492,7 @@ function ConvItem({
 
 interface Project { id: string; name: string; }
 
-export function EralPage() {
+export function EralPage({ userId }: { userId?: string }) {
   const router = useRouter();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -501,6 +501,8 @@ export function EralPage() {
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarTab, setSidebarTab] = useState<'chats' | 'notes'>('chats');
+  const [notepadText, setNotepadText] = useState('');
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
   const [conversationsLoaded, setConversationsLoaded] = useState(false);
   const [actionConfirmation, setActionConfirmation] = useState<string | null>(null);
@@ -557,6 +559,15 @@ export function EralPage() {
   useEffect(() => {
     if (conversations.length > 0) saveConversations(conversations);
   }, [conversations]);
+
+  // Notepad: load on mount and auto-save on change
+  const notepadKey = `eral-notepad-${userId ?? 'local'}`;
+  useEffect(() => {
+    try { const s = localStorage.getItem(notepadKey); if (s != null) setNotepadText(s); } catch {}
+  }, [notepadKey]);
+  useEffect(() => {
+    try { localStorage.setItem(notepadKey, notepadText); } catch {}
+  }, [notepadText, notepadKey]);
 
   const activeConv = conversations.find((c) => c.id === activeId) ?? null;
 
@@ -907,6 +918,37 @@ export function EralPage() {
               <span>+</span> New chat
             </button>
 
+            {/* Sidebar tabs */}
+            <div className="eral-sidebar-tabs">
+              <button
+                className={`eral-sidebar-tab${sidebarTab === 'chats' ? ' eral-sidebar-tab--active' : ''}`}
+                onClick={() => setSidebarTab('chats')}
+              >Chats</button>
+              <button
+                className={`eral-sidebar-tab${sidebarTab === 'notes' ? ' eral-sidebar-tab--active' : ''}`}
+                onClick={() => setSidebarTab('notes')}
+              >Notes</button>
+            </div>
+
+            {sidebarTab === 'notes' ? (
+              <div className="eral-notepad-wrap">
+                <textarea
+                  className="eral-notepad"
+                  value={notepadText}
+                  onChange={(e) => setNotepadText(e.target.value)}
+                  placeholder="Jot down ideas, references, or context…"
+                />
+                <div className="eral-notepad-footer">
+                  <span className="eral-notepad-count">{notepadText.length} chars</span>
+                  <button
+                    className="eral-notepad-clear"
+                    onClick={() => { if (window.confirm('Clear notepad?')) setNotepadText(''); }}
+                    disabled={!notepadText}
+                  >Clear</button>
+                </div>
+              </div>
+            ) : (<>
+
             {/* Memory Panel */}
             <div className="eral-v2-memory-panel">
               <p className="eral-v2-memory-panel__title">Memory</p>
@@ -1010,6 +1052,7 @@ export function EralPage() {
                 wokgen.wokspec.org ↗
               </a>
             </div>
+            </>)}
           </>
         )}
       </aside>
@@ -1998,6 +2041,100 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           animation: eral-blink 0.8s step-end infinite;
         }
         @keyframes eral-blink { 0%,100% { opacity: 1 } 50% { opacity: 0 } }
+
+        /* Typing indicator */
+        .eral-typing { display: flex; align-items: center; gap: 5px; padding: 4px 2px; }
+        .eral-typing span {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: rgba(129,140,248,0.65);
+          animation: eral-bounce 1.2s ease infinite;
+        }
+        .eral-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .eral-typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes eral-bounce {
+          0%,80%,100% { transform: scale(0.65); opacity: 0.5; }
+          40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Message sender label */
+        .eral-msg-label {
+          font-size: 10px;
+          font-weight: 600;
+          color: var(--text-faint);
+          letter-spacing: 0.04em;
+          padding: 0 2px 3px;
+          text-transform: uppercase;
+        }
+
+        /* Sidebar tabs */
+        .eral-sidebar-tabs {
+          display: flex;
+          padding: 6px 10px 0;
+          border-bottom: 1px solid var(--border);
+          gap: 0;
+        }
+        .eral-sidebar-tab {
+          flex: 1;
+          padding: 5px 0;
+          background: none;
+          border: none;
+          border-bottom: 2px solid transparent;
+          color: var(--text-faint);
+          font-size: 11px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: color 0.15s, border-color 0.15s;
+          margin-bottom: -1px;
+        }
+        .eral-sidebar-tab:hover { color: var(--text-muted); }
+        .eral-sidebar-tab--active {
+          color: #818cf8;
+          border-bottom-color: #818cf8;
+        }
+
+        /* Notepad */
+        .eral-notepad-wrap {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          padding: 8px 10px;
+          gap: 6px;
+          overflow: hidden;
+        }
+        .eral-notepad {
+          flex: 1;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          color: var(--text);
+          font-size: 12px;
+          font-family: var(--font-body, 'DM Sans', sans-serif);
+          line-height: 1.55;
+          padding: 8px 10px;
+          resize: none;
+          outline: none;
+          min-height: 180px;
+        }
+        .eral-notepad:focus { border-color: rgba(129,140,248,0.35); }
+        .eral-notepad::placeholder { color: var(--text-faint); }
+        .eral-notepad-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .eral-notepad-count { font-size: 10px; color: var(--text-faint); }
+        .eral-notepad-clear {
+          font-size: 11px;
+          color: var(--text-faint);
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 2px 6px;
+          border-radius: 3px;
+          transition: color 0.15s;
+        }
+        .eral-notepad-clear:hover:not(:disabled) { color: var(--danger, #ef4444); }
+        .eral-notepad-clear:disabled { opacity: 0.35; cursor: not-allowed; }
 
         /* Bubble meta */
         .eral-bubble-meta {

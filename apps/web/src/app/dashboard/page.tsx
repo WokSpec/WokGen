@@ -157,10 +157,12 @@ export default async function DashboardPage() {
         <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', flexShrink: 0 }}>Quick create</span>
         <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
           {[
-            { label: 'Pixel art', href: '/pixel/studio' },
-            { label: 'Brand asset', href: '/business/studio' },
-            { label: 'SVG icon', href: '/vector/studio' },
-            { label: 'UI component', href: '/uiux/studio' },
+            { label: 'Pixel Studio', href: '/pixel/studio' },
+            { label: 'Business Studio', href: '/business/studio' },
+            { label: 'Vector Studio', href: '/vector/studio' },
+            { label: 'Voice Studio', href: '/voice/studio' },
+            { label: 'Code Studio', href: '/studio/code' },
+            { label: 'All Tools', href: '/tools' },
           ].map(a => (
             <Link key={a.href} href={a.href} style={{ padding: '0.375rem 0.875rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.8125rem', color: 'var(--text-secondary)', textDecoration: 'none', transition: 'border-color 0.15s, color 0.15s' }}>
               {a.label}

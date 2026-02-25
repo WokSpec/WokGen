@@ -125,12 +125,12 @@ export default function LibraryClient() {
             </svg>
           </div>
           <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-            {searchQuery || modeFilter !== 'all' ? 'No matching assets' : 'No assets yet'}
+            {searchQuery || modeFilter !== 'all' ? 'No matching assets' : 'Your library is empty'}
           </h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem', marginBottom: '1.5rem' }}>
             {searchQuery || modeFilter !== 'all'
               ? 'Try a different search or filter.'
-              : 'Generate your first asset in WokGen Studio and it will appear here.'}
+              : 'Generated assets will appear here.'}
           </p>
           {!searchQuery && modeFilter === 'all' && (
             <Link href="/studio" className="btn btn-primary" style={{ padding: '0.625rem 1.5rem' }}>

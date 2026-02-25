@@ -18,7 +18,7 @@ export interface EralSidebarProps {
   studioContext?: string;
 }
 
-type ModelVariant = 'eral-7c' | 'eral-mini';
+type ModelVariant = 'eral-7c' | 'speed' | 'code' | 'creative';
 
 interface SidebarMessage {
   id: string;
@@ -30,7 +30,9 @@ interface SidebarMessage {
 
 const MINI_MODEL_OPTIONS: { value: ModelVariant; label: string }[] = [
   { value: 'eral-7c',   label: 'Eral 7c'   },
-  { value: 'eral-mini', label: 'Eral Mini' },
+  { value: 'speed',     label: 'Speed'     },
+  { value: 'code',      label: 'Code'      },
+  { value: 'creative',  label: 'Creative'  },
 ];
 
 const QUICK_COMMANDS: { label: string; path: string }[] = [
@@ -258,9 +260,9 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
               <button
                 className="esb-clear-btn"
                 onClick={() => { setMessages([]); setStreamingContent(''); }}
-                title="Clear chat"
+                title="Start a new chat"
               >
-                Clear
+                New chat
               </button>
               <button
                 className="esb-close-btn"

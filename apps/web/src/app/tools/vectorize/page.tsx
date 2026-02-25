@@ -21,6 +21,11 @@ export default function VectorizePage() {
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
+    if (!f.type.startsWith('image/')) {
+      setError('Please select an image file (PNG, JPG, GIF, WebP, etc.)');
+      return;
+    }
+    setError('');
     setUploadedFile(f);
     setPreviewSrc(URL.createObjectURL(f));
   }

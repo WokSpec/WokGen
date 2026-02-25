@@ -27,7 +27,9 @@ function dueDate() {
 
 export default function InvoiceGeneratorTool() {
   const [company, setCompany] = useState('');
+  const [companyAddress, setCompanyAddress] = useState('');
   const [client, setClient] = useState('');
+  const [clientAddress, setClientAddress] = useState('');
   const [invoiceNum, setInvoiceNum] = useState(genInvoiceNumber);
   const [date, setDate] = useState(today);
   const [due, setDue] = useState(dueDate);
@@ -58,8 +60,18 @@ export default function InvoiceGeneratorTool() {
             <input value={company} onChange={e => setCompany(e.target.value)} placeholder="Acme Corp" />
           </label>
           <label className="inv-tool__field">
+            <span>Company Address</span>
+            <input value={companyAddress} onChange={e => setCompanyAddress(e.target.value)} placeholder="123 Main St, City, State ZIP" />
+          </label>
+        </div>
+        <div className="inv-tool__row">
+          <label className="inv-tool__field">
             <span>Client Name</span>
             <input value={client} onChange={e => setClient(e.target.value)} placeholder="John Doe" />
+          </label>
+          <label className="inv-tool__field">
+            <span>Client Address</span>
+            <input value={clientAddress} onChange={e => setClientAddress(e.target.value)} placeholder="456 Oak Ave, City, State ZIP" />
           </label>
         </div>
         <div className="inv-tool__row">
@@ -83,7 +95,9 @@ export default function InvoiceGeneratorTool() {
         <div className="inv-preview__header">
           <div>
             <div className="inv-preview__company">{company || 'Your Company'}</div>
+            {companyAddress && <div className="inv-preview__address">{companyAddress}</div>}
             <div className="inv-preview__bill-to">Bill To: <strong>{client || 'Client Name'}</strong></div>
+            {clientAddress && <div className="inv-preview__address">{clientAddress}</div>}
           </div>
           <div className="inv-preview__meta">
             <div><span>Invoice #:</span> <strong>{invoiceNum}</strong></div>
@@ -195,6 +209,7 @@ export default function InvoiceGeneratorTool() {
         }
         .inv-preview__header { display: flex; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
         .inv-preview__company { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .inv-preview__address { font-size: 12px; color: #666; margin-bottom: 2px; }
         .inv-preview__bill-to { font-size: 13px; color: #555; }
         .inv-preview__meta { text-align: right; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #444; }
         .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }

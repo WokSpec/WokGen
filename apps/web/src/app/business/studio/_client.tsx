@@ -1173,6 +1173,7 @@ function BusinessStudioInner() {
 
         {/* Brand kit 2x2 grid */}
         {isBrandKit && brandKitResults.length > 0 && (
+          <>
           <div className="biz-brandkit-grid">
             {brandKitResults.map((r, i) => {
               const labels = ['Logo Mark', 'Brand Banner', 'Profile Image', 'OG Meta'];
@@ -1203,6 +1204,7 @@ function BusinessStudioInner() {
               Export Brand Kit
             </button>
           </div>
+          </>
         )}
 
         {/* Single output */}

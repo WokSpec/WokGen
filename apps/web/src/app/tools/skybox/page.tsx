@@ -119,7 +119,7 @@ export default function SkyboxPage() {
           </div>
         </div>
         <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Style</label>
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
           {STYLES.map(s => (
             <button
               key={s.value}

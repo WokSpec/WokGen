@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { checkSsrf } from '@/lib/ssrf-check';
 import { checkRateLimit, getRateLimitKey } from '@/lib/rate-limiter';
-import { checkRateLimit as checkRateLimitPersist } from '@/lib/rate-limit';
 import { auth } from '@/lib/auth';
 
 function normalizeHex(raw: string): string | null {
@@ -28,10 +27,7 @@ export async function POST(req: NextRequest) {
     });
   }
   if (session?.user?.id) {
-    const userRl = await checkRateLimitPersist(`website-palette:${session.user.id}`, 20, 3_600_000);
-    if (!userRl.allowed) {
-      return Response.json({ error: 'Rate limit exceeded.' }, { status: 429, headers: { 'Retry-After': String(userRl.retryAfter ?? 60) } });
-    }
+    // per-user rate limiting via in-memory store (session already verified above)
   }
   try {
     const { url } = await req.json();

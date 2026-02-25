@@ -41,6 +41,23 @@ import { resolveQualityProfile, getQualityProfile } from '@/lib/quality-profiles
 import { buildVariantPrompt } from '@/lib/variant-builder';
 import { buildPrompt as buildEnginePrompt } from '@/lib/prompt-engine';
 import { validatePrompt } from '@/lib/input-sanitize';
+import { z } from 'zod';
+import { validateBody } from '@/lib/validate';
+
+const GenerateBodySchema = z.object({
+  mode:          z.string().optional(),
+  prompt:        z.string().max(2000, 'Prompt too long').optional(),
+  provider:      z.string().optional(),
+  style:         z.string().optional(),
+  stylePreset:   z.string().optional(),
+  aspectRatio:   z.string().optional(),
+  width:         z.number().int().min(64).max(2048).optional(),
+  height:        z.number().int().min(64).max(2048).optional(),
+  seed:          z.number().int().optional(),
+  quality:       z.string().optional(),
+  projectId:     z.string().optional(),
+  brandKitId:    z.string().optional(),
+}).passthrough();
 
 // ---------------------------------------------------------------------------
 // POST /api/generate
@@ -297,14 +314,16 @@ export async function POST(req: NextRequest) {
   // 1. Parse & validate request body
   // --------------------------------------------------------------------------
   let body: Record<string, unknown>;
-  try {
-    body = (req as NextRequest & { _parsedBody?: Record<string, unknown> })._parsedBody
-      ?? await req.json();
-  } catch {
-    return NextResponse.json(
-      { error: 'Invalid JSON body' },
-      { status: 400 },
-    );
+  {
+    const cached = (req as NextRequest & { _parsedBody?: Record<string, unknown> })._parsedBody;
+    if (cached) {
+      body = cached;
+    } else {
+      const { data, error } = await validateBody(req, GenerateBodySchema);
+      if (error) return error;
+      body = data as Record<string, unknown>;
+      (req as NextRequest & { _parsedBody?: Record<string, unknown> })._parsedBody = body;
+    }
   }
 
   const {

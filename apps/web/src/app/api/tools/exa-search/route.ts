@@ -2,6 +2,15 @@ import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { auth } from '@/lib/auth';
+import { z } from 'zod';
+import { validateBody } from '@/lib/validate';
+
+const ExaSearchSchema = z.object({
+  query:              z.string().min(1, 'query is required').max(500),
+  numResults:         z.number().int().min(1).max(20).optional().default(10),
+  startPublishedDate: z.string().optional(),
+  category:           z.string().optional(),
+});
 
 export const runtime = 'nodejs';
 
@@ -15,8 +24,8 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.EXA_API_KEY;
   if (!apiKey) return apiError({ message: 'Exa API not configured. Add EXA_API_KEY to your environment.', code: 'NOT_CONFIGURED', status: 503 });
 
-  const body = await req.json().catch(() => null);
-  if (!body?.query?.trim()) return API_ERRORS.BAD_REQUEST('query is required');
+  const { data: body, error: bodyError } = await validateBody(req, ExaSearchSchema);
+  if (bodyError) return bodyError as Response;
 
   const exaBody: Record<string, unknown> = {
     query: body.query,

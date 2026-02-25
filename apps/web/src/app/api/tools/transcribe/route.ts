@@ -8,6 +8,18 @@ import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, API_ERRORS } from '@/lib/api-response';
 import { auth } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { z } from 'zod';
+import { validateBody } from '@/lib/validate';
+
+const TranscribeSchema = z.object({
+  audioUrl:          z.string().url('Must be a valid URL').optional(),
+  audioBase64:       z.string().optional(),
+  speakerLabels:     z.boolean().optional(),
+  autoChapters:      z.boolean().optional(),
+  entityDetection:   z.boolean().optional(),
+  sentimentAnalysis: z.boolean().optional(),
+  languageCode:      z.string().optional(),
+}).refine(d => d.audioUrl || d.audioBase64, { message: 'audioUrl or audioBase64 is required' });
 import { withCircuitBreaker } from '@/lib/circuit-breaker';
 
 export const runtime = 'nodejs';
@@ -36,8 +48,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const body = await req.json().catch(() => null);
-  if (!body?.audioUrl?.trim() && !body?.audioBase64) return API_ERRORS.BAD_REQUEST('audioUrl or audioBase64 is required');
+  const { data: body, error: bodyError } = await validateBody(req, TranscribeSchema);
+  if (bodyError) return bodyError as Response;
 
   const { audioUrl, speakerLabels = true, autoChapters = false, entityDetection = true, sentimentAnalysis = false } = body;
 

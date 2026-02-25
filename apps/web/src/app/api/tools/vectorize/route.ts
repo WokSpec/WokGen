@@ -8,6 +8,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { checkSsrf } from '@/lib/ssrf-check';
+import { z } from 'zod';
+import { validateBody } from '@/lib/validate';
+
+const VectorizeSchema = z.object({
+  imageUrl:    z.string().url('Must be a valid URL').optional(),
+  imageBase64: z.string().optional(),
+}).refine(d => d.imageUrl || d.imageBase64, { message: 'imageUrl or imageBase64 is required' });
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -38,13 +45,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const body = await req.json().catch(() => null);
-  const imageUrl: string | undefined = body?.imageUrl?.trim();
-  const imageBase64: string | undefined = body?.imageBase64;
-
-  if (!imageUrl && !imageBase64) {
-    return NextResponse.json({ error: 'imageUrl or imageBase64 is required' }, { status: 400 });
-  }
+  const { data: body, error: bodyError } = await validateBody(req, VectorizeSchema);
+  if (bodyError) return bodyError;
+  const imageUrl: string | undefined = body.imageUrl?.trim();
+  const imageBase64: string | undefined = body.imageBase64;
 
   let imgBuffer: ArrayBuffer;
   let contentType: string;

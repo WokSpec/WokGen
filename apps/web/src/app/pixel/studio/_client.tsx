@@ -18,6 +18,7 @@ import { useWAPListener } from '@/hooks/useWAPListener';
 import { QuotaBadge } from '@/components/quota-badge';
 import { ColorPalette } from '@/components/color-palette';
 import { StudioResult } from '@/components/StudioResult';
+import { PostProcessToolbar } from '@/components/studio/PostProcessToolbar';
 import PromptIntelligenceBar from '@/app/_components/PromptIntelligenceBar';
 import SfxBrowser from '@/components/sfx-browser';
 import { CanvasPresets } from '@/components/studio/CanvasPresets';
@@ -1215,6 +1216,16 @@ function OutputPanel({
           seed={result?.resolvedSeed ?? (result?.seed ?? undefined)}
           onSave={onSaveToGallery}
         />
+      )}
+      {activeUrl && (
+        <div className="px-3 pb-2 flex-shrink-0">
+          <PostProcessToolbar
+            imageUrl={displayUrl ?? activeUrl}
+            prompt={prompt}
+            mode="pixel"
+            onResult={(url, tool) => { console.log('Post-process result:', tool, url); }}
+          />
+        </div>
       )}
 
 
@@ -3701,6 +3712,37 @@ function StudioInner() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Studio Tools — quick access to processing tools */}
+        <div
+          className="flex-shrink-0"
+          style={{ borderBottom: '1px solid var(--surface-border)' }}
+        >
+          <div className="px-4 py-3">
+            <p className="pixel-studio-section-label mb-2">Tools</p>
+            <div className="space-y-0.5">
+              {[
+                { label: 'Background Remover', href: '/tools/background-remover', icon: '✂' },
+                { label: 'Vectorize', href: '/tools/vectorize', icon: '⬡' },
+                { label: 'Image Resize', href: '/tools/image-resize', icon: '⤡' },
+                { label: 'Image Compress', href: '/tools/image-compress', icon: '⊡' },
+                { label: 'Color Extractor', href: '/tools/color-extractor', icon: '◑' },
+                { label: 'Sprite Packer', href: '/tools/sprite-packer', icon: '⊞' },
+              ].map(t => (
+                <a
+                  key={t.href}
+                  href={t.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/70 hover:bg-white/5 transition-all"
+                >
+                  <span className="text-[10px]">{t.icon}</span>
+                  {t.label}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Generate button */}

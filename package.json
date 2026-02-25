@@ -40,6 +40,10 @@
   "engines": {
     "node": ">=20"
   },
+  "overrides": {
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0"
+  },
   "dependencies": {
     "figlet": "^1.10.0",
     "inquirer": "^13.2.2",

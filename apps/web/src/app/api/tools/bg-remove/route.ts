@@ -4,6 +4,14 @@ import { removeBackground } from '@/lib/bg-remove';
 import { prisma } from '@/lib/db';
 import { log as logger } from '@/lib/logger';
 import { checkSsrf } from '@/lib/ssrf-check';
+import { z } from 'zod';
+import { validateBody } from '@/lib/validate';
+
+const BgRemoveSchema = z.object({
+  imageUrl:    z.string().url('Must be a valid URL').optional(),
+  imageBase64: z.string().optional(),
+  projectId:   z.string().optional(),
+}).refine(d => d.imageUrl || d.imageBase64, { message: 'Provide either imageUrl or imageBase64' });
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -63,21 +71,10 @@ export async function POST(req: NextRequest) {
     // Non-critical: allow through if quota check fails
   }
 
-  let body: { imageUrl?: string; imageBase64?: string; projectId?: string };
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+  const { data: body, error: bodyError } = await validateBody(req, BgRemoveSchema);
+  if (bodyError) return bodyError;
 
   const { imageUrl, imageBase64, projectId } = body;
-
-  if (!imageUrl && !imageBase64) {
-    return NextResponse.json(
-      { error: 'Provide either imageUrl or imageBase64' },
-      { status: 400 }
-    );
-  }
 
   // SSRF protection for imageUrl
   if (imageUrl) {

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import PixelStudioClient from './_client';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'Pixel Art Studio',
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function PixelStudioPage() {
-  return <PixelStudioClient />;
+  return (
+    <ErrorBoundary context="Pixel Studio">
+      <PixelStudioClient />
+    </ErrorBoundary>
+  );
 }

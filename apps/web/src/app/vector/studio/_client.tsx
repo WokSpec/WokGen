@@ -11,6 +11,7 @@ import { EralSidebar } from '@/app/_components/EralSidebar';
 import { QuotaBadge } from '@/components/quota-badge';
 import { ColorPalette } from '@/components/color-palette';
 import { BrandContextSelector } from '@/components/studio/BrandContextSelector';
+import { PostProcessToolbar } from '@/components/studio/PostProcessToolbar';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -808,6 +809,16 @@ function VectorStudioInner() {
                   </button>
                 </div>
               </>
+            )}
+            {displayResult?.resultUrl && jobStatus !== 'running' && (
+              <div className="px-3 pb-3">
+                <PostProcessToolbar
+                  imageUrl={displayUrl ?? displayResult.resultUrl}
+                  prompt={prompt}
+                  mode="vector"
+                  onResult={(url, tool) => { console.log('Post-process result:', tool, url); }}
+                />
+              </div>
             )}
           </div>
         )}

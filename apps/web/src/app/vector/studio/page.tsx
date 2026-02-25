@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import VectorStudioClient from './_client';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'Vector Studio',
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function VectorStudioPage() {
-  return <VectorStudioClient />;
+  return (
+    <ErrorBoundary context="Vector Studio">
+      <VectorStudioClient />
+    </ErrorBoundary>
+  );
 }

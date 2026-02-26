@@ -20,8 +20,9 @@ jobs:
       - name: Generate Prisma client
         run: |
           rm -rf apps/web/node_modules/.prisma
-          find node_modules -maxdepth 2 -mindepth 2 -name '.*' -type d -exec rm -rf {} + 2>/dev/null || true
-          cd apps/web && npx prisma generate
+          mkdir -p apps/web/node_modules/@prisma
+          cp -a node_modules/@prisma/client apps/web/node_modules/@prisma/client
+          cd apps/web && PRISMA_GENERATE_SKIP_AUTOINSTALL=1 npx prisma generate
       - name: TypeScript check
         run: cd apps/web && npx tsc --noEmit
 

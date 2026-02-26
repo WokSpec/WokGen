@@ -10,18 +10,14 @@ jobs:
   type-check:
     name: TypeScript
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --legacy-peer-deps --ignore-scripts
-      - name: Generate Prisma client
-        run: |
-          rm -rf apps/web/node_modules/.prisma
-          cd apps/web && npx prisma generate
+      - name: Install dependencies (with postinstall for Prisma generate)
+        run: npm ci --legacy-peer-deps
       - name: TypeScript check
         run: cd apps/web && npx tsc --noEmit
 

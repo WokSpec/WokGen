@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { SkeletonGalleryGrid } from '@/app/_components/Skeleton';
 // Inline Search icon since lucide-react is not a dependency
 function SearchIcon({ className }: { className?: string }) {
   return (
@@ -31,6 +32,9 @@ export default function LibraryClient() {
   const [modeFilter, setModeFilter] = useState<string>('all');
   const [sort, setSort] = useState<string>('newest');
   const [total, setTotal] = useState(0);
+  // TODO(C3): Batch selection — add checkbox overlay on hover for each card,
+  // then implement bulk-download and bulk-delete once ≥2 are selected.
+  // State: const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const fetchAssets = useCallback(async (search: string, mode: string, sortBy: string) => {
     setLoading(true);
@@ -58,7 +62,7 @@ export default function LibraryClient() {
   if (loading && assets.length === 0) {
     return (
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
-        <p style={{ color: 'var(--text-muted, #6b7280)' }}>Loading…</p>
+        <SkeletonGalleryGrid count={12} />
       </div>
     );
   }

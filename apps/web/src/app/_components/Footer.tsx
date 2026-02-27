@@ -82,7 +82,7 @@ export function Footer() {
         <div className="site-footer__bottom">
           {/* Left */}
           <p className="site-footer__copy">
-            © {new Date().getFullYear()} WokGen — Free forever
+            © {new Date().getFullYear()} WokGen
           </p>
 
           {/* Center — powered by open source + model chips */}

@@ -94,7 +94,7 @@ export default function ApiKeysClient() {
             Authenticate programmatic access to WokGen. Keys are hashed — we never store the raw value.
           </p>
         </div>
-        <button className="btn-primary" onClick={() => { setShowForm(true); setRawKey(null); }}>
+        <button type="button" className="btn-primary" onClick={() => { setShowForm(true); setRawKey(null); }}>
           New key
         </button>
       </div>
@@ -107,11 +107,11 @@ export default function ApiKeysClient() {
           </p>
           <div className="apikeys-reveal-row">
             <code className="apikeys-reveal-value">{rawKey}</code>
-            <button className="btn-ghost btn-sm" onClick={copyKey}>
+            <button type="button" className="btn-ghost btn-sm" onClick={copyKey}>
               {copied ? 'Copied' : 'Copy'}
             </button>
           </div>
-          <button className="apikeys-reveal-dismiss" onClick={() => setRawKey(null)}>
+          <button type="button" className="apikeys-reveal-dismiss" onClick={() => setRawKey(null)}>
             I have saved this key
           </button>
         </div>
@@ -156,10 +156,10 @@ export default function ApiKeysClient() {
           </label>
 
           <div className="apikeys-form-actions">
-            <button className="btn-primary" onClick={handleCreate} disabled={creating}>
+            <button type="button" className="btn-primary" onClick={handleCreate} disabled={creating}>
               {creating ? 'Creating…' : 'Create key'}
             </button>
-            <button className="btn-ghost" onClick={() => { setShowForm(false); setError(''); }}>
+            <button type="button" className="btn-ghost" onClick={() => { setShowForm(false); setError(''); }}>
               Cancel
             </button>
           </div>

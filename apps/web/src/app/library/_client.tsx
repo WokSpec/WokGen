@@ -333,6 +333,7 @@ export default function LibraryClient() {
       {hasMore && (
         <div style={{ textAlign: 'center', padding: '2rem 0' }}>
           <button
+            type="button"
             onClick={() => fetchAssets(searchQuery, modeFilter, sort, true, cursor ?? undefined)}
             disabled={loading}
             style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text)', padding: '8px 24px', borderRadius: 8, fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}

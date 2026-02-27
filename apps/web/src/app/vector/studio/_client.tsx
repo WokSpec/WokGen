@@ -423,7 +423,7 @@ function VectorStudioInner() {
         {/* Tool tabs */}
         <div className="studio-tool-tabs">
           {TOOLS.map(t => (
-            <button
+            <button type="button"
               key={t.id}
               className={`studio-tool-tab${activeTool === t.id ? ' active' : ''}`}
               onClick={() => switchTool(t.id)}
@@ -488,7 +488,7 @@ function VectorStudioInner() {
           <label className="studio-label">Style</label>
           <div className="studio-preset-grid studio-preset-grid--sm">
             {PRESETS.map(p => (
-              <button
+              <button type="button"
                 key={p.id}
                 className={`studio-preset-btn${preset === p.id ? ' active' : ''}`}
                 onClick={() => setPreset(p.id)}
@@ -507,7 +507,7 @@ function VectorStudioInner() {
             {(activeTool === 'icon' ? ICON_SIZES : ILLUSTRATION_SIZES).map(s => {
               const active = activeTool === 'icon' ? iconSize === s : illustSize === s;
               return (
-                <button
+                <button type="button"
                   key={s}
                   className={`studio-preset-btn${active ? ' active' : ''}`}
                   onClick={() => activeTool === 'icon' ? setIconSize(s) : setIllustSize(s)}
@@ -542,7 +542,7 @@ function VectorStudioInner() {
               { id: 'white',       label: '⬜ White' },
               { id: 'dark',        label: '⬛ Dark'  },
             ] as { id: BgMode; label: string }[]).map(opt => (
-              <button
+              <button type="button"
                 key={opt.id}
                 className={`studio-preset-btn${bgMode === opt.id ? ' active' : ''}`}
                 onClick={() => setBgMode(opt.id)}
@@ -558,7 +558,7 @@ function VectorStudioInner() {
           <label className="studio-label">Batch</label>
           <div className="studio-preset-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
             {BATCH_COUNTS.map(n => (
-              <button
+              <button type="button"
                 key={n}
                 className={`studio-preset-btn${batchCount === n ? ' active' : ''}`}
                 onClick={() => setBatchCount(n as 1 | 2 | 4)}
@@ -576,7 +576,7 @@ function VectorStudioInner() {
               HD Quality
               <span className="studio-label-opt"> (uses 2 credits)</span>
             </label>
-            <button
+            <button type="button"
               className={`toggle-track${useHD ? ' on' : ''}`}
               onClick={() => setUseHD(v => !v)}
               disabled={!session}
@@ -597,7 +597,7 @@ function VectorStudioInner() {
           <div className="studio-control-section">
             <div className="studio-row studio-row--spaced">
               <label className="studio-label" style={{ margin: 0 }}>Share to Gallery</label>
-              <button
+              <button type="button"
                 className={`toggle-track${isPublic ? ' on' : ''}`}
                 onClick={() => setIsPublic(v => !v)}
               >
@@ -684,7 +684,7 @@ function VectorStudioInner() {
                       Sign in →
                     </a>
                   ) : (
-                    <button
+                    <button type="button"
                       className="btn-ghost btn-xs"
                       style={{ position: 'absolute', bottom: 6, right: 6 }}
                       onClick={() => r.resultUrl && handleDownload(r.resultUrl, i)}
@@ -729,7 +729,7 @@ function VectorStudioInner() {
                     alt="Generated vector asset"
                     style={{ maxWidth: '100%', maxHeight: 400, objectFit: 'contain', imageRendering: 'auto' }}
                   />
-                  <button
+                  <button type="button"
                     onClick={() => handleBgRemove(displayUrl ?? displayResult.resultUrl!)}
                     disabled={bgRemoving}
                     style={{
@@ -773,14 +773,14 @@ function VectorStudioInner() {
                       Sign in to download →
                     </a>
                   ) : (
-                    <button
+                    <button type="button"
                       className="btn-ghost btn-sm"
                       onClick={() => handleDownload(displayUrl ?? displayResult.resultUrl!)}
                     >
                       ↓ Download
                     </button>
                   )}
-                  <button
+                  <button type="button"
                     className="btn-ghost btn-sm"
                     onClick={() => {
                       const u = displayUrl ?? displayResult.resultUrl;
@@ -789,7 +789,7 @@ function VectorStudioInner() {
                   >
                     Copy URL
                   </button>
-                  <button
+                  <button type="button"
                     className="btn-ghost btn-sm"
                     onClick={() => { navigator.clipboard.writeText(prompt).catch(() => null); toastSuccess('Prompt copied'); }}
                   >
@@ -823,7 +823,7 @@ function VectorStudioInner() {
             </p>
             <div className="studio-idle-chips">
               {Object.entries(EXAMPLE_PROMPTS).map(([tool, p]) => (
-                <button
+                <button type="button"
                   key={tool}
                   className="studio-chip"
                   onClick={() => {
@@ -865,7 +865,7 @@ function VectorStudioInner() {
             <p className="studio-history-empty">Generated assets appear here</p>
           )}
           {history.map((item, idx) => (
-            <button
+            <button type="button"
               key={item.id}
               className={`studio-history-item${selectedHistory === idx ? ' active' : ''}`}
               onClick={() => {

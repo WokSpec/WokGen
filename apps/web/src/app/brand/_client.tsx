@@ -33,13 +33,12 @@ function ColorSwatch({ hex, onChange }: { hex: string; onChange: (h: string) => 
 
   return (
     <div ref={ref} className="color-swatch-wrap">
-      <button
+      <button type="button"
         className="color-swatch-btn"
         style={{ background: hex, border: '2px solid rgba(255,255,255,0.15)', borderRadius: 6, width: 32, height: 32, cursor: 'pointer', flexShrink: 0 }}
         onClick={() => setOpen(v => !v)}
         title="Pick color"
         aria-label={`Color picker: current color ${hex}`}
-        type="button"
       />
       {open && (
         <div className="color-swatch-picker" style={{ position: 'absolute', zIndex: 200, top: 36, left: 0, background: '#1a1a2e', border: '1px solid #303050', borderRadius: 8, padding: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
@@ -83,10 +82,10 @@ function PaletteEditor({
           <select className="input input--sm" value={c.role} onChange={e => update(i, 'role', e.target.value)} style={{ width: 110 }}>
             {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
-          <button className="btn btn--ghost btn--sm btn--icon" onClick={() => remove(i)} title="Remove" aria-label="Remove color">×</button>
+          <button type="button" className="btn btn--ghost btn--sm btn--icon" onClick={() => remove(i)} title="Remove" aria-label="Remove color">×</button>
         </div>
       ))}
-      <button className="btn btn--ghost btn--sm" onClick={add}>+ Add color</button>
+      <button type="button" className="btn btn--ghost btn--sm" onClick={add}>+ Add color</button>
     </div>
   );
 }
@@ -164,8 +163,8 @@ function KitForm({ initial, onSaved, onCancel }: KitFormProps) {
       {error && <p className="kit-form__error">{error}</p>}
 
       <div className="kit-form__actions">
-        <button className="btn btn--ghost" onClick={onCancel}>Cancel</button>
-        <button className="btn btn--primary" onClick={save} disabled={saving}>
+        <button type="button" className="btn btn--ghost" onClick={onCancel}>Cancel</button>
+        <button type="button" className="btn btn--primary" onClick={save} disabled={saving}>
           {saving ? 'Saving…' : initial ? 'Save changes' : 'Create kit'}
         </button>
       </div>
@@ -264,7 +263,7 @@ export default function BrandClient() {
           <h1 className="brand-page__title">Brand Kits</h1>
           <p className="brand-page__sub">Save your palette, mood, and style guide. Apply to any generation.</p>
         </div>
-        <button className="btn btn--primary" onClick={() => setShowForm(true)}>+ New kit</button>
+        <button type="button" className="btn btn--primary" onClick={() => setShowForm(true)}>+ New kit</button>
       </div>
 
       {loading ? (
@@ -274,7 +273,7 @@ export default function BrandClient() {
       ) : kits.length === 0 ? (
         <div className="brand-empty">
           <p>No brand kits yet. Create one to lock in your visual identity across all generations.</p>
-          <button className="btn btn--primary" onClick={() => setShowForm(true)}>Create your first kit</button>
+          <button type="button" className="btn btn--primary" onClick={() => setShowForm(true)}>Create your first kit</button>
         </div>
       ) : (
         <div className="brand-kit-list">

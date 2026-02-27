@@ -136,7 +136,7 @@ export default function GalleryClient() {
                     <p className="text-xs text-[var(--text)] line-clamp-2">{a.prompt}</p>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-[10px] text-[var(--text)]/40">{a.mode}</span>
-                      <button className="text-xs text-[var(--text)]/60 hover:text-[var(--text)]">View</button>
+                      <button type="button" className="text-xs text-[var(--text)]/60 hover:text-[var(--text)]">View</button>
                     </div>
                   </div>
                 </div>

@@ -187,12 +187,14 @@ function RequestLog({ items, page, pages, onPage }: {
       {pages > 1 && (
         <div className="request-log__pagination">
           <button
+            type="button"
             className="btn btn--ghost btn--sm"
             disabled={page <= 1}
             onClick={() => onPage(page - 1)}
           >← Prev</button>
           <span className="request-log__page-info">Page {page} / {pages}</span>
           <button
+            type="button"
             className="btn btn--ghost btn--sm"
             disabled={page >= pages}
             onClick={() => onPage(page + 1)}

@@ -281,7 +281,7 @@ export default function TextStudio() {
               display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8,
             }}>
               {CONTENT_TYPES.map(ct => (
-                <button
+                <button type="button"
                   key={ct.id}
                   onClick={() => setContentType(ct.id)}
                   style={{
@@ -309,7 +309,7 @@ export default function TextStudio() {
             </label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {TONES.map(t => (
-                <button
+                <button type="button"
                   key={t.id}
                   onClick={() => setTone(t.id)}
                   style={{
@@ -334,7 +334,7 @@ export default function TextStudio() {
             </label>
             <div style={{ display: 'flex', gap: 8 }}>
               {LENGTHS.map(l => (
-                <button
+                <button type="button"
                   key={l.id}
                   onClick={() => setLength(l.id)}
                   style={{
@@ -461,7 +461,7 @@ export default function TextStudio() {
                     {result.model.split('/').pop()}
                   </span>
                 )}
-                <button
+                <button type="button"
                   onClick={() => setShowRawMarkdown(v => !v)}
                   style={{
                     marginLeft: 'auto', padding: '3px 10px', borderRadius: 4, fontSize: 12,
@@ -488,7 +488,7 @@ export default function TextStudio() {
 
               {/* Action buttons */}
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <button
+                <button type="button"
                   onClick={handleCopy}
                   style={{
                     padding: '8px 16px', borderRadius: 6, border: 'none',
@@ -499,7 +499,7 @@ export default function TextStudio() {
                 >
                   {copied ? 'Copied!' : 'Copy'}
                 </button>
-                <button
+                <button type="button"
                   onClick={() => downloadText(result.content, `wokgen-text-${Date.now()}.txt`)}
                   style={{
                     padding: '8px 16px', borderRadius: 6, border: 'none',
@@ -509,7 +509,7 @@ export default function TextStudio() {
                 >
                   ⬇ .txt
                 </button>
-                <button
+                <button type="button"
                   onClick={() => downloadText(result.content, `wokgen-text-${Date.now()}.md`)}
                   style={{
                     padding: '8px 16px', borderRadius: 6, border: 'none',
@@ -519,7 +519,7 @@ export default function TextStudio() {
                 >
                   ⬇ .md
                 </button>
-                <button
+                <button type="button"
                   onClick={() => {
                     setSavedMsg(true);
                     setTimeout(() => setSavedMsg(false), 2000);
@@ -533,7 +533,7 @@ export default function TextStudio() {
                 >
                   {savedMsg ? 'Saved' : 'Save to Gallery'}
                 </button>
-                <button
+                <button type="button"
                   onClick={() => { setStatus('idle'); void handleGenerate(); }}
                   style={{
                     padding: '8px 16px', borderRadius: 6, border: 'none',

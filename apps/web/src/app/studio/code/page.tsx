@@ -156,7 +156,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
             />
             <p className="text-[10px] text-[var(--text)]/20 mt-1 mb-3">⌘+Enter to generate</p>
 
-            <button
+            <button type="button"
               onClick={() => generate()}
               disabled={isGenerating || !prompt.trim()}
               className="w-full py-2.5 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium flex items-center justify-center gap-2 transition-colors"
@@ -181,7 +181,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
             <p className="text-[10px] text-[var(--text)]/30 uppercase tracking-wider mb-2">Templates</p>
             <div className="space-y-1">
               {TEMPLATES.map(t => (
-                <button
+                <button type="button"
                   key={t.label}
                   onClick={() => { setPrompt(t.prompt); generate(t.prompt); }}
                   className="w-full text-left px-3 py-1.5 text-xs text-[var(--text)]/50 hover:text-[var(--text)]/80 hover:bg-white/5 rounded-lg transition-colors"
@@ -200,13 +200,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
               {/* Toolbar */}
               <div className="border-b border-white/5 px-4 py-2 flex items-center gap-2">
                 <div className="flex rounded-lg overflow-hidden border border-white/10">
-                  <button
+                  <button type="button"
                     onClick={() => setView('code')}
                     className={`px-3 py-1.5 text-xs flex items-center gap-1.5 transition-colors ${view === 'code' ? 'bg-white/10 text-[var(--text)]' : 'text-[var(--text)]/40 hover:text-[var(--text)]/60'}`}
                   >
                     <IconCode2 size={12} /> Code
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setView('preview')}
                     className={`px-3 py-1.5 text-xs flex items-center gap-1.5 transition-colors ${view === 'preview' ? 'bg-white/10 text-[var(--text)]' : 'text-[var(--text)]/40 hover:text-[var(--text)]/60'}`}
                   >
@@ -214,13 +214,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
                   </button>
                 </div>
                 <div className="ml-auto flex gap-2">
-                  <button onClick={copyCode} className="text-xs text-[var(--text)]/40 hover:text-[var(--text)]/70 flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-white/5">
+                  <button type="button" onClick={copyCode} className="text-xs text-[var(--text)]/40 hover:text-[var(--text)]/70 flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-white/5">
                     <IconCopy /> {copied ? 'Copied!' : 'Copy'}
                   </button>
-                  <button onClick={downloadCode} className="text-xs text-[var(--text)]/40 hover:text-[var(--text)]/70 flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-white/5">
+                  <button type="button" onClick={downloadCode} className="text-xs text-[var(--text)]/40 hover:text-[var(--text)]/70 flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-white/5">
                     <IconDownload /> .tsx
                   </button>
-                  <button onClick={() => generate()} className="text-xs text-[var(--text)]/40 hover:text-[var(--text)]/70 flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-white/5">
+                  <button type="button" onClick={() => generate()} className="text-xs text-[var(--text)]/40 hover:text-[var(--text)]/70 flex items-center gap-1.5 px-2 py-1.5 rounded hover:bg-white/5">
                     <IconRefreshCw /> Regenerate
                   </button>
                 </div>

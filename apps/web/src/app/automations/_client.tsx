@@ -78,7 +78,7 @@ function AutomationForm({
         <input className="input" value={schedule} onChange={e => setSched(e.target.value)} placeholder="0 9 * * 1" />
         <div className="automation-form__presets">
           {CRON_PRESETS.map(p => (
-            <button key={p.value} className="btn btn--ghost btn--sm automation-form__preset" onClick={() => setSched(p.value)}>
+            <button type="button" key={p.value} className="btn btn--ghost btn--sm automation-form__preset" onClick={() => setSched(p.value)}>
               {p.label}
             </button>
           ))}
@@ -108,7 +108,7 @@ function AutomationForm({
         <label>Message template</label>
         <div className="automation-form__vars">
           {TEMPLATE_VARS.map(v => (
-            <button key={v} className="btn btn--ghost btn--sm automation-form__var" onClick={() => setTpl(t => t + v)}>
+            <button type="button" key={v} className="btn btn--ghost btn--sm automation-form__var" onClick={() => setTpl(t => t + v)}>
               {v}
             </button>
           ))}
@@ -126,10 +126,10 @@ function AutomationForm({
       {error && <p className="automation-form__error">{error}</p>}
 
       <div className="automation-form__actions">
-        <button className="btn btn--primary btn--sm" onClick={submit} disabled={saving}>
+        <button type="button" className="btn btn--primary btn--sm" onClick={submit} disabled={saving}>
           {saving ? 'Creating…' : 'Create automation'}
         </button>
-        <button className="btn btn--ghost btn--sm" onClick={onCancel}>Cancel</button>
+        <button type="button" className="btn btn--ghost btn--sm" onClick={onCancel}>Cancel</button>
       </div>
     </div>
   );
@@ -273,7 +273,7 @@ export default function AutomationsClient() {
           </h1>
           <p className="automations-page__subtitle">Schedule messages, webhooks, and alerts on a cron timer.</p>
         </div>
-        <button className="btn btn--primary" onClick={() => setShowForm(v => !v)}>
+        <button type="button" className="btn btn--primary" onClick={() => setShowForm(v => !v)}>
           {showForm ? 'Cancel' : '+ New automation'}
         </button>
       </div>

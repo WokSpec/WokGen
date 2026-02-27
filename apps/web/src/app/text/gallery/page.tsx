@@ -135,7 +135,7 @@ function TextCard({ asset }: { asset: TextAsset }) {
       </p>
 
       {/* Copy button */}
-      <button
+      <button type="button"
         onClick={handleCopy}
         style={{
           alignSelf: 'flex-start',
@@ -255,7 +255,7 @@ export default function TextGallery() {
       <div className="gallery-filters">
         <div className="gallery-pill-row" style={{ flexWrap: 'wrap' }}>
           {CONTENT_FILTERS.map(f => (
-            <button
+            <button type="button"
               key={f.id}
               className={`gallery-pill${typeFilter === f.id ? ' active' : ''}`}
               onClick={() => setTypeFilter(f.id)}
@@ -291,7 +291,7 @@ export default function TextGallery() {
           <span>!</span>
           <p>Failed to load gallery</p>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
-          <button className="btn-ghost btn-sm" onClick={() => void fetchAssets(null, true)}>
+          <button type="button" className="btn-ghost btn-sm" onClick={() => void fetchAssets(null, true)}>
             Retry
           </button>
         </div>

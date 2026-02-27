@@ -215,14 +215,14 @@ function AssetModal({
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       {hasPrev && (
-        <button
+        <button type="button"
           onClick={onPrev}
           className="community-modal-nav-btn community-modal-nav-btn--prev"
           aria-label="Previous"
         >←</button>
       )}
       {hasNext && (
-        <button
+        <button type="button"
           onClick={onNext}
           className="community-modal-nav-btn community-modal-nav-btn--next"
           aria-label="Next"
@@ -237,26 +237,26 @@ function AssetModal({
             <span className="community-modal-tool-name">{capitalize(asset.tool)}</span>
           </div>
           <div className="community-modal-header-right">
-            <button onClick={() => setZoom(nextZoom)} className="community-modal-btn">
+            <button type="button" onClick={() => setZoom(nextZoom)} className="community-modal-btn">
               {zoom}× zoom
             </button>
-            <button onClick={download} className="community-modal-btn">
+            <button type="button" onClick={download} className="community-modal-btn">
               ↓ Download
             </button>
-            <button
+            <button type="button"
               onClick={copyStyle}
               className={`community-modal-btn${styleCopied ? ' community-modal-btn--copied' : ''}`}
             >
               {styleCopied ? 'Style copied' : '⊕ Copy style'}
             </button>
-            <button
+            <button type="button"
               onClick={shareAsset}
               className={`community-modal-btn${urlCopied ? ' community-modal-btn--copied' : ''}`}
               title="Copy shareable link"
             >
               {urlCopied ? '✓ Link copied' : '⤴ Share'}
             </button>
-            <button onClick={onClose} className="community-modal-close-btn" aria-label="Close">✕</button>
+            <button type="button" onClick={onClose} className="community-modal-close-btn" aria-label="Close">✕</button>
           </div>
         </div>
 
@@ -277,7 +277,7 @@ function AssetModal({
           <div>
             <div className="community-modal-prompt-header">
               <span className="community-modal-label">Prompt</span>
-              <button
+              <button type="button"
                 onClick={copyPrompt}
                 className={`community-modal-copy-btn${copied ? ' community-modal-copy-btn--copied' : ''}`}
               >
@@ -335,7 +335,7 @@ function CommunityCard({ asset, index, onClick }: { asset: CommunityAsset; index
   const modeColor = asset.mode ? (MODE_COLORS[asset.mode] ?? null) : null;
 
   return (
-    <button
+    <button type="button"
       onClick={onClick}
       className="gallery-card animate-fade-in community-card-btn"
       style={{
@@ -682,7 +682,7 @@ export default function CommunityClient() {
 
             <div className="community-actions-row">
               {session?.user && (
-                <button
+                <button type="button"
                   onClick={togglePublicDefault}
                   disabled={savingDefault}
                   className={`community-toggle-btn${publicDefault ? ' community-toggle-btn--active' : ''}${savingDefault ? ' community-toggle-btn--saving' : ''}`}
@@ -704,7 +704,7 @@ export default function CommunityClient() {
             {session?.user && (
               <>
                 {(['community', 'mine'] as const).map(tab => (
-                  <button
+                  <button type="button"
                     key={tab}
                     onClick={() => setGalleryTab(tab)}
                     className={`community-gallery-tab${galleryTab === tab ? ' community-gallery-tab--active' : ''}`}
@@ -718,7 +718,7 @@ export default function CommunityClient() {
 
             {/* Mode filter pills */}
             {MODE_FILTERS.map(m => (
-              <button
+              <button type="button"
                 key={m.id}
                 onClick={() => setModeFilter(m.id)}
                 className={`gallery-filter-pill${modeFilter === m.id ? ' gallery-filter-pill--active' : ''}`}
@@ -735,7 +735,7 @@ export default function CommunityClient() {
             <div className="community-search-row">
               <div className="gallery-sort-group">
                 {SORT_OPTIONS.map(o => (
-                  <button
+                  <button type="button"
                     key={o.id}
                     onClick={() => setSort(o.id as SortId)}
                     className={`gallery-filter-pill gallery-filter-pill--sort${sort === o.id ? ' gallery-filter-pill--active' : ''}`}
@@ -767,7 +767,7 @@ export default function CommunityClient() {
                 ? 'Too many requests. Please wait a moment.'
                 : 'Unable to load content. Please try again.'}
             </span>
-            <button onClick={() => fetchAssets(null, true)} className="community-retry-btn">Retry</button>
+            <button type="button" onClick={() => fetchAssets(null, true)} className="community-retry-btn">Retry</button>
           </div>
         )}
 
@@ -808,7 +808,7 @@ export default function CommunityClient() {
             {/* Explicit load more button when auto-scroll hasn't triggered */}
             {!loadingMore && hasMore && (
               <div className="gallery-load-more-wrap">
-                <button onClick={loadMore} className="gallery-load-more">
+                <button type="button" onClick={loadMore} className="gallery-load-more">
                   Load more
                 </button>
               </div>

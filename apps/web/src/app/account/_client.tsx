@@ -119,7 +119,7 @@ function ProfileTab({ user }: { user: Props['user'] }) {
             <span style={{ fontSize: '0.8125rem', fontWeight: 600 }}>Profile completion</span>
             <span style={{ fontSize: '0.8125rem', color: 'var(--accent)' }}>{completionPct}%</span>
           </div>
-          <div style={{ height: '4px', background: 'var(--bg-elevated, rgba(255,255,255,0.06))', borderRadius: '2px', overflow: 'hidden' }}>
+          <div style={{ height: '4px', background: 'var(--surface-raised)', borderRadius: '2px', overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${completionPct}%`, background: 'var(--accent)', borderRadius: '2px', transition: 'width 0.3s' }} />
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
@@ -167,7 +167,7 @@ function ProfileTab({ user }: { user: Props['user'] }) {
       <button type="button" className="acct-btn-primary" onClick={save} disabled={saving}>
         {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save Profile'}
       </button>
-      {saveError && <p style={{ color: 'var(--danger, #f87171)', fontSize: '0.8125rem', marginTop: '0.5rem' }}>{saveError}</p>}
+      {saveError && <p style={{ color: 'var(--danger)', fontSize: '0.8125rem', marginTop: '0.5rem' }}>{saveError}</p>}
 
       <div className="acct-divider" />
 
@@ -373,7 +373,7 @@ function UsageTab() {
               <div className="acct-quota-track">
                 <div
                   className="acct-quota-fill"
-                  style={{ width: `${dailyPct}%`, background: dailyPct >= 90 ? 'var(--danger, #ef4444)' : dailyPct >= 70 ? 'var(--warning, #f59e0b)' : 'var(--accent, var(--accent))' }}
+                  style={{ width: `${dailyPct}%`, background: dailyPct >= 90 ? 'var(--danger)' : dailyPct >= 70 ? 'var(--warning)' : 'var(--accent)' }}
                 />
               </div>
             </div>

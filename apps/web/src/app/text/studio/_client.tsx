@@ -249,8 +249,8 @@ export default function TextStudio() {
           <span style={{ color: ACCENT, fontWeight: 600 }}>Text mode</span>
           <span style={{
             padding: '2px 8px', borderRadius: 4, fontSize: '0.7rem',
-            background: `${ACCENT}22`, color: ACCENT,
-            border: `1px solid ${ACCENT}44`, fontWeight: 600,
+            background: 'var(--accent-subtle)', color: ACCENT,
+            border: '1px solid var(--accent-glow)', fontWeight: 600,
           }}>BETA</span>
         </div>
         <Link
@@ -287,14 +287,14 @@ export default function TextStudio() {
                   style={{
                     padding: '10px 12px', borderRadius: 8, textAlign: 'left',
                     border: `1px solid ${contentType === ct.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: contentType === ct.id ? `${ACCENT}18` : 'var(--surface)',
+                    background: contentType === ct.id ? 'var(--accent-subtle)' : 'var(--surface)',
                     color: contentType === ct.id ? ACCENT : 'var(--text)',
                     cursor: 'pointer', transition: 'all 0.15s',
                   }}
                 >
                   <div style={{ fontSize: 18, marginBottom: 3 }}></div>
                   <div style={{ fontSize: 12, fontWeight: 600 }}>{ct.label}</div>
-                  <div style={{ fontSize: 11, color: contentType === ct.id ? `${ACCENT}cc` : 'var(--text-muted)', marginTop: 1 }}>
+                  <div style={{ fontSize: 11, color: contentType === ct.id ? ACCENT : 'var(--text-muted)', marginTop: 1 }}>
                     {ct.desc}
                   </div>
                 </button>
@@ -315,7 +315,7 @@ export default function TextStudio() {
                   style={{
                     padding: '6px 14px', borderRadius: 20, fontSize: 12,
                     border: `1px solid ${tone === t.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: tone === t.id ? `${ACCENT}22` : 'var(--surface)',
+                    background: tone === t.id ? 'var(--accent-subtle)' : 'var(--surface)',
                     color: tone === t.id ? ACCENT : 'var(--text)',
                     cursor: 'pointer', fontWeight: tone === t.id ? 600 : 400,
                     transition: 'all 0.15s',
@@ -340,7 +340,7 @@ export default function TextStudio() {
                   style={{
                     flex: 1, padding: '8px 4px', borderRadius: 8, fontSize: 12,
                     border: `1px solid ${length === l.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: length === l.id ? `${ACCENT}22` : 'var(--surface)',
+                    background: length === l.id ? 'var(--accent-subtle)' : 'var(--surface)',
                     color: length === l.id ? ACCENT : 'var(--text)',
                     cursor: 'pointer', fontWeight: length === l.id ? 600 : 400,
                     transition: 'all 0.15s', textAlign: 'center',
@@ -402,7 +402,7 @@ export default function TextStudio() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: ACCENT, fontSize: 14 }}>
                 <span style={{
                   display: 'inline-block', width: 14, height: 14, borderRadius: '50%',
-                  border: `2px solid ${ACCENT}44`, borderTopColor: ACCENT,
+                  border: '2px solid var(--accent-glow)', borderTopColor: ACCENT,
                   animation: 'spin 0.7s linear infinite',
                 }} />
                 {loadingMsg} {msToSecs(elapsedMs)}
@@ -434,7 +434,7 @@ export default function TextStudio() {
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                 <span style={{
                   padding: '3px 10px', borderRadius: 4, fontSize: 12,
-                  background: `${ACCENT}18`, color: ACCENT, fontWeight: 600,
+                  background: 'var(--accent-subtle)', color: ACCENT, fontWeight: 600,
                 }}>
                   {result.wordCount} words
                 </span>
@@ -465,7 +465,7 @@ export default function TextStudio() {
                   onClick={() => setShowRawMarkdown(v => !v)}
                   style={{
                     marginLeft: 'auto', padding: '3px 10px', borderRadius: 4, fontSize: 12,
-                    background: showRawMarkdown ? `${ACCENT}22` : 'var(--surface)',
+                    background: showRawMarkdown ? 'var(--accent-subtle)' : 'var(--surface)',
                     border: `1px solid ${showRawMarkdown ? ACCENT : 'var(--surface-border)'}`,
                     color: showRawMarkdown ? ACCENT : 'var(--text-muted)',
                     cursor: 'pointer', fontWeight: showRawMarkdown ? 600 : 400,
@@ -492,7 +492,7 @@ export default function TextStudio() {
                   onClick={handleCopy}
                   style={{
                     padding: '8px 16px', borderRadius: 6, border: 'none',
-                    background: copied ? `${ACCENT}22` : 'var(--surface-border)',
+                    background: copied ? 'var(--accent-subtle)' : 'var(--surface-border)',
                     color: copied ? ACCENT : 'var(--text)', fontSize: 13, cursor: 'pointer',
                     fontWeight: copied ? 600 : 400,
                   }}
@@ -526,7 +526,7 @@ export default function TextStudio() {
                   }}
                   style={{
                     padding: '8px 16px', borderRadius: 6, border: 'none',
-                    background: savedMsg ? `${ACCENT}22` : 'var(--surface-border)',
+                    background: savedMsg ? 'var(--accent-subtle)' : 'var(--surface-border)',
                     color: savedMsg ? ACCENT : 'var(--text)',
                     fontSize: 13, cursor: 'pointer',
                   }}

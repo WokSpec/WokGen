@@ -301,9 +301,9 @@ function AssetModal({
                 fontSize: '0.65rem',
                 padding: '2px 6px',
                 borderRadius: 4,
-                background: `${ACCENT}18`,
+                background: 'var(--accent-subtle)',
                 color: ACCENT,
-                border: `1px solid ${ACCENT}40`,
+                border: '1px solid var(--accent-glow)',
                 textTransform: 'uppercase',
                 fontWeight: 600,
                 letterSpacing: '0.04em',
@@ -319,8 +319,8 @@ function AssetModal({
               style={{
                 padding: '5px 10px',
                 borderRadius: 6,
-                background: `${ACCENT}18`,
-                border: `1px solid ${ACCENT}40`,
+                background: 'var(--accent-subtle)',
+                border: '1px solid var(--accent-glow)',
                 color: ACCENT,
                 fontSize: '0.75rem',
                 cursor: 'pointer',
@@ -585,7 +585,7 @@ function ShowcaseCard({ item, index }: { item: typeof SHOWCASE_PROMPTS[number]; 
           {item.prompt}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: '0.58rem', color: ACCENT, background: `${ACCENT}18`, border: `1px solid ${ACCENT}30`, borderRadius: 3, padding: '1px 5px' }}>
+          <span style={{ fontSize: '0.58rem', color: ACCENT, background: 'var(--accent-subtle)', border: '1px solid var(--accent-glow)', borderRadius: 3, padding: '1px 5px' }}>
             Try this →
           </span>
         </div>
@@ -814,7 +814,7 @@ export default function VectorGalleryPage() {
                       fontWeight: 500,
                       cursor: 'pointer',
                       transition: 'all 0.14s ease',
-                      background: galleryTab === tab ? `${ACCENT}20` : 'var(--surface-overlay)',
+                      background: galleryTab === tab ? 'var(--accent-subtle)' : 'var(--surface-overlay)',
                       border: `1px solid ${galleryTab === tab ? ACCENT + '50' : 'var(--surface-border)'}`,
                       color: galleryTab === tab ? ACCENT : 'var(--text-muted)',
                     }}
@@ -882,7 +882,7 @@ export default function VectorGalleryPage() {
                     fontWeight: 500,
                     cursor: 'pointer',
                     transition: 'all 0.14s ease',
-                    background: toolFilter === f.id ? `${ACCENT}20` : 'var(--surface-overlay)',
+                    background: toolFilter === f.id ? 'var(--accent-subtle)' : 'var(--surface-overlay)',
                     border: `1px solid ${toolFilter === f.id ? ACCENT + '50' : 'var(--surface-border)'}`,
                     color: toolFilter === f.id ? ACCENT : 'var(--text-muted)',
                     whiteSpace: 'nowrap',
@@ -906,7 +906,7 @@ export default function VectorGalleryPage() {
                     fontWeight: 500,
                     cursor: 'pointer',
                     transition: 'all 0.14s ease',
-                    background: styleFilter === f.id ? `${ACCENT}20` : 'var(--surface-overlay)',
+                    background: styleFilter === f.id ? 'var(--accent-subtle)' : 'var(--surface-overlay)',
                     border: `1px solid ${styleFilter === f.id ? ACCENT + '50' : 'var(--surface-border)'}`,
                     color: styleFilter === f.id ? ACCENT : 'var(--text-muted)',
                     whiteSpace: 'nowrap',

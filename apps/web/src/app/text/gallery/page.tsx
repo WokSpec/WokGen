@@ -100,7 +100,7 @@ function TextCard({ asset }: { asset: TextAsset }) {
           <span style={{ fontSize: 16 }}></span>
           <span style={{
             padding: '2px 8px', borderRadius: 4, fontSize: 11,
-            background: `${ACCENT}22`, color: ACCENT, fontWeight: 600,
+            background: 'var(--accent-subtle)', color: ACCENT, fontWeight: 600,
             textTransform: 'capitalize',
           }}>
             {contentType.replace('-', ' ')}
@@ -140,7 +140,7 @@ function TextCard({ asset }: { asset: TextAsset }) {
         style={{
           alignSelf: 'flex-start',
           padding: '5px 12px', borderRadius: 6, border: 'none', fontSize: 12,
-          background: copied ? `${ACCENT}22` : 'var(--surface-border)',
+          background: copied ? 'var(--accent-subtle)' : 'var(--surface-border)',
           color: copied ? ACCENT : 'var(--text)', cursor: 'pointer',
           fontWeight: copied ? 600 : 400,
         }}
@@ -259,7 +259,7 @@ export default function TextGallery() {
               key={f.id}
               className={`gallery-pill${typeFilter === f.id ? ' active' : ''}`}
               onClick={() => setTypeFilter(f.id)}
-              style={typeFilter === f.id ? { borderColor: ACCENT, color: ACCENT, background: `${ACCENT}18` } : {}}
+              style={typeFilter === f.id ? { borderColor: ACCENT, color: ACCENT, background: 'var(--accent-subtle)' } : {}}
             >
               {f.id ? `$ ` : ''}{f.label}
             </button>

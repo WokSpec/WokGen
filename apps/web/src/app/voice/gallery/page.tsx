@@ -91,7 +91,7 @@ function VoiceCard({ asset }: { asset: VoiceAsset }) {
           <span style={{ fontSize: 18 }}></span>
           <span style={{
             padding: '2px 8px', borderRadius: 4, fontSize: 11,
-            background: `${ACCENT}22`, color: ACCENT, fontWeight: 600,
+            background: 'var(--accent-subtle)', color: ACCENT, fontWeight: 600,
             textTransform: 'capitalize',
           }}>
             {voiceType}
@@ -130,7 +130,7 @@ function VoiceCard({ asset }: { asset: VoiceAsset }) {
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
               padding: '7px 14px', borderRadius: 6, border: 'none',
-              background: playing ? `${ACCENT}22` : 'var(--surface-border)',
+              background: playing ? 'var(--accent-subtle)' : 'var(--surface-border)',
               color: playing ? ACCENT : 'var(--text)',
               fontSize: 13, cursor: 'pointer', width: 'fit-content',
               fontWeight: 600,
@@ -254,7 +254,7 @@ export default function VoiceGallery() {
               key={f.id}
               className={`gallery-pill${voiceFilter === f.id ? ' active' : ''}`}
               onClick={() => setVoiceFilter(f.id)}
-              style={voiceFilter === f.id ? { borderColor: ACCENT, color: ACCENT, background: `${ACCENT}18` } : {}}
+              style={voiceFilter === f.id ? { borderColor: ACCENT, color: ACCENT, background: 'var(--accent-subtle)' } : {}}
             >
               {f.id ? `$ ` : ''}{f.label}
             </button>

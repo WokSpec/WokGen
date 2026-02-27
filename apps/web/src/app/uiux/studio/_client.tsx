@@ -761,7 +761,7 @@ export default function UIUXStudio() {
                       <div style={{ display: 'flex', gap: 14 }}>
                         {([['Dark mode', darkMode, setDarkMode], ['Responsive', responsive, setResponsive]] as [string, boolean, React.Dispatch<React.SetStateAction<boolean>>][]).map(([label, val, setter]) => (
                           <label key={label} style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer' }}>
-                            <input type="checkbox" checked={val} onChange={(e) => setter(e.target.checked)} style={{ accentColor: '#a855f7', width: 12, height: 12 }} />
+                            <input type="checkbox" checked={val} onChange={(e) => setter(e.target.checked)} style={{ accentColor: 'var(--purple)', width: 12, height: 12 }} />
                             <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{label}</span>
                           </label>
                         ))}
@@ -784,11 +784,11 @@ export default function UIUXStudio() {
                     </div>
                     {isGeneratingLibrary ? (
                       <div style={{ height: 4, background: 'var(--surface-overlay)', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', borderRadius: 2, background: 'linear-gradient(90deg,#a855f7,#ec4899)', width: `${(libraryProcessed / selectedLibraryTypes.length) * 100}%`, transition: 'width 0.4s' }} />
+                        <div style={{ height: '100%', borderRadius: 2, background: 'linear-gradient(90deg,var(--purple),var(--pink))', width: `${(libraryProcessed / selectedLibraryTypes.length) * 100}%`, transition: 'width 0.4s' }} />
                       </div>
                     ) : (
                       <div style={{ height: 3, background: 'var(--surface-overlay)', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: '40%', borderRadius: 2, background: 'linear-gradient(90deg,#a855f7,#ec4899)', animation: 'uiux-progress-slide 1.4s ease infinite' }} />
+                        <div style={{ height: '100%', width: '40%', borderRadius: 2, background: 'linear-gradient(90deg,var(--purple),var(--pink))', animation: 'uiux-progress-slide 1.4s ease infinite' }} />
                       </div>
                     )}
                     <button type="button" onClick={handleCancel} style={{ padding: '6px', borderRadius: 6, border: '1px solid var(--surface-border)', background: 'var(--surface-raised)', color: 'var(--text-secondary)', fontSize: '0.75rem', cursor: 'pointer', width: '100%' }}>Cancel</button>
@@ -892,7 +892,7 @@ export default function UIUXStudio() {
                         {session?.user && (
                           <>
                             <label style={{ display: 'flex', alignItems: 'center', gap: 3, cursor: 'pointer' }}>
-                              <input type="checkbox" checked={galleryIsPublic} onChange={(e) => setGalleryIsPublic(e.target.checked)} style={{ accentColor: '#a855f7', width: 10, height: 10 }} />
+                              <input type="checkbox" checked={galleryIsPublic} onChange={(e) => setGalleryIsPublic(e.target.checked)} style={{ accentColor: 'var(--purple)', width: 10, height: 10 }} />
                               <span style={{ fontSize: '0.62rem', color: 'var(--text-disabled)' }}>public</span>
                             </label>
                             <button type="button" onClick={handleSaveToGallery} disabled={isSavingToGallery || gallerySaved} style={{ padding: '3px 7px', borderRadius: 4, fontSize: '0.7rem', cursor: isSavingToGallery || gallerySaved ? 'not-allowed' : 'pointer', border: `1px solid ${gallerySaved ? 'rgba(34,197,94,0.4)' : 'var(--surface-border)'}`, background: gallerySaved ? 'rgba(34,197,94,0.08)' : 'var(--surface-raised)', color: gallerySaved ? '#22c55e' : 'var(--text-secondary)' }}>
@@ -1121,7 +1121,7 @@ function UIUXLibraryResults({
       <div style={{ padding: '7px 12px', borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-raised)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)' }}>Library — {processed}/{total}</span>
         <div style={{ flex: 1, height: 4, background: 'var(--surface-overlay)', borderRadius: 2, overflow: 'hidden' }}>
-          <div style={{ height: '100%', borderRadius: 2, background: 'linear-gradient(90deg,#a855f7,#ec4899)', width: `${(processed / total) * 100}%`, transition: 'width 0.4s' }} />
+          <div style={{ height: '100%', borderRadius: 2, background: 'linear-gradient(90deg,var(--purple),var(--pink))', width: `${(processed / total) * 100}%`, transition: 'width 0.4s' }} />
         </div>
         {isGenerating && currentType && <span style={{ fontSize: '0.68rem', color: '#f472b6', whiteSpace: 'nowrap' }}>Generating {COMPONENT_TYPES.find((c) => c.id === currentType)?.label}…</span>}
         {!isGenerating && processed > 0 && (

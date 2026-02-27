@@ -677,8 +677,8 @@ function VectorStudioInner() {
                       style={{
                         position: 'absolute', bottom: 6, right: 6,
                         padding: '2px 6px', borderRadius: 4,
-                        background: '#f59e0b18', border: '1px solid #f59e0b55',
-                        color: '#f59e0b', fontSize: 10, fontWeight: 600, textDecoration: 'none',
+                        background: 'var(--warning-bg)', border: '1px solid var(--warning)',
+                        color: 'var(--warning)', fontSize: 10, fontWeight: 600, textDecoration: 'none',
                       }}
                     >
                       Sign in →
@@ -761,9 +761,9 @@ function VectorStudioInner() {
                       style={{
                         padding: '4px 10px',
                         borderRadius: 6,
-                        background: '#f59e0b18',
-                        border: '1px solid #f59e0b55',
-                        color: '#f59e0b',
+                        background: 'var(--warning-bg)',
+                        border: '1px solid var(--warning)',
+                        color: 'var(--warning)',
                         fontSize: 11,
                         fontWeight: 600,
                         textDecoration: 'none',

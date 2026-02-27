@@ -45,8 +45,8 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
 
               html, body {
                 height: 100%;
-                background: #0d0d14;
-                color: #F4F4F4;
+                background: var(--bg);
+                color: var(--text);
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
                              "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                 -webkit-font-smoothing: antialiased;
@@ -82,8 +82,8 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 position: absolute;
                 inset: 0;
                 background-image:
-                  linear-gradient(rgba(177,62,83,0.04) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(177,62,83,0.04) 1px, transparent 1px);
+                  linear-gradient(rgba(248,113,113,0.04) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(248,113,113,0.04) 1px, transparent 1px);
                 background-size: 24px 24px;
                 pointer-events: none;
               }
@@ -104,8 +104,8 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 width: 72px;
                 height: 72px;
                 border-radius: 12px;
-                background: rgba(177,62,83,0.10);
-                border: 2px solid rgba(177,62,83,0.25);
+                background: var(--danger-bg);
+                border: 2px solid var(--danger-border);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -119,9 +119,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 gap: 6px;
                 padding: 4px 10px;
                 border-radius: 4px;
-                background: rgba(177,62,83,0.12);
-                border: 1px solid rgba(177,62,83,0.3);
-                color: #EF7D57;
+                background: var(--danger-bg);
+                border: 1px solid var(--danger-border);
+                color: var(--danger);
                 font-size: 11px;
                 font-weight: 700;
                 letter-spacing: 0.06em;
@@ -133,7 +133,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 width: 6px;
                 height: 6px;
                 border-radius: 50%;
-                background: #B13E53;
+                background: var(--danger);
                 flex-shrink: 0;
                 animation: pulse 1.4s ease-in-out infinite;
               }
@@ -141,7 +141,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               h1 {
                 font-size: 22px;
                 font-weight: 700;
-                color: #F4F4F4;
+                color: var(--text);
                 line-height: 1.3;
                 margin-bottom: 12px;
               }
@@ -177,7 +177,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               }
 
               .px-accent {
-                background: #B13E53;
+                background: var(--danger);
               }
 
               .actions {
@@ -206,11 +206,11 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               .btn-danger {
                 background: rgba(177,62,83,0.15);
                 border-color: rgba(177,62,83,0.4);
-                color: #EF7D57;
+                color: var(--danger);
               }
 
               .btn-danger:hover {
-                background: rgba(177,62,83,0.25);
+                background: var(--danger-border);
                 border-color: rgba(239,125,87,0.5);
               }
 
@@ -223,7 +223,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               .btn-secondary:hover {
                 background: #1a1a2e;
                 border-color: #29366F;
-                color: #F4F4F4;
+                color: var(--text);
               }
 
               .help {

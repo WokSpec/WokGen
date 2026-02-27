@@ -338,7 +338,7 @@ function VoiceStudioInner() {
                     padding: '10px 6px',
                     borderRadius: 8,
                     border: `1px solid ${style === v.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: style === v.id ? `${ACCENT_HEX}18` : 'var(--surface)',
+                    background: style === v.id ? 'var(--accent-subtle)' : 'var(--surface)',
                     color: style === v.id ? ACCENT : 'var(--text)',
                     cursor: 'pointer',
                     textAlign: 'center',
@@ -371,7 +371,7 @@ function VoiceStudioInner() {
                       fontSize: 11,
                       borderColor: style === p.style ? ACCENT : 'var(--surface-border)',
                       color: style === p.style ? ACCENT : 'var(--text-muted)',
-                      background: style === p.style ? `${ACCENT_HEX}18` : 'transparent',
+                      background: style === p.style ? 'var(--accent-subtle)' : 'transparent',
                     }}
                   >
                     {p.label}
@@ -416,7 +416,7 @@ function VoiceStudioInner() {
                     padding: '2px 8px',
                     borderRadius: 4,
                     border: '1px solid var(--surface-border)',
-                    background: previewPlaying ? `${ACCENT_HEX}22` : 'transparent',
+                    background: previewPlaying ? 'var(--accent-subtle)' : 'transparent',
                     color: previewPlaying ? ACCENT : 'var(--text-muted)',
                     fontSize: 11,
                     cursor: 'pointer',
@@ -449,7 +449,7 @@ function VoiceStudioInner() {
                 style={{
                   fontSize: 12,
                   fontWeight: 400,
-                  color: isOverLimit ? '#f87171' : charsLeft < 500 ? ACCENT : 'var(--text-muted)',
+                  color: isOverLimit ? 'var(--danger)' : charsLeft < 500 ? ACCENT : 'var(--text-muted)',
                 }}
               >
                 {isOverLimit ? `${Math.abs(charsLeft)} over limit` : `${charsLeft.toLocaleString()} left`}
@@ -465,7 +465,7 @@ function VoiceStudioInner() {
                 padding: '12px',
                 borderRadius: 8,
                 background: 'var(--surface)',
-                border: `1px solid ${isOverLimit ? '#f87171' : 'var(--surface-border)'}`,
+                border: `1px solid ${isOverLimit ? 'var(--danger)' : 'var(--surface-border)'}`,
                 color: 'var(--text)',
                 fontSize: 13,
                 lineHeight: 1.6,
@@ -557,7 +557,7 @@ function VoiceStudioInner() {
                   width: 18,
                   height: 18,
                   borderRadius: '50%',
-                  background: '#fff',
+                  background: 'var(--text)',
                   transition: 'left 0.2s',
                 }}
               />
@@ -643,7 +643,7 @@ function VoiceStudioInner() {
                   position: 'absolute', top: 2,
                   left: naturalPauses ? 18 : 2,
                   width: 16, height: 16, borderRadius: '50%',
-                  background: '#fff', transition: 'left 0.2s',
+                  background: 'var(--text)', transition: 'left 0.2s',
                 }} />
               </button>
             </div>
@@ -853,7 +853,7 @@ function VoiceStudioInner() {
                   style={{
                     display: 'inline-block',
                     width: 14, height: 14, borderRadius: '50%',
-                    border: `2px solid ${ACCENT}44`, borderTopColor: ACCENT,
+                    border: '2px solid var(--accent-glow)', borderTopColor: ACCENT,
                     animation: 'spin 0.8s linear infinite',
                   }}
                 />
@@ -947,8 +947,8 @@ function VoiceStudioInner() {
                       gap: 6,
                       padding: '8px 16px',
                       borderRadius: 7,
-                      background: `${ACCENT_HEX}18`,
-                      border: `1px solid ${ACCENT}55`,
+                      background: 'var(--accent-subtle)',
+                      border: '1px solid var(--accent-glow)',
                       color: ACCENT,
                       fontSize: 12,
                       fontWeight: 600,

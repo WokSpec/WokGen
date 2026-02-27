@@ -21,27 +21,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // Pixel mode
     { url: `${base}/pixel`,               lastModified: now, changeFrequency: 'monthly',  priority: 0.9 },
-    { url: `${base}/studio`,        lastModified: now, changeFrequency: 'monthly',  priority: 0.85 },
+    { url: `${base}/studio`,              lastModified: now, changeFrequency: 'monthly',  priority: 0.85 },
     { url: `${base}/pixel/gallery`,       lastModified: now, changeFrequency: 'daily',    priority: 0.8 },
 
     // Business mode
     { url: `${base}/business`,            lastModified: now, changeFrequency: 'monthly',  priority: 0.9 },
-    { url: `${base}/business/studio`,     lastModified: now, changeFrequency: 'monthly',  priority: 0.85 },
-    { url: `${base}/business/gallery`,    lastModified: now, changeFrequency: 'daily',    priority: 0.8 },
 
     // Coming soon / beta
     { url: `${base}/vector`,              lastModified: now, changeFrequency: 'monthly',  priority: 0.5 },
-    { url: `${base}/emoji`,               lastModified: now, changeFrequency: 'monthly',  priority: 0.5 },
     { url: `${base}/uiux`,                lastModified: now, changeFrequency: 'monthly',  priority: 0.5 },
 
     // Voice mode (beta)
     { url: `${base}/voice`,               lastModified: now, changeFrequency: 'monthly',  priority: 0.7 },
-    { url: `${base}/voice/studio`,        lastModified: now, changeFrequency: 'monthly',  priority: 0.65 },
     { url: `${base}/voice/gallery`,       lastModified: now, changeFrequency: 'daily',    priority: 0.6 },
 
     // Text mode (beta)
     { url: `${base}/text`,                lastModified: now, changeFrequency: 'monthly',  priority: 0.7 },
-    { url: `${base}/text/studio`,         lastModified: now, changeFrequency: 'monthly',  priority: 0.65 },
     { url: `${base}/text/gallery`,        lastModified: now, changeFrequency: 'daily',    priority: 0.6 },
 
     // Eral — AI companion

@@ -1,6 +1,6 @@
 {
-  "installCommand": "npm install --legacy-peer-deps --ignore-scripts",
-  "buildCommand": "mkdir -p node_modules/@prisma && (cp -a ../../node_modules/@prisma/client node_modules/@prisma/client 2>/dev/null || true) && PRISMA_GENERATE_SKIP_AUTOINSTALL=1 npx prisma generate && next build",
+  "installCommand": "cd $(git rev-parse --show-toplevel) && npm install --legacy-peer-deps --ignore-scripts",
+  "buildCommand": "ROOT=$(git rev-parse --show-toplevel) && mkdir -p node_modules/@prisma && cp -a $ROOT/node_modules/@prisma/client node_modules/@prisma/client && PRISMA_GENERATE_SKIP_AUTOINSTALL=1 npx prisma generate && next build",
   "crons": [
     {
       "path": "/api/cron/cleanup",

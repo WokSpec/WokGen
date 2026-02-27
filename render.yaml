@@ -26,6 +26,8 @@ services:
         value: production
       - key: NEXT_TELEMETRY_DISABLED
         value: "1"
+      - key: PRISMA_GENERATE_SKIP_AUTOINSTALL
+        value: "1"
       - key: HOSTNAME
         value: "0.0.0.0"
       # Auth — NextAuth v5

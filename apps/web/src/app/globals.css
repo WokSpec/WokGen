@@ -52,6 +52,10 @@
   --danger:        #f87171;
   --danger-bg:     rgba(248, 113, 113, 0.10);
   --danger-border: rgba(248, 113, 113, 0.25);
+  --danger-muted:  rgba(248, 113, 113, 0.07);
+  --danger-hover:  #fca5a5;
+  --glow-md:       0 0 16px rgba(129,140,248,0.35);
+  --font-heading:  var(--font-display);
   --warning:       #fbbf24;
   --warning-bg:    rgba(251, 191, 36, 0.10);
   --info:          #60a5fa;
@@ -19527,6 +19531,10 @@ select:focus-visible {
   --danger:        #dc2626;
   --danger-bg:     rgba(220, 38, 38, 0.08);
   --danger-border: rgba(220, 38, 38, 0.25);
+  --danger-muted:  rgba(220, 38, 38, 0.05);
+  --danger-hover:  #b91c1c;
+  --glow-md:       0 0 16px rgba(99,102,241,0.25);
+  --font-heading:  var(--font-display);
   --warning:       #d97706;
   --warning-bg:    rgba(217, 119, 6, 0.08);
   --info:          #2563eb;

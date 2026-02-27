@@ -303,11 +303,11 @@ export function EralVoiceButton() {
 
   // ── Derive button visuals ──────────────────────────────────────────────────
   const bgColor =
-    state === 'listening'  ? '#dc2626' :
-    state === 'speaking'   ? '#7c3aed' :
-    state === 'processing' ? '#1e1b4b' :
-    state === 'error'      ? '#b91c1c' :
-    '#1a1a2e';
+    state === 'listening'  ? 'var(--danger)' :
+    state === 'speaking'   ? 'var(--accent-dim)' :
+    state === 'processing' ? 'var(--bg-elevated)' :
+    state === 'error'      ? 'var(--danger)' :
+    'var(--bg-elevated)';
 
   const label =
     state === 'listening'  ? 'Listening…' :
@@ -336,11 +336,11 @@ export function EralVoiceButton() {
       {showOverlay && responseText && (
         <div
           style={{
-            background: 'rgba(17,17,34,0.95)',
-            border: '1px solid rgba(129,140,248,0.3)',
+            background: 'var(--bg-overlay)',
+            border: '1px solid var(--accent-glow)',
             borderRadius: 12,
             padding: '8px 12px',
-            color: '#c7d2fe',
+            color: 'var(--accent-2)',
             fontSize: 13,
             maxWidth: 260,
             lineHeight: 1.4,

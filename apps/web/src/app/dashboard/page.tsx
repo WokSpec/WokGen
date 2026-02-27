@@ -21,7 +21,7 @@ export default async function DashboardPage() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
 
-  const [generationsToday, generationsMonth, totalAssets, recentProjects] = await Promise.all([
+  const [generationsToday, generationsMonth, totalAssets, recentProjects, subscription] = await Promise.all([
     prisma.job.count({ where: { userId, createdAt: { gte: today } } }),
     prisma.job.count({ where: { userId, createdAt: { gte: monthStart } } }),
     prisma.galleryAsset.count({ where: { job: { userId } } }),
@@ -31,9 +31,14 @@ export default async function DashboardPage() {
       take: 4,
       select: { id: true, name: true, mode: true, updatedAt: true, _count: { select: { jobs: true } } },
     }),
+    prisma.subscription.findUnique({
+      where: { userId },
+      select: { planId: true, status: true },
+    }),
   ]);
 
-  const dailyLimit = DAILY_STD_LIMIT['free'] ?? 100;
+  const planId = subscription?.planId ?? 'free';
+  const dailyLimit = DAILY_STD_LIMIT[planId as keyof typeof DAILY_STD_LIMIT] ?? DAILY_STD_LIMIT['free'] ?? 100;
 
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
@@ -42,7 +47,7 @@ export default async function DashboardPage() {
         {user.image ? (
           <Image src={user.image} alt={user.name || 'User avatar'} width={48} height={48} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.08)' }} />
         ) : (
-          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(167,139,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.125rem', color: '#a78bfa', border: '2px solid rgba(167,139,250,0.2)' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--accent-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.125rem', color: 'var(--accent)', border: '2px solid var(--accent-glow)' }}>
             {initial}
           </div>
         )}
@@ -238,14 +243,14 @@ export default async function DashboardPage() {
       <div style={{ marginTop: '1rem', padding: '1.25rem 1.5rem', border: '1px solid var(--border)', borderRadius: '10px', background: 'rgba(167,139,250,0.04)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
           <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Usage</span>
-          <Link href="/account/usage" style={{ fontSize: '0.8125rem', color: '#a78bfa', textDecoration: 'none' }}>View full report →</Link>
+          <Link href="/account/usage" style={{ fontSize: '0.8125rem', color: 'var(--accent)', textDecoration: 'none' }}>View full report →</Link>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Daily generations</div>
             <div style={{ fontSize: '1.125rem', fontWeight: 700 }}>{generationsToday} <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--text-muted)' }}>/ {dailyLimit}</span></div>
             <div style={{ marginTop: '0.375rem', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${Math.min(100, Math.round((generationsToday / dailyLimit) * 100))}%`, background: generationsToday / dailyLimit >= 0.9 ? '#f87171' : '#a78bfa', borderRadius: '2px', transition: 'width 0.3s' }} />
+              <div style={{ height: '100%', width: `${Math.min(100, Math.round((generationsToday / dailyLimit) * 100))}%`, background: generationsToday / dailyLimit >= 0.9 ? 'var(--danger)' : 'var(--accent)', borderRadius: '2px', transition: 'width 0.3s' }} />
             </div>
           </div>
           <div>

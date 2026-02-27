@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
           await sendSubscriptionCanceledEmail(
             existing.user.email,
             existing.currentPeriodEnd,
-          ).catch(() => {});
+          ).catch((e) => logger.warn({ err: e }, 'stripe: sendSubscriptionCanceledEmail failed'));
         }
         break;
       }
@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
             sub.user.email,
             amountPaid,
             sub.plan?.name ?? undefined,
-          ).catch(() => {});
+          ).catch((e) => logger.warn({ err: e }, 'stripe: sendBillingReceiptEmail failed'));
         }
         break;
       }

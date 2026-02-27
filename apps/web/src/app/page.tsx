@@ -294,7 +294,7 @@ console.log(asset.url);
                 ★ GitHub
               </a>
               <span className="homepage-oss-pill">MIT License</span>
-              <span className="homepage-oss-pill">No account required</span>
+              <span className="homepage-oss-pill">Open Source</span>
             </div>
             <div className="homepage-oss-providers">
               <span className="homepage-provider-badge">FLUX</span>
@@ -311,7 +311,7 @@ console.log(asset.url);
         <div className="homepage-final-cta-card">
           <div className="orb orb-purple homepage-final-orb" />
           <h2 className="homepage-final-title">Ready to create?</h2>
-          <p className="homepage-final-sub">No account. No card. Just open a mode and start.</p>
+          <p className="homepage-final-sub">Sign in free. No credit card required. Generate your first asset in seconds.</p>
           <div className="homepage-final-btns">
             <Link href="/studio" className="homepage-cta-primary">Open WokGen Studio →</Link>
             <Link href="/tools" className="homepage-cta-ghost">Explore free tools →</Link>

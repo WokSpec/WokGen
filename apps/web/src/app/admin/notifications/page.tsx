@@ -215,7 +215,7 @@ export default function AdminNotificationsPage() {
           >
             {saving ? 'Saving…' : 'Save Configuration'}
           </button>
-          {saveResult === 'ok'    && <span className="text-sm text-emerald-400">Saved successfully</span>}
+          {saveResult === 'ok'    && <span className="text-sm" style={{ color: 'var(--success)' }}>Saved successfully</span>}
           {saveResult === 'error' && <span style={{ fontSize: "0.875rem", color: "var(--danger)" }}>Save failed — check console</span>}
         </div>
 

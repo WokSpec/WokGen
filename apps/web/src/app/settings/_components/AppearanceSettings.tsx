@@ -24,7 +24,7 @@ export function AppearanceSettings() {
   };
 
   return (
-    <section style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', background: 'rgba(255,255,255,0.02)' }}>
+    <section style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', background: 'var(--surface-card)' }}>
       <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Appearance</h2>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>

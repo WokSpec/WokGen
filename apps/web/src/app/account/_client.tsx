@@ -19,6 +19,7 @@ interface UsageSummary {
   allTime:   { total: number; hd: number; standard: number };
   quota: { todayUsed: number; dailyLimit: number };
   daily?: { date: string; total: number; hd: number; standard: number }[];
+  modeMonth?: Record<string, number>;
 }
 
 interface ComputeSettings {
@@ -363,7 +364,6 @@ function UsageTab() {
           {data.daily && data.daily.length > 0 && (
             <div className="acct-chart-section">
               <h3 className="acct-section-title">Generations — Last 7 Days</h3>
-              {/* TODO: Add per-studio breakdown (Pixel / Vector / Voice) once the usage API returns mode-level counts */}
               <div className="usage-chart">
                 {data.daily.slice(-7).map((d) => {
                   const max = Math.max(...(data.daily ?? []).slice(-7).map(x => x.total), 1);
@@ -391,6 +391,28 @@ function UsageTab() {
               <div className="usage-chart-legend">
                 <span className="usage-chart-legend__item"><span className="usage-chart-legend__dot usage-chart-legend__dot--hd" />HD</span>
                 <span className="usage-chart-legend__item"><span className="usage-chart-legend__dot usage-chart-legend__dot--std" />Standard</span>
+              </div>
+            </div>
+          )}
+          {data.modeMonth && Object.values(data.modeMonth).some(v => v > 0) && (
+            <div className="acct-chart-section">
+              <h3 className="acct-section-title">By Studio — This Month</h3>
+              <div className="mode-breakdown">
+                {(Object.entries(data.modeMonth) as [string, number][])
+                  .filter(([, v]) => v > 0)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([mode, count]) => {
+                    const total = Object.values(data.modeMonth!).reduce((s, v) => s + v, 0) || 1;
+                    return (
+                      <div key={mode} className="mode-breakdown__row">
+                        <span className="mode-breakdown__label">{mode.charAt(0).toUpperCase() + mode.slice(1)}</span>
+                        <div className="mode-breakdown__track">
+                          <div className="mode-breakdown__fill" style={{ width: `${Math.round((count / total) * 100)}%`, background: 'var(--accent)' }} />
+                        </div>
+                        <span className="mode-breakdown__count">{count}</span>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           )}

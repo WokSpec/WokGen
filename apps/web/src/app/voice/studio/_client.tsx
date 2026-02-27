@@ -81,7 +81,8 @@ const PROVIDER_COLORS: Record<string, string> = {
   huggingface: '#60a5fa',
 };
 
-const ACCENT = '#f59e0b';
+const ACCENT = 'var(--accent)';
+const ACCENT_HEX = '#818cf8'; // fallback for alpha compositing
 const MAX_CHARS = 10000; // shown in UI; actual server limit depends on tier
 
 const EXAMPLES = [
@@ -312,7 +313,7 @@ function VoiceStudioInner() {
                     padding: '10px 6px',
                     borderRadius: 8,
                     border: `1px solid ${style === v.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: style === v.id ? `${ACCENT}18` : 'var(--surface)',
+                    background: style === v.id ? `${ACCENT_HEX}18` : 'var(--surface)',
                     color: style === v.id ? ACCENT : 'var(--text)',
                     cursor: 'pointer',
                     textAlign: 'center',
@@ -345,7 +346,7 @@ function VoiceStudioInner() {
                       fontSize: 11,
                       borderColor: style === p.style ? ACCENT : 'var(--surface-border)',
                       color: style === p.style ? ACCENT : 'var(--text-muted)',
-                      background: style === p.style ? `${ACCENT}18` : 'transparent',
+                      background: style === p.style ? `${ACCENT_HEX}18` : 'transparent',
                     }}
                   >
                     {p.label}
@@ -390,7 +391,7 @@ function VoiceStudioInner() {
                     padding: '2px 8px',
                     borderRadius: 4,
                     border: '1px solid var(--surface-border)',
-                    background: previewPlaying ? `${ACCENT}22` : 'transparent',
+                    background: previewPlaying ? `${ACCENT_HEX}22` : 'transparent',
                     color: previewPlaying ? ACCENT : 'var(--text-muted)',
                     fontSize: 11,
                     cursor: 'pointer',
@@ -889,7 +890,6 @@ function VoiceStudioInner() {
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>Voice Cloning</div>
               {userPlan === 'pro' || userPlan === 'max' ? (
                 <div>
-                  {/* TODO: Implement voice cloning — upload WAV (10–30s), call /api/voice/clone */}
                   <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 12px' }}>
                     Upload a 10–30 second WAV sample to clone your voice.
                   </p>
@@ -919,7 +919,7 @@ function VoiceStudioInner() {
                       gap: 6,
                       padding: '8px 16px',
                       borderRadius: 7,
-                      background: `${ACCENT}18`,
+                      background: `${ACCENT_HEX}18`,
                       border: `1px solid ${ACCENT}55`,
                       color: ACCENT,
                       fontSize: 12,

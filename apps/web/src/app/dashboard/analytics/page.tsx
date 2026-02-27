@@ -14,7 +14,7 @@ function heatColour(count: number): string {
   if (count === 1) return 'var(--accent-glow)';
   if (count <= 3) return 'var(--accent)';
   if (count <= 5) return 'var(--accent)';
-  return 'rgba(167,139,250,1)';
+  return 'var(--purple)';
 }
 
 export default async function AnalyticsPage() {

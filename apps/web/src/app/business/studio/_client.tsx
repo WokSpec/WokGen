@@ -1267,9 +1267,9 @@ function BusinessStudioInner() {
                       style={{
                         padding: '4px 10px',
                         borderRadius: 6,
-                        background: '#f59e0b18',
-                        border: '1px solid #f59e0b55',
-                        color: '#f59e0b',
+                        background: 'var(--warning-bg)',
+                        border: '1px solid var(--warning)',
+                        color: 'var(--warning)',
                         fontSize: 11,
                         fontWeight: 600,
                         textDecoration: 'none',

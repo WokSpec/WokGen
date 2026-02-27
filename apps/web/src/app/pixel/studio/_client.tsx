@@ -481,7 +481,7 @@ function SettingsModal({
               API keys are stored in your browser only — never sent to the server unless generating.
             </p>
           </div>
-          <button
+          <button type="button"
             onClick={onClose}
             className="btn-ghost btn-icon flex-shrink-0"
             aria-label="Close settings"
@@ -601,10 +601,10 @@ function SettingsModal({
           className="flex items-center justify-end gap-3 px-5 py-4 flex-shrink-0"
           style={{ borderTop: '1px solid var(--surface-border)' }}
         >
-          <button className="btn-ghost" onClick={onClose}>
+          <button type="button" className="btn-ghost" onClick={onClose}>
             Cancel
           </button>
-          <button
+          <button type="button"
             className="btn-primary"
             onClick={() => {
               onSave(keys, host || 'http://127.0.0.1:8188');
@@ -645,7 +645,7 @@ function HistoryPanel({
         style={{ borderBottom: '1px solid var(--surface-border)' }}
       >
         <span className="section-title">History</span>
-        <button
+        <button type="button"
           className="btn-ghost btn-icon"
           onClick={onClose}
           aria-label="Close history"
@@ -661,7 +661,7 @@ function HistoryPanel({
           </div>
         )}
         {items.map((item) => (
-          <button
+          <button type="button"
             key={item.id}
             onClick={() => onSelect(item)}
             className="flex items-center gap-3 p-3 text-left w-full transition-colors duration-150"
@@ -828,7 +828,7 @@ function OutputPanel({
           {onFillPrompt && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%' }}>
               {idleExamples.map((ex, i) => (
-                <button
+                <button type="button"
                   key={i}
                   onClick={() => onFillPrompt(ex)}
                   style={{
@@ -943,7 +943,7 @@ function OutputPanel({
             {error ?? 'An unknown error occurred.'}
           </p>
         </div>
-        <button className="btn-secondary" onClick={onReroll}>
+        <button type="button" className="btn-secondary" onClick={onReroll}>
           ↻ Retry
         </button>
       </div>
@@ -963,7 +963,7 @@ function OutputPanel({
         {/* Zoom — snap buttons */}
         <div className="flex items-center gap-1">
           {([1, 2, 4] as const).map((z) => (
-            <button
+            <button type="button"
               key={z}
               className="btn-ghost btn-xs"
               style={{
@@ -979,7 +979,7 @@ function OutputPanel({
         </div>
 
         {/* Pixel grid toggle */}
-        <button
+        <button type="button"
           className="btn-ghost btn-xs"
           style={{
             background: showPixelGrid ? 'var(--accent-dim)' : 'transparent',
@@ -1000,18 +1000,18 @@ function OutputPanel({
         )}
 
         {/* Actions */}
-        <button
+        <button type="button"
           className="btn-ghost btn-sm"
           onClick={onReroll}
           title="Reroll with new seed"
         >
           ↻ Reroll
         </button>
-        <button className="btn-ghost btn-sm" onClick={onCopyImage} title="Copy image to clipboard">
+        <button type="button" className="btn-ghost btn-sm" onClick={onCopyImage} title="Copy image to clipboard">
           ⎘ Copy
         </button>
         {result?.jobId && (
-          <button
+          <button type="button"
             className="btn-ghost btn-sm"
             title="Copy share link"
             onClick={() => {
@@ -1046,11 +1046,11 @@ function OutputPanel({
             Sign in to download →
           </a>
         ) : (
-          <button className="btn-secondary btn-sm" onClick={onDownload}>
+          <button type="button" className="btn-secondary btn-sm" onClick={onDownload}>
             ↓ Download
           </button>
         )}
-        <button
+        <button type="button"
           className={cn(savedToGallery ? 'btn-success' : 'btn-primary', 'btn-sm')}
           onClick={onSaveToGallery}
           disabled={savedToGallery}
@@ -1077,7 +1077,7 @@ function OutputPanel({
           <div className="flex flex-col items-center gap-6 w-full">
             <div className="grid grid-cols-2 gap-4">
               {urls.map((url, i) => (
-                <button
+                <button type="button"
                   key={i}
                   onClick={() => setActiveUrl(url)}
                   className="output-image-frame p-2 transition-all duration-150"
@@ -1139,7 +1139,7 @@ function OutputPanel({
             />
             {/* Remove BG button on hover */}
             {onBgRemove && (
-              <button
+              <button type="button"
                 onClick={() => onBgRemove(displayUrl ?? activeUrl)}
                 disabled={bgRemoving}
                 style={{
@@ -1234,7 +1234,7 @@ function OutputPanel({
           style={{ borderTop: '1px solid var(--surface-border)', background: 'var(--surface-overlay)' }}
         >
           {batchResults.map((br, i) => br.resultUrl && (
-            <button
+            <button type="button"
               key={i}
               onClick={() => onSelectBatch?.(i)}
               title={`Variation ${i + 1} — seed ${br.resolvedSeed ?? '?'}`}
@@ -1334,7 +1334,7 @@ function OutputPanel({
             </span>
           )}
           {result.resolvedSeed != null && (
-            <button
+            <button type="button"
               className="flex items-center gap-1"
               title="Click to copy seed"
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-disabled)', fontSize: 'inherit', padding: 0 }}
@@ -1375,7 +1375,7 @@ function RatingButton({ jobId, value, label, title }: { jobId: string; value: 1 
     }).catch(() => {});
   };
   return (
-    <button
+    <button type="button"
       className="btn-ghost btn-xs"
       onClick={handle}
       title={title}
@@ -1413,7 +1413,7 @@ function ApplySavedStyleButton({ mode, onApply }: { mode: string; onApply: (pres
 
   return (
     <div className="px-4 pb-2">
-      <button
+      <button type="button"
         onClick={handleApply}
         className="community-modal-btn"
         style={{ width: '100%', textAlign: 'left', fontSize: '0.72rem' }}
@@ -1648,7 +1648,7 @@ function GenerateForm({
                 {promptLen}/200
               </span>
               {/* Save as Favorite */}
-              <button
+              <button type="button"
                 title={favSaved ? 'Saved!' : 'Save prompt as favorite'}
                 aria-label={favSaved ? 'Saved!' : 'Save prompt as favorite'}
                 onClick={savePromptAsFavorite}
@@ -1659,7 +1659,7 @@ function GenerateForm({
               {/* My Prompts dropdown */}
               {favPrompts.length > 0 && (
                 <div data-fav-menu style={{ position: 'relative' }}>
-                  <button
+                  <button type="button"
                     title="My saved prompts"
                     onClick={() => setShowFavMenu(v => !v)}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.65rem', color: 'var(--text-disabled)', padding: '0 2px' }}
@@ -1669,7 +1669,7 @@ function GenerateForm({
                   {showFavMenu && (
                     <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, minWidth: 220, maxHeight: 180, overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
                       {favPrompts.map(f => (
-                        <button
+                        <button type="button"
                           key={f.id}
                           onClick={() => { setPrompt(f.prompt); setShowFavMenu(false); }}
                           style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.7rem', color: 'var(--text-primary)', borderBottom: '1px solid var(--border)' }}
@@ -1697,9 +1697,8 @@ function GenerateForm({
                 {showPromptHistory && (
                   <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 100, background: 'var(--surface-overlay, #1a1a2e)', border: '1px solid var(--surface-border, #303050)', borderRadius: 6, minWidth: 280, maxHeight: 220, overflowY: 'auto', padding: 4, marginTop: 4 }}>
                     {promptHistory.map((p, i) => (
-                      <button
+                      <button type="button"
                         key={i}
-                        type="button"
                         style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', fontSize: 12, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 4 }}
                         onClick={() => { setPrompt(p); setShowPromptHistory(false); }}
                       >
@@ -1756,7 +1755,7 @@ function GenerateForm({
           </p>
           <div className="flex flex-wrap gap-1.5">
             {examples.slice(0, 4).map((ex) => (
-              <button
+              <button type="button"
                 key={ex}
                 className="chip text-xs"
                 style={{ fontSize: '0.7rem' }}
@@ -1769,7 +1768,7 @@ function GenerateForm({
         </div>
 
         {/* Advanced toggle — contains negative prompt */}
-        <button
+        <button type="button"
           className="flex items-center gap-1.5 text-xs self-start transition-colors duration-150"
           style={{ color: showAdvanced ? 'var(--text-secondary)' : 'var(--text-disabled)' }}
           onClick={() => setShowAdvanced(!showAdvanced)}
@@ -1802,7 +1801,7 @@ function GenerateForm({
         {/* Category tabs */}
         <div className="flex gap-1 mb-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           {PRESET_CATEGORIES.map((cat) => (
-            <button
+            <button type="button"
               key={cat.id}
               onClick={() => setPresetCategory(cat.id)}
               className="flex-shrink-0 text-xs px-2.5 py-1 rounded-full transition-all duration-150"
@@ -1825,7 +1824,7 @@ function GenerateForm({
             const preset = STYLE_PRESETS.find(p => p.id === pid);
             if (!preset) return null;
             return (
-              <button
+              <button type="button"
                 key={preset.id}
                 onClick={() => onPresetSelect(preset.id)}
                 className="flex flex-col gap-0.5 p-2 rounded-md text-left transition-all duration-150"
@@ -1871,7 +1870,7 @@ function GenerateForm({
             { id: 'portrait',    label: 'Portrait', hint: 'Character bust, face and upper body, expressive' },
             { id: 'vehicle',     label: 'Vehicle',  hint: 'Vehicle or mount, side or top-down view' },
           ] as { id: import('@/lib/prompt-builder').AssetCategory; label: string; hint: string }[]).map((cat) => (
-            <button
+            <button type="button"
               key={cat.id}
               onClick={() => setAssetCategory(cat.id)}
               title={cat.hint}
@@ -1932,7 +1931,7 @@ function GenerateForm({
             { id: 'gba',     label: '32-bit'    },
             { id: 'modern',  label: 'Modern'    },
           ] as { id: import('@/lib/prompt-builder').PixelEra; label: string }[]).map((era) => (
-            <button
+            <button type="button"
               key={era.id}
               onClick={() => setPixelEra(era.id)}
               className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
@@ -1962,7 +1961,7 @@ function GenerateForm({
             { id: 'dark',        label: 'Dark'  },
             { id: 'scene',       label: 'Scene' },
           ] as { id: import('@/lib/prompt-builder').BackgroundMode; label: string }[]).map((bg) => (
-            <button
+            <button type="button"
               key={bg.id}
               onClick={() => setBgMode(bg.id)}
               className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
@@ -1992,7 +1991,7 @@ function GenerateForm({
             { id: 'none', label: 'None'  },
             { id: 'glow', label: 'Glow'  },
           ] as { id: import('@/lib/prompt-builder').OutlineStyle; label: string }[]).map((o) => (
-            <button
+            <button type="button"
               key={o.id}
               onClick={() => setOutlineStyle(o.id)}
               className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
@@ -2017,7 +2016,7 @@ function GenerateForm({
       <div className="px-4 pb-4">
           <div className="flex gap-1.5 flex-wrap">
             {([4, 8, 16, 32, 64, 256] as import('@/lib/prompt-builder').PaletteSize[]).map((p) => (
-              <button
+              <button type="button"
                 key={p}
                 onClick={() => setPaletteSize(p)}
                 className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
@@ -2055,7 +2054,7 @@ function GenerateForm({
                 { id: 'water',     label: 'Water',      desc: 'Ripple surface loop'         },
                 { id: 'custom',    label: 'Custom',     desc: 'Describe your own'           },
               ] as { id: import('@/lib/prompt-builder').AnimationType; label: string; desc: string }[]).map((atype) => (
-                <button
+                <button type="button"
                   key={atype.id}
                   onClick={() => setAnimationType(atype.id)}
                   className="flex flex-col gap-0.5 p-2 rounded-md text-left transition-all duration-150"
@@ -2081,7 +2080,7 @@ function GenerateForm({
               </label>
               <div className="flex gap-1.5">
                 {([2, 4, 6, 8, 12] as number[]).map((fc) => (
-                  <button key={fc} onClick={() => setAnimFrameCount(fc)}
+                  <button type="button" key={fc} onClick={() => setAnimFrameCount(fc)}
                     className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
                     style={{
                       background: animFrameCount === fc ? 'var(--accent-dim)' : 'var(--surface-overlay)',
@@ -2099,7 +2098,7 @@ function GenerateForm({
               </label>
               <div className="flex gap-1.5">
                 {([4, 8, 12, 18, 24] as number[]).map((f) => (
-                  <button key={f} onClick={() => setAnimFps(f)}
+                  <button type="button" key={f} onClick={() => setAnimFps(f)}
                     className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
                     style={{
                       background: animFps === f ? 'var(--accent-dim)' : 'var(--surface-overlay)',
@@ -2118,7 +2117,7 @@ function GenerateForm({
                   { id: 'pingpong', label: 'Ping-Pong' },
                   { id: 'once',     label: 'Once'      },
                 ] as { id: typeof animLoop; label: string }[]).map((lm) => (
-                  <button key={lm.id} onClick={() => setAnimLoop(lm.id)}
+                  <button type="button" key={lm.id} onClick={() => setAnimLoop(lm.id)}
                     className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
                     style={{
                       background: animLoop === lm.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
@@ -2140,7 +2139,7 @@ function GenerateForm({
                   { id: 'gif',          label: 'GIF'         },
                   { id: 'png_sequence', label: 'PNG Sequence' },
                 ] as { id: 'gif' | 'png_sequence'; label: string }[]).map((fmt) => (
-                  <button key={fmt.id} onClick={() => setAnimOutputFormat(fmt.id)}
+                  <button type="button" key={fmt.id} onClick={() => setAnimOutputFormat(fmt.id)}
                     className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
                     style={{
                       background: animOutputFormat === fmt.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
@@ -2163,7 +2162,7 @@ function GenerateForm({
           <div className="p-4 flex flex-col gap-3">
             <div className="flex gap-1.5">
               {([4, 8] as (4|8)[]).map((n) => (
-                <button key={n} onClick={() => setDirectionCount(n)}
+                <button type="button" key={n} onClick={() => setDirectionCount(n)}
                   className="flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150 flex flex-col items-center"
                   style={{
                     background: directionCount === n ? 'var(--accent-dim)' : 'var(--surface-overlay)',
@@ -2198,8 +2197,8 @@ function GenerateForm({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={refImageUrl} alt="Reference" style={{ width: 64, height: 64, imageRendering: 'pixelated', borderRadius: 4, border: '1px solid var(--surface-border)', objectFit: 'contain', background: 'var(--surface-overlay)' }} />
                   <div className="flex gap-1.5">
-                    <button className="btn-ghost btn-xs flex-1" onClick={() => refImageInputRef.current?.click()}>Change</button>
-                    <button className="btn-ghost btn-xs flex-1" onClick={() => setRefImageUrl(null)}>Remove</button>
+                    <button type="button" className="btn-ghost btn-xs flex-1" onClick={() => refImageInputRef.current?.click()}>Change</button>
+                    <button type="button" className="btn-ghost btn-xs flex-1" onClick={() => setRefImageUrl(null)}>Remove</button>
                   </div>
                 </div>
               ) : (
@@ -2287,7 +2286,7 @@ function GenerateForm({
             const recSize = PRESET_CONFIG[stylePreset].size;
             const isRec = s === recSize;
             return (
-              <button
+              <button type="button"
                 key={s}
                 onClick={() => setSize(s)}
                 className="flex flex-col items-center flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
@@ -2331,7 +2330,7 @@ function GenerateForm({
             const tw = ar.w >= ar.h ? maxDim : Math.round(maxDim * ar.w / ar.h);
             const th = ar.h >= ar.w ? maxDim : Math.round(maxDim * ar.h / ar.w);
             return (
-              <button
+              <button type="button"
                 key={ar.id}
                 onClick={() => setAspectRatio(ar.id)}
                 className="flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150 flex flex-col items-center gap-1"
@@ -2371,7 +2370,7 @@ function GenerateForm({
             const info = providers.find((p) => p.id === pid);
             const supported = info?.capabilities?.[tool] !== false;
             return (
-              <button
+              <button type="button"
                 key={pid}
                 disabled={!supported}
                 onClick={() => setProvider(pid)}
@@ -2457,7 +2456,7 @@ function GenerateForm({
                 min={0}
                 max={2147483647}
               />
-              <button
+              <button type="button"
                 className="btn-secondary btn-icon flex-shrink-0"
                 onClick={() => setSeed(String(randomSeed()))}
                 title="Roll random seed"
@@ -2466,7 +2465,7 @@ function GenerateForm({
                 Rng
               </button>
               {seed && (
-                <button
+                <button type="button"
                   className="btn-ghost btn-icon flex-shrink-0"
                   onClick={() => setSeed('')}
                   title="Clear seed"
@@ -2546,7 +2545,7 @@ function GenerateForm({
                 Publishes result to the shared gallery
               </p>
             </div>
-            <button
+            <button type="button"
               className={cn('toggle-track', isPublic && 'on')}
               onClick={() => setIsPublic(!isPublic)}
               role="switch"
@@ -3323,7 +3322,7 @@ function StudioInner() {
           style={{ borderBottom: '1px solid var(--surface-border)' }}
         >
           {TOOLS.map((tool) => (
-            <button
+            <button type="button"
               key={tool.id}
               onClick={() => setActiveTool(tool.id)}
               style={{
@@ -3391,7 +3390,7 @@ function StudioInner() {
               )}
               {genPresets.map(p => (
                 <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                  <button
+                  <button type="button"
                     onClick={() => setPrompt(p.prompt)}
                     style={{ flex: 1, textAlign: 'left', fontSize: 11, padding: '3px 6px',
                              background: 'var(--surface-2)', border: '1px solid var(--surface-border)',
@@ -3400,7 +3399,7 @@ function StudioInner() {
                   >
                     {p.name}
                   </button>
-                  <button onClick={() => deleteGenPreset(p.id)}
+                  <button type="button" onClick={() => deleteGenPreset(p.id)}
                           style={{ fontSize: 10, padding: '2px 5px', background: 'transparent',
                                    border: '1px solid var(--surface-border)', borderRadius: 4, cursor: 'pointer', opacity: 0.6 }}>
                     ✕
@@ -3542,7 +3541,7 @@ function StudioInner() {
                 <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                   Describe the sound…
                 </label>
-                <button
+                <button type="button"
                   className="btn-secondary"
                   style={{ fontSize: '0.7rem', padding: '2px 8px', height: 'auto' }}
                   onClick={async () => {
@@ -3597,7 +3596,7 @@ function StudioInner() {
                 <label className="text-xs mb-1 block" style={{ color: 'var(--text-secondary)' }}>Prompt influence</label>
                 <div className="flex gap-1">
                   {([['Low', 0.3], ['Balanced', 0.6], ['Exact', 0.9]] as [string, number][]).map(([label, val]) => (
-                    <button
+                    <button type="button"
                       key={label}
                       onClick={() => setSfxInfluence(val)}
                       className="flex-1"
@@ -3621,7 +3620,7 @@ function StudioInner() {
               </div>
 
               {/* Generate button */}
-              <button
+              <button type="button"
                 className="btn btn-primary w-full"
                 style={{ height: 38, fontSize: '0.85rem', fontWeight: 600 }}
                 disabled={sfxLoading || !sfxPrompt.trim()}
@@ -3729,7 +3728,7 @@ function StudioInner() {
                 Quality
               </span>
               <div className="flex gap-1" style={{ fontSize: '0.75rem' }}>
-                <button
+                <button type="button"
                   style={{
                     padding: '2px 10px',
                     borderRadius: 4,
@@ -3744,7 +3743,7 @@ function StudioInner() {
                 >
                   Standard
                 </button>
-                <button
+                <button type="button"
                   style={{
                     padding: '2px 10px',
                     borderRadius: 4,
@@ -3843,7 +3842,7 @@ function StudioInner() {
                 <span>Batch</span>
                 <div className="flex gap-1">
                   {([1, 2, 4] as const).map(n => (
-                    <button
+                    <button type="button"
                       key={n}
                       onClick={() => { setBatchCount(n); setCompareMode(false); }}
                       style={{
@@ -4012,7 +4011,7 @@ function StudioInner() {
           <div className="modal" style={{ maxWidth: 440 }} onClick={e => e.stopPropagation()}>
             <div className="modal__header">
               <span className="modal__title">Keyboard Shortcuts</span>
-              <button className="btn btn--ghost btn--sm btn--icon" onClick={() => setShowShortcuts(false)} aria-label="Close">&times;</button>
+              <button type="button" className="btn btn--ghost btn--sm btn--icon" onClick={() => setShowShortcuts(false)} aria-label="Close">&times;</button>
             </div>
             <div className="modal__body" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {([

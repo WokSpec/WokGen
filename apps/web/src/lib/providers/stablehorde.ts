@@ -91,7 +91,7 @@ async function tryModel(
     headers: {
       'Content-Type': 'application/json',
       'apikey': apiKey,
-      'Client-Agent': 'WokGen:1.1.0:contact@wokgen.ai',
+      'Client-Agent': 'WokGen:1.1.0:contact@wokspec.org',
     },
     body: JSON.stringify({
       prompt: negPrompt ? `${prompt} ### ${negPrompt}` : prompt,
@@ -135,7 +135,7 @@ async function tryModel(
     await new Promise(r => setTimeout(r, 3_000));
 
     const checkRes = await fetchWithTimeout(`${HORDE_API}/generate/check/${id}`, {
-      headers: { 'apikey': apiKey, 'Client-Agent': 'WokGen:1.1.0:contact@wokgen.ai' },
+      headers: { 'apikey': apiKey, 'Client-Agent': 'WokGen:1.1.0:contact@wokspec.org' },
     }, Math.min(60_000, deadline - Date.now()));
 
     if (!checkRes.ok) continue; // transient check failure, keep polling
@@ -160,7 +160,7 @@ async function tryModel(
 
     // Retrieve result
     const statusRes = await fetchWithTimeout(`${HORDE_API}/generate/status/${id}`, {
-      headers: { 'apikey': apiKey, 'Client-Agent': 'WokGen:1.1.0:contact@wokgen.ai' },
+      headers: { 'apikey': apiKey, 'Client-Agent': 'WokGen:1.1.0:contact@wokspec.org' },
     }, 60_000);
 
     if (!statusRes.ok) {

@@ -13,7 +13,7 @@ const PRESETS = [
   { label: 'Hashtag',     pattern: '#\\w+',                                                       flags: 'gi' },
 ];
 
-const DEFAULT_TEST = `Hello world! Contact us at support@wokgen.ai or visit https://wokgen.ai
+const DEFAULT_TEST = `Hello world! Contact us at support@wokspec.org or visit https://wokgen.wokspec.org
 Created on 2024-01-15. Server IP: 192.168.1.100. Color: #ff5500
 Phone: +1 (555) 123-4567 or 555.987.6543
 **Bold text** and #hashtag support`;

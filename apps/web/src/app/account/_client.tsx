@@ -159,7 +159,7 @@ function ProfileTab({ user }: { user: Props['user'] }) {
       <div className="acct-field-group">
         <label className="acct-label">Public Profile</label>
         <div className="acct-profile-link-row">
-          <span className="acct-profile-link-prefix">wokgen.ai/profile/</span>
+          <span className="acct-profile-link-prefix">wokgen.wokspec.org/profile/</span>
           <Link href="/profile" className="acct-link">View your profile →</Link>
         </div>
       </div>

@@ -32,8 +32,8 @@ const ENDPOINTS: Endpoint[] = [
     responseBody: [
       { field: 'error', type: 'string', description: 'Error message when authentication fails' },
     ],
-    curlExample: `curl -H "Authorization: Bearer wg_sk_..." https://wokgen.ai/api/quota`,
-    jsExample: `const res = await fetch('https://wokgen.ai/api/quota', {
+    curlExample: `curl -H "Authorization: Bearer wg_sk_..." https://wokgen.wokspec.org/api/quota`,
+    jsExample: `const res = await fetch('https://wokgen.wokspec.org/api/quota', {
   headers: { Authorization: 'Bearer wg_sk_...' }
 });`,
     errors: [
@@ -66,11 +66,11 @@ const ENDPOINTS: Endpoint[] = [
       { field: 'status', type: '"pending" | "running"', description: 'Initial job status' },
       { field: 'estimatedSeconds', type: 'number', description: 'Estimated processing time' },
     ],
-    curlExample: `curl -X POST https://wokgen.ai/api/generate \\
+    curlExample: `curl -X POST https://wokgen.wokspec.org/api/generate \\
   -H "Authorization: Bearer wg_sk_..." \\
   -H "Content-Type: application/json" \\
   -d '{"prompt":"neon cat","mode":"pixel","quality":"standard"}'`,
-    jsExample: `const res = await fetch('https://wokgen.ai/api/generate', {
+    jsExample: `const res = await fetch('https://wokgen.wokspec.org/api/generate', {
   method: 'POST',
   headers: {
     Authorization: 'Bearer wg_sk_...',
@@ -102,10 +102,10 @@ const { jobId } = await res.json();`,
       { field: 'createdAt', type: 'string', description: 'ISO timestamp' },
     ],
     curlExample: `curl -H "Authorization: Bearer wg_sk_..." \\
-  https://wokgen.ai/api/jobs/job_abc123`,
+  https://wokgen.wokspec.org/api/jobs/job_abc123`,
     jsExample: `async function waitForJob(jobId: string) {
   while (true) {
-    const res = await fetch(\`https://wokgen.ai/api/jobs/\${jobId}\`, {
+    const res = await fetch(\`https://wokgen.wokspec.org/api/jobs/\${jobId}\`, {
       headers: { Authorization: 'Bearer wg_sk_...' },
     });
     const job = await res.json();
@@ -138,8 +138,8 @@ const { jobId } = await res.json();`,
       { field: 'total', type: 'number', description: 'Total matching assets' },
       { field: 'hasMore', type: 'boolean', description: 'Whether more pages exist' },
     ],
-    curlExample: `curl "https://wokgen.ai/api/gallery?limit=10&mode=pixel"`,
-    jsExample: `const res = await fetch('https://wokgen.ai/api/gallery?limit=10&mode=pixel');
+    curlExample: `curl "https://wokgen.wokspec.org/api/gallery?limit=10&mode=pixel"`,
+    jsExample: `const res = await fetch('https://wokgen.wokspec.org/api/gallery?limit=10&mode=pixel');
 const { items, total } = await res.json();`,
     errors: [
       { code: 400, description: 'Invalid query parameters' },
@@ -164,11 +164,11 @@ const { items, total } = await res.json();`,
       { field: 'conversationId', type: 'string', description: 'Use this ID for follow-up messages' },
       { field: 'model', type: 'string', description: 'Model used for this response' },
     ],
-    curlExample: `curl -X POST https://wokgen.ai/api/eral/chat \\
+    curlExample: `curl -X POST https://wokgen.wokspec.org/api/eral/chat \\
   -H "Authorization: Bearer wg_sk_..." \\
   -H "Content-Type: application/json" \\
   -d '{"message":"What pixel art styles work best for icons?"}'`,
-    jsExample: `const res = await fetch('https://wokgen.ai/api/eral/chat', {
+    jsExample: `const res = await fetch('https://wokgen.wokspec.org/api/eral/chat', {
   method: 'POST',
   headers: {
     Authorization: 'Bearer wg_sk_...',
@@ -199,8 +199,8 @@ const { reply, conversationId } = await res.json();`,
       { field: 'hdUsed', type: 'number', description: 'HD credits used this month' },
       { field: 'hdAvailable', type: 'number', description: 'HD credits remaining (alloc + top-up − used)' },
     ],
-    curlExample: `curl -H "Authorization: Bearer wg_sk_..." https://wokgen.ai/api/quota`,
-    jsExample: `const res = await fetch('https://wokgen.ai/api/quota', {
+    curlExample: `curl -H "Authorization: Bearer wg_sk_..." https://wokgen.wokspec.org/api/quota`,
+    jsExample: `const res = await fetch('https://wokgen.wokspec.org/api/quota', {
   headers: { Authorization: 'Bearer wg_sk_...' },
 });
 const quota = await res.json();
@@ -224,8 +224,8 @@ console.log(\`\${quota.todayUsed}/\${quota.dailyLimit} used today\`);`,
       { field: 'providers[].available', type: 'boolean', description: 'Whether provider is currently available' },
       { field: 'providers[].degraded', type: 'boolean', description: 'True if experiencing issues' },
     ],
-    curlExample: `curl https://wokgen.ai/api/providers`,
-    jsExample: `const res = await fetch('https://wokgen.ai/api/providers');
+    curlExample: `curl https://wokgen.wokspec.org/api/providers`,
+    jsExample: `const res = await fetch('https://wokgen.wokspec.org/api/providers');
 const { providers } = await res.json();
 const available = providers.filter((p: { available: boolean }) => p.available);`,
     errors: [],

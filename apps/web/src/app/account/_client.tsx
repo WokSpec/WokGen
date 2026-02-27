@@ -210,12 +210,12 @@ function BYOCTab() {
       body: JSON.stringify({ type, url }),
     });
     setTesting(null);
-    const d = await res.json().catch(() => ({})) as { ok?: boolean; models?: string[]; error?: string };
+    const d = await res.json().catch(() => ({})) as { ok?: boolean; models?: string[]; message?: string; error?: string };
     setTestResult(r => ({
       ...r,
       [type]: res.ok && d.ok
-        ? `✓ Connected${d.models ? ` — ${d.models.length} models detected` : ''}`
-        : `✗ ${d.error ?? 'Connection failed'}`,
+        ? `✓ ${d.message ?? 'Connected'}${d.models ? ` — ${d.models.length} models detected` : ''}`
+        : `✗ ${d.message ?? d.error ?? 'Connection failed'}`,
     }));
   };
 

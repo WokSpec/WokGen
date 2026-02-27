@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -112,7 +113,7 @@ function PersonaRow({
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function SimulateClient() {
-  const router = typeof window !== 'undefined' ? null : null; // use window.location for voice routing
+  const router = useRouter();
   const [personas, setPersonas]   = useState<Persona[]>([
     { id: uid(), name: 'Creative Director', personality: 'Visionary lead who sets the creative direction with bold, decisive choices', role: 'Creative Director' },
     { id: uid(), name: 'Art Director',      personality: 'Visual craftsperson obsessed with aesthetics, composition, and color theory', role: 'Art Director' },
@@ -248,7 +249,7 @@ export default function SimulateClient() {
     if (!transcript.length) return;
     // Format as Speaker: text for multi-speaker TTS
     const voiceText = transcript.map(t => `${t.agent}: ${t.message}`).join('\n\n');
-    window.location.href = `/voice/studio?text=${encodeURIComponent(voiceText.slice(0, 2000))}`;
+    router.push(`/voice/studio?text=${encodeURIComponent(voiceText.slice(0, 2000))}`)
   };
 
   const stopSimulation = () => {

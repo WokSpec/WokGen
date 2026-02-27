@@ -13,6 +13,7 @@
  */
 
 import { prisma } from '@/lib/db';
+import { log } from '@/lib/logger';
 
 // ─── Upstash Redis (primary) ───────────────────────────────────────────────
 
@@ -92,6 +93,9 @@ async function checkPostgres(
     return { allowed: true };
   } catch {
     // DB unavailable — fall through to in-memory (development only)
+    if (process.env.NODE_ENV === 'production') {
+      log.warn({ key }, 'rate-limit: falling back to in-memory (NOT shared across instances)');
+    }
     return checkInMemory(key, maxRequests, windowMs);
   }
 }

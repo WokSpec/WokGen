@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
     const daily = Array.from(dailyMap.entries()).map(([date, counts]) => ({ date, ...counts }));
 
     // Per-mode breakdown (today + all-time from recentJobs for today slice)
-    const modes = ['pixel', 'business', 'vector', 'emoji', 'uiux', 'voice', 'text'] as const;
+    const modes = ['pixel', 'business', 'vector', 'emoji', 'uiux', 'voice', 'code'] as const;
     const modeBreakdownToday: Record<string, number> = {};
     const modeBreakdownMonth: Record<string, number> = {};
     for (const m of modes) {

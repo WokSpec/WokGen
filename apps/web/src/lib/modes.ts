@@ -4,7 +4,7 @@
 // Used by: generate route, projects route, ModeSwitcher component.
 // ---------------------------------------------------------------------------
 
-export type ModeId = 'pixel' | 'vector' | 'business' | 'uiux' | 'voice' | 'text';
+export type ModeId = 'pixel' | 'vector' | 'business' | 'uiux' | 'voice' | 'code';
 export type ModeStatus = 'stable' | 'beta' | 'coming_soon';
 
 export interface ModeContract {
@@ -71,12 +71,12 @@ export const MODES_LIST: ModeContract[] = [
     models: {},
   },
   {
-    id: 'text',
-    label: 'Text',
-    shortLabel: 'Text',
+    id: 'code',
+    label: 'Code',
+    shortLabel: 'Code',
     accentColor: '#10b981',
     status: 'beta',
-    routes: { landing: '/text', studio: '/text/studio' },
+    routes: { landing: '/code', studio: '/code/studio' },
     models: {},
   },
 ];

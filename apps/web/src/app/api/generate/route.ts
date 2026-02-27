@@ -406,9 +406,9 @@ export const POST = withErrorHandler(async (req) => {
       { status: 400 },
     );
   }
-  if (resolvedMode === 'text') {
+  if (resolvedMode === 'code') {
     return NextResponse.json(
-      { error: 'Text generation uses /api/text/generate', code: 'WRONG_ENDPOINT' },
+      { error: 'Code generation uses /api/text/generate', code: 'WRONG_ENDPOINT' },
       { status: 400 },
     );
   }

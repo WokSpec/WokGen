@@ -45,7 +45,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
         {user.image ? (
-          <Image src={user.image} alt={user.name || 'User avatar'} width={48} height={48} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.08)' }} />
+          <Image src={user.image} alt={user.name || 'User avatar'} width={48} height={48} priority style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.08)' }} />
         ) : (
           <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--accent-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.125rem', color: 'var(--accent)', border: '2px solid var(--accent-glow)' }}>
             {initial}

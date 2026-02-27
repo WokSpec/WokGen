@@ -475,6 +475,23 @@ export default function UnifiedStudioClient({ type }: Props) {
           animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Mobile ─────────────────────────────────────────────────────── */
+        @media (max-width: 640px) {
+          .wok-studio-rail {
+            width: 40px;
+          }
+          .wok-studio-rail__label {
+            display: none;
+          }
+          .wok-studio-rail__item {
+            padding: 8px 2px;
+          }
+          .wok-studio-ctx-bar {
+            flex-wrap: wrap;
+            gap: 4px;
+          }
+        }
       `}</style>
     </div>
   );

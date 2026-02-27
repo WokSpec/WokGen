@@ -130,7 +130,7 @@ export default function CommandPalette() {
                     onSelect={() => runCommand(`/assets/${r.id}`)}
                   >
                     <div className="cmdk-item-thumb">
-                      <Image src={r.resultUrl} alt="" width={32} height={32} style={{ objectFit: 'cover' }} />
+                      <Image src={r.resultUrl} alt="" width={32} height={32} style={{ objectFit: 'cover' }} sizes="32px" />
                     </div>
                     <div className="cmdk-item-text">
                       <span className="cmdk-item-label">{r.prompt.slice(0, 50)}</span>

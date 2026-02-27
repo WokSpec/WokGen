@@ -47,7 +47,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
         {user.image ? (
-          <Image src={user.image} alt={user.name || 'User avatar'} width={48} height={48} priority style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.08)' }} />
+          <Image src={user.image} alt={user.name || 'User avatar'} width={48} height={48} priority style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)' }} />
         ) : (
           <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--accent-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.125rem', color: 'var(--accent)', border: '2px solid var(--accent-glow)' }}>
             {initial}
@@ -172,9 +172,9 @@ export default async function DashboardPage() {
             ),
             label: 'Settings',
             desc: 'Profile, connected accounts, and account management',
-            accent: 'rgba(255,255,255,0.5)',
-            bg: 'rgba(255,255,255,0.06)',
-            border: 'rgba(255,255,255,0.12)',
+            accent: 'var(--text-secondary)',
+            bg: 'var(--surface-raised)',
+            border: 'var(--border)',
           },
           {
             href: '/developers',
@@ -198,7 +198,7 @@ export default async function DashboardPage() {
               padding: '1.125rem',
               border: '1px solid var(--border)',
               borderRadius: '10px',
-              background: 'rgba(255,255,255,0.02)',
+              background: 'var(--surface-card)',
               textDecoration: 'none',
               transition: 'border-color 0.15s, background 0.15s',
             }}
@@ -223,15 +223,15 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick actions */}
-      <div style={{ padding: '1.25rem', border: '1px solid var(--border)', borderRadius: '10px', background: 'rgba(255,255,255,0.01)', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+      <div style={{ padding: '1.25rem', border: '1px solid var(--border)', borderRadius: '10px', background: 'var(--surface-card)', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', flexShrink: 0 }}>Quick create</span>
         <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
           {[
-            { label: 'Pixel Studio', href: '/studio' },
-            { label: 'Business Studio', href: '/business/studio' },
-            { label: 'Vector Studio', href: '/studio' },
-            { label: 'Voice Studio', href: '/voice/studio' },
-            { label: 'Code Studio', href: '/studio/code' },
+            { label: 'Pixel Studio', href: '/studio?type=pixel' },
+            { label: 'Brand Studio', href: '/studio?type=business' },
+            { label: 'Vector Studio', href: '/studio?type=vector' },
+            { label: 'Voice Studio', href: '/studio?type=voice' },
+            { label: 'Code Studio', href: '/studio?type=code' },
             { label: 'All Tools', href: '/tools' },
           ].map(a => (
             <Link key={a.href} href={a.href} style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', padding: '0.375rem 0.875rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.8125rem', color: 'var(--text-secondary)', textDecoration: 'none', transition: 'border-color 0.15s, color 0.15s' }}>
@@ -251,7 +251,7 @@ export default async function DashboardPage() {
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Daily generations</div>
             <div style={{ fontSize: '1.125rem', fontWeight: 700 }}>{generationsToday} <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--text-muted)' }}>/ {dailyLimit}</span></div>
-            <div style={{ marginTop: '0.375rem', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+            <div style={{ marginTop: '0.375rem', height: '4px', borderRadius: '2px', background: 'var(--surface-raised)', overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${Math.min(100, Math.round((generationsToday / dailyLimit) * 100))}%`, background: generationsToday / dailyLimit >= 0.9 ? 'var(--danger)' : 'var(--accent)', borderRadius: '2px', transition: 'width 0.3s' }} />
             </div>
           </div>

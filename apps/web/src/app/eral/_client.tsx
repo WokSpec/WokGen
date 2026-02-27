@@ -190,12 +190,14 @@ function parsePlanItems(content: string): PlanItem[] {
 
 function studioHref(studio: string): string {
   const lower = studio.toLowerCase();
-  if (lower.includes('pixel')) return '/studio/pixel';
-  if (lower.includes('business')) return '/studio/business';
-  if (lower.includes('voice')) return '/voice/studio';
-  if (lower.includes('logo')) return '/studio/logo';
+  if (lower.includes('pixel')) return '/studio?type=pixel';
+  if (lower.includes('business') || lower.includes('brand') || lower.includes('logo')) return '/studio?type=business';
+  if (lower.includes('voice')) return '/studio?type=voice';
+  if (lower.includes('vector')) return '/studio?type=vector';
+  if (lower.includes('uiux') || lower.includes('ui/ux') || lower.includes('ui ux')) return '/studio?type=uiux';
+  if (lower.includes('code') || lower.includes('text')) return '/studio?type=code';
   if (lower.includes('whiteboard')) return '/tools/whiteboard';
-  return '/studio';
+  return '/studio?type=pixel';
 }
 
 function newConversation(): Conversation {
@@ -1359,9 +1361,9 @@ export function EralPage({ userId }: { userId?: string }) {
           <div className="eral-v2-plan-panel__section">
             <p className="eral-v2-plan-panel__section-title">Modes</p>
             <div className="eral-v2-panel-suggestions">
-              <a href="/studio" className="eral-v2-panel-suggestion-btn">Pixel mode</a>
-              <a href="/studio" className="eral-v2-panel-suggestion-btn">Business mode</a>
-              <a href="/studio" className="eral-v2-panel-suggestion-btn">Voice mode</a>
+              <a href="/studio?type=pixel" className="eral-v2-panel-suggestion-btn">Pixel mode</a>
+              <a href="/studio?type=business" className="eral-v2-panel-suggestion-btn">Business mode</a>
+              <a href="/studio?type=voice" className="eral-v2-panel-suggestion-btn">Voice mode</a>
               <a href="/tools" className="eral-v2-panel-suggestion-btn">All Tools</a>
             </div>
           </div>

@@ -23,11 +23,11 @@ type NoteColor = 'default' | 'purple' | 'blue' | 'green' | 'amber' | 'red';
 
 const COLOR_SWATCHES: { value: NoteColor; bg: string; border: string }[] = [
   { value: 'default', bg: 'var(--bg-surface)',      border: 'var(--surface-border)' },
-  { value: 'purple',  bg: 'rgba(167,139,250,0.08)', border: 'rgba(167,139,250,0.25)' },
-  { value: 'blue',    bg: 'rgba(96,165,250,0.08)',  border: 'rgba(96,165,250,0.25)' },
-  { value: 'green',   bg: 'rgba(52,211,153,0.08)',  border: 'rgba(52,211,153,0.25)' },
-  { value: 'amber',   bg: 'rgba(245,158,11,0.08)',  border: 'rgba(245,158,11,0.25)' },
-  { value: 'red',     bg: 'rgba(239,68,68,0.08)',   border: 'rgba(239,68,68,0.25)' },
+  { value: 'purple',  bg: 'var(--accent-subtle)', border: 'var(--accent-glow)' },
+  { value: 'blue',    bg: 'var(--info-bg)', border: 'var(--info)' },
+  { value: 'green',   bg: 'var(--success-bg)', border: 'var(--success-glow)' },
+  { value: 'amber',   bg: 'var(--warning-bg)', border: 'var(--warning)' },
+  { value: 'red',     bg: 'var(--danger-bg)', border: 'var(--danger-border)' },
 ];
 
 const GUEST_KEY = 'wokgen-eral-notes-guest';

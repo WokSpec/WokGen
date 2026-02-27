@@ -152,21 +152,21 @@ export default function PricingPage() {
 
           {/* PRO */}
           <div style={{
-            border: '2px solid rgba(96,165,250,0.35)',
+            border: '2px solid var(--blue)',
             borderRadius: '14px',
             padding: '1.75rem',
-            background: 'rgba(96,165,250,0.04)',
+            background: 'var(--surface-card)',
             display: 'flex',
             flexDirection: 'column',
             gap: '1.25rem',
             position: 'relative',
           }}>
-            <div style={{ position: 'absolute', top: '-13px', left: '50%', transform: 'translateX(-50%)', background: '#1e3a5f', border: '1px solid rgba(96,165,250,0.4)', borderRadius: '99px', padding: '0.2rem 0.875rem', fontSize: '0.75rem', fontWeight: 600, color: '#60a5fa', whiteSpace: 'nowrap' }}>
+            <div style={{ position: 'absolute', top: '-13px', left: '50%', transform: 'translateX(-50%)', background: 'var(--surface-raised)', border: '1px solid var(--blue)', borderRadius: '99px', padding: '0.2rem 0.875rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--blue)', whiteSpace: 'nowrap' }}>
               Coming Soon
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#60a5fa' }}>PRO</span>
+                <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--blue)' }}>PRO</span>
               </div>
               <div style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1.1, color: 'var(--text-muted)' }}>TBD<span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-muted)' }}> / mo</span></div>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Power-user features with unlimited generation and private workspace.</p>
@@ -175,7 +175,7 @@ export default function PricingPage() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               {PRO_FEATURES.map(f => (
                 <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                  <span style={{ color: '#60a5fa', flexShrink: 0, marginTop: '0.05rem' }}>✓</span>
+                  <span style={{ color: 'var(--blue)', flexShrink: 0, marginTop: '0.05rem' }}>✓</span>
                   {f}
                 </li>
               ))}
@@ -184,17 +184,17 @@ export default function PricingPage() {
 
           {/* ENTERPRISE */}
           <div style={{
-            border: '2px solid rgba(52,211,153,0.3)',
+            border: '2px solid var(--green)',
             borderRadius: '14px',
             padding: '1.75rem',
-            background: 'rgba(52,211,153,0.03)',
+            background: 'var(--surface-card)',
             display: 'flex',
             flexDirection: 'column',
             gap: '1.25rem',
           }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#34d399' }}>ENTERPRISE</span>
+                <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--green)' }}>ENTERPRISE</span>
               </div>
               <div style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1.1 }}>Custom</div>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Dedicated infrastructure, SSO, audit logs, and white-label options for teams.</p>
@@ -206,12 +206,12 @@ export default function PricingPage() {
                 textAlign: 'center',
                 padding: '0.625rem 1.25rem',
                 borderRadius: '8px',
-                border: '1px solid rgba(52,211,153,0.4)',
-                color: '#34d399',
+                border: '1px solid var(--green)',
+                color: 'var(--green)',
                 fontWeight: 600,
                 fontSize: '0.9375rem',
                 textDecoration: 'none',
-                background: 'rgba(52,211,153,0.08)',
+                background: 'var(--success-bg)',
               }}
             >
               Contact us →
@@ -219,7 +219,7 @@ export default function PricingPage() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               {ENTERPRISE_FEATURES.map(f => (
                 <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                  <span style={{ color: '#34d399', flexShrink: 0, marginTop: '0.05rem' }}>✓</span>
+                  <span style={{ color: 'var(--green)', flexShrink: 0, marginTop: '0.05rem' }}>✓</span>
                   {f}
                 </li>
               ))}

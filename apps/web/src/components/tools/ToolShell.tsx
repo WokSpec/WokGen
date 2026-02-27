@@ -46,7 +46,7 @@ export default function ToolShell({
               width: 40,
               height: 40,
               borderRadius: 6,
-              background: '#111827',
+              background: 'var(--surface-card)',
               color: '#fff',
               fontFamily: 'monospace',
               fontSize: 12,

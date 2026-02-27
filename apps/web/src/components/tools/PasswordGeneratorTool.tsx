@@ -35,7 +35,7 @@ function calcStrength(pwd: string): { label: string; level: number } {
   return             { label: 'Very Strong',   level: 4 };
 }
 
-const STRENGTH_COLORS = ['', '#f87171', '#fbbf24', '#34d399', '#818cf8'];
+const STRENGTH_COLORS = ['', 'var(--danger)', 'var(--warning)', 'var(--success)', 'var(--accent)'];
 
 export default function PasswordGeneratorTool() {
   const [length,   setLength]   = useState(16);
@@ -122,9 +122,9 @@ export default function PasswordGeneratorTool() {
         .pwd-tool__slider-label { display: flex; justify-content: space-between; align-items: center; }
         .pwd-tool__length-val {
           font-size: 20px; font-weight: 700; font-family: 'Menlo','Consolas',monospace;
-          color: #818cf8;
+          color: var(--accent);
         }
-        .pwd-tool__slider { width: 100%; accent-color: #818cf8; cursor: pointer; }
+        .pwd-tool__slider { width: 100%; accent-color: var(--accent); cursor: pointer; }
         .pwd-tool__slider-ends { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
         .pwd-tool__checkboxes { display: flex; flex-wrap: wrap; gap: 12px; }
         .pwd-tool__checkbox {
@@ -154,7 +154,7 @@ export default function PasswordGeneratorTool() {
           border: 1px solid var(--surface-border); border-radius: 4px;
           transition: background 0.12s; flex-shrink: 0;
         }
-        .pwd-tool__copy-btn:hover { background: rgba(255,255,255,0.1); }
+        .pwd-tool__copy-btn:hover { background: var(--surface-hover); }
       `}</style>
     </div>
   );

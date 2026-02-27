@@ -172,7 +172,7 @@ export default function ChangelogWriterTool() {
         .cl-tool__output-btns { display: flex; gap: 8px; }
         .cl-tool__preview { padding: 16px; font-size: 13px; font-family: 'Menlo','Consolas',monospace; white-space: pre-wrap; color: var(--text); max-height: 480px; overflow-y: auto; margin: 0; }
         .btn.btn-sm { padding: 5px 12px; font-size: 12px; cursor: pointer; background: var(--surface-raised); border: 1px solid var(--surface-border); color: var(--text); border-radius: 4px; }
-        .btn.btn-sm:hover { background: rgba(255,255,255,0.1); }
+        .btn.btn-sm:hover { background: var(--surface-hover); }
       `}</style>
     </div>
   );

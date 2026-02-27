@@ -232,7 +232,7 @@ export default function JsonTool() {
           )}
           {/* Stat bar */}
           {parsedData !== null && output && (
-            <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', paddingTop: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-faint)', paddingTop: '0.5rem' }}>
               {typeof parsedData === 'object' && parsedData !== null && !Array.isArray(parsedData) && (
                 <span>{Object.keys(parsedData as object).length} top-level keys</span>
               )}

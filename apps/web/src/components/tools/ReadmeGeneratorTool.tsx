@@ -200,14 +200,14 @@ export default function ReadmeGeneratorTool() {
           border: 1px solid var(--surface-border); border-radius: 6px;
           outline: none; width: 100%;
         }
-        .tool-input:focus, .tool-select:focus { border-color: #818cf8; }
+        .tool-input:focus, .tool-select:focus { border-color: var(--accent); }
         .tool-textarea {
           padding: 7px 10px; font-size: 12px; line-height: 1.5;
           background: var(--bg); color: var(--text);
           border: 1px solid var(--surface-border); border-radius: 6px;
           outline: none; resize: vertical; font-family: inherit; width: 100%;
         }
-        .tool-textarea:focus { border-color: #818cf8; }
+        .tool-textarea:focus { border-color: var(--accent); }
         .readme-gen__check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
         .readme-gen__preview { display: flex; flex-direction: column; }
         .readme-gen__preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }

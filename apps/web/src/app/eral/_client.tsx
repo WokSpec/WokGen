@@ -410,8 +410,8 @@ function MessageBubble({
         )}
         {!isUser && !isStreaming && msg.wap && (
           <div style={{
-            background: 'rgba(129,140,248,0.1)',
-            border: '1px solid rgba(129,140,248,0.2)',
+            background: 'var(--accent-subtle)',
+            border: '1px solid var(--accent-glow)',
             borderRadius: 6,
             padding: '6px 12px',
             marginTop: 4,
@@ -1460,7 +1460,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
       {callActive && (
         <div style={{
           position: 'absolute', inset: 0, zIndex: 100,
-          background: 'rgba(10,10,20,0.96)',
+          background: 'var(--bg)',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           gap: 24, backdropFilter: 'blur(12px)',
@@ -1470,16 +1470,16 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
             {callState === 'speaking' && (
               <span style={{
                 position: 'absolute', inset: -12, borderRadius: '50%',
-                border: '2px solid rgba(129,140,248,0.4)',
+                border: '2px solid var(--accent-glow)',
                 animation: 'call-ring 1.2s ease-out infinite',
               }} />
             )}
             <div style={{
               width: 120, height: 120, borderRadius: '50%',
-              background: 'linear-gradient(135deg,#312e81,#4c1d95)',
-              border: '3px solid rgba(129,140,248,0.4)',
+              background: 'var(--accent-muted)',
+              border: '3px solid var(--accent-glow)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 52, boxShadow: '0 0 40px rgba(129,140,248,0.2)',
+              fontSize: 52, boxShadow: '0 0 40px var(--accent-glow)',
             }}>
               Eral
             </div>
@@ -1500,9 +1500,9 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           {/* Transcript */}
           {callTranscript && (
             <div style={{
-              background: 'rgba(30,27,75,0.7)', borderRadius: 12,
+              background: 'var(--surface-raised)', borderRadius: 12,
               padding: '14px 20px', maxWidth: 420, width: '90%',
-              border: '1px solid rgba(129,140,248,0.2)',
+              border: '1px solid var(--accent-glow)',
             }}>
               {callTranscript.user && (
                 <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: '0 0 8px' }}>
@@ -1526,7 +1526,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
               value={callVoiceId}
               onChange={(e) => setCallVoiceId(e.target.value)}
               style={{
-                background: 'rgba(30,27,75,0.8)', border: '1px solid rgba(129,140,248,0.25)',
+                background: 'var(--surface-raised)', border: '1px solid var(--accent-glow)',
                 borderRadius: 6, color: 'var(--text, var(--accent-2))', fontSize: 12, padding: '4px 8px', cursor: 'pointer',
               }}
             >
@@ -1554,7 +1554,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
               width: 72, height: 72, borderRadius: '50%',
               background: callState === 'listening' ? '#dc2626' :
                           callState === 'speaking' ? 'var(--accent-muted)' : 'transparent',
-              border: '2px solid rgba(129,140,248,0.4)',
+              border: '2px solid var(--accent-glow)',
               cursor: callState === 'processing' ? 'default' : 'pointer',
               fontSize: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 20px rgba(129,140,248,0.3)',
@@ -1665,8 +1665,8 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           align-items: center;
           gap: 6px;
           padding: 7px 10px;
-          background: rgba(129,140,248,0.12);
-          border: 1px solid rgba(129,140,248,0.25);
+          background: var(--accent-subtle);
+          border: 1px solid var(--accent-glow);
           border-radius: 4px;
           color: var(--accent-secondary, var(--accent));
           font-size: 12px;
@@ -1675,8 +1675,8 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           transition: background 0.15s, border-color 0.15s;
         }
         .eral-new-chat-btn:hover {
-          background: rgba(129,140,248,0.2);
-          border-color: rgba(129,140,248,0.4);
+          background: var(--accent-glow);
+          border-color: var(--accent-glow);
         }
 
         .eral-conv-list {
@@ -1695,7 +1695,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           transition: background 0.1s;
         }
         .eral-conv-item:hover { background: var(--surface-card); }
-        .eral-conv-item-active { background: rgba(129,140,248,0.1) !important; }
+        .eral-conv-item-active { background: var(--accent-subtle) !important; }
         .eral-conv-title {
           font-size: 12px;
           color: var(--text-muted);
@@ -1817,7 +1817,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           gap: 6px;
           padding: 4px 10px;
           background: rgba(129,140,248,0.08);
-          border: 1px solid rgba(129,140,248,0.2);
+          border: 1px solid var(--accent-glow);
           border-radius: 20px;
           color: var(--accent-secondary, var(--accent));
           font-size: 12px;
@@ -1889,8 +1889,8 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
 
         .eral-call-btn {
           padding: 4px 12px;
-          background: rgba(129,140,248,0.1);
-          border: 1px solid rgba(129,140,248,0.25);
+          background: var(--accent-subtle);
+          border: 1px solid var(--accent-glow);
           border-radius: 4px;
           color: var(--accent-secondary, var(--accent));
           font-size: 12px;
@@ -1899,7 +1899,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
         }
         .eral-call-btn:hover {
           background: rgba(129,140,248,0.18);
-          border-color: rgba(129,140,248,0.4);
+          border-color: var(--accent-glow);
         }
         .eral-call-btn-active {
           background: rgba(220,38,38,0.15);
@@ -2013,7 +2013,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           align-items: center;
           justify-content: center;
           background: rgba(129,140,248,0.15);
-          border: 1px solid rgba(129,140,248,0.2);
+          border: 1px solid var(--accent-glow);
           flex-shrink: 0;
           margin-top: 2px;
         }
@@ -2032,8 +2032,8 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           word-break: break-word;
         }
         .eral-bubble-user {
-          background: rgba(129,140,248,0.12);
-          border: 1px solid rgba(129,140,248,0.2);
+          background: var(--accent-subtle);
+          border: 1px solid var(--accent-glow);
           color: var(--text);
           border-radius: 8px 2px 8px 8px;
         }
@@ -2211,7 +2211,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           transition: border-color 0.2s, box-shadow 0.2s;
         }
         .eral-input-box:focus-within {
-          border-color: rgba(129,140,248,0.4);
+          border-color: var(--accent-glow);
           box-shadow: 0 0 0 3px rgba(129,140,248,0.08);
         }
         .eral-textarea {
@@ -2295,7 +2295,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           white-space: nowrap;
         }
         .eral-cap-chip:hover:not(:disabled) {
-          background: rgba(129,140,248,0.1);
+          background: var(--accent-subtle);
           border-color: rgba(129,140,248,0.3);
           color: var(--accent-2);
         }
@@ -2336,7 +2336,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
         .eral-followup-chip {
           padding: 4px 10px;
           background: rgba(129,140,248,0.06);
-          border: 1px solid rgba(129,140,248,0.2);
+          border: 1px solid var(--accent-glow);
           border-radius: 12px;
           color: var(--accent-secondary, var(--accent));
           font-size: 11px;
@@ -2346,7 +2346,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
         }
         .eral-followup-chip:hover {
           background: rgba(129,140,248,0.14);
-          border-color: rgba(129,140,248,0.4);
+          border-color: var(--accent-glow);
         }
 
         /* Tool suggestion banner */

@@ -80,7 +80,7 @@ export default function GalleryClient() {
 
   return (
     <div className="gallery-page">
-      <h1 style={{ margin: '0 0 1.5rem', fontSize: '1.5rem', color: '#e2e8f0' }}>My Gallery</h1>
+      <h1 style={{ margin: '0 0 1.5rem', fontSize: '1.5rem', color: 'var(--text)' }}>My Gallery</h1>
 
       {/* Filter + search bar */}
       <div className="flex gap-3 mb-6">

@@ -62,11 +62,11 @@ const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
 
 const CONTENT_TYPE_COLORS: Record<ContentType, string> = {
   narrative: 'var(--accent)',
-  technical: '#60a5fa',
-  marketing: '#fb923c',
-  dialogue:  '#34d399',
-  news:      '#f59e0b',
-  casual:    '#f472b6',
+  technical: 'var(--blue)',
+  marketing: 'var(--orange)',
+  dialogue:  'var(--green)',
+  news:      'var(--yellow)',
+  casual:    'var(--pink)',
 };
 
 const PROVIDER_LABELS: Record<string, string> = {
@@ -76,9 +76,9 @@ const PROVIDER_LABELS: Record<string, string> = {
 };
 
 const PROVIDER_COLORS: Record<string, string> = {
-  elevenlabs:  '#f59e0b',
-  openai:      '#22c55e',
-  huggingface: '#60a5fa',
+  elevenlabs:  'var(--yellow)',
+  openai:      'var(--green)',
+  huggingface: 'var(--blue)',
 };
 
 const ACCENT = 'var(--accent)';
@@ -686,7 +686,7 @@ function VoiceStudioInner() {
                       width: 14,
                       height: 14,
                       borderRadius: '50%',
-                      border: `2px solid #00000044`,
+                      border: `2px solid var(--overlay-30)`,
                       borderTopColor: '#000',
                       animation: 'spin 0.7s linear infinite',
                       display: 'inline-block',
@@ -808,7 +808,7 @@ function VoiceStudioInner() {
                   style={{
                     padding: '7px 14px',
                     borderRadius: 8,
-                    background: '#4f46e5',
+                    background: 'var(--accent-dim)',
                     border: 'none',
                     color: '#fff',
                     fontSize: 12,

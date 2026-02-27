@@ -121,7 +121,7 @@ function Spinner() {
         height: 20,
         borderRadius: '50%',
         border: '2px solid var(--surface-border)',
-        borderTopColor: '#34d399',
+        borderTopColor: 'var(--green)',
         animation: 'spin 0.7s linear infinite',
         flexShrink: 0,
       }}
@@ -405,7 +405,7 @@ function VectorStudioInner() {
     finally { setBgRemoving(false); }
   }, [toastError, toastSuccess]);
 
-  const ACCENT = '#34d399';
+  const ACCENT = 'var(--green)';
 
   return (
     <div className="studio-layout">
@@ -471,7 +471,7 @@ function VectorStudioInner() {
                 padding: '2px 8px',
                 borderRadius: 4,
                 background: isEnhancing ? 'var(--surface-overlay)' : 'rgba(139,92,246,0.15)',
-                border: '1px solid rgba(139,92,246,0.4)',
+                border: '1px solid var(--accent-glow)',
                 color: isEnhancing ? 'var(--text-disabled)' : 'var(--accent)',
                 cursor: isEnhancing || !prompt.trim() ? 'not-allowed' : 'pointer',
                 opacity: !prompt.trim() ? 0.4 : 1,

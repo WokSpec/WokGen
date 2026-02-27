@@ -14,7 +14,7 @@ interface PlanItem {
 
 const MODE_COLORS: Record<string, string> = {
   pixel: 'var(--accent)', business: '#60a5fa', vector: '#34d399',
-  emoji: '#fbbf24', uiux: '#f472b6', voice: '#fb923c', text: '#94a3b8',
+  emoji: 'var(--yellow)', uiux: 'var(--pink)', voice: 'var(--orange)', text: 'var(--text-muted)',
 };
 
 const MODE_STUDIOS: Record<string, string> = {

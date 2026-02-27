@@ -80,7 +80,7 @@ function LoginForm() {
           width: 100%;
           max-width: 380px;
           background: var(--bg-surface, #141414);
-          border: 1px solid var(--border, #2c2c2c);
+          border: 1px solid var(--border);
           border-radius: 4px;
           padding: 2.5rem;
           display: flex;
@@ -100,8 +100,8 @@ function LoginForm() {
           letter-spacing: 0.06em;
           text-transform: uppercase;
           color: var(--accent);
-          background: rgba(167,139,250,.1);
-          border: 1px solid rgba(167,139,250,.25);
+          background: var(--accent-subtle);
+          border: 1px solid var(--accent-glow);
           border-radius: 2px;
           padding: 2px 8px;
         }
@@ -113,12 +113,12 @@ function LoginForm() {
         }
         .login-sub {
           font-size: 0.78rem;
-          color: var(--text-muted, #666);
+          color: var(--text-muted);
           margin: 0;
         }
         .login-desc {
           font-size: 0.85rem;
-          color: var(--text-muted, #888);
+          color: var(--text-muted);
           text-align: center;
           margin: 0;
           line-height: 1.5;
@@ -136,9 +136,9 @@ function LoginForm() {
           width: 100%;
           padding: 0.7rem 1rem;
           border-radius: 4px;
-          border: 1px solid var(--border, #2c2c2c);
-          background: var(--bg-elevated, #1c1c1c);
-          color: var(--text, #ebebeb);
+          border: 1px solid var(--border);
+          background: var(--surface-card);
+          color: var(--text);
           font-size: 0.875rem;
           font-weight: 500;
           cursor: pointer;
@@ -146,7 +146,7 @@ function LoginForm() {
         }
         .login-btn:hover {
           background: var(--surface-raised);
-          border-color: #3a3a3a;
+          border-color: var(--border);
         }
         .login-btn--google {
           background: #fff;
@@ -161,7 +161,7 @@ function LoginForm() {
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          color: var(--text-faint, #464646);
+          color: var(--text-faint);
           font-size: 0.75rem;
         }
         .login-divider::before,
@@ -179,7 +179,7 @@ function LoginForm() {
           text-decoration: none;
           padding: 0.6rem;
           border-radius: 4px;
-          border: 1px solid rgba(167,139,250,.25);
+          border: 1px solid var(--accent-glow);
           transition: background 0.15s, border-color 0.15s;
         }
         .login-guest:hover {
@@ -188,7 +188,7 @@ function LoginForm() {
         }
         .login-hint {
           font-size: 0.72rem;
-          color: var(--text-faint, #464646);
+          color: var(--text-faint);
           text-align: center;
           margin: -0.5rem 0 0;
           line-height: 1.5;
@@ -201,11 +201,11 @@ function LoginForm() {
         }
         .login-back {
           font-size: 0.78rem;
-          color: var(--text-faint, #464646);
+          color: var(--text-faint);
           text-decoration: none;
           transition: color 0.15s;
         }
-        .login-back:hover { color: var(--text-muted, #888); }
+        .login-back:hover { color: var(--text-muted); }
       `}</style>
     </main>
   );

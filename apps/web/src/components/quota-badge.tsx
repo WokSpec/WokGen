@@ -43,9 +43,9 @@ export function QuotaBadge() {
         title="Daily standard generation limit. Resets at midnight UTC."
         style={{
           ...basePill,
-          background: 'rgba(56,183,100,0.12)',
-          border:     '1px solid rgba(56,183,100,0.3)',
-          color:      '#38B764',
+          background: 'var(--success-bg)',
+          border:     '1px solid var(--success-glow)',
+          color:      'var(--success)',
         }}
       >
         Unlimited
@@ -62,9 +62,9 @@ export function QuotaBadge() {
         <span
           style={{
             ...basePill,
-            background: 'rgba(177,62,83,0.15)',
-            border:     '1px solid rgba(177,62,83,0.35)',
-            color:      '#EF7D57',
+            background: 'var(--danger-bg)',
+            border:     '1px solid var(--danger-border)',
+            color:      'var(--danger)',
           }}
         >
           {used} / {limit} today
@@ -74,7 +74,7 @@ export function QuotaBadge() {
           style={{
             fontSize:       10,
             fontWeight:     600,
-            color:          '#41A6F6',
+            color:          'var(--blue)',
             textDecoration: 'none',
             whiteSpace:     'nowrap',
           }}
@@ -91,8 +91,8 @@ export function QuotaBadge() {
       title="Daily standard generation limit. Resets at midnight UTC."
       style={{
         ...basePill,
-        background: 'rgba(86,108,134,0.15)',
-        border:     '1px solid rgba(86,108,134,0.25)',
+        background: 'var(--surface-raised)',
+        border:     '1px solid var(--border)',
         color:      'var(--text-muted, #94B0C2)',
       }}
     >

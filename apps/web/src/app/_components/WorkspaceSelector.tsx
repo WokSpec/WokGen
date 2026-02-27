@@ -252,11 +252,11 @@ export default function WorkspaceSelector({ mode, activeWorkspaceId, onChange }:
                       />
                     </div>
                   ) : deleteConf === ws.id ? (
-                    <div style={{ padding: '0.35rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'rgba(239,68,68,0.08)' }}>
-                      <span style={{ flex: 1, fontSize: '0.72rem', color: '#fca5a5' }}>Delete "{ws.name}"?</span>
+                    <div style={{ padding: '0.35rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'var(--danger-bg)' }}>
+                      <span style={{ flex: 1, fontSize: '0.72rem', color: 'var(--danger)' }}>Delete "{ws.name}"?</span>
                       <button type="button"
                         onClick={() => handleDelete(ws.id)}
-                        style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 3, padding: '2px 8px', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}
+                        style={{ background: 'var(--danger)', color: 'var(--text-on-accent)', border: 'none', borderRadius: 3, padding: '2px 8px', fontSize: '0.68rem', cursor: 'pointer', fontWeight: 600 }}
                       >
                         Delete
                       </button>
@@ -320,7 +320,7 @@ export default function WorkspaceSelector({ mode, activeWorkspaceId, onChange }:
                           onClick={() => setDeleteConf(ws.id)}
                           title="Delete workspace"
                           style={{ background: 'transparent', border: 'none', color: 'var(--text-faint, #555)', cursor: 'pointer', padding: '2px 4px', fontSize: 11, borderRadius: 3 }}
-                          onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
+                          onMouseEnter={e => (e.currentTarget.style.color = 'var(--danger)')}
                           onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-faint, #555)')}
                         >
                           ×
@@ -336,7 +336,7 @@ export default function WorkspaceSelector({ mode, activeWorkspaceId, onChange }:
           {/* Create workspace */}
           <div style={{ borderTop: '1px solid var(--surface-border)', paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
             {error && (
-              <p style={{ fontSize: '0.68rem', color: '#fca5a5', padding: '0.25rem 0.75rem', margin: 0 }}>{error}</p>
+              <p style={{ fontSize: '0.68rem', color: 'var(--danger)', padding: '0.25rem 0.75rem', margin: 0 }}>{error}</p>
             )}
             {isCreating ? (
               <div style={{ padding: '0.35rem 0.75rem', display: 'flex', gap: '0.35rem' }}>

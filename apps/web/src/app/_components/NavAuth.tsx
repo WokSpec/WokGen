@@ -283,7 +283,7 @@ export function NavAuth() {
           position: absolute; top: 100%; right: 0; margin-top: -1px;
           background: var(--bg-surface, #111); border: 1px solid var(--border, #2a2a2a);
           border-radius: 8px; overflow: hidden; min-width: 210px; z-index: 200;
-          box-shadow: 0 12px 32px rgba(0,0,0,.6), 0 2px 8px rgba(0,0,0,.4);
+          box-shadow: var(--shadow-lg);
           animation: menuIn 0.1s ease;
         }
         @keyframes menuIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
@@ -312,7 +312,7 @@ export function NavAuth() {
           transition: background 0.1s, color 0.1s;
         }
         .nav-user-item:hover { background: var(--surface-raised, #1e1e1e); color: var(--text, #f0f0f0); }
-        .nav-user-item--danger:hover { color: #ef4444; background: rgba(239,68,68,.06); }
+        .nav-user-item--danger:hover { color: var(--danger); background: var(--danger-bg); }
         .nav-user-item--toggle { justify-content: space-between; }
         .nav-user-item--toggle:hover { background: var(--surface-raised, #1e1e1e); color: var(--text, #f0f0f0); }
         .nav-user-item:disabled { opacity: 0.6; cursor: wait; }

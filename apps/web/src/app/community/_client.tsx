@@ -678,7 +678,7 @@ export default function CommunityClient() {
                   Public by default
                 </button>
               )}
-              <Link href="/studio" className="community-create-link">✦ Create</Link>
+              <Link href="/studio?type=pixel" className="community-create-link">✦ Create</Link>
             </div>
           </div>
 

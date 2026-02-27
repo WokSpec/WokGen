@@ -645,7 +645,7 @@ function IntegrationsTab() {
             <p className="account-v2-integration-card__name">Discord</p>
             <p className="account-v2-integration-card__desc">Connect Discord to use the WokGen bot in your server.</p>
           </div>
-          <button type="button" className="acct-btn-ghost-sm">Connect</button>
+          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '4px', padding: '3px 8px' }}>Coming soon</span>
         </div>
 
         <div className="account-v2-integration-card">

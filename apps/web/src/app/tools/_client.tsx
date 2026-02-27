@@ -47,7 +47,7 @@ function ToolCard({ tool, starred, onStar, onVisit }: ToolCardProps) {
               width: 36,
               height: 36,
               borderRadius: 6,
-              background: '#111827',
+              background: 'var(--surface-card)',
               color: '#fff',
               fontFamily: 'monospace',
               fontSize: 12,

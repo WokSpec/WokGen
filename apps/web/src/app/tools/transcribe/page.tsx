@@ -101,7 +101,7 @@ export default function TranscribePage() {
           {loading ? 'Transcribing... (~30–60s)' : 'Transcribe Audio'}
         </button>
 
-        {error && <p style={{ marginTop: '1rem', color: '#f87171', fontSize: '0.875rem' }}>{error}</p>}
+        {error && <p style={{ marginTop: '1rem', color: 'var(--danger)', fontSize: '0.875rem' }}>{error}</p>}
 
         {result && (
           <div style={{ marginTop: '1.5rem' }}>
@@ -134,7 +134,7 @@ export default function TranscribePage() {
                   {result.words.map((word: any, i: number) => (
                     <span
                       key={i}
-                      style={word.confidence < 0.7 ? { textDecoration: 'underline', textDecorationStyle: 'dotted', color: '#facc15' } : undefined}
+                      style={word.confidence < 0.7 ? { textDecoration: 'underline', textDecorationStyle: 'dotted', color: 'var(--yellow)' } : undefined}
                       title={`Confidence: ${Math.round((word.confidence ?? 1) * 100)}%`}
                     >
                       {word.text}{' '}

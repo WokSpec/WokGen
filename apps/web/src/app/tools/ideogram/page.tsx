@@ -79,7 +79,7 @@ export default function IdeogramPage() {
         <button type="button" onClick={generate} disabled={loading || !prompt.trim()} className="btn btn-primary" style={{ padding: '0.625rem 1.5rem' }}>
           {loading ? 'Generating...' : 'Generate with Ideogram'}
         </button>
-        {error && <p style={{ marginTop: '0.875rem', color: '#f87171', fontSize: '0.875rem' }}>{error}</p>}
+        {error && <p style={{ marginTop: '0.875rem', color: 'var(--danger)', fontSize: '0.875rem' }}>{error}</p>}
         {result?.url && (
           <div style={{ marginTop: '1.5rem' }}>
             <div style={{ position: 'relative', width: '100%', maxWidth: '600px', aspectRatio: '1', borderRadius: '10px', border: '1px solid var(--border)', overflow: 'hidden' }}>

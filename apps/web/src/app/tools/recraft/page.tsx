@@ -78,7 +78,7 @@ export default function RecraftPage() {
         <button type="button" onClick={generate} disabled={loading || !prompt.trim()} className="btn btn-primary" style={{ padding: '0.625rem 1.5rem' }}>
           {loading ? 'Generating...' : 'Generate with Recraft'}
         </button>
-        {error && <p style={{ marginTop: '0.875rem', color: '#f87171', fontSize: '0.875rem' }}>{error}</p>}
+        {error && <p style={{ marginTop: '0.875rem', color: 'var(--danger)', fontSize: '0.875rem' }}>{error}</p>}
         {images.length > 0 && (
           <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
             {images.map((url, i) => (

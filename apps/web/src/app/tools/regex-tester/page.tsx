@@ -40,7 +40,7 @@ export default function RegexTesterPage() {
         {result && (
           <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--surface-card)' }}>
             {result.error ? (
-              <p style={{ color: '#f87171', fontFamily: 'monospace', fontSize: '0.875rem' }}>Error: {result.error}</p>
+              <p style={{ color: 'var(--danger)', fontFamily: 'monospace', fontSize: '0.875rem' }}>Error: {result.error}</p>
             ) : (
               <>
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>{result.count} match{result.count !== 1 ? 'es' : ''} found</p>

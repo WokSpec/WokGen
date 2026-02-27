@@ -148,8 +148,8 @@ export default function SkyboxPage() {
         )}
 
         {error && (
-          <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', background: 'rgba(239,68,68,0.05)' }}>
-            <p style={{ color: '#f87171', fontSize: '0.875rem' }}>{error}</p>
+          <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid var(--danger-border)', borderRadius: '8px', background: 'var(--danger-bg)' }}>
+            <p style={{ color: 'var(--danger)', fontSize: '0.875rem' }}>{error}</p>
             {error.includes('SKYBOX_API_KEY') && (
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
                 Get a free key at <a href="https://skybox.blockadelabs.com/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>skybox.blockadelabs.com</a>

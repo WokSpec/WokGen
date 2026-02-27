@@ -408,7 +408,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           position: 'fixed', bottom: 80, right: 24, zIndex: 200,
           background: 'var(--surface-1)', border: '1px solid var(--accent)',
           borderRadius: 8, padding: '8px 16px',
-          color: '#a5b4fc', fontSize: 13,
+          color: 'var(--accent)', fontSize: 13,
           animation: 'esb-slide-in 0.3s ease',
           maxWidth: 280,
           pointerEvents: 'none',
@@ -424,8 +424,8 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           bottom: 24px;
           right: 24px;
           z-index: 40;
-          background: #1c1c2e;
-          border: 1px solid rgba(129,140,248,0.35);
+          background: var(--surface-card);
+          border: 1px solid var(--accent-glow);
           border-radius: 20px;
           color: var(--accent);
           font-size: 13px;
@@ -435,8 +435,8 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
         }
         .esb-toggle-btn:hover {
-          background: #22223a;
-          border-color: rgba(129,140,248,0.6);
+          background: var(--surface-hover);
+          border-color: var(--accent);
           box-shadow: 0 4px 24px var(--overlay-60), 0 0 20px rgba(129,140,248,0.2);
         }
         .esb-toggle-label { font-family: var(--font-heading, 'Space Grotesk', sans-serif); }
@@ -451,8 +451,8 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           max-height: calc(100vh - 120px);
           display: flex;
           flex-direction: column;
-          background: #111118;
-          border: 1px solid rgba(129,140,248,0.2);
+          background: var(--bg);
+          border: 1px solid var(--accent-subtle);
           border-radius: 10px;
           box-shadow: 0 8px 40px var(--overlay-70), 0 0 24px rgba(129,140,248,0.08);
           overflow: hidden;
@@ -513,7 +513,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           justify-content: space-between;
           padding: 10px 12px;
           border-bottom: 1px solid var(--surface-raised);
-          background: rgba(129,140,248,0.05);
+          background: var(--accent-subtle);
           flex-shrink: 0;
         }
         .esb-header-left {
@@ -531,8 +531,8 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
         .esb-ctx-badge {
           font-size: 10px;
           padding: 1px 6px;
-          background: rgba(129,140,248,0.12);
-          border: 1px solid rgba(129,140,248,0.2);
+          background: var(--accent-glow);
+          border: 1px solid var(--accent-subtle);
           border-radius: 10px;
           color: var(--accent);
           text-transform: capitalize;
@@ -550,7 +550,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           border-radius: 3px;
           transition: background 0.1s;
         }
-        .esb-open-full:hover { background: rgba(129,140,248,0.1); }
+        .esb-open-full:hover { background: var(--accent-subtle); }
         .esb-clear-btn {
           font-size: 11px;
           color: var(--text-faint, #464646);
@@ -593,10 +593,10 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           cursor: pointer;
           transition: background 0.1s, border-color 0.1s, color 0.1s;
         }
-        .esb-model-pill:hover { background: rgba(129,140,248,0.08); border-color: rgba(129,140,248,0.2); color: var(--accent); }
+        .esb-model-pill:hover { background: var(--accent-subtle); border-color: var(--accent-subtle); color: var(--accent); }
         .esb-model-pill-active {
-          background: rgba(129,140,248,0.12) !important;
-          border-color: rgba(129,140,248,0.3) !important;
+          background: var(--accent-glow) !important;
+          border-color: var(--accent-glow) !important;
           color: var(--accent) !important;
         }
 
@@ -615,7 +615,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           padding: 3px 6px;
           cursor: pointer;
         }
-        .esb-project-select:focus { outline: none; border-color: rgba(129,140,248,0.35); }
+        .esb-project-select:focus { outline: none; border-color: var(--accent-glow); }
 
         /* Messages */
         .esb-messages {
@@ -645,8 +645,8 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
         }
         .esb-msg-user {
           align-self: flex-end;
-          background: rgba(129,140,248,0.12);
-          border: 1px solid rgba(129,140,248,0.18);
+          background: var(--accent-glow);
+          border: 1px solid var(--accent-subtle);
           color: var(--text, #ebebeb);
           border-radius: 6px 2px 6px 6px;
         }
@@ -681,14 +681,14 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           font-size: 11px;
           margin: 4px 0;
         }
-        pre.esb-code code { color: #c9d1d9; font-family: monospace; }
+        pre.esb-code code { color: var(--text); font-family: monospace; }
         code.esb-inline-code {
           background: var(--surface-raised);
           border-radius: 3px;
           padding: 1px 4px;
           font-size: 11px;
           font-family: monospace;
-          color: #c9d1d9;
+          color: var(--text);
         }
 
         /* Input */
@@ -699,7 +699,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           gap: 8px;
           align-items: flex-end;
           flex-shrink: 0;
-          background: rgba(0,0,0,0.2);
+          background: var(--overlay-30);
         }
         .esb-textarea {
           flex: 1;
@@ -715,7 +715,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           outline: none;
           transition: border-color 0.15s;
         }
-        .esb-textarea:focus { border-color: rgba(129,140,248,0.35); }
+        .esb-textarea:focus { border-color: var(--accent-glow); }
         .esb-textarea::placeholder { color: var(--text-faint); }
         .esb-textarea:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -731,20 +731,20 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           display: flex; align-items: center; justify-content: center;
           transition: background 0.15s, opacity 0.15s;
         }
-        .esb-send-btn:hover:not(:disabled) { background: #6366f1; }
+        .esb-send-btn:hover:not(:disabled) { background: var(--accent); }
         .esb-send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .esb-stop-btn {
           padding: 5px 10px;
           border-radius: 5px;
-          border: 1px solid rgba(239,68,68,0.3);
-          background: rgba(239,68,68,0.1);
-          color: #ef4444;
+          border: 1px solid var(--danger-border);
+          background: var(--danger-bg);
+          color: var(--danger);
           font-size: 11px;
           cursor: pointer;
           transition: background 0.15s;
           white-space: nowrap;
         }
-        .esb-stop-btn:hover { background: rgba(239,68,68,0.2); }
+        .esb-stop-btn:hover { background: var(--danger-bg); }
 
         /* Quick commands */
         .esb-quick-commands {
@@ -756,8 +756,8 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
         }
         .esb-quick-cmd {
           padding: 4px 10px;
-          background: rgba(129,140,248,0.07);
-          border: 1px solid rgba(129,140,248,0.15);
+          background: var(--accent-subtle);
+          border: 1px solid var(--accent-subtle);
           border-radius: 12px;
           color: var(--accent);
           font-size: 11px;
@@ -765,7 +765,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
           transition: background 0.15s, border-color 0.15s;
           white-space: nowrap;
         }
-        .esb-quick-cmd:hover { background: rgba(129,140,248,0.15); border-color: rgba(129,140,248,0.3); }
+        .esb-quick-cmd:hover { background: var(--accent-glow); border-color: var(--accent-glow); }
       `}</style>
     </>
   );

@@ -494,7 +494,6 @@ export default function CommunityClient() {
   const [nextCursor, setNextCursor]       = useState<string | null>(null);
   const [hasMore, setHasMore]             = useState(false);
   const [galleryTab, setGalleryTab]       = useState<'community' | 'mine'>('community');
-  const [statsText, setStatsText]         = useState<string>('');
 
   // Filters
   const [modeFilter, setModeFilter]       = useState('');
@@ -509,17 +508,6 @@ export default function CommunityClient() {
   const [publicDefault, setPublicDefault] = useState(false);
   const [savingDefault, setSavingDefault] = useState(false);
 
-  // Fetch stats
-  useEffect(() => {
-    fetch('/api/stats')
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (d?.totalGenerations != null) {
-          setStatsText(`${d.totalGenerations.toLocaleString()} assets · 6 modes · Community driven`);
-        }
-      })
-      .catch(() => null);
-  }, []);
 
   // Fetch user setting
   useEffect(() => {
@@ -673,11 +661,7 @@ export default function CommunityClient() {
             <div className="community-title-left">
               <h1 className="community-heading">Community Gallery</h1>
               <p className="community-subtitle">Assets created with WokGen — free, public, remixable</p>
-              {statsText && (
-                <div className="gallery-stats-bar community-stats-bar">
-                  <span className="gallery-stats-text">{statsText}</span>
-                </div>
-              )}
+  
             </div>
 
             <div className="community-actions-row">

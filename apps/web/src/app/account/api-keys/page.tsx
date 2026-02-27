@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import ApiKeysClient from './_client';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'API Keys — WokGen',
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function ApiKeysPage() {
-  return <ApiKeysClient />;
+  return <ErrorBoundary context="API Keys"><ApiKeysClient /></ErrorBoundary>;
 }

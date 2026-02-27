@@ -442,7 +442,7 @@ export default function UnifiedStudioClient({ type }: Props) {
           text-align: left;
           transition: background 0.1s, color 0.1s;
         }
-        .wok-proj-option:hover { background: var(--surface-hover); color: rgba(255,255,255,0.85); }
+        .wok-proj-option:hover { background: var(--surface-hover); color: var(--text); }
         .wok-proj-option.--active { color: var(--accent); }
 
         .wok-proj-option__dot {

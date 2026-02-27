@@ -1036,7 +1036,7 @@ function OutputPanel({
               borderRadius: 6,
               background: 'var(--warning-subtle, rgba(245,158,11,0.1))',
               border: '1px solid var(--warning-border, rgba(245,158,11,0.33))',
-              color: 'var(--warning, #f59e0b)',
+              color: 'var(--warning)',
               fontSize: 11,
               fontWeight: 600,
               textDecoration: 'none',
@@ -1195,7 +1195,7 @@ function OutputPanel({
               <span style={{
                 fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
                 padding: '2px 6px', borderRadius: 3,
-                background: 'rgba(52,211,153,.15)', color: 'var(--success, #34d399)', border: '1px solid rgba(52,211,153,.3)',
+                background: 'rgba(52,211,153,.15)', color: 'var(--success)', border: '1px solid rgba(52,211,153,.3)',
               }}>GIF</span>
             )}
             {result.width && result.height && (
@@ -1609,7 +1609,7 @@ function GenerateForm({
   });
   // Prompt length color — yellow at 160, red at 190+
   const promptLen = prompt.length;
-  const promptLenColor = promptLen >= 190 ? 'var(--danger, #ef4444)' : promptLen >= 160 ? 'var(--warning, #eab308)' : 'var(--text-disabled)';
+  const promptLenColor = promptLen >= 190 ? 'var(--danger)' : promptLen >= 160 ? 'var(--warning)' : 'var(--text-disabled)';
 
   // Auto-resize textarea
   useEffect(() => {
@@ -2307,7 +2307,7 @@ function GenerateForm({
           })}
         </div>
         {size < PRESET_CONFIG[stylePreset].size && (
-          <p className="form-hint mt-2" style={{ color: 'var(--warning, #eab308)' }}>
+          <p className="form-hint mt-2" style={{ color: 'var(--warning)' }}>
             Below recommended size — detail loss likely
           </p>
         )}
@@ -3733,9 +3733,9 @@ function StudioInner() {
                     padding: '2px 10px',
                     borderRadius: 4,
                     border: '1px solid',
-                    borderColor: !useHD ? 'var(--success, #10b981)' : 'var(--surface-border, #2a2a2a)',
+                    borderColor: !useHD ? 'var(--success)' : 'var(--surface-border, #2a2a2a)',
                     background:  !useHD ? 'rgba(16,185,129,.12)' : 'transparent',
-                    color:       !useHD ? 'var(--success, #10b981)' : 'var(--text-muted, #666)',
+                    color:       !useHD ? 'var(--success)' : 'var(--text-muted, #666)',
                     cursor: 'pointer',
                     fontWeight: !useHD ? 600 : 400,
                   }}
@@ -3810,9 +3810,9 @@ function StudioInner() {
               fontSize: '0.72rem', color: 'var(--text-faint)', padding: '0.25rem 0',
             }}>
               <span>
-                <span style={{ color: hdBalance.monthly + hdBalance.topUp > 0 ? 'var(--text-muted)' : 'var(--danger, #ef4444)' }}>
+                <span style={{ color: hdBalance.monthly + hdBalance.topUp > 0 ? 'var(--text-muted)' : 'var(--danger)' }}>
                   HD:{' '}
-                  <strong style={{ color: hdBalance.monthly + hdBalance.topUp > 0 ? 'var(--accent-light, #c4b5fd)' : 'var(--danger, #ef4444)' }}>
+                  <strong style={{ color: hdBalance.monthly + hdBalance.topUp > 0 ? 'var(--accent-light, #c4b5fd)' : 'var(--danger)' }}>
                     {hdBalance.monthly + hdBalance.topUp}
                   </strong>
                   {' '}credit{hdBalance.monthly + hdBalance.topUp !== 1 ? 's' : ''} left
@@ -3888,7 +3888,7 @@ function StudioInner() {
                 </button>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', color: 'var(--text-faint)', paddingTop: '0.125rem' }}>
-                <span style={{ color: 'var(--success, #10b981)', marginRight: '0.25rem' }}>∞</span>
+                <span style={{ color: 'var(--success)', marginRight: '0.25rem' }}>∞</span>
                 Standard generation is always free
               </div>
             </>

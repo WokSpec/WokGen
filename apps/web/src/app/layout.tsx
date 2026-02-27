@@ -113,7 +113,7 @@ function NavBar() {
       {/* Wordmark */}
       <Link href="/" className="nav-wordmark flex-shrink-0" aria-label="WokGen home">
         <span style={{ color: 'var(--text-muted)' }}>Wok</span>
-        <span style={{ color: 'var(--accent, var(--accent))' }}>Gen</span>
+        <span style={{ color: 'var(--accent)' }}>Gen</span>
       </Link>
 
       {/* Nav links — hidden on mobile (MobileNav handles mobile) */}
@@ -133,7 +133,7 @@ function NavBar() {
             fontWeight: 700,
             letterSpacing: '0.04em',
             background: 'var(--accent-subtle, rgba(var(--accent-rgb, 129,140,248), 0.12))',
-            color: 'var(--accent, var(--accent))',
+            color: 'var(--accent)',
             border: '1px solid var(--accent-glow, rgba(var(--accent-rgb, 129,140,248), 0.25))',
             borderRadius: '4px',
             padding: '1px 5px',

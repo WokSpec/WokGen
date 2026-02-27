@@ -51,11 +51,11 @@ export default function PrivacyPage() {
 
       <Section title="3. Third-Party Services">
         <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <li><strong style={{ color: 'var(--text)' }}>Vercel</strong> — hosting. Your requests are processed on Vercel infrastructure. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent, var(--accent))', textDecoration: 'none' }}>Privacy policy →</a></li>
-          <li><strong style={{ color: 'var(--text)' }}>Neon</strong> — serverless PostgreSQL database hosting your account and generation data. <a href="https://neon.tech/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent, var(--accent))', textDecoration: 'none' }}>Privacy policy →</a></li>
-          <li><strong style={{ color: 'var(--text)' }}>Stripe</strong> — payment processing. Governed by Stripe&apos;s privacy policy. <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent, var(--accent))', textDecoration: 'none' }}>Privacy policy →</a></li>
-          <li><strong style={{ color: 'var(--text)' }}>Resend</strong> — transactional email delivery. <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent, var(--accent))', textDecoration: 'none' }}>Privacy policy →</a></li>
-          <li><strong style={{ color: 'var(--text)' }}>GitHub OAuth</strong> — authentication. We receive only your public profile and primary email. <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent, var(--accent))', textDecoration: 'none' }}>Privacy statement →</a></li>
+          <li><strong style={{ color: 'var(--text)' }}>Vercel</strong> — hosting. Your requests are processed on Vercel infrastructure. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Privacy policy →</a></li>
+          <li><strong style={{ color: 'var(--text)' }}>Neon</strong> — serverless PostgreSQL database hosting your account and generation data. <a href="https://neon.tech/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Privacy policy →</a></li>
+          <li><strong style={{ color: 'var(--text)' }}>Stripe</strong> — payment processing. Governed by Stripe&apos;s privacy policy. <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Privacy policy →</a></li>
+          <li><strong style={{ color: 'var(--text)' }}>Resend</strong> — transactional email delivery. <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Privacy policy →</a></li>
+          <li><strong style={{ color: 'var(--text)' }}>GitHub OAuth</strong> — authentication. We receive only your public profile and primary email. <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Privacy statement →</a></li>
           <li><strong style={{ color: 'var(--text)' }}>AI Providers</strong> — your prompts are sent to Replicate, fal.ai, Together.ai, or Pollinations to generate images. Their privacy policies apply to prompts processed by their models.</li>
         </ul>
       </Section>
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
       <Section title="5. Your Rights">
         <p>Depending on your location, you may have rights to access, correct, or delete your personal data,
         or to object to or restrict processing. To exercise these rights, email
-        <a href="mailto:privacy@wokspec.org" style={{ color: 'var(--accent, var(--accent))', textDecoration: 'none', marginLeft: '0.25rem' }}>privacy@wokspec.org</a>.
+        <a href="mailto:privacy@wokspec.org" style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: '0.25rem' }}>privacy@wokspec.org</a>.
         We will respond within 30 days.</p>
         <p style={{ marginTop: '0.75rem' }}>You can delete your account and all associated data from the Account settings page.</p>
       </Section>
@@ -91,8 +91,8 @@ export default function PrivacyPage() {
       </Section>
 
       <Section title="9. Contact">
-        <p>Privacy questions: <a href="mailto:privacy@wokspec.org" style={{ color: 'var(--accent, var(--accent))', textDecoration: 'none' }}>privacy@wokspec.org</a></p>
-        <p>General contact: <a href="mailto:team@wokspec.org" style={{ color: 'var(--accent, var(--accent))', textDecoration: 'none' }}>team@wokspec.org</a></p>
+        <p>Privacy questions: <a href="mailto:privacy@wokspec.org" style={{ color: 'var(--accent)', textDecoration: 'none' }}>privacy@wokspec.org</a></p>
+        <p>General contact: <a href="mailto:team@wokspec.org" style={{ color: 'var(--accent)', textDecoration: 'none' }}>team@wokspec.org</a></p>
       </Section>
 
       <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>

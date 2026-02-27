@@ -190,7 +190,7 @@ function AutomationRow({
           <p className="automation-row__error">{auto.lastRunError}</p>
         )}
         {testMsg && (
-          <p style={{ fontSize: '0.75rem', color: testMsg.ok ? 'var(--success, #10b981)' : 'var(--danger, #ef4444)', marginTop: '0.25rem' }}>{testMsg.text}</p>
+          <p style={{ fontSize: '0.75rem', color: testMsg.ok ? 'var(--success)' : 'var(--danger)', marginTop: '0.25rem' }}>{testMsg.text}</p>
         )}
       </div>
       <div className="automation-row__actions">
@@ -269,7 +269,7 @@ export default function AutomationsClient() {
         <div>
           <h1 className="automations-page__title">
             Automations
-            <span style={{ fontSize: '0.625rem', padding: '0.2rem 0.5rem', borderRadius: '999px', fontWeight: 600, marginLeft: '0.5rem', background: 'rgba(59,130,246,0.15)', color: '#60a5fa', verticalAlign: 'middle', letterSpacing: '0.04em' }}>Beta</span>
+            <span style={{ fontSize: '0.625rem', padding: '0.2rem 0.5rem', borderRadius: '999px', fontWeight: 600, marginLeft: '0.5rem', background: 'var(--info-bg)', color: 'var(--blue, #60a5fa)', verticalAlign: 'middle', letterSpacing: '0.04em' }}>Beta</span>
           </h1>
           <p className="automations-page__subtitle">Schedule messages, webhooks, and alerts on a cron timer.</p>
         </div>

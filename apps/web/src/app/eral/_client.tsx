@@ -1512,7 +1512,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
               )}
               {callTranscript.eral && (
                 <p style={{ color: 'var(--text, var(--accent-subtle))', fontSize: 13, margin: 0 }}>
-                  <span style={{ color: 'var(--accent, var(--accent))', fontWeight: 600 }}>Eral: </span>
+                  <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Eral: </span>
                   {callTranscript.eral}
                 </p>
               )}
@@ -2147,7 +2147,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           border-radius: 3px;
           transition: color 0.15s;
         }
-        .eral-notepad-clear:hover:not(:disabled) { color: var(--danger, #ef4444); }
+        .eral-notepad-clear:hover:not(:disabled) { color: var(--danger); }
         .eral-notepad-clear:disabled { opacity: 0.35; cursor: not-allowed; }
 
         /* Bubble meta */

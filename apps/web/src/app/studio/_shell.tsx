@@ -125,7 +125,7 @@ function ProjectPicker({ projectId, onSelect }: {
             <div className="wok-proj-loading">Loading...</div>
           ) : projects.length === 0 ? (
             <div className="wok-proj-loading">
-              <a href="/projects" style={{ color: 'var(--accent, var(--accent))', textDecoration: 'none', fontSize: '0.7rem' }}>
+              <a href="/projects" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.7rem' }}>
                 Create a project →
               </a>
             </div>
@@ -309,8 +309,8 @@ export default function UnifiedStudioClient({ type }: Props) {
         }
         .wok-studio-rail__item.--active {
           background: var(--accent-subtle, rgba(var(--accent-rgb, 129,140,248), 0.06));
-          border-left-color: var(--accent, var(--accent));
-          color: var(--accent, var(--accent));
+          border-left-color: var(--accent);
+          color: var(--accent);
         }
 
         .wok-studio-rail__abbr {
@@ -356,7 +356,7 @@ export default function UnifiedStudioClient({ type }: Props) {
           margin-left: auto;
           transition: color 0.1s;
         }
-        .wok-studio-ctx-link:hover { color: var(--accent, var(--accent)); }
+        .wok-studio-ctx-link:hover { color: var(--accent); }
 
         .wok-studio-ctx-meta {
           display: flex;
@@ -443,7 +443,7 @@ export default function UnifiedStudioClient({ type }: Props) {
           transition: background 0.1s, color 0.1s;
         }
         .wok-proj-option:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
-        .wok-proj-option.--active { color: var(--accent, var(--accent)); }
+        .wok-proj-option.--active { color: var(--accent); }
 
         .wok-proj-option__dot {
           width: 5px; height: 5px;
@@ -451,7 +451,7 @@ export default function UnifiedStudioClient({ type }: Props) {
           border: 1px solid rgba(255,255,255,0.2);
           flex-shrink: 0;
         }
-        .wok-proj-option__dot.--filled { background: var(--accent, var(--accent)); border-color: var(--accent, var(--accent)); }
+        .wok-proj-option__dot.--filled { background: var(--accent); border-color: var(--accent); }
 
         .wok-proj-loading {
           padding: 8px;
@@ -472,7 +472,7 @@ export default function UnifiedStudioClient({ type }: Props) {
           width: 20px;
           height: 20px;
           border: 2px solid rgba(255,255,255,0.1);
-          border-top-color: var(--accent, var(--accent));
+          border-top-color: var(--accent);
           border-radius: 9999px;
           animation: spin 0.7s linear infinite;
         }

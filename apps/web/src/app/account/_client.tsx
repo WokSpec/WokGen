@@ -41,6 +41,7 @@ function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void 
     <div className="account-tabs">
       {tabs.map(t => (
         <button
+          type="button"
           key={t.id}
           onClick={() => onChange(t.id)}
           className={`account-tab${active === t.id ? ' account-tab--active' : ''}`}
@@ -254,6 +255,7 @@ function BYOCTab() {
             onChange={e => setSettings(s => ({ ...s, comfyUrl: e.target.value }))}
           />
           <button
+            type="button"
             className="acct-btn-ghost-sm"
             onClick={() => testEndpoint('comfyUrl')}
             disabled={!settings.comfyUrl || testing === 'comfyUrl'}
@@ -276,6 +278,7 @@ function BYOCTab() {
             onChange={e => setSettings(s => ({ ...s, ollamaUrl: e.target.value }))}
           />
           <button
+            type="button"
             className="acct-btn-ghost-sm"
             onClick={() => testEndpoint('ollamaUrl')}
             disabled={!settings.ollamaUrl || testing === 'ollamaUrl'}
@@ -298,7 +301,7 @@ function BYOCTab() {
         </p>
       </div>
 
-      <button className="acct-btn-primary" onClick={handleSave} disabled={saving}>
+      <button type="button" className="acct-btn-primary" onClick={handleSave} disabled={saving}>
         {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save settings'}
       </button>
     </div>
@@ -524,7 +527,7 @@ function ApiKeysTab() {
     <div className="acct-section">
       <div className="account-v2-apikeys-header">
         <h2 className="acct-section-title">API Keys</h2>
-        <button className="acct-btn-primary acct-btn-primary--sm" onClick={() => setShowForm(v => !v)}>
+        <button type="button" className="acct-btn-primary acct-btn-primary--sm" onClick={() => setShowForm(v => !v)}>
           {showForm ? 'Cancel' : '+ New Key'}
         </button>
       </div>
@@ -535,13 +538,14 @@ function ApiKeysTab() {
           <div className="account-v2-rawkey__row">
             <code className="account-v2-rawkey__code">{rawKey}</code>
             <button
+              type="button"
               className="acct-btn-ghost-sm"
               onClick={() => { navigator.clipboard.writeText(rawKey); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
             >
               {copied ? '✓' : 'Copy'}
             </button>
           </div>
-          <button className="acct-btn-ghost-sm" onClick={() => setRawKey(null)}>Dismiss</button>
+          <button type="button" className="acct-btn-ghost-sm" onClick={() => setRawKey(null)}>Dismiss</button>
         </div>
       )}
 
@@ -569,7 +573,7 @@ function ApiKeysTab() {
               {EXPIRY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
-          <button className="acct-btn-primary" onClick={handleCreate} disabled={creating}>
+          <button type="button" className="acct-btn-primary" onClick={handleCreate} disabled={creating}>
             {creating ? 'Creating…' : 'Create Key'}
           </button>
         </div>
@@ -641,7 +645,7 @@ function IntegrationsTab() {
             <p className="account-v2-integration-card__name">Discord</p>
             <p className="account-v2-integration-card__desc">Connect Discord to use the WokGen bot in your server.</p>
           </div>
-          <button className="acct-btn-ghost-sm">Connect</button>
+          <button type="button" className="acct-btn-ghost-sm">Connect</button>
         </div>
 
         <div className="account-v2-integration-card">

@@ -169,9 +169,12 @@ function RelationshipPanel({
 function BriefPanel({ projectId, brief, mode, onSaved }: {
   projectId: string; brief: Brief | null; mode: string; onSaved: (b: Brief) => void;
 }) {
+  const router = useRouter();
   const [form, setForm] = useState<Brief>(brief ?? {});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const save = useCallback(async (data: Brief) => {
@@ -253,9 +256,56 @@ function BriefPanel({ projectId, brief, mode, onSaved }: {
           {saving ? 'Saving…' : 'Save brief'}
         </button>
         {saved && !saving && (
-          <span style={{ color: 'var(--color-success, #22c55e)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{ color: 'var(--success)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
             ✓ Saved
           </span>
+        )}
+      </div>
+      <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--danger)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Danger Zone</h4>
+        {!confirmDelete ? (
+          <button
+            type="button"
+            className="btn btn--sm"
+            style={{ background: 'var(--danger-bg)', color: 'var(--danger)', border: '1px solid var(--danger-border)', cursor: 'pointer' }}
+            onClick={() => setConfirmDelete(true)}
+          >
+            Delete project
+          </button>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--danger)', margin: 0 }}>
+              This will permanently delete the project and all its assets. This cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                type="button"
+                className="btn btn--sm"
+                style={{ background: 'var(--danger)', color: '#fff', border: 'none', cursor: 'pointer', opacity: deleting ? 0.6 : 1 }}
+                disabled={deleting}
+                onClick={async () => {
+                  setDeleting(true);
+                  const res = await fetch(`/api/projects/${projectId}`, { method: 'DELETE' });
+                  if (res.ok) {
+                    router.push('/projects');
+                  } else {
+                    setDeleting(false);
+                    setConfirmDelete(false);
+                  }
+                }}
+              >
+                {deleting ? 'Deleting…' : 'Confirm delete'}
+              </button>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={() => setConfirmDelete(false)}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

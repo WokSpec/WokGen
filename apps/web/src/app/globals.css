@@ -66,6 +66,7 @@
   --teal-glow:     rgba(45, 212, 191, 0.18);
 
   /* ── Surface aliases (backward compat) ───────────────── */
+  --surface:         #111111;
   --surface-base:    var(--bg);
   --surface-raised:  rgba(255,255,255,0.04);
   --surface-card:    rgba(255,255,255,0.03);
@@ -19529,6 +19530,7 @@ select:focus-visible {
   --teal-glow:     rgba(13, 148, 136, 0.18);
 
   /* ── Surface aliases ──────────────────────────────────── */
+  --surface:         #ffffff;
   --surface-base:    #fafafa;
   --surface-raised:  rgba(0,0,0,0.02);
   --surface-card:    #ffffff;

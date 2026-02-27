@@ -148,7 +148,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
 
               .message {
                 font-size: 13px;
-                color: #566C86;
+                color: var(--text-muted);
                 line-height: 1.6;
                 max-width: 380px;
                 margin-bottom: 8px;
@@ -156,13 +156,13 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
 
               .digest {
                 font-size: 11px;
-                color: #333C57;
+                color: var(--text-secondary);
                 font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
                 margin-bottom: 0;
               }
 
               .digest span {
-                color: #566C86;
+                color: var(--text-muted);
               }
 
               .divider {
@@ -173,7 +173,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               }
 
               .px {
-                background: #252538;
+                background: var(--surface-raised);
               }
 
               .px-accent {
@@ -204,24 +204,24 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               }
 
               .btn-danger {
-                background: rgba(177,62,83,0.15);
-                border-color: rgba(177,62,83,0.4);
+                background: var(--danger-bg);
+                border-color: var(--danger-border);
                 color: var(--danger);
               }
 
               .btn-danger:hover {
                 background: var(--danger-border);
-                border-color: rgba(239,125,87,0.5);
+                border-color: var(--danger-border);
               }
 
               .btn-secondary {
                 background: transparent;
-                border-color: #252538;
-                color: #94B0C2;
+                border-color: var(--border);
+                color: var(--text-muted);
               }
 
               .btn-secondary:hover {
-                background: #1a1a2e;
+                background: var(--surface-card);
                 border-color: #29366F;
                 color: var(--text);
               }
@@ -229,17 +229,17 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               .help {
                 margin-top: 28px;
                 font-size: 12px;
-                color: #333C57;
+                color: var(--text-secondary);
                 line-height: 1.5;
               }
 
               .help a {
-                color: #566C86;
+                color: var(--text-muted);
                 text-underline-offset: 2px;
               }
 
               .help a:hover {
-                color: #94B0C2;
+                color: var(--text-muted);
               }
             `,
           }}

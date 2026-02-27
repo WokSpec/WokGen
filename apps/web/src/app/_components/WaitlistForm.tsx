@@ -110,7 +110,7 @@ export function WaitlistForm({ mode, accent = 'var(--accent)' }: Props) {
         </button>
       </div>
       {status === 'error' && (
-        <p style={{ fontSize: '0.8rem', color: '#f87171', margin: 0 }}>
+        <p style={{ fontSize: '0.8rem', color: 'var(--danger)', margin: 0 }}>
           {errorMsg}
         </p>
       )}

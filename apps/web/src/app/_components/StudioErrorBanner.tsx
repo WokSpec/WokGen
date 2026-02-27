@@ -13,8 +13,8 @@ export function StudioErrorBanner({ error, onDismiss, onRetry }: Props) {
 
   return (
     <div style={{
-      background: 'rgba(239, 68, 68, 0.1)',
-      border: '1px solid rgba(239, 68, 68, 0.3)',
+      background: 'var(--danger-bg)',
+      border: '1px solid var(--danger-border)',
       borderRadius: 8,
       padding: '12px 16px',
       display: 'flex',
@@ -23,11 +23,11 @@ export function StudioErrorBanner({ error, onDismiss, onRetry }: Props) {
     }}>
       <WarningIcon size={16} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, color: '#fca5a5', fontSize: 14, fontWeight: 500 }}>
+        <p style={{ margin: 0, color: 'var(--danger)', fontSize: 14, fontWeight: 500 }}>
           {error.message}
         </p>
         {error.hint && (
-          <p style={{ margin: '4px 0 0', color: '#6b7280', fontSize: 12 }}>
+          <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: 12 }}>
             {error.hint}
           </p>
         )}
@@ -46,7 +46,7 @@ export function StudioErrorBanner({ error, onDismiss, onRetry }: Props) {
         )}
         <button type="button"
           onClick={onDismiss}
-          style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}
+          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}
         >
           ×
         </button>

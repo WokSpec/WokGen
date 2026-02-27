@@ -1552,7 +1552,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
             disabled={callState === 'processing'}
             style={{
               width: 72, height: 72, borderRadius: '50%',
-              background: callState === 'listening' ? '#dc2626' :
+              background: callState === 'listening' ? 'var(--danger)' :
                           callState === 'speaking' ? 'var(--accent-muted)' : 'transparent',
               border: '2px solid var(--accent-glow)',
               cursor: callState === 'processing' ? 'default' : 'pointer',
@@ -1572,7 +1572,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
             onClick={endCall}
             style={{
               padding: '8px 24px', borderRadius: 999,
-              background: '#991b1b', border: '1px solid #dc2626',
+              background: 'var(--danger)', border: '1px solid var(--danger)',
               color: 'white', fontSize: 14, cursor: 'pointer',
               fontWeight: 600,
             }}
@@ -1588,7 +1588,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           position: 'fixed', bottom: 24, right: 24, zIndex: 200,
           background: 'var(--surface-2, var(--surface-1))', border: '1px solid var(--accent-secondary, var(--accent))',
           borderRadius: 8, padding: '10px 18px',
-          color: '#a5b4fc', fontSize: 13,
+          color: 'var(--accent)', fontSize: 13,
           maxWidth: 320,
           pointerEvents: 'none',
         }}>
@@ -1766,9 +1766,9 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           transition: all .12s;
         }
         .eral-tool-chip:hover {
-          background: rgba(99,102,241,.12);
-          border-color: rgba(99,102,241,.4);
-          color: #a5b4fc;
+          background: var(--accent-subtle);
+          border-color: var(--accent-glow);
+          color: var(--accent);
         }
         .eral-tool-chip span:first-child { font-size: 14px; }
         .eral-tools-all {
@@ -1778,7 +1778,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           text-decoration: none;
           text-align: center;
         }
-        .eral-tools-all:hover { color: #a5b4fc; }
+        .eral-tools-all:hover { color: var(--accent); }
 
         /* Main */
         .eral-main {
@@ -1902,12 +1902,12 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           border-color: var(--accent-glow);
         }
         .eral-call-btn-active {
-          background: rgba(220,38,38,0.15);
-          border-color: rgba(220,38,38,0.4);
-          color: #f87171;
+          background: var(--danger-bg);
+          border-color: var(--danger-border);
+          color: var(--danger);
         }
         .eral-call-btn-active:hover {
-          background: rgba(220,38,38,0.22);
+          background: var(--danger-bg);
         }
 
         @keyframes call-ring {
@@ -2190,7 +2190,7 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           padding: 1px 5px;
           font-size: 12px;
           font-family: 'JetBrains Mono', 'Fira Code', monospace;
-          color: #c9d1d9;
+          color: var(--text);
         }
 
         /* Input area */
@@ -2244,14 +2244,14 @@ Use these WokGen Studio modes: Pixel (sprites/pixel art/icons), Business (brandi
           justify-content: center;
           transition: background 0.15s, opacity 0.15s;
         }
-        .eral-send-btn:hover:not(:disabled) { background: #6366f1; }
+        .eral-send-btn:hover:not(:disabled) { background: var(--accent); }
         .eral-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
         .eral-stop-btn {
           width: auto;
           padding: 0 10px;
           font-size: 12px;
-          background: rgba(239,68,68,0.15);
-          border: 1px solid rgba(239,68,68,0.3);
+          background: var(--danger-bg);
+          border: 1px solid var(--danger-border);
           color: #ef4444;
         }
         .eral-stop-btn:hover { background: rgba(239,68,68,0.25) !important; }

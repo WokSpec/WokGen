@@ -132,7 +132,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
   return (
     <div className="min-h-screen text-[var(--text)]" style={{ background: 'var(--bg)' }}>
       <div className="border-b border-white/5 px-6 py-4 flex items-center gap-3">
-        <span className="text-blue-400"><IconCode2 size={20} /></span>
+        <span style={{ color: 'var(--blue, #60a5fa)' }}><IconCode2 size={20} /></span>
         <div>
           <h1 className="font-semibold text-sm">Code Studio</h1>
           <p className="text-xs text-[var(--text)]/30">Generate React + Tailwind components with AI</p>
@@ -170,8 +170,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
             </button>
 
             {error && (
-              <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                <p className="text-xs text-red-400">{error}</p>
+              <div className="mt-3 p-3" style={{ background: 'var(--danger-bg)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '8px' }}>
+                <p className="text-xs" style={{ color: 'var(--danger)' }}>{error}</p>
               </div>
             )}
           </div>

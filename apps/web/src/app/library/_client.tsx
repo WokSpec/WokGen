@@ -188,7 +188,7 @@ export default function LibraryClient() {
           <button type="button" onClick={bulkDownload} style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '6px', padding: '0.375rem 0.875rem', color: 'var(--text)', cursor: 'pointer', fontSize: '0.8125rem' }}>
             Download {selected.size}
           </button>
-          <button type="button" onClick={bulkDelete} disabled={deleting} style={{ background: confirmBulkDelete ? 'rgba(239,68,68,0.15)' : 'var(--danger-bg)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '6px', padding: '0.375rem 0.875rem', color: 'var(--danger)', cursor: 'pointer', fontSize: '0.8125rem', opacity: deleting ? 0.6 : 1, fontWeight: confirmBulkDelete ? 700 : 400 }}>
+          <button type="button" onClick={bulkDelete} disabled={deleting} style={{ background: confirmBulkDelete ? 'var(--danger-bg)' : 'var(--danger-bg)', border: '1px solid var(--danger-border)', borderRadius: '6px', padding: '0.375rem 0.875rem', color: 'var(--danger)', cursor: 'pointer', fontSize: '0.8125rem', opacity: deleting ? 0.6 : 1, fontWeight: confirmBulkDelete ? 700 : 400 }}>
             {deleting ? 'Deleting…' : confirmBulkDelete ? `Confirm delete ${selected.size}?` : `Delete ${selected.size}`}
           </button>
           <button type="button" onClick={clearSelection} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.125rem', padding: '0 4px', lineHeight: 1 }}>✕</button>

@@ -223,9 +223,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant === 'primary'
         ? 'var(--text-on-accent, #0d0d14)'
         : variant === 'danger'
-        ? '#EF7D57'
+        ? 'var(--danger)'
         : variant === 'success'
-        ? '#38B764'
+        ? 'var(--success)'
         : 'var(--accent)';
 
     const spinnerSize = size === 'xs' ? 'xs' : size === 'sm' ? 'xs' : size === 'lg' ? 'sm' : 'xs';

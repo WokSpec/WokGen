@@ -234,10 +234,10 @@ const STATUS_CONFIG: Record<
   string,
   { variant: BadgeVariant; dot: string; label: string }
 > = {
-  pending:   { variant: 'muted',   dot: '#566C86', label: 'Pending'   },
-  running:   { variant: 'accent',  dot: '#41A6F6', label: 'Running'   },
-  succeeded: { variant: 'success', dot: '#38B764', label: 'Done'      },
-  failed:    { variant: 'danger',  dot: '#EF7D57', label: 'Failed'    },
+  pending:   { variant: 'muted',   dot: 'var(--text-muted)',  label: 'Pending'   },
+  running:   { variant: 'accent',  dot: 'var(--blue)',        label: 'Running'   },
+  succeeded: { variant: 'success', dot: 'var(--success)',     label: 'Done'      },
+  failed:    { variant: 'danger',  dot: 'var(--danger)',      label: 'Failed'    },
 };
 
 interface StatusBadgeProps {

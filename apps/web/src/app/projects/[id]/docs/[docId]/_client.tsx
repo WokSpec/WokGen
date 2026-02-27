@@ -156,7 +156,7 @@ export default function DocumentEditorClient({
           flex-direction: column;
           height: calc(100dvh - var(--nav-height, 56px));
           background: var(--surface-base, #0d0d14);
-          color: var(--text-primary, #f0f0f5);
+          color: var(--text);
         }
 
         .doc-editor__breadcrumb {
@@ -200,13 +200,13 @@ export default function DocumentEditorClient({
           padding: 6px 12px;
           border-bottom: 1px solid var(--surface-hover);
           flex-shrink: 0;
-          background: #09090f;
+          background: var(--surface-card);
           flex-wrap: wrap;
         }
         .doc-editor__toolbar-btn {
           background: none;
           border: none;
-          color: rgba(255,255,255,0.35);
+          color: var(--text-faint);
           font-size: 0.7rem;
           font-family: ui-monospace, monospace;
           font-weight: 600;
@@ -256,7 +256,7 @@ export default function DocumentEditorClient({
           border: none;
           font-size: 2rem;
           font-weight: 700;
-          color: var(--text-primary, #f0f0f5);
+          color: var(--text);
           outline: none;
           padding: 0;
           line-height: 1.2;
@@ -270,7 +270,7 @@ export default function DocumentEditorClient({
           outline: none;
           font-size: 1rem;
           line-height: 1.7;
-          color: var(--text-primary, #f0f0f5);
+          color: var(--text);
         }
         .doc-editor__content .ProseMirror p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
@@ -319,7 +319,7 @@ export default function DocumentEditorClient({
         }
         .doc-editor__content .ProseMirror hr {
           border: none;
-          border-top: 1px solid rgba(255,255,255,0.1);
+          border-top: 1px solid var(--border);
           margin: 1.5em 0;
         }
         .doc-editor__content .ProseMirror a {
@@ -328,7 +328,7 @@ export default function DocumentEditorClient({
         .doc-editor__content .ProseMirror img {
           max-width: 100%; height: auto; border-radius: 2px; margin: 0.5em 0;
         }
-        .doc-editor__content .ProseMirror strong { color: var(--text-primary, #f0f0f5); }
+        .doc-editor__content .ProseMirror strong { color: var(--text); }
       `}</style>
     </div>
   );

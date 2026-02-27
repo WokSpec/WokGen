@@ -62,10 +62,10 @@ export default function AdminJobsPage() {
                   <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>{queue.name}</h2>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     {[
-                      { label: 'Waiting',   value: s.waiting,   color: '#f59e0b' },
-                      { label: 'Active',    value: s.active,    color: '#3b82f6' },
-                      { label: 'Completed', value: s.completed, color: '#10b981' },
-                      { label: 'Failed',    value: s.failed,    color: '#ef4444' },
+                      { label: 'Waiting',   value: s.waiting,   color: 'var(--yellow)' },
+                      { label: 'Active',    value: s.active,    color: 'var(--blue)' },
+                      { label: 'Completed', value: s.completed, color: 'var(--green)' },
+                      { label: 'Failed',    value: s.failed,    color: 'var(--danger)' },
                     ].map(stat => (
                       <div key={stat.label} style={{ padding: '0.75rem', border: '1px solid var(--surface-raised)', borderRadius: '8px', background: 'var(--surface-card)' }}>
                         <div style={{ fontSize: '1.25rem', fontWeight: 700, color: stat.color }}>{stat.value}</div>

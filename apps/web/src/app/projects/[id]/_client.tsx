@@ -38,8 +38,8 @@ const REL_LABELS: Record<string, string> = {
 };
 
 const REL_COLORS: Record<string, string> = {
-  variation: 'var(--accent)', animation_of: '#60a5fa', enemy_of: '#f87171',
-  tileset_for: '#34d399', same_palette: '#fbbf24', brand_use: '#fb923c',
+  variation: 'var(--accent)', animation_of: 'var(--blue)', enemy_of: 'var(--red)',
+  tileset_for: 'var(--green)', same_palette: 'var(--yellow)', brand_use: 'var(--orange)',
 };
 
 const MODE_STUDIO_TYPES: Record<string, string> = {

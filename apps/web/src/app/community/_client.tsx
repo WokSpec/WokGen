@@ -82,11 +82,11 @@ const RARITY_COLORS: Record<string, string> = {
 
 const MODE_COLORS: Record<string, string> = {
   pixel:    'var(--accent)',
-  business: '#38B764',
-  uiux:     '#41A6F6',
-  vector:   '#FF9D00',
-  voice:    '#f472b6',
-  text:     '#34d399',
+  business: 'var(--green)',
+  uiux:     'var(--blue)',
+  vector:   'var(--orange)',
+  voice:    'var(--pink)',
+  text:     'var(--teal)',
 };
 
 const MODE_LABELS: Record<string, string> = {

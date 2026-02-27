@@ -30,7 +30,15 @@ export default function AdminCharts() {
   if (error)   return <div className="admin-error">{error}</div>;
   if (!data)   return null;
 
-  const chartStyle = { background: '#0d0d14', borderRadius: 8, padding: '1rem' };
+  const chartStyle = { background: 'var(--surface-card)', borderRadius: 8, padding: '1rem' };
+  // Recharts SVG attrs don't support CSS vars — use matching token values
+  const C = {
+    grid:    '#252538',
+    axis:    '#8888aa',
+    accent:  '#818cf8',
+    blue:    '#60a5fa',
+    tooltip: { bg: 'var(--surface-raised)', border: 'var(--border)', text: 'var(--text)' },
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -39,14 +47,14 @@ export default function AdminCharts() {
         <div style={chartStyle}>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={data.dailyVolume} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#252538" />
-              <XAxis dataKey="date" tick={{ fill: '#8888aa', fontSize: 11 }} tickLine={false} axisLine={false} />
-              <YAxis tick={{ fill: '#8888aa', fontSize: 11 }} tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} />
+              <XAxis dataKey="date" tick={{ fill: C.axis, fontSize: 11 }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fill: C.axis, fontSize: 11 }} tickLine={false} axisLine={false} />
               <Tooltip
-                contentStyle={{ background: '#12121e', border: '1px solid #252538', borderRadius: 6, color: '#e0e0f0' }}
-                labelStyle={{ color: '#a78bfa' }}
+                contentStyle={{ background: C.tooltip.bg, border: `1px solid ${C.tooltip.border}`, borderRadius: 6, color: C.tooltip.text }}
+                labelStyle={{ color: C.accent }}
               />
-              <Line type="monotone" dataKey="count" stroke="#a78bfa" strokeWidth={2} dot={{ fill: '#a78bfa', r: 3 }} activeDot={{ r: 5 }} name="Generations" />
+              <Line type="monotone" dataKey="count" stroke={C.accent} strokeWidth={2} dot={{ fill: C.accent, r: 3 }} activeDot={{ r: 5 }} name="Generations" />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -57,15 +65,15 @@ export default function AdminCharts() {
         <div style={chartStyle}>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={data.providerBreakdown} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#252538" />
-              <XAxis dataKey="provider" tick={{ fill: '#8888aa', fontSize: 11 }} tickLine={false} axisLine={false} />
-              <YAxis tick={{ fill: '#8888aa', fontSize: 11 }} tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} />
+              <XAxis dataKey="provider" tick={{ fill: C.axis, fontSize: 11 }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fill: C.axis, fontSize: 11 }} tickLine={false} axisLine={false} />
               <Tooltip
-                contentStyle={{ background: '#12121e', border: '1px solid #252538', borderRadius: 6, color: '#e0e0f0' }}
-                labelStyle={{ color: '#4f8ef7' }}
+                contentStyle={{ background: C.tooltip.bg, border: `1px solid ${C.tooltip.border}`, borderRadius: 6, color: C.tooltip.text }}
+                labelStyle={{ color: C.blue }}
               />
-              <Legend wrapperStyle={{ color: '#8888aa', fontSize: 11 }} />
-              <Bar dataKey="count" fill="#4f8ef7" radius={[3, 3, 0, 0]} name="Jobs" />
+              <Legend wrapperStyle={{ color: C.axis, fontSize: 11 }} />
+              <Bar dataKey="count" fill={C.blue} radius={[3, 3, 0, 0]} name="Jobs" />
             </BarChart>
           </ResponsiveContainer>
         </div>

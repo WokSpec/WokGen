@@ -22,7 +22,6 @@ export const authConfig: NextAuthConfig = {
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-      allowDangerousEmailAccountLinking: true,
       checks: ['pkce', 'state'],
     }),
   ],
@@ -40,15 +39,25 @@ export const authConfig: NextAuthConfig = {
   },
 
   callbacks: {
-    // Persist the DB user.id into the JWT so we can read it without a DB call
-    jwt({ token, user }) {
-      if (user?.id) token.sub = user.id;
+    // Persist the DB user.id + isAdmin into the JWT (one DB hit at sign-in,
+    // then read from the encrypted cookie on every subsequent request).
+    async jwt({ token, user }) {
+      if (user?.id) {
+        token.sub = user.id;
+        // Load isAdmin once when the token is first minted
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { isAdmin: true },
+        }).catch(() => null);
+        token.isAdmin = dbUser?.isAdmin ?? false;
+      }
       return token;
     },
-    // Expose user id in session so API routes can read it
+    // Expose user id + isAdmin in session so client components can read it
     session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
+        (session.user as { id: string; isAdmin?: boolean }).isAdmin = (token.isAdmin as boolean) ?? false;
       }
       return session;
     },

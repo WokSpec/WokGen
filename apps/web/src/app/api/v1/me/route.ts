@@ -3,7 +3,7 @@
  * WokSDK v1 — returns user info for the authenticated API key owner.
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateApiKey } from '@/lib/api-key-auth';
+import { authenticateApiKey, hasScope } from '@/lib/api-key-auth';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 
@@ -24,6 +24,9 @@ export async function GET(req: NextRequest) {
   const apiUser = await authenticateApiKey(req);
   if (!apiUser) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!hasScope(apiUser.scopes, 'read:profile')) {
+    return NextResponse.json({ error: 'Forbidden: read:profile scope required' }, { status: 403 });
   }
 
   let user;

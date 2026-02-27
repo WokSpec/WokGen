@@ -85,10 +85,12 @@ export default function CommandPalette() {
 
   if (!open) return null;
 
-  // Filter nav commands by query
+  // Filter nav commands by query and role
+  const isAdmin = (session?.user as { id?: string; isAdmin?: boolean } | undefined)?.isAdmin ?? false;
+  const visibleNav = NAV_COMMANDS.filter(c => c.group !== 'Admin' || isAdmin);
   const filteredNav = query
-    ? NAV_COMMANDS.filter(c => c.label.toLowerCase().includes(query.toLowerCase()))
-    : NAV_COMMANDS;
+    ? visibleNav.filter(c => c.label.toLowerCase().includes(query.toLowerCase()))
+    : visibleNav;
 
   // Group nav commands
   const groups = Array.from(new Set(filteredNav.map(c => c.group)));

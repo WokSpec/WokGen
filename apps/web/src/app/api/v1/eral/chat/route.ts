@@ -3,7 +3,7 @@
  * WokSDK v1 wrapper — authenticates via API key, forwards to /api/eral/chat.
  */
 import { type NextRequest, NextResponse } from 'next/server';
-import { authenticateApiKey } from '@/lib/api-key-auth';
+import { authenticateApiKey, hasScope } from '@/lib/api-key-auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
@@ -24,6 +24,9 @@ export async function POST(req: NextRequest) {
   const apiUser = await authenticateApiKey(req);
   if (!apiUser) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!hasScope(apiUser.scopes, 'chat')) {
+    return NextResponse.json({ error: 'Forbidden: chat scope required' }, { status: 403, headers: CORS_HEADERS });
   }
 
   const rl = await checkRateLimit(`v1:eral:${apiUser.userId}`, 50, 60 * 60 * 1000);

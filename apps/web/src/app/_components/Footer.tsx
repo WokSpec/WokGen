@@ -19,9 +19,9 @@ const RESOURCES_LINKS = [
 ];
 
 const SUPPORT_LINKS = [
-  { label: 'Donate',     href: '/support',                               ext: false },
-  { label: 'Discord',    href: '#',                                      ext: false },
-  { label: 'Twitter / X', href: '#',                                     ext: false },
+  { label: 'Donate',     href: '/support',                                      ext: false },
+  { label: 'Discord',    href: 'https://discord.gg/wokgen',                     ext: true  },
+  { label: 'Twitter / X', href: 'https://twitter.com/WokSpec',                  ext: true  },
 ];
 
 const MODEL_CHIPS = ['FLUX', 'Stable Diffusion', 'Llama 3.3', 'Kokoro'];
@@ -82,7 +82,7 @@ export function Footer() {
         <div className="site-footer__bottom">
           {/* Left */}
           <p className="site-footer__copy">
-            © 2025–2026 WokGen — Free forever
+            © {new Date().getFullYear()} WokGen — Free forever
           </p>
 
           {/* Center — powered by open source + model chips */}

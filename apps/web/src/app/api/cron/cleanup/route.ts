@@ -16,12 +16,16 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
+  const auth = req.headers.get('authorization');
 
+  // Always enforce the secret when set; if unset warn and block in non-dev environments
   if (secret) {
-    const auth = req.headers.get('authorization');
     if (auth !== `Bearer ${secret}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+  } else if (process.env.NODE_ENV === 'production') {
+    // CRON_SECRET not configured — block all requests in production
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 503 });
   }
 
   try {

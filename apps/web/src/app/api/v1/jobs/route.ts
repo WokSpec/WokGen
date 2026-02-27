@@ -11,7 +11,7 @@
  */
 import { type NextRequest, NextResponse } from 'next/server';
 import { prisma, dbQuery } from '@/lib/db';
-import { authenticateApiKey } from '@/lib/api-key-auth';
+import { authenticateApiKey, hasScope } from '@/lib/api-key-auth';
 import { API_ERRORS } from '@/lib/api-response';
 import { log } from '@/lib/logger';
 
@@ -31,7 +31,9 @@ export async function GET(req: NextRequest) {
     if (!apiUser) {
       return API_ERRORS.UNAUTHORIZED();
     }
-
+    if (!hasScope(apiUser.scopes, 'read:jobs')) {
+      return NextResponse.json({ error: 'Forbidden: read:jobs scope required' }, { status: 403, headers: CORS });
+    }
     const url = new URL(req.url);
     const status = url.searchParams.get('status') ?? undefined;
     const limit  = Math.min(parseInt(url.searchParams.get('limit')  ?? '20', 10), 100);

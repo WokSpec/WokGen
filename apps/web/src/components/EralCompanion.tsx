@@ -13,7 +13,7 @@ import { usePathname } from 'next/navigation';
 
 interface Message { role: 'user' | 'assistant'; content: string; id: string }
 
-// ── minimal inline styles — no Tailwind dependency ──────────────────────────
+// ── minimal inline styles — use CSS variables for theming ───────────────────
 const S = {
   btn: {
     position: 'fixed' as const,
@@ -23,15 +23,15 @@ const S = {
     width: 44,
     height: 44,
     borderRadius: '50%',
-    background: 'linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%)',
+    background: 'linear-gradient(135deg, var(--grad-from) 0%, var(--accent) 100%)',
     border: 'none',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 20px rgba(109,40,217,0.4)',
+    boxShadow: '0 4px 20px var(--accent-glow)',
     transition: 'transform 0.15s, box-shadow 0.15s',
-    color: '#fff',
+    color: 'var(--text)',
   },
   panel: (open: boolean) => ({
     position: 'fixed' as const,
@@ -40,8 +40,8 @@ const S = {
     zIndex: 9997,
     width: 360,
     height: 560,
-    background: '#0d0d14',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'var(--bg-surface)',
+    border: '1px solid var(--border)',
     borderRadius: 6,
     display: 'flex',
     flexDirection: 'column' as const,
@@ -57,8 +57,8 @@ const S = {
     alignItems: 'center',
     gap: 8,
     padding: '10px 14px',
-    borderBottom: '1px solid rgba(255,255,255,0.07)',
-    background: '#0d0d14',
+    borderBottom: '1px solid var(--border-subtle)',
+    background: 'var(--bg-surface)',
     flexShrink: 0,
   },
   msgList: {
@@ -73,13 +73,13 @@ const S = {
     maxWidth: '85%',
     padding: '7px 11px',
     borderRadius: role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-    background: role === 'user' ? 'rgba(109,40,217,0.3)' : 'rgba(255,255,255,0.05)',
+    background: role === 'user' ? 'var(--accent-subtle)' : 'var(--surface-raised)',
     border: '1px solid',
-    borderColor: role === 'user' ? 'rgba(109,40,217,0.4)' : 'rgba(255,255,255,0.08)',
+    borderColor: role === 'user' ? 'var(--accent-glow)' : 'var(--border-subtle)',
     alignSelf: role === 'user' ? 'flex-end' : 'flex-start',
     fontSize: 13,
     lineHeight: 1.45,
-    color: 'rgba(255,255,255,0.88)',
+    color: 'var(--text-primary)',
     whiteSpace: 'pre-wrap' as const,
     wordBreak: 'break-word' as const,
   }),
@@ -87,29 +87,29 @@ const S = {
     display: 'flex',
     gap: 8,
     padding: '10px 14px',
-    borderTop: '1px solid rgba(255,255,255,0.07)',
-    background: '#0d0d14',
+    borderTop: '1px solid var(--border-subtle)',
+    background: 'var(--bg-surface)',
     flexShrink: 0,
   },
   input: {
     flex: 1,
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'var(--surface-raised)',
+    border: '1px solid var(--border)',
     borderRadius: 4,
     padding: '7px 10px',
-    color: '#fff',
+    color: 'var(--text)',
     fontSize: 13,
     outline: 'none',
     resize: 'none' as const,
     fontFamily: 'inherit',
   },
   sendBtn: {
-    background: 'rgba(109,40,217,0.8)',
+    background: 'var(--accent-muted)',
     border: 'none',
     borderRadius: 4,
     width: 34,
     cursor: 'pointer',
-    color: '#fff',
+    color: 'var(--text)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -193,24 +193,24 @@ function EralCompanionInner() {
         <div style={S.header}>
           <div style={{
             width: 28, height: 28, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #6d28d9, #4f46e5)',
+            background: 'linear-gradient(135deg, var(--grad-from), var(--accent))',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
+            fontSize: 12, fontWeight: 700, color: 'var(--text)', flexShrink: 0,
           }}>E</div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', lineHeight: 1 }}>Eral 7c</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>AI creative director</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', lineHeight: 1 }}>Eral 7c</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 1 }}>AI creative director</div>
           </div>
           <a
             href={`/eral${convId ? `?restore=${convId}` : ''}`}
-            style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', padding: '3px 6px',
-              border: '1px solid rgba(255,255,255,0.08)', borderRadius: 3, transition: 'color 0.1s' }}
+            style={{ fontSize: 11, color: 'var(--text-muted)', textDecoration: 'none', padding: '3px 6px',
+              border: '1px solid var(--border-subtle)', borderRadius: 3, transition: 'color 0.1s' }}
           >
             Full view
           </a>
           <button
             onClick={() => setOpen(false)}
-            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', cursor: 'pointer',
+            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer',
               padding: 4, marginLeft: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             aria-label="Close Eral companion"
           >
@@ -221,7 +221,7 @@ function EralCompanionInner() {
         {/* Message list */}
         <div style={S.msgList}>
           {messages.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>
+            <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-muted)', fontSize: 12 }}>
               <div style={{ fontSize: 22, marginBottom: 8 }}>Eral 7c</div>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>Eral 7c</div>
               <div>Your AI creative director.</div>
@@ -232,7 +232,7 @@ function EralCompanionInner() {
             <div key={m.id} style={S.bubble(m.role)}>{m.content}</div>
           ))}
           {loading && (
-            <div style={{ ...S.bubble('assistant'), color: 'rgba(255,255,255,0.4)' }}>
+            <div style={{ ...S.bubble('assistant'), color: 'var(--text-secondary)' }}>
               <span style={{ display: 'inline-flex', gap: 3 }}>
                 <span style={{ animation: 'pulse 1s infinite' }}>·</span>
                 <span style={{ animation: 'pulse 1s infinite 0.2s' }}>·</span>
@@ -285,22 +285,22 @@ function EralCompanionInner() {
             </svg>
             <span style={{
               position: 'absolute', top: -1, right: -1,
-              fontSize: 8, fontWeight: 800, color: '#fff',
-              background: '#6d28d9',
+              fontSize: 8, fontWeight: 800, color: 'var(--text)',
+              background: 'var(--accent-dim)',
               width: 14, height: 14, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               letterSpacing: '-0.02em',
-              border: '1.5px solid #0d0d14',
+              border: '1.5px solid var(--bg)',
             }}>7c</span>
           </>
         )}
         {unread > 0 && !open && (
           <span style={{
             position: 'absolute', top: -4, right: -4,
-            background: '#ef4444', borderRadius: '50%',
-            width: 16, height: 16, fontSize: 9, fontWeight: 700, color: '#fff',
+            background: 'var(--danger)', borderRadius: '50%',
+            width: 16, height: 16, fontSize: 9, fontWeight: 700, color: 'var(--text)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            border: '2px solid #0d0d14',
+            border: '2px solid var(--bg)',
           }}>{unread}</span>
         )}
       </button>

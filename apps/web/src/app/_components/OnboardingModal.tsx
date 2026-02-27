@@ -75,6 +75,7 @@ export default function OnboardingModal({ onComplete }: Props) {
   const [projName,   setProjName]   = useState('');
   const [projBrief,  setProjBrief]  = useState('');
   const [creating,   setCreating]   = useState(false);
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
   const router = useRouter();
 
   const selectedCase = USE_CASES.find(u => u.id === useCase);
@@ -147,7 +148,7 @@ export default function OnboardingModal({ onComplete }: Props) {
     await saveStep(4);
     setStep(4);
     if (data.project?.id) {
-      // Pre-navigate so clicking "Open Project" is instant
+      setCreatedProjectId(data.project.id);
     }
   };
 
@@ -296,6 +297,11 @@ export default function OnboardingModal({ onComplete }: Props) {
               <button className="btn-primary" onClick={() => { handleComplete(); router.push('/eral'); }}>
                 Open Eral
               </button>
+              {createdProjectId && (
+                <button className="btn-ghost" onClick={() => { handleComplete(); router.push(`/projects/${createdProjectId}`); }}>
+                  Open Project
+                </button>
+              )}
               <button className="btn-ghost" onClick={handleComplete}>
                 Go to studio
               </button>

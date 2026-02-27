@@ -38,6 +38,7 @@ function AddWebhookForm({ onAdded, onCancel }: { onAdded: () => void; onCancel: 
 
   const handleSubmit = async () => {
     if (!url.trim()) { setError('URL is required.'); return; }
+    try { const u = new URL(url.trim()); if (u.protocol !== 'https:') throw new Error(); } catch { setError('Endpoint URL must be a valid HTTPS URL.'); return; }
     if (!events.length) { setError('Select at least one event.'); return; }
     setError('');
     setSaving(true);

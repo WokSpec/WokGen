@@ -33,13 +33,16 @@ export default function LibraryClient() {
   const [total, setTotal] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
 
-  const fetchAssets = useCallback(async (search: string, mode: string, sortBy: string) => {
-    setLoading(true);
-    const params = new URLSearchParams({ mine: 'true', limit: '60' });
+  const fetchAssets = useCallback(async (search: string, mode: string, sortBy: string, append = false, afterCursor?: string) => {
+    if (!append) setLoading(true);
+    const params = new URLSearchParams({ mine: 'true', limit: '48' });
     if (search.trim()) params.set('search', search.trim());
     if (mode !== 'all') params.set('mode', mode);
     if (sortBy === 'oldest') params.set('sort', 'oldest');
+    if (afterCursor) params.set('cursor', afterCursor);
     const res = await fetch(`/api/gallery?${params}`);
     if (res.ok) {
       const d = await res.json();
@@ -47,8 +50,14 @@ export default function LibraryClient() {
       if (sortBy === 'mode') {
         fetched = [...fetched].sort((a, b) => a.mode.localeCompare(b.mode));
       }
-      setAssets(fetched);
-      setTotal(fetched.length);
+      if (append) {
+        setAssets(prev => [...prev, ...fetched]);
+      } else {
+        setAssets(fetched);
+      }
+      setCursor(d.nextCursor ?? null);
+      setHasMore(d.hasMore ?? false);
+      setTotal(prev => append ? prev + fetched.length : fetched.length);
     }
     setLoading(false);
   }, []);
@@ -279,6 +288,17 @@ export default function LibraryClient() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {hasMore && (
+        <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+          <button
+            onClick={() => fetchAssets(searchQuery, modeFilter, sort, true, cursor ?? undefined)}
+            disabled={loading}
+            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text)', padding: '8px 24px', borderRadius: 8, fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
+          >
+            {loading ? 'Loading…' : `Load more`}
+          </button>
         </div>
       )}
     </div>

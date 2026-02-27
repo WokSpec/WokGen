@@ -183,8 +183,8 @@ function LoginForm() {
           transition: background 0.15s, border-color 0.15s;
         }
         .login-guest:hover {
-          background: rgba(167,139,250,.08);
-          border-color: rgba(167,139,250,.4);
+          background: var(--accent-subtle);
+          border-color: var(--accent-glow);
         }
         .login-hint {
           font-size: 0.72rem;

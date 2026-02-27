@@ -80,12 +80,12 @@ export default function BusinessLanding() {
         <div className="landing-hero-inner">
           <div className="landing-hero-content">
             <div className="landing-badge">
-              <span className="landing-badge-dot" style={{ background: '#60a5fa' }} />
+              <span className="landing-badge-dot" style={{ background: 'var(--blue)' }} />
               <span>WokGen Business</span>
             </div>
             <h1 className="landing-h1">
               Professional assets.<br />
-              <span style={{ color: '#60a5fa' }}>Generated in seconds.</span>
+              <span style={{ color: 'var(--blue)' }}>Generated in seconds.</span>
             </h1>
             <p className="landing-desc">
               Logos, brand kits, slide visuals, social banners, and web heroes — all with AI.

@@ -794,17 +794,17 @@ export default function UIUXStudio() {
                     <button type="button" onClick={handleCancel} style={{ padding: '6px', borderRadius: 6, border: '1px solid var(--surface-border)', background: 'var(--surface-raised)', color: 'var(--text-secondary)', fontSize: '0.75rem', cursor: 'pointer', width: '100%' }}>Cancel</button>
                   </div>
                 ) : libraryMode ? (
-                  <button type="button" onClick={handleGenerateLibrary} disabled={selectedLibraryTypes.length < 2} style={{ width: '100%', padding: '9px', borderRadius: 7, border: 'none', cursor: selectedLibraryTypes.length < 2 ? 'not-allowed' : 'pointer', background: 'linear-gradient(135deg,#a855f7,#ec4899)', color: '#fff', fontWeight: 700, fontSize: '0.83rem', opacity: selectedLibraryTypes.length < 2 ? 0.5 : 1 }}>
+                  <button type="button" onClick={handleGenerateLibrary} disabled={selectedLibraryTypes.length < 2} style={{ width: '100%', padding: '9px', borderRadius: 7, border: 'none', cursor: selectedLibraryTypes.length < 2 ? 'not-allowed' : 'pointer', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: '0.83rem', opacity: selectedLibraryTypes.length < 2 ? 0.5 : 1 }}>
                     ✦ Generate Library ({selectedLibraryTypes.length})
                   </button>
                 ) : (
-                  <button type="button" onClick={handleGenerate} disabled={isLoading} style={{ width: '100%', padding: '9px', borderRadius: 7, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg,#a855f7,#ec4899)', color: '#fff', fontWeight: 700, fontSize: '0.83rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <button type="button" onClick={handleGenerate} disabled={isLoading} style={{ width: '100%', padding: '9px', borderRadius: 7, border: 'none', cursor: 'pointer', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: '0.83rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <span>Generate {FRAMEWORKS.find((f) => f.id === framework)?.label ?? 'Code'}</span>
                     <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>⌘↵</span>
                   </button>
                 )}
                 <div style={{ fontSize: '0.62rem', textAlign: 'center', color: 'var(--text-disabled)', marginTop: 5 }}>
-                  <span style={{ color: '#10b981' }}>∞</span> Free code generation
+                  <span style={{ color: 'var(--success)' }}>∞</span> Free code generation
                 </div>
               </div>
             </div>
@@ -992,9 +992,9 @@ function UIUXPreview({
     <div className="uiux-preview-frame">
       <div className="uiux-preview-toolbar">
         <div className="uiux-browser-dots">
-          <span style={{ background: '#ef4444' }} />
-          <span style={{ background: '#f59e0b' }} />
-          <span style={{ background: '#22c55e' }} />
+          <span style={{ background: 'var(--danger)' }} />
+          <span style={{ background: 'var(--warning)' }} />
+          <span style={{ background: 'var(--success)' }} />
         </div>
         <div className="uiux-browser-bar">
           {viewportMode !== 'desktop' && <span style={{ marginRight: 5 }}>{VIEWPORT_OPTIONS.find((v) => v.id === viewportMode)?.icon} {vpWidth}px</span>}
@@ -1123,7 +1123,7 @@ function UIUXLibraryResults({
         <div style={{ flex: 1, height: 4, background: 'var(--surface-overlay)', borderRadius: 2, overflow: 'hidden' }}>
           <div style={{ height: '100%', borderRadius: 2, background: 'linear-gradient(90deg,var(--purple),var(--pink))', width: `${(processed / total) * 100}%`, transition: 'width 0.4s' }} />
         </div>
-        {isGenerating && currentType && <span style={{ fontSize: '0.68rem', color: '#f472b6', whiteSpace: 'nowrap' }}>Generating {COMPONENT_TYPES.find((c) => c.id === currentType)?.label}…</span>}
+        {isGenerating && currentType && <span style={{ fontSize: '0.68rem', color: 'var(--pink)', whiteSpace: 'nowrap' }}>Generating {COMPONENT_TYPES.find((c) => c.id === currentType)?.label}…</span>}
         {!isGenerating && processed > 0 && (
           <button type="button" onClick={onExportAll} style={{ padding: '3px 10px', borderRadius: 5, border: '1px solid var(--accent-muted)', background: 'var(--accent-dim)', color: 'var(--accent)', fontSize: '0.7rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>⊞ Export All</button>
         )}
@@ -1145,7 +1145,7 @@ function UIUXLibraryResults({
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 10px', borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-overlay)' }}>
                 <span style={{ fontSize: '0.95rem' }}>{ctInfo?.icon}</span>
                 <span style={{ fontWeight: 600, fontSize: '0.78rem', color: 'var(--text-primary)' }}>{ctInfo?.label}</span>
-                {isCurrentlyGenerating && <span style={{ fontSize: '0.65rem', color: '#f472b6' }}>Generating…</span>}
+                {isCurrentlyGenerating && <span style={{ fontSize: '0.65rem', color: 'var(--pink)' }}>Generating…</span>}
                 {isPending && <span style={{ fontSize: '0.65rem', color: 'var(--text-disabled)' }}>Queued</span>}
                 {res && (
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: 3 }}>
@@ -1241,7 +1241,7 @@ function UIUXPageBuilder({
       <div style={{ padding: '9px 14px', borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-raised)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-primary)' }}>⊞ Page Builder — {order.length} component{order.length !== 1 ? 's' : ''}</span>
         <div style={{ flex: 1 }} />
-        <button type="button" onClick={onAssemble} style={{ padding: '5px 13px', borderRadius: 6, border: 'none', background: 'linear-gradient(135deg,#a855f7,#ec4899)', color: '#fff', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer' }}>⬡ Assemble Page →</button>
+        <button type="button" onClick={onAssemble} style={{ padding: '5px 13px', borderRadius: 6, border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer' }}>⬡ Assemble Page →</button>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
@@ -1261,7 +1261,7 @@ function UIUXPageBuilder({
               <div style={{ display: 'flex', gap: 3 }}>
                 <button type="button" onClick={() => onMove(id, 'up')} disabled={idx === 0} aria-label="Move up" style={{ padding: '3px 6px', borderRadius: 4, border: '1px solid var(--surface-border)', background: 'transparent', color: idx === 0 ? 'var(--text-disabled)' : 'var(--text-muted)', cursor: idx === 0 ? 'not-allowed' : 'pointer', fontSize: '0.78rem' }}>↑</button>
                 <button type="button" onClick={() => onMove(id, 'down')} disabled={idx === order.length - 1} aria-label="Move down" style={{ padding: '3px 6px', borderRadius: 4, border: '1px solid var(--surface-border)', background: 'transparent', color: idx === order.length - 1 ? 'var(--text-disabled)' : 'var(--text-muted)', cursor: idx === order.length - 1 ? 'not-allowed' : 'pointer', fontSize: '0.78rem' }}>↓</button>
-                <button type="button" onClick={() => onRemove(id)} aria-label="Remove" style={{ padding: '3px 6px', borderRadius: 4, border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.06)', color: '#ef4444', cursor: 'pointer', fontSize: '0.78rem' }}>✕</button>
+                <button type="button" onClick={() => onRemove(id)} aria-label="Remove" style={{ padding: '3px 6px', borderRadius: 4, border: '1px solid var(--danger-border)', background: 'var(--danger-bg)', color: 'var(--danger)', cursor: 'pointer', fontSize: '0.78rem' }}>✕</button>
               </div>
             </div>
           );

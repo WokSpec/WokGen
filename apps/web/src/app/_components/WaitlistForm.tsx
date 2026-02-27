@@ -43,11 +43,11 @@ export function WaitlistForm({ mode, accent = 'var(--accent)' }: Props) {
       <div style={{
         display: 'flex', alignItems: 'center', gap: '0.5rem',
         padding: '0.75rem 1.25rem',
-        background: `rgba(${hexToRgb(accent)}, 0.08)`,
-        border: `1px solid rgba(${hexToRgb(accent)}, 0.3)`,
+        background: 'var(--accent-subtle)',
+        border: '1px solid var(--accent-glow)',
         borderRadius: 6,
         fontSize: '0.875rem',
-        color: accent,
+        color: accent.startsWith('var(') ? accent : accent,
         fontWeight: 500,
       }}>
         <span>{'\u2713'}</span>
@@ -116,12 +116,4 @@ export function WaitlistForm({ mode, accent = 'var(--accent)' }: Props) {
       )}
     </form>
   );
-}
-
-function hexToRgb(hex: string): string {
-  const clean = hex.replace('#', '');
-  const r = parseInt(clean.slice(0, 2), 16);
-  const g = parseInt(clean.slice(2, 4), 16);
-  const b = parseInt(clean.slice(4, 6), 16);
-  return `${r}, ${g}, ${b}`;
 }

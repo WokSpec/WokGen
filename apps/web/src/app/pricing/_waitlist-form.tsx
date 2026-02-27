@@ -24,7 +24,7 @@ export default function ProWaitlistForm() {
 
   if (status === 'done') {
     return (
-      <div style={{ padding: '0.75rem 1rem', borderRadius: '8px', background: 'rgba(96,165,250,0.1)', border: '1px solid rgba(96,165,250,0.3)', fontSize: '0.875rem', color: '#60a5fa', textAlign: 'center' }}>
+      <div style={{ padding: '0.75rem 1rem', borderRadius: '8px', background: 'var(--info-bg)', border: '1px solid var(--info)', fontSize: '0.875rem', color: 'var(--info)', textAlign: 'center' }}>
         ✓ You&apos;re on the list! We&apos;ll notify you when Pro launches.
       </div>
     );
@@ -46,7 +46,7 @@ export default function ProWaitlistForm() {
             flex: 1,
             padding: '0.5rem 0.75rem',
             borderRadius: '7px',
-            border: '1px solid rgba(96,165,250,0.35)',
+            border: '1px solid var(--info)',
             background: 'var(--surface-card)',
             color: 'var(--text-primary)',
             fontSize: '0.875rem',
@@ -59,9 +59,9 @@ export default function ProWaitlistForm() {
           style={{
             padding: '0.5rem 1rem',
             borderRadius: '7px',
-            border: '1px solid rgba(96,165,250,0.4)',
-            background: 'rgba(96,165,250,0.15)',
-            color: '#60a5fa',
+            border: '1px solid var(--info)',
+            background: 'var(--info-bg)',
+            color: 'var(--info)',
             fontWeight: 600,
             fontSize: '0.875rem',
             cursor: status === 'loading' ? 'not-allowed' : 'pointer',
@@ -72,7 +72,7 @@ export default function ProWaitlistForm() {
         </button>
       </div>
       {status === 'error' && (
-        <p style={{ fontSize: '0.8rem', color: '#f87171', margin: 0 }}>Something went wrong. Please try again.</p>
+        <p style={{ fontSize: '0.8rem', color: 'var(--danger)', margin: 0 }}>Something went wrong. Please try again.</p>
       )}
     </form>
   );

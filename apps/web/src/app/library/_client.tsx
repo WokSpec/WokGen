@@ -12,7 +12,6 @@ function SearchIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
 interface LibraryAsset {
   id: string;
   imageUrl: string;
@@ -32,9 +31,8 @@ export default function LibraryClient() {
   const [modeFilter, setModeFilter] = useState<string>('all');
   const [sort, setSort] = useState<string>('newest');
   const [total, setTotal] = useState(0);
-  // TODO(C3): Batch selection — add checkbox overlay on hover for each card,
-  // then implement bulk-download and bulk-delete once ≥2 are selected.
-  // State: const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
 
   const fetchAssets = useCallback(async (search: string, mode: string, sortBy: string) => {
     setLoading(true);
@@ -58,6 +56,48 @@ export default function LibraryClient() {
   useEffect(() => {
     fetchAssets(searchQuery, modeFilter, sort);
   }, [searchQuery, modeFilter, sort, fetchAssets]);
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const selectAll = useCallback(() => {
+    setSelected(new Set(assets.map(a => a.id)));
+  }, [assets]);
+
+  const clearSelection = useCallback(() => setSelected(new Set()), []);
+
+  const bulkDelete = useCallback(async () => {
+    if (!selected.size) return;
+    if (!confirm(`Delete ${selected.size} asset${selected.size > 1 ? 's' : ''}? This cannot be undone.`)) return;
+    setDeleting(true);
+    const ids = Array.from(selected);
+    await Promise.allSettled(
+      ids.map(id => fetch(`/api/gallery?id=${id}`, { method: 'DELETE' }))
+    );
+    setAssets(prev => prev.filter(a => !selected.has(a.id)));
+    setTotal(prev => prev - selected.size);
+    setSelected(new Set());
+    setDeleting(false);
+  }, [selected]);
+
+  const bulkDownload = useCallback(() => {
+    const selectedAssets = assets.filter(a => selected.has(a.id));
+    for (const asset of selectedAssets) {
+      const a = document.createElement('a');
+      a.href = asset.imageUrl;
+      a.download = `wokgen-${asset.id}.png`;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  }, [assets, selected]);
 
   if (loading && assets.length === 0) {
     return (
@@ -84,6 +124,27 @@ export default function LibraryClient() {
           Gallery View
         </Link>
       </div>
+
+      {/* Bulk action toolbar */}
+      {selected.size > 0 && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '0.75rem',
+          padding: '0.625rem 1rem', marginBottom: '1rem',
+          background: 'var(--accent-subtle)', border: '1px solid var(--accent-glow)',
+          borderRadius: '8px', fontSize: '0.875rem',
+        }}>
+          <span style={{ color: 'var(--accent)', fontWeight: 600 }}>{selected.size} selected</span>
+          <button onClick={selectAll} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8125rem', padding: '2px 6px' }}>Select all</button>
+          <div style={{ flex: 1 }} />
+          <button onClick={bulkDownload} style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '6px', padding: '0.375rem 0.875rem', color: 'var(--text)', cursor: 'pointer', fontSize: '0.8125rem' }}>
+            Download {selected.size}
+          </button>
+          <button onClick={bulkDelete} disabled={deleting} style={{ background: 'var(--danger-bg)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '6px', padding: '0.375rem 0.875rem', color: 'var(--danger)', cursor: 'pointer', fontSize: '0.8125rem', opacity: deleting ? 0.6 : 1 }}>
+            {deleting ? 'Deleting…' : `Delete ${selected.size}`}
+          </button>
+          <button onClick={clearSelection} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.125rem', padding: '0 4px', lineHeight: 1 }}>✕</button>
+        </div>
+      )}
 
       {/* Search + filter bar */}
       <div className="flex gap-3 mb-6">
@@ -147,9 +208,28 @@ export default function LibraryClient() {
           {assets.map(asset => (
             <div
               key={asset.id}
-              className="group relative rounded overflow-hidden border border-white/5 hover:border-white/20 transition-all"
-              style={{ background: 'rgba(255,255,255,0.02)' }}
+              className="group relative rounded overflow-hidden border hover:border-white/20 transition-all"
+              style={{ background: 'rgba(255,255,255,0.02)', borderColor: selected.has(asset.id) ? 'var(--accent)' : 'rgba(255,255,255,0.05)' }}
+              onClick={() => toggleSelect(asset.id)}
             >
+              {/* Checkbox overlay */}
+              <div
+                style={{
+                  position: 'absolute', top: 8, left: 8, zIndex: 10,
+                  width: 20, height: 20, borderRadius: 4,
+                  background: selected.has(asset.id) ? 'var(--accent)' : 'rgba(0,0,0,0.6)',
+                  border: '1.5px solid',
+                  borderColor: selected.has(asset.id) ? 'var(--accent)' : 'rgba(255,255,255,0.4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  opacity: selected.has(asset.id) ? 1 : 0,
+                  transition: 'opacity 0.1s',
+                }}
+                className="group-hover:!opacity-100"
+              >
+                {selected.has(asset.id) && (
+                  <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                )}
+              </div>
               <div style={{ aspectRatio: '1', overflow: 'hidden', background: 'rgba(0,0,0,0.3)', position: 'relative' }}>
                 {(asset.thumbUrl ?? asset.imageUrl) && (
                   <Image
@@ -193,7 +273,7 @@ export default function LibraryClient() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{asset.mode || 'pixel'}</span>
                   {asset.imageUrl && (
-                    <a href={asset.imageUrl} download target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.75rem', color: '#a78bfa', textDecoration: 'none' }}>Download</a>
+                    <a href={asset.imageUrl} download target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.75rem', color: 'var(--accent)', textDecoration: 'none' }}>Download</a>
                   )}
                 </div>
               </div>

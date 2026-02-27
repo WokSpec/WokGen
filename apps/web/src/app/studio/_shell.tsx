@@ -254,7 +254,7 @@ export default function UnifiedStudioClient({ type }: Props) {
           display: flex;
           height: calc(100dvh - var(--nav-height, 56px));
           overflow: hidden;
-          background: var(--surface-base, #0d0d14);
+          background: var(--surface-base, var(--bg));
         }
 
         /* ── Rail ───────────────────────────────────────────────────────── */
@@ -420,7 +420,7 @@ export default function UnifiedStudioClient({ type }: Props) {
           left: 0;
           z-index: 50;
           min-width: 180px;
-          background: #13131f;
+          background: var(--bg-surface-2, var(--bg-surface));
           border: 1px solid rgba(255,255,255,0.1);
           border-radius: 3px;
           padding: 4px;
@@ -492,6 +492,46 @@ export default function UnifiedStudioClient({ type }: Props) {
           .wok-studio-ctx-bar {
             flex-wrap: wrap;
             gap: 4px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .wok-studio-shell {
+            flex-direction: column-reverse;
+          }
+          .wok-studio-rail {
+            width: 100%;
+            flex-direction: row;
+            height: 48px;
+            padding: 0;
+            border-right: none;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+          }
+          .wok-studio-rail::-webkit-scrollbar { display: none; }
+          .wok-studio-rail__wordmark {
+            display: none;
+          }
+          .wok-studio-rail__items {
+            flex-direction: row;
+            flex: 1;
+          }
+          .wok-studio-rail__item {
+            flex: 1;
+            padding: 6px 4px;
+            border-left: none;
+            border-top: 2px solid transparent;
+            min-width: 48px;
+          }
+          .wok-studio-rail__item.--active {
+            border-left-color: transparent;
+            border-top-color: var(--accent);
+          }
+          .wok-studio-rail__label {
+            display: block;
+            font-size: 0.44rem;
           }
         }
       `}</style>

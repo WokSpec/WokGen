@@ -219,7 +219,7 @@ export default function ApiKeysClient() {
                       {confirmRevoke === k.id ? 'Confirm?' : 'Revoke'}
                     </button>
                     {confirmRevoke === k.id && (
-                      <button type="button" onClick={() => setConfirmRevoke(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.75rem', marginLeft: '4px' }}>✕</button>
+                      <button type="button" onClick={() => setConfirmRevoke(null)} aria-label="Cancel revoke" style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.75rem', marginLeft: '4px' }}>✕</button>
                     )}
                   </td>
                 </tr>

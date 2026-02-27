@@ -100,7 +100,7 @@ export default function ProjectsClient() {
   return (
     <div className="projects-page">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-        <h1 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text-primary)' }}>Projects</h1>
+        <h1 style={{ margin: 0, fontSize: '1.75rem', color: 'var(--text-primary)' }}>Projects</h1>
         <Link href="/projects/new" style={{ background: 'var(--accent)', color: '#fff', padding: '8px 16px', borderRadius: 6, textDecoration: 'none', fontSize: 14 }}>
           + New project
         </Link>

@@ -12813,7 +12813,7 @@ select:focus-visible {
 }
 
 .acct-title {
-  font-size: 1.6rem;
+  font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   font-family: var(--font-heading);

@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import AutomationsClient from './_client';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'Automations — WokGen',
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 export default async function AutomationsPage() {
   const session = await auth();
   if (!session?.user?.id) redirect('/login?callbackUrl=/automations');
-  return <AutomationsClient />;
+  return <ErrorBoundary context="Automations"><AutomationsClient /></ErrorBoundary>;
 }

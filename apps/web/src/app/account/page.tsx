@@ -12,6 +12,7 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import AccountClient from './_client';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default async function AccountPage() {
   const session = await auth();
@@ -20,12 +21,14 @@ export default async function AccountPage() {
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
 
   return (
-    <AccountClient
-      user={{
-        name:  user?.name  ?? null,
-        email: user?.email ?? null,
-        image: user?.image ?? null,
-      }}
-    />
+    <ErrorBoundary context="Account">
+      <AccountClient
+        user={{
+          name:  user?.name  ?? null,
+          email: user?.email ?? null,
+          image: user?.image ?? null,
+        }}
+      />
+    </ErrorBoundary>
   );
 }

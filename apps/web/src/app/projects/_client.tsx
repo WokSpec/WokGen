@@ -63,6 +63,21 @@ export default function ProjectsClient() {
 
   useEffect(() => { load(); }, [load]);
 
+  const deleteProject = useCallback(async (id: string, name: string) => {
+    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const d = await res.json().catch(() => null);
+        alert(d?.error ?? 'Failed to delete project');
+        return;
+      }
+      setProjects(prev => prev.filter(p => p.id !== id));
+    } catch {
+      alert('Network error');
+    }
+  }, []);
+
   const filtered = projects
     .filter(p => !searchQuery.trim() || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.description?.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
@@ -79,7 +94,7 @@ export default function ProjectsClient() {
     <div className="projects-page">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
         <h1 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text-primary)' }}>Projects</h1>
-        <Link href="/projects/new" style={{ background: '#4f8ef7', color: '#fff', padding: '8px 16px', borderRadius: 6, textDecoration: 'none', fontSize: 14 }}>
+        <Link href="/projects/new" style={{ background: 'var(--accent)', color: '#fff', padding: '8px 16px', borderRadius: 6, textDecoration: 'none', fontSize: 14 }}>
           + New project
         </Link>
       </div>
@@ -119,7 +134,7 @@ export default function ProjectsClient() {
           {filtered.map(p => (
             <div
               key={p.id}
-              style={{ background: '#1a1a2e', borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}
+              style={{ background: 'var(--bg-surface, #1a1a2e)', borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)' }}
             >
               {/* Asset thumbnail preview strip */}
               <div className="grid grid-cols-4 gap-1 overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)' }}>
@@ -153,19 +168,26 @@ export default function ProjectsClient() {
                 <p style={{ margin: '0 0 0.75rem', fontSize: 11, color: '#4b5563' }}>{p.mode} · updated {new Date(p.updatedAt).toLocaleDateString()}</p>
 
                 {/* Quick action buttons */}
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <Link
-                    href={`/studio?projectId=${p.id}`}
-                    style={{ fontSize: 12, background: '#4f8ef7', color: '#fff', padding: '5px 12px', borderRadius: 6, textDecoration: 'none' }}
+                    href={`/projects/${p.id}`}
+                    style={{ fontSize: 12, background: 'var(--accent)', color: '#fff', padding: '5px 12px', borderRadius: 6, textDecoration: 'none' }}
                   >
-                    Open Studio
+                    Open
                   </Link>
                   <Link
                     href={`/library?projectId=${p.id}`}
                     style={{ fontSize: 12, background: 'rgba(255,255,255,0.08)', color: '#cbd5e1', padding: '5px 12px', borderRadius: 6, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}
                   >
-                    View Assets
+                    Assets
                   </Link>
+                  <button
+                    onClick={() => deleteProject(p.id, p.name)}
+                    style={{ marginLeft: 'auto', fontSize: 12, background: 'transparent', color: 'var(--danger, #ef4444)', border: '1px solid rgba(239,68,68,0.25)', padding: '5px 10px', borderRadius: 6, cursor: 'pointer' }}
+                    title="Delete project"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>

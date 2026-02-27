@@ -68,6 +68,17 @@ export default function NotificationSettingsClient() {
   const save = async () => {
     setSaving(true); setError(''); setSaved(false);
     try {
+      // Validate webhook URL if provided
+      if (settings.notifyWebhookUrl) {
+        try { new URL(settings.notifyWebhookUrl); } catch {
+          setError('Webhook URL must be a valid URL (e.g. https://hooks.slack.com/…)');
+          return;
+        }
+        if (!settings.notifyWebhookUrl.startsWith('https://')) {
+          setError('Webhook URL must use HTTPS');
+          return;
+        }
+      }
       const res = await fetch('/api/settings/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

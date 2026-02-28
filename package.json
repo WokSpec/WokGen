@@ -49,5 +49,8 @@
     "inquirer": "^13.2.2",
     "lru-cache": "^11.2.6",
     "rate-limiter-flexible": "^9.1.1"
+  },
+  "devDependencies": {
+    "prisma": "5.14.0"
   }
 }

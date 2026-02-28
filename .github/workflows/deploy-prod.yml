@@ -21,7 +21,7 @@ jobs:
         run: npm install --legacy-peer-deps --ignore-scripts
 
       - name: Generate Prisma client
-        run: PRISMA_GENERATE_SKIP_AUTOINSTALL=1 npx prisma generate --schema=apps/web/prisma/schema.prisma
+        run: PRISMA_GENERATE_SKIP_AUTOINSTALL=1 ./node_modules/.bin/prisma generate --schema=apps/web/prisma/schema.prisma
 
       - name: Build check
         working-directory: apps/web

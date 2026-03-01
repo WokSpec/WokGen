@@ -6,7 +6,7 @@
 export type Tool = 'generate' | 'animate' | 'rotate' | 'inpaint' | 'scene';
 
 // Provider identifiers
-export type ProviderName = 'replicate' | 'fal' | 'together' | 'comfyui' | 'pollinations' | 'huggingface' | 'stablehorde';
+export type ProviderName = 'replicate' | 'fal' | 'together' | 'comfyui' | 'pollinations' | 'huggingface' | 'stablehorde' | 'prodia';
 
 // Canonical export pixel sizes
 export type PixelSize = 32 | 64 | 128 | 256 | 512;
@@ -351,6 +351,19 @@ export const PROVIDER_CAPABILITIES: Record<ProviderName, ProviderCapability> = {
     free: true,
     requiresKey: false,
   },
+  prodia: {
+    generate: true,
+    animate: false,
+    rotate: false,
+    inpaint: false,
+    scene: false,
+    maxWidth: 1024,
+    maxHeight: 1024,
+    supportsSeed: true,
+    supportsNegativePrompt: true,
+    free: true,
+    requiresKey: false,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -445,5 +458,16 @@ export const PROVIDER_META: Record<ProviderName, ProviderMeta> = {
     freeCredits: true,
     freeCreditsNote: 'Completely free — anonymous key works, free signup for priority',
     color: '#8b5cf6',
+  },
+  prodia: {
+    id: 'prodia',
+    label: 'Prodia',
+    description: 'Free Stable Diffusion API. No key required. PRODIA_API_KEY unlocks higher rate limits.',
+    docsUrl: 'https://docs.prodia.com',
+    keyEnvVar: 'PRODIA_API_KEY',
+    keyLabel: 'API Key (optional)',
+    freeCredits: true,
+    freeCreditsNote: 'Free without a key; key unlocks higher rate limits',
+    color: '#f97316',
   },
 };

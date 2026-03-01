@@ -356,10 +356,12 @@ async function handleNonStreaming(
   }
 
   if (provider === 'cerebras') {
-    const systemMsg = messages.find(m => m.role === 'system')?.content ?? '';
-    const userMsg = messages.filter(m => m.role === 'user').at(-1)?.content ?? '';
-    const result = await cerebrasChat(systemMsg, userMsg, { model, maxTokens: 2048 });
-    return { reply: result.text, durationMs: Date.now() - start };
+    const cerebrasMessages = messages.map((m: { role: string; content: string }) => ({
+      role: m.role as 'system' | 'user' | 'assistant',
+      content: m.content,
+    }));
+    const reply = await cerebrasChat(cerebrasMessages, { model, maxTokens: 2048 });
+    return { reply, durationMs: Date.now() - start };
   }
 
   const res = await fetch(url, {

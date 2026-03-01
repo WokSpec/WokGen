@@ -40,6 +40,7 @@ const STANDARD_MATRIX: Record<string, Record<string, ProviderPreference[]>> = {
     generate: [
       { provider: 'together',    requires: 'TOGETHER_API_KEY' },
       { provider: 'huggingface', requires: 'HF_TOKEN' },
+      { provider: 'prodia' },                           // free SD, no key needed
       { provider: 'pollinations' },                     // always free, no key
     ],
     animate: [
@@ -47,6 +48,7 @@ const STANDARD_MATRIX: Record<string, Record<string, ProviderPreference[]>> = {
     ],
     rotate: [
       { provider: 'together',    requires: 'TOGETHER_API_KEY' },
+      { provider: 'prodia' },
       { provider: 'pollinations' },
     ],
     inpaint: [
@@ -56,6 +58,7 @@ const STANDARD_MATRIX: Record<string, Record<string, ProviderPreference[]>> = {
     scene: [
       { provider: 'together',    requires: 'TOGETHER_API_KEY' },
       { provider: 'huggingface', requires: 'HF_TOKEN' },
+      { provider: 'prodia' },
       { provider: 'pollinations' },
     ],
   },
@@ -63,6 +66,7 @@ const STANDARD_MATRIX: Record<string, Record<string, ProviderPreference[]>> = {
     generate: [
       { provider: 'together',    requires: 'TOGETHER_API_KEY' },
       { provider: 'huggingface', requires: 'HF_TOKEN' },
+      { provider: 'prodia' },
       { provider: 'pollinations' },
     ],
     animate: [
@@ -70,6 +74,7 @@ const STANDARD_MATRIX: Record<string, Record<string, ProviderPreference[]>> = {
     ],
     rotate: [
       { provider: 'together',    requires: 'TOGETHER_API_KEY' },
+      { provider: 'prodia' },
       { provider: 'pollinations' },
     ],
     inpaint: [
@@ -78,6 +83,7 @@ const STANDARD_MATRIX: Record<string, Record<string, ProviderPreference[]>> = {
     ],
     scene: [
       { provider: 'together',    requires: 'TOGETHER_API_KEY' },
+      { provider: 'prodia' },
       { provider: 'pollinations' },
     ],
   },
@@ -106,12 +112,13 @@ const VECTOR_STANDARD: Record<string, ProviderPreference[]> = {
   generate: [
     { provider: 'together',    requires: 'TOGETHER_API_KEY' },
     { provider: 'huggingface', requires: 'HF_TOKEN' },
+    { provider: 'prodia' },
     { provider: 'pollinations' },
   ],
   animate:  [{ provider: 'pollinations' }],
-  rotate:   [{ provider: 'together', requires: 'TOGETHER_API_KEY' }, { provider: 'pollinations' }],
+  rotate:   [{ provider: 'together', requires: 'TOGETHER_API_KEY' }, { provider: 'prodia' }, { provider: 'pollinations' }],
   inpaint:  [{ provider: 'together', requires: 'TOGETHER_API_KEY' }, { provider: 'pollinations' }],
-  scene:    [{ provider: 'together', requires: 'TOGETHER_API_KEY' }, { provider: 'pollinations' }],
+  scene:    [{ provider: 'together', requires: 'TOGETHER_API_KEY' }, { provider: 'prodia' }, { provider: 'pollinations' }],
 };
 
 const VECTOR_HD: Record<string, ProviderPreference[]> = {

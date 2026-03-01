@@ -1,105 +1,84 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
-import { z } from 'zod';
+import { signEralToken } from '@/lib/eral-token';
+
+// ---------------------------------------------------------------------------
+// /api/eral/memory — proxy to Eral Worker chat session memory
+//
+//   GET  ?sessionId=xxx → GET  /v1/chat/:sessionId  (retrieve session messages)
+//   GET  (no sessionId) → GET  /v1/chat/sessions    (list all sessions)
+//   DELETE ?sessionId=xxx → DELETE /v1/chat/:sessionId (clear session memory)
+// ---------------------------------------------------------------------------
 
 export const dynamic = 'force-dynamic';
 
-interface MemFact { key: string; value: string; savedAt: string }
+const ERAL_API = process.env.ERAL_API_URL ?? 'https://eral.wokspec.org/api';
 
-// GET /api/eral/memory — return user's Eral memory facts
-export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ facts: [] });
-
-  const pref = await prisma.userPreference.findUnique({
-    where: { userId: session.user.id },
-    select: { eralMemory: true, eralContext: true },
+async function makeEralRequest(
+  url: string,
+  method: string,
+  token: string,
+): Promise<Response> {
+  return fetch(url, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'X-Eral-Source': 'wokgen',
+    },
   });
-
-  let facts: MemFact[] = [];
-  if (pref?.eralMemory) {
-    try { facts = JSON.parse(pref.eralMemory); } catch { /* ignore */ }
-  }
-  let context = null;
-  if (pref?.eralContext) {
-    try { context = JSON.parse(pref.eralContext); } catch { /* ignore */ }
-  }
-
-  return NextResponse.json({ facts, context });
 }
 
-const saveSchema = z.object({
-  action: z.enum(['remember', 'forget', 'set_context']),
-  key:    z.string().min(1).max(100).optional(),
-  value:  z.string().min(1).max(500).optional(),
-  context: z.object({
-    projectType:     z.string().max(100).optional(),
-    mainTool:        z.string().max(100).optional(),
-    stylePreference: z.string().max(100).optional(),
-  }).optional(),
-});
-
-// POST /api/eral/memory — save or forget a memory fact
-export async function POST(req: Request) {
+export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await req.json().catch(() => null);
-  const parsed = saveSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+  const token = signEralToken(session.user);
+  if (!token) {
+    return NextResponse.json(
+      { error: 'Eral service not configured (ERAL_JWT_SECRET missing)' },
+      { status: 503 },
+    );
   }
 
-  const { action, key, value, context } = parsed.data;
-  const userId = session.user.id;
+  const sessionId = req.nextUrl.searchParams.get('sessionId');
+  const url = sessionId
+    ? `${ERAL_API}/v1/chat/${encodeURIComponent(sessionId)}`
+    : `${ERAL_API}/v1/chat/sessions`;
 
-  const pref = await prisma.userPreference.findUnique({
-    where:  { userId },
-    select: { eralMemory: true },
-  });
+  const eralRes = await makeEralRequest(url, 'GET', token);
+  const data = await eralRes.json();
+  return NextResponse.json(data, { status: eralRes.status });
+}
 
-  let facts: MemFact[] = [];
-  if (pref?.eralMemory) {
-    try { facts = JSON.parse(pref.eralMemory); } catch { /* ignore */ }
+export async function DELETE(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  if (action === 'remember' && key && value) {
-    const existing = facts.findIndex(f => f.key.toLowerCase() === key.toLowerCase());
-    const fact: MemFact = { key, value, savedAt: new Date().toISOString() };
-    if (existing >= 0) {
-      facts[existing] = fact;
-    } else {
-      facts = [...facts.slice(-29), fact]; // max 30 facts
-    }
-    await prisma.userPreference.upsert({
-      where:  { userId },
-      update: { eralMemory: JSON.stringify(facts) },
-      create: { userId, eralMemory: JSON.stringify(facts) },
-    });
-    return NextResponse.json({ ok: true, facts });
+  const token = signEralToken(session.user);
+  if (!token) {
+    return NextResponse.json(
+      { error: 'Eral service not configured (ERAL_JWT_SECRET missing)' },
+      { status: 503 },
+    );
   }
 
-  if (action === 'forget' && key) {
-    facts = facts.filter(f => f.key.toLowerCase() !== key.toLowerCase());
-    await prisma.userPreference.upsert({
-      where:  { userId },
-      update: { eralMemory: JSON.stringify(facts) },
-      create: { userId, eralMemory: JSON.stringify(facts) },
-    });
-    return NextResponse.json({ ok: true, facts });
+  const sessionId =
+    req.nextUrl.searchParams.get('sessionId') ??
+    (await req.json().catch(() => ({} as Record<string, unknown>)) as Record<string, unknown>)?.sessionId as string | undefined;
+
+  if (!sessionId) {
+    return NextResponse.json({ error: 'sessionId is required' }, { status: 400 });
   }
 
-  if (action === 'set_context' && context) {
-    await prisma.userPreference.upsert({
-      where:  { userId },
-      update: { eralContext: JSON.stringify(context) },
-      create: { userId, eralContext: JSON.stringify(context) },
-    });
-    return NextResponse.json({ ok: true });
-  }
-
-  return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+  const eralRes = await makeEralRequest(
+    `${ERAL_API}/v1/chat/${encodeURIComponent(sessionId)}`,
+    'DELETE',
+    token,
+  );
+  const data = await eralRes.json();
+  return NextResponse.json(data, { status: eralRes.status });
 }

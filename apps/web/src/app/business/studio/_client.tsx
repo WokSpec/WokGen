@@ -647,33 +647,33 @@ function BusinessStudioInner() {
         {/* Prompt / concept input */}
         <div className="studio-control-section">
           <div className="flex items-center justify-between mb-1">
-            <label className="studio-label" style={{ marginBottom: 0 }}>Concept / Description</label>
+            <label className="studio-label">Concept / Description</label>
             <div className="flex items-center gap-2">
               {/* Save as Favorite */}
               <button type="button"
                 title={favSaved ? 'Saved!' : 'Save prompt as favorite'}
                 onClick={savePromptAsFavorite}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', lineHeight: 1, color: favSaved ? '#f59e0b' : 'var(--text-disabled)', transition: 'color 0.15s' }}
+                className={`biz-fav-btn${favSaved ? ' biz-fav-btn--saved' : ''}`}
               >
                 {favSaved ? '✓' : '+'}
               </button>
               {/* My Prompts dropdown */}
               {favPrompts.length > 0 && (
-                <div data-fav-menu style={{ position: 'relative' }}>
+                <div data-fav-menu className="biz-fav-menu-wrap">
                   <button type="button"
                     title="My saved prompts"
                     onClick={() => setShowFavMenu(v => !v)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.65rem', color: 'var(--text-disabled)', padding: '0 2px' }}
+                    className="biz-fav-menu-trigger"
                   >
                     My Prompts ▾
                   </button>
                   {showFavMenu && (
-                    <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, minWidth: 220, maxHeight: 180, overflowY: 'auto', boxShadow: '0 4px 12px var(--overlay-30)' }}>
+                    <div className="biz-fav-dropdown">
                       {favPrompts.map(f => (
                         <button type="button"
                           key={f.id}
                           onClick={() => { setPrompt(f.prompt); setShowFavMenu(false); }}
-                          style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.7rem', color: 'var(--text-primary)', borderBottom: '1px solid var(--border)' }}
+                          className="biz-fav-item"
                         >
                           {f.prompt.length > 60 ? f.prompt.slice(0, 58) + '…' : f.prompt}
                         </button>
@@ -754,7 +754,7 @@ function BusinessStudioInner() {
         {activeTool === 'logo' && (
           <div className="studio-control-section">
             <label className="studio-label">Logo Background</label>
-            <div className="studio-preset-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+            <div className="studio-preset-grid studio-preset-grid--3">
               {([
                 { id: 'white',       label: '⬜ White'       },
                 { id: 'dark',        label: '⬛ Dark'         },
@@ -869,7 +869,7 @@ function BusinessStudioInner() {
             onKeyDown={(e) => e.key === 'Enter' && setShowAudioPanel((v) => !v)}
             aria-expanded={showAudioPanel}
           >
-            <span className="studio-control-label" style={{ fontWeight: 600 }}>Audio</span>
+            <span className="studio-control-label" >Audio</span>
             <span className="studio-section-toggle__chevron">
               {showAudioPanel ? '▾' : '▸'}
             </span>
@@ -879,7 +879,7 @@ function BusinessStudioInner() {
             <div className="px-4 pb-4 flex flex-col gap-3">
               {/* Freesound browser */}
               <SfxBrowser onSelectPrompt={(p) => setSfxPrompt(p)} />
-              <div style={{ borderTop: '1px solid var(--surface-border)', margin: '2px 0' }} />
+              <div className="studio-section-divider" />
               {/* Prompt label + Auto-suggest */}
               <div className="flex items-center justify-between">
                 <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
@@ -917,7 +917,7 @@ function BusinessStudioInner() {
               {/* Duration slider */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs" style={{ color: 'var(--text-secondary)' }}>Duration</label>
+                  <label className="text-xs" >Duration</label>
                   <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{sfxDuration.toFixed(1)}s</span>
                 </div>
                 <input
@@ -997,7 +997,7 @@ function BusinessStudioInner() {
 
               {/* Error */}
               {sfxError && (
-                <p className="text-xs" style={{ color: 'var(--error, #ef4444)' }}>{sfxError}</p>
+                <p className="text-xs" className="text-danger">{sfxError}</p>
               )}
 
               {/* Audio player */}
@@ -1017,7 +1017,7 @@ function BusinessStudioInner() {
               )}
 
               {/* Hint */}
-              <p className="text-xs" style={{ color: 'var(--text-disabled)', marginTop: -4 }}>
+              <p className="text-xs text-faint" style={{ marginTop: -4 }}>
                 Free: 3 sounds/day · Great for game assets
               </p>
             </div>
@@ -1033,7 +1033,7 @@ function BusinessStudioInner() {
             tabIndex={0}
             onKeyDown={e => e.key === 'Enter' && setShowQrPanel(v => !v)}
           >
-            <span className="studio-control-label" style={{ fontWeight: 600 }}>QR Code</span>
+            <span className="studio-control-label" >QR Code</span>
             <span className="studio-section-toggle__chevron">{showQrPanel ? '▾' : '▸'}</span>
           </div>
           {showQrPanel && (
@@ -1052,7 +1052,7 @@ function BusinessStudioInner() {
             tabIndex={0}
             onKeyDown={e => e.key === 'Enter' && setShowFontPanel(v => !v)}
           >
-            <span className="studio-control-label" style={{ fontWeight: 600 }}>Font Pairing</span>
+            <span className="studio-control-label" >Font Pairing</span>
             <span className="studio-section-toggle__chevron">{showFontPanel ? '▾' : '▸'}</span>
           </div>
           {showFontPanel && (
@@ -1071,7 +1071,7 @@ function BusinessStudioInner() {
             tabIndex={0}
             onKeyDown={e => e.key === 'Enter' && setShowCopyPanel(v => !v)}
           >
-            <span className="studio-control-label" style={{ fontWeight: 600 }}>Brand Copy</span>
+            <span className="studio-control-label" >Brand Copy</span>
             <span className="studio-section-toggle__chevron">{showCopyPanel ? '▾' : '▸'}</span>
           </div>
           {showCopyPanel && (
@@ -1088,7 +1088,7 @@ function BusinessStudioInner() {
                 {copyLoading ? 'Generating…' : 'Generate Brand Copy'}
               </button>
               {copyError && (
-                <p className="text-xs" style={{ color: 'var(--error, #ef4444)' }}>{copyError}</p>
+                <p className="text-xs" className="text-danger">{copyError}</p>
               )}
               {brandCopy && (
                 <div className="biz-copy-section">
@@ -1159,7 +1159,7 @@ function BusinessStudioInner() {
 
         {/* Error state */}
         {jobStatus === 'failed' && studioError && (
-          <div style={{ padding: '0 16px 16px' }}>
+          <div className="biz-error-wrap">
             <StudioErrorBanner
               error={studioError}
               onDismiss={() => setStudioError(null)}
@@ -1176,7 +1176,7 @@ function BusinessStudioInner() {
               const labels = ['Logo Mark', 'Brand Banner', 'Profile Image', 'OG Meta'];
               return r.resultUrl ? (
                 <div key={i} className="biz-brandkit-cell">
-                  <div className="biz-brandkit-img" style={{ position: 'relative', aspectRatio: '1' }}>
+                  <div className="biz-brandkit-img">
                     <Image src={r.resultUrl} alt={labels[i]} fill className="object-cover" placeholder="blur" blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" sizes="300px" />
                   </div>
                   <div className="biz-brandkit-footer">
@@ -1193,7 +1193,7 @@ function BusinessStudioInner() {
             })}
           </div>
           {/* Export brand kit as JSON */}
-          <div style={{ padding: '8px 0 4px', display: 'flex', justifyContent: 'flex-end' }}>
+          <div className="biz-brandkit-export">
             <button type="button"
               className="btn-ghost btn-sm"
               onClick={handleExportBrandKitJson}
@@ -1228,7 +1228,7 @@ function BusinessStudioInner() {
             )}
             {displayResult?.resultUrl && jobStatus !== 'running' && (
               <>
-                <div key={displayResult.resultUrl} className="generated-result-enter" style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                <div key={displayResult.resultUrl} className="generated-result-wrap generated-result-enter">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={displayUrl ?? displayResult.resultUrl}
@@ -1239,22 +1239,7 @@ function BusinessStudioInner() {
                   <button type="button"
                     onClick={() => displayResult.resultUrl && handleBgRemove(displayUrl ?? displayResult.resultUrl)}
                     disabled={bgRemoving}
-                    style={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 8,
-                      opacity: 0,
-                      transition: 'opacity 0.15s',
-                      fontSize: '0.72rem',
-                      padding: '3px 8px',
-                      background: 'var(--overlay-70)',
-                      border: '1px solid var(--border-strong, var(--border))',
-                      borderRadius: 4,
-                      color: '#fff',
-                      cursor: bgRemoving ? 'wait' : 'pointer',
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '0'; }}
+                    className="biz-output-rm-bg"
                     title="Remove background"
                   >
                     {bgRemoving ? 'Removing…' : 'Remove BG'}
@@ -1271,20 +1256,7 @@ function BusinessStudioInner() {
                     </span>
                   )}
                   {(displayResult as GenerationResult)?.guestDownloadGated ? (
-                    <a
-                      href="/api/auth/signin"
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: 6,
-                        background: 'var(--warning-bg)',
-                        border: '1px solid var(--warning)',
-                        color: 'var(--warning)',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        textDecoration: 'none',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
+                    <a href="/api/auth/signin" className="btn-sign-gate">
                       Sign in to download →
                     </a>
                   ) : (
@@ -1378,7 +1350,7 @@ function BusinessStudioInner() {
             >
               {item.resultUrl
                 ? (
-                    <div className="studio-history-thumb biz-history-thumb" style={{ position: 'relative' }}>
+                    <div className="studio-history-thumb biz-history-thumb">
                       <Image src={item.resultUrl} alt={item.prompt?.slice(0, 50) || 'Generated business asset'} fill className="object-cover" sizes="48px" />
                     </div>
                   )

@@ -7,7 +7,7 @@
  *
  * Environment variables (add to .env.local):
  *   NEXT_PUBLIC_ERAL_ENABLED=true          — toggles all Eral UI in WokGen
- *   NEXT_PUBLIC_ERAL_URL=https://eral.wokspec.com  — standalone Eral origin
+ *   NEXT_PUBLIC_ERAL_URL=https://eral.wokspec.org  — standalone Eral origin
  *
  * Integration surface:
  *   1. EralCompanion   — floating widget in root layout (client-side only)
@@ -34,6 +34,14 @@ export const ERAL_URL =
 
 /** The chat API endpoint WokGen uses when Eral is bundled (local mode only) */
 export const ERAL_CHAT_API = '/api/eral/chat';
+
+/**
+ * Base URL of the Eral Worker API used by server-side proxy routes.
+ * Server-side only — not exposed to the browser.
+ */
+export const ERAL_API_URL = process.env.NEXT_PUBLIC_ERAL_URL
+  ? `${process.env.NEXT_PUBLIC_ERAL_URL}/api`
+  : (process.env.ERAL_API_URL ?? 'https://eral.wokspec.org/api');
 
 /**
  * Context passed from WokGen studios to Eral.

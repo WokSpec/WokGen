@@ -1899,6 +1899,7 @@ body {
 .biz-history-thumb {
   border-radius: var(--radius);
   aspect-ratio: auto !important;
+  position: relative;
 }
 .biz-lightbox-img {
   max-width: 100%;
@@ -23828,4 +23829,104 @@ input[type="range"].studio-range {
   background: var(--accent-dim);
   color: var(--accent);
   border-color: var(--accent-muted);
+}
+
+/* ── Business studio output area ────────────────────────────────────────── */
+.biz-brandkit-export {
+  padding: 8px 0 4px;
+  display: flex;
+  justify-content: flex-end;
+}
+.biz-output-rm-bg {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  background: var(--bg-overlay-dark, rgba(0,0,0,0.7));
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+.biz-output-rm-bg:hover { opacity: 1 !important; }
+.generated-result-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* ── Business studio left panel extras ──────────────────────────────────── */
+.biz-fav-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: var(--text-disabled);
+  transition: color 0.15s;
+}
+.biz-fav-btn--saved { color: #f59e0b; }
+.biz-fav-menu-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.65rem;
+  color: var(--text-disabled);
+  padding: 0 2px;
+}
+.biz-fav-menu-wrap { position: relative; }
+.biz-fav-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 50;
+  background: var(--surface-2, var(--bg-elevated));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  min-width: 220px;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.biz-fav-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: var(--text-primary);
+  transition: background 0.1s;
+}
+.biz-fav-item:hover { background: var(--bg-overlay); }
+
+/* ── Business studio brandkit img ───────────────────────────────────────── */
+.biz-brandkit-img {
+  position: relative;
+  aspect-ratio: 1;
+}
+
+/* ── Business studio error banner wrap ──────────────────────────────────── */
+.biz-error-wrap {
+  padding: 0 16px 16px;
+}
+
+/* ── Utility text color classes ──────────────────────────────────────────── */
+.text-danger { color: var(--error, #ef4444); }
+.text-faint  { color: var(--text-faint); }
+
+/* ── Studio preset grid columns ─────────────────────────────────────────── */
+.studio-preset-grid--3 { grid-template-columns: repeat(3, 1fr); }
+
+/* ── Studio section divider ─────────────────────────────────────────────── */
+.studio-section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2px 0;
 }

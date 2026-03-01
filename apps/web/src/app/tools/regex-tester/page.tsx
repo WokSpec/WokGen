@@ -24,29 +24,29 @@ export default function RegexTesterPage() {
         <p className="tool-page-desc">Test regular expressions against text. See matches instantly.</p>
       </div>
       <div className="tool-section">
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '200px' }}>
-            <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Pattern</label>
-            <input value={pattern} onChange={e => setPattern(e.target.value)} placeholder="\b\w+\b" style={{ width: '100%', background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 0.875rem', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.9375rem', outline: 'none' }} />
+        <div className="tool-options-row">
+          <div className="tool-options-row__flex">
+            <label className="tool-field-label">Pattern</label>
+            <input value={pattern} onChange={e => setPattern(e.target.value)} placeholder="\b\w+\b" className="tool-field-input tool-field-input--mono" />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Flags</label>
-            <input value={flags} onChange={e => setFlags(e.target.value)} placeholder="gi" style={{ width: '80px', background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 0.875rem', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.9375rem', outline: 'none' }} />
+            <label className="tool-field-label">Flags</label>
+            <input value={flags} onChange={e => setFlags(e.target.value)} placeholder="gi" className="tool-field-input tool-field-input--mono tool-field-input--narrow" />
           </div>
         </div>
-        <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Test string</label>
-        <textarea value={input} onChange={e => setInput(e.target.value)} rows={4} style={{ width: '100%', background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem', color: 'var(--text-primary)', fontSize: '0.9375rem', outline: 'none', resize: 'vertical', fontFamily: 'monospace' }} />
-        <button type="button" onClick={test} className="btn btn-primary" style={{ marginTop: '0.875rem', padding: '0.5rem 1.25rem' }}>Test Pattern</button>
+        <label className="tool-field-label">Test string</label>
+        <textarea value={input} onChange={e => setInput(e.target.value)} rows={4} className="tool-field-textarea tool-field-textarea--mono" />
+        <button type="button" onClick={test} className="btn btn-primary tool-submit-btn">Test Pattern</button>
         {result && (
-          <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--surface-card)' }}>
+          <div className="tool-result-panel">
             {result.error ? (
-              <p style={{ color: 'var(--danger)', fontFamily: 'monospace', fontSize: '0.875rem' }}>Error: {result.error}</p>
+              <p className="tool-result-error">{result.error}</p>
             ) : (
               <>
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>{result.count} match{result.count !== 1 ? 'es' : ''} found</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
+                <p className="tool-result-meta">{result.count} match{result.count !== 1 ? 'es' : ''} found</p>
+                <div className="tool-match-chips">
                   {result.matches.map((m, i) => (
-                    <code key={i} style={{ padding: '0.2rem 0.5rem', background: 'var(--accent-subtle)', border: '1px solid var(--accent-glow)', borderRadius: '4px', fontSize: '0.8125rem', color: 'var(--accent)' }}>{m}</code>
+                    <code key={i} className="tool-match-chip">{m}</code>
                   ))}
                 </div>
               </>

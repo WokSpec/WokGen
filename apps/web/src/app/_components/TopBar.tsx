@@ -3,6 +3,7 @@ import { NavAuth } from './NavAuth';
 import { CmdKButton } from './CmdKButton';
 import { MobileNav } from './MobileNav';
 import { Breadcrumb } from './Breadcrumb';
+import { NotificationBell } from './NotificationBell';
 import AppThemeToggle from '@/components/AppThemeToggle';
 
 /**
@@ -31,6 +32,7 @@ export function TopBar() {
         <span className="app-topbar__cmdk-wrap">
           <CmdKButton />
         </span>
+        <NotificationBell />
         <AppThemeToggle />
         <NavAuth />
         {/* Hamburger menu — visible only on mobile (sidebar is hidden) */}

@@ -159,8 +159,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
             <button type="button"
               onClick={() => generate()}
               disabled={isGenerating || !prompt.trim()}
-              className="w-full py-2.5 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium flex items-center justify-center gap-2 transition-colors"
-              style={{ background: 'var(--accent)', color: '#000', borderRadius: 'var(--radius)' }}
+              className="btn btn-generate w-full"
             >
               {isGenerating ? (
                 <><IconLoader2 /> Generating...</>

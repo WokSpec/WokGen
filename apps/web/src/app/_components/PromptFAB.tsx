@@ -75,11 +75,11 @@ export function PromptFAB() {
       {open && (
         <div className="prompt-fab__panel" role="dialog" aria-label="Prompt Lab">
           <div className="prompt-fab__panel-header">
-            <span style={{ fontWeight: 600, fontSize: 14 }}>✨ Prompt Lab</span>
+            <span className="prompt-fab__title">✨ Prompt Lab</span>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', fontSize: 18, lineHeight: 1, padding: '0 4px' }}
+              className="prompt-fab__close"
               aria-label="Close Prompt Lab"
             >
               ×
@@ -87,21 +87,21 @@ export function PromptFAB() {
           </div>
 
           <div className="prompt-fab__panel-body">
-            <label className="tool-page__label" style={{ fontSize: 12 }}>
-              Mode: <strong style={{ color: 'var(--accent)' }}>{mode}</strong>
+            <label className="prompt-fab__mode-label">
+              Mode: <strong className="prompt-fab__mode-name">{mode}</strong>
             </label>
             <textarea
-              className="tool-page__textarea"
+              className="studio-textarea"
               placeholder="Enter a prompt to enhance…"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows={3}
-              style={{ fontSize: 13, marginTop: 4 }}
+              style={{ width: '100%', fontSize: '0.8rem', marginTop: 4 }}
             />
 
             <button
               type="button"
-              className="tool-page__btn-primary"
+              className="btn btn-generate"
               onClick={enhance}
               disabled={loading || !prompt.trim()}
               style={{ width: '100%', marginTop: 8 }}
@@ -110,31 +110,21 @@ export function PromptFAB() {
             </button>
 
             {error && (
-              <div className="tool-page__error" style={{ marginTop: 8, fontSize: 12 }}>
+              <div className="prompt-fab__error">
                 {error}
               </div>
             )}
 
             {enhancedPrompt && !error && (
-              <div style={{ marginTop: 12 }}>
-                <div style={{ fontSize: 12, color: 'var(--text-faint)', marginBottom: 4 }}>Enhanced:</div>
-                <div
-                  style={{
-                    background: 'var(--surface-raised)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 6,
-                    padding: '8px 10px',
-                    fontSize: 13,
-                    lineHeight: 1.5,
-                    marginBottom: 8,
-                  }}
-                >
+              <div className="prompt-fab__result">
+                <div className="prompt-fab__result-label">Enhanced:</div>
+                <div className="prompt-fab__result-text">
                   {enhancedPrompt}
                 </div>
                 <button
                   type="button"
-                  className="tool-page__btn-primary"
-                  style={{ width: '100%', fontSize: 12 }}
+                  className="btn btn-generate"
+                  style={{ width: '100%', fontSize: '0.75rem' }}
                   onClick={() => usePrompt(enhancedPrompt)}
                 >
                   Use this prompt ↗
@@ -143,28 +133,15 @@ export function PromptFAB() {
             )}
 
             {variations.length > 1 && (
-              <div style={{ marginTop: 12 }}>
-                <div style={{ fontSize: 12, color: 'var(--text-faint)', marginBottom: 6 }}>Suggestions:</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div className="prompt-fab__variations">
+                <div className="prompt-fab__variations-label">Suggestions:</div>
+                <div className="prompt-fab__variations-list">
                   {variations.slice(1, 4).map((v, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={() => usePrompt(v)}
-                      style={{
-                        background: 'var(--surface-raised)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 6,
-                        padding: '6px 10px',
-                        fontSize: 12,
-                        color: 'var(--text-secondary)',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'border-color 0.12s',
-                        lineHeight: 1.4,
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+                      className="prompt-fab__variation-btn"
                     >
                       {v}
                     </button>

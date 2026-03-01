@@ -21534,7 +21534,84 @@ select:focus-visible {
   border-bottom: 1px solid var(--border);
   background: var(--surface-raised);
 }
-.prompt-fab__panel-body {
+.prompt-fab__title {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.prompt-fab__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-faint);
+  font-size: 1.125rem;
+  line-height: 1;
+  padding: 0 4px;
+  transition: color 0.12s;
+}
+.prompt-fab__close:hover { color: var(--text-muted); }
+
+.prompt-fab__mode-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: block;
+}
+.prompt-fab__mode-name { color: var(--accent); }
+
+.prompt-fab__error {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--danger, #f87171);
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--danger, #f87171) 8%, transparent);
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--danger, #f87171) 20%, transparent);
+}
+.prompt-fab__result {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.prompt-fab__result-label {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+.prompt-fab__result-text {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+.prompt-fab__variations { margin-top: 0.75rem; }
+.prompt-fab__variations-label {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+.prompt-fab__variations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.prompt-fab__variation-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.12s, background 0.12s;
+  line-height: 1.4;
+}
+.prompt-fab__variation-btn:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
   padding: 14px 16px;
   overflow-y: auto;
   flex: 1;
@@ -22288,7 +22365,13 @@ select:focus-visible {
   height: 40px;
   border-radius: 10px;
   flex-shrink: 0;
+  background: color-mix(in srgb, var(--stat-color, var(--accent)) 12%, transparent);
+  color: var(--stat-color, var(--accent));
 }
+.dash-stat-card__icon--accent { --stat-color: var(--accent); }
+.dash-stat-card__icon--success { --stat-color: var(--success, #4ade80); }
+.dash-stat-card__icon--yellow { --stat-color: var(--yellow, #fbbf24); }
+
 .dash-stat-card__body { flex: 1; min-width: 0; }
 .dash-stat-card__value {
   font-size: 1.5rem;
@@ -22308,7 +22391,11 @@ select:focus-visible {
   padding: 2px 7px;
   border-radius: 99px;
   flex-shrink: 0;
+  background: color-mix(in srgb, var(--badge-color, var(--accent)) 12%, transparent);
+  color: var(--badge-color, var(--accent));
 }
+.dash-stat-card__badge--accent { --badge-color: var(--accent); }
+.dash-stat-card__badge--yellow { --badge-color: var(--yellow, #fbbf24); }
 
 /* ============================================================
    Homepage — utility classes

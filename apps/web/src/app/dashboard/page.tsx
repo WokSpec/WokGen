@@ -52,7 +52,7 @@ export default async function DashboardPage() {
       {/* ── Stats row ───────────────────────────────────────── */}
       <div className="dash-stats">
         <div className="dash-stat-card">
-          <div className="dash-stat-card__icon" style={{ background: 'color-mix(in srgb, var(--accent) 12%, transparent)', color: 'var(--accent)' }}>
+          <div className="dash-stat-card__icon dash-stat-card__icon--accent">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
@@ -61,15 +61,12 @@ export default async function DashboardPage() {
             <div className="dash-stat-card__value">{generationsToday}</div>
             <div className="dash-stat-card__label">Today&apos;s generations</div>
           </div>
-          <span
-            className="dash-stat-card__badge"
-            style={{ background: 'var(--accent-subtle)', color: 'var(--accent)' }}
-          >
+          <span className="dash-stat-card__badge dash-stat-card__badge--accent">
             {generationsToday > 0 ? '↑ active' : '—'}
           </span>
         </div>
         <div className="dash-stat-card">
-          <div className="dash-stat-card__icon" style={{ background: 'color-mix(in srgb, var(--success) 12%, transparent)', color: 'var(--success)' }}>
+          <div className="dash-stat-card__icon dash-stat-card__icon--success">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
               <rect x="3" y="3" width="18" height="18" rx="3" />
               <circle cx="9" cy="9" r="2" />
@@ -82,7 +79,7 @@ export default async function DashboardPage() {
           </div>
         </div>
         <div className="dash-stat-card">
-          <div className="dash-stat-card__icon" style={{ background: 'color-mix(in srgb, var(--yellow) 12%, transparent)', color: 'var(--yellow)' }}>
+          <div className="dash-stat-card__icon dash-stat-card__icon--yellow">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
               <path d="M12 2L2 7l10 5 10-5-10-5z" />
               <path d="M2 17l10 5 10-5" />
@@ -94,7 +91,7 @@ export default async function DashboardPage() {
             <div className="dash-stat-card__label">Current plan</div>
           </div>
           {planId === 'free' && (
-            <a href="/pricing" className="dash-stat-card__badge" style={{ background: 'color-mix(in srgb, var(--yellow) 12%, transparent)', color: 'var(--yellow)', textDecoration: 'none' }}>
+            <a href="/pricing" className="dash-stat-card__badge dash-stat-card__badge--yellow" style={{ textDecoration: 'none' }}>
               Upgrade
             </a>
           )}

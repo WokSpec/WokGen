@@ -1107,40 +1107,20 @@ function OutputPanel({
       {/* Compare mode side-by-side */}
       {compareMode && compareResults && compareResults.length === 2 && (
         <div
-          className="flex items-center justify-center gap-4 px-4 py-4 flex-shrink-0"
-          className="pixel-meta-bar"
+          className="pixel-compare-bar"
         >
           {compareResults.map((r: GenerationResult, i: number) => r.resultUrl && (
             <div
               key={i}
-              style={{
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 8,
-              }}
+              className="pixel-compare-item"
             >
               <div
-                style={{
-                  border: '1px solid var(--surface-border)',
-                  borderRadius: 6,
-                  padding: 8,
-                  background: 'var(--surface-raised)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+                className="pixel-compare-card"
               >
                 <img
                   src={r.resultUrl}
                   alt={`Variant ${i + 1}`}
-                  className="pixel-art"
-                  style={{
-                    maxWidth: 120,
-                    maxHeight: 120,
-                    objectFit: 'contain',
-                  }}
+                  className="pixel-art pixel-compare-img"
                 />
               </div>
               <div className="pixel-meta-bar-inner">
@@ -1160,12 +1140,7 @@ function OutputPanel({
       {/* Seed / meta strip */}
       {result && (
         <div
-          className="flex items-center gap-4 px-4 py-2 flex-shrink-0 text-xs flex-wrap"
-          style={{
-            borderTop: '1px solid var(--surface-border)',
-            background: 'var(--surface-raised)',
-            color: 'var(--text-disabled)',
-          }}
+          className="flex items-center gap-4 px-4 py-2 flex-shrink-0 text-xs flex-wrap pixel-meta-strip"
         >
           {result.width && result.height && (
             <span className="pixel-meta-muted">
@@ -1175,9 +1150,8 @@ function OutputPanel({
           )}
           {result.resolvedSeed != null && (
             <button type="button"
-              className="flex items-center gap-1"
-              title="Click to copy seed"
               className="pixel-seed-copy-btn"
+              title="Click to copy seed"
               onClick={() => {
                 navigator.clipboard.writeText(String(result.resolvedSeed)).catch(() => {});
               }}
@@ -1563,17 +1537,7 @@ function GenerateForm({
               onClick={handleEnhancePrompt}
               disabled={isEnhancing || !prompt.trim()}
               title="AI-enhance your prompt with style details (⌘↑)"
-              style={{
-                fontSize: '0.65rem',
-                padding: '2px 8px',
-                borderRadius: 4,
-                background: isEnhancing ? 'var(--surface-overlay)' : 'rgba(139,92,246,0.15)',
-                border: '1px solid var(--accent-glow)',
-                color: isEnhancing ? 'var(--text-disabled)' : 'var(--accent)',
-                cursor: isEnhancing || !prompt.trim() ? 'not-allowed' : 'pointer',
-                opacity: !prompt.trim() ? 0.4 : 1,
-                transition: 'all 0.15s',
-              }}
+              className="pixel-enhance-btn"
             >
               {isEnhancing ? 'Enhancing…' : 'Enhance'}
             </button>
@@ -1587,7 +1551,7 @@ function GenerateForm({
 
         {/* Example prompts */}
         <div>
-          <p className="text-xs mb-1.5" style={{ color: 'var(--text-disabled)' }}>
+          <p className="text-xs mb-1.5 pixel-examples-hint">
             Examples:
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -1606,8 +1570,7 @@ function GenerateForm({
 
         {/* Advanced toggle — contains negative prompt */}
         <button type="button"
-          className="flex items-center gap-1.5 text-xs self-start transition-colors duration-150"
-          style={{ color: showAdvanced ? 'var(--text-secondary)' : 'var(--text-disabled)' }}
+          className={`flex items-center gap-1.5 text-xs self-start transition-colors duration-150 pixel-advanced-toggle${showAdvanced ? ' active' : ''}`}
           onClick={() => setShowAdvanced(!showAdvanced)}
         >
           {showAdvanced ? '▾' : '▸'}
@@ -1640,15 +1603,7 @@ function GenerateForm({
             <button type="button"
               key={cat.id}
               onClick={() => setPresetCategory(cat.id)}
-              className="flex-shrink-0 text-xs px-2.5 py-1 rounded-full transition-all duration-150"
-              style={{
-                background: presetCategory === cat.id ? 'var(--accent-dim)' : 'transparent',
-                border: `1px solid ${presetCategory === cat.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                color: presetCategory === cat.id ? 'var(--accent)' : 'var(--text-muted)',
-                fontSize: '0.68rem',
-                fontWeight: 500,
-                whiteSpace: 'nowrap',
-              }}
+              className={`pixel-tab-btn${presetCategory === cat.id ? ' active' : ''}`}
             >
               {cat.label}
             </button>
@@ -1663,17 +1618,11 @@ function GenerateForm({
               <button type="button"
                 key={preset.id}
                 onClick={() => onPresetSelect(preset.id)}
-                className="flex flex-col gap-0.5 p-2 rounded-md text-left transition-all duration-150"
-                style={{
-                  background: stylePreset === preset.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                  border: `1px solid ${stylePreset === preset.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                  color: stylePreset === preset.id ? 'var(--accent)' : 'var(--text-secondary)',
-                }}
+               className={`pixel-preset-btn pixel-option-btn${stylePreset === preset.id ? ' active' : ''}`}
               >
                 <span className="text-xs font-medium">{preset.label}</span>
                 <span
-                  className="text-2xs leading-tight"
-                  style={{ fontSize: '0.6rem', color: stylePreset === preset.id ? 'var(--text-muted)' : 'var(--text-disabled)' }}
+                  className="text-2xs leading-tight pixel-preset-desc"
                 >
                   {preset.description}
                 </span>
@@ -1710,14 +1659,9 @@ function GenerateForm({
               key={cat.id}
               onClick={() => setAssetCategory(cat.id)}
               title={cat.hint}
-              className="flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-md transition-all duration-150"
-              style={{
-                background: assetCategory === cat.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                border: `1px solid ${assetCategory === cat.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                color: assetCategory === cat.id ? 'var(--accent)' : 'var(--text-secondary)',
-              }}
+              className={`pixel-category-btn pixel-option-btn${assetCategory === cat.id ? ' active' : ''}`}
             >
-              <span style={{ fontSize: '0.6rem', fontWeight: 500 }}>{cat.label}</span>
+              <span className="pixel-category-label">{cat.label}</span>
             </button>
           ))}
         </div>
@@ -1742,8 +1686,7 @@ function GenerateForm({
           const hint = CATEGORY_HINTS[assetCategory];
           return hint ? (
             <p
-              className="mt-2 text-2xs leading-relaxed"
-              style={{ fontSize: '0.65rem', color: 'var(--text-muted)', lineHeight: 1.5 }}
+              className="mt-2 text-2xs leading-relaxed pixel-category-hint"
             >
               {hint}
             </p>

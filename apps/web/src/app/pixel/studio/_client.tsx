@@ -941,15 +941,11 @@ function OutputPanel({
 
       {/* Canvas */}
       <div
-        className="output-canvas flex-1 relative overflow-auto"
+        className="output-canvas flex-1 relative overflow-auto pixel-canvas-output-inner"
         style={{
           background: bgMode === 'transparent'
             ? 'repeating-conic-gradient(#1a1a1a 0% 25%, #111 0% 50%) 0 0 / 16px 16px'
             : 'var(--surface-muted)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '2rem',
         }}
       >
         {urls.length > 1 ? (
@@ -989,32 +985,14 @@ function OutputPanel({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--accent-subtle)',
-              borderRadius: 4,
-              padding: '0.75rem',
-              maxWidth: '90%',
-              maxHeight: '90%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-            }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={displayUrl ?? activeUrl}
               alt="Generated result"
-              className="pixel-art result-reveal"
+              className="pixel-art result-reveal pixel-result-img"
               style={{
-                imageRendering: 'pixelated',
                 transform: `scale(${zoom})`,
-                transformOrigin: 'center',
-                transition: 'transform 0.15s ease',
-                maxWidth: '100%',
-                maxHeight: '100%',
-                display: 'block',
               }}
             />
             {/* Remove BG button on hover */}
@@ -1022,14 +1000,8 @@ function OutputPanel({
               <button type="button"
                 onClick={() => onBgRemove(displayUrl ?? activeUrl)}
                 disabled={bgRemoving}
-                style={{
-                  position: 'absolute', top: 4, right: 4, opacity: 0,
-                  transition: 'opacity 0.15s', fontSize: '0.68rem', padding: '2px 6px',
-                  background: 'rgba(0,0,0,0.75)', border: '1px solid var(--border)',
-                  borderRadius: 3, color: '#fff', cursor: bgRemoving ? 'wait' : 'pointer',
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '0'; }}
+                className="pixel-rm-bg-btn"
+                style={{ cursor: bgRemoving ? 'wait' : 'pointer' }}
                 title="Remove background"
               >
                 {bgRemoving ? '' : 'Remove BG'}
@@ -1039,13 +1011,11 @@ function OutputPanel({
             {showPixelGrid && (
               <div
                 aria-hidden="true"
+                className="pixel-grid-overlay"
                 style={{
-                  position: 'absolute', inset: '0.75rem',
                   backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent calc(100%/var(--grid-cells) - 1px),var(--surface-raised) calc(100%/var(--grid-cells))), repeating-linear-gradient(90deg,transparent,transparent calc(100%/var(--grid-cells) - 1px),var(--surface-raised) calc(100%/var(--grid-cells)))',
                   // @ts-expect-error CSS custom prop
                   '--grid-cells': result?.width ?? 64,
-                  pointerEvents: 'none',
-                  borderRadius: 2,
                 }}
               />
             )}
@@ -1056,21 +1026,14 @@ function OutputPanel({
 
         {/* Color palette — shown below canvas when result is ready */}
         {result && activeUrl && (
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+          <div className="pixel-palette-bar">
             <ColorPalette imageUrl={displayUrl ?? activeUrl} />
           </div>
         )}
 
         {/* Size + provider readout */}
         {result && activeUrl && (
-          <div style={{
-            position: 'absolute',
-            bottom: '0.75rem',
-            right: '0.75rem',
-            display: 'flex',
-            gap: '0.5rem',
-            alignItems: 'center',
-          }}>
+          <div className="pixel-size-readout">
             {activeUrl.startsWith('data:image/gif') && (
               <span style={{
                 fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
@@ -1292,8 +1255,7 @@ function ApplySavedStyleButton({ mode, onApply }: { mode: string; onApply: (pres
     <div className="px-4 pb-2">
       <button type="button"
         onClick={handleApply}
-        className="community-modal-btn"
-        style={{ width: '100%', textAlign: 'left', fontSize: '0.72rem' }}
+        className="community-modal-btn pixel-wide-btn-sm"
         title={`Apply saved style: ${label}`}
       >
         ✦ Apply saved style: <strong>{label}</strong>
@@ -1589,14 +1551,12 @@ function GenerateForm({
           </div>
           <textarea
             ref={textareaRef}
-            className="textarea"
+            className="textarea studio-textarea pixel-prompt-textarea"
             placeholder={PRESET_PLACEHOLDERS[stylePreset] ?? 'Describe what you want to generate…'}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value.slice(0, 200))}
             rows={3}
             maxLength={200}
-            style={{ resize: 'none', minHeight: 72 }}
-          />
           <div className="flex justify-end mt-1">
             <button
               type="button"
@@ -1657,14 +1617,13 @@ function GenerateForm({
         {showAdvanced && (
           <div className="flex flex-col gap-2 animate-fade-in-fast">
             <div className="form-group">
-              <label className="label mb-1" style={{ fontSize: '0.72rem' }}>Negative prompt</label>
+              <label className="label mb-1 pixel-label-sm">Negative prompt</label>
               <textarea
-                className="textarea"
+                className="textarea studio-textarea pixel-neg-textarea"
                 placeholder="What to avoid in the output…"
                 value={negPrompt}
                 onChange={(e) => setNegPrompt(e.target.value)}
                 rows={2}
-                style={{ resize: 'none', minHeight: 54 }}
               />
             </div>
           </div>
@@ -1676,7 +1635,7 @@ function GenerateForm({
       <ApplySavedStyleButton mode="pixel" onApply={(preset) => onPresetSelect(preset as StylePreset)} />
       <div className="px-4 pb-1">
         {/* Category tabs */}
-        <div className="flex gap-1 mb-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex gap-1 mb-2 overflow-x-auto pixel-style-pills">
           {PRESET_CATEGORIES.map((cat) => (
             <button type="button"
               key={cat.id}
@@ -2302,8 +2261,7 @@ function GenerateForm({
 
       {/* Advanced */}
       <div
-        className="px-4 py-3 flex items-center justify-between cursor-pointer transition-colors duration-150"
-        style={{ borderTop: '1px solid var(--surface-border)', borderBottom: '1px solid var(--surface-border)' }}
+        className="px-4 py-3 flex items-center justify-between cursor-pointer transition-colors duration-150 pixel-section-border-y"
         onClick={() => setShowAdvanced(!showAdvanced)}
         role="button"
         tabIndex={0}
@@ -2436,7 +2394,7 @@ function GenerateForm({
       )}
 
       {/* Spacer */}
-      <div className="flex-1" style={{ minHeight: 16 }} />
+      <div className="flex-1 pixel-spacer-min" />
     </div>
   );
 }
@@ -3149,7 +3107,7 @@ function StudioInner() {
         }}
       >
         {/* Panel header */}
-        <div className="studio-shell__panel-header" style={{ borderBottom: '1px solid var(--surface-border)' }}>
+        <div className="studio-shell__panel-header">
           <span className="studio-shell__panel-title">Pixel Studio</span>
           <div className="studio-shell__panel-actions">
             <ProviderBadge provider={provider} />
@@ -3237,7 +3195,7 @@ function StudioInner() {
         <div className="flex-shrink-0 px-4 py-2 pixel-section-border-b">
           <div className="pixel-presets-header"
                onClick={() => setShowGenPresets(v => !v)}>
-            <p className="pixel-studio-section-label" style={{ margin: 0 }}>Generation Presets</p>
+            <p className="pixel-studio-section-label">Generation Presets</p>
             <span className="pixel-presets-chevron">{showGenPresets ? '▲' : '▼'}</span>
           </div>
           {showGenPresets && (
@@ -3387,7 +3345,7 @@ function StudioInner() {
             <div className="px-4 pb-4 flex flex-col gap-3 animate-fade-in-fast">
               {/* Freesound browser */}
               <SfxBrowser onSelectPrompt={(p) => setSfxPrompt(p)} />
-              <div style={{ borderTop: '1px solid var(--surface-border)', margin: '2px 0' }} />
+              <div className="pixel-rule-sm" />
               {/* Prompt label + Auto-suggest */}
               <div className="flex items-center justify-between">
                 <label className="text-xs font-medium pixel-sfx-label">
@@ -3847,7 +3805,7 @@ function StudioInner() {
           aria-label="Keyboard shortcuts"
           onClick={() => setShowShortcuts(false)}
         >
-          <div className="modal" style={{ maxWidth: 440 }} onClick={e => e.stopPropagation()}>
+          <div className="modal pixel-modal-md" onClick={e => e.stopPropagation()}>
             <div className="modal__header">
               <span className="modal__title">Keyboard Shortcuts</span>
               <button type="button" className="btn btn--ghost btn--sm btn--icon" onClick={() => setShowShortcuts(false)} aria-label="Close">&times;</button>
@@ -3882,8 +3840,7 @@ export default function StudioPage() {
     <Suspense
       fallback={
         <div
-          className="flex items-center justify-center"
-          style={{ height: 'calc(100dvh - 56px)' }}
+          className="flex items-center justify-center pixel-panel-full-height"
         >
           <div className="flex flex-col items-center gap-4">
             <div
@@ -3896,7 +3853,7 @@ export default function StudioPage() {
             >
               ✦
             </div>
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-sm text-muted">
               Loading Studio…
             </p>
           </div>

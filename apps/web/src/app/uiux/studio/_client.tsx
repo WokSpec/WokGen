@@ -568,8 +568,8 @@ export default function UIUXStudio() {
   return (
     <div className="uiux-studio-root">
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
-      <div className="app-topbar" style={{ height: 44, flexShrink: 0 }}>
-        <span className="app-topbar__title" style={{ fontSize: '0.88rem' }}>WokGen UI/UX</span>
+      <div className="app-topbar">
+        <span className="app-topbar__title">WokGen UI/UX</span>
         <div className="app-topbar__divider" />
         {/* Studio / Page Builder tabs */}
         <div className="app-topbar__tabs">
@@ -580,10 +580,10 @@ export default function UIUXStudio() {
             </button>
           ))}
         </div>
-        <div style={{ flex: 1 }} />
+        <div className="sidebar-spacer" />
         <QuotaBadge />
         <button type="button" onClick={() => setHistorySidebarOpen((v) => !v)}
-          className="btn btn-secondary" style={{ padding: '3px 10px', fontSize: '0.7rem' }}>
+          className="btn btn-secondary btn-sm">
           {historySidebarOpen ? '⊟ History' : '⊞ History'}
         </button>
         <Link href="/" className="app-topbar__back-link">← Platform</Link>
@@ -844,13 +844,14 @@ export default function UIUXStudio() {
               ) : (
                 <>
                   {/* Output toolbar */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 10px', borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-raised)', flexShrink: 0, flexWrap: 'wrap', minHeight: 42 }}>
+                  <div className="uiux-output-toolbar">
                     {/* Tabs */}
                     <div style={{ display: 'flex', gap: 2 }}>
                       {(['preview', 'code', 'accessibility'] as OutputTab[]).map((tab) => {
                         const labels: Record<OutputTab, string> = { preview: 'Preview', code: '{ } Code', accessibility: 'A11y' };
                         return (
-                          <button type="button" key={tab} onClick={() => setOutputTab(tab)} disabled={!currentResult} style={{ padding: '3px 9px', borderRadius: 5, border: `1px solid ${outputTab === tab ? 'var(--accent-muted)' : 'transparent'}`, background: outputTab === tab ? 'var(--accent-dim)' : 'transparent', color: outputTab === tab ? 'var(--accent)' : 'var(--text-muted)', fontSize: '0.72rem', cursor: currentResult ? 'pointer' : 'not-allowed', opacity: currentResult ? 1 : 0.4 }}>
+                          <button type="button" key={tab} onClick={() => setOutputTab(tab)} disabled={!currentResult}
+                            className={`uiux-output-tab${outputTab === tab ? ' active' : ''}`}>
                             {labels[tab]}
                           </button>
                         );
@@ -859,23 +860,25 @@ export default function UIUXStudio() {
 
                     {/* Viewport switcher */}
                     {outputTab === 'preview' && currentResult && (currentResult.framework === 'html-tailwind' || currentResult.framework === 'vanilla-css') && (
-                      <div style={{ display: 'flex', gap: 2, marginLeft: 4, borderLeft: '1px solid var(--surface-border)', paddingLeft: 6 }}>
+                      <div className="uiux-viewport-group">
                         {VIEWPORT_OPTIONS.map((vp) => (
-                          <button type="button" key={vp.id} onClick={() => setViewportMode(vp.id)} title={`${vp.label}${vp.width ? ` (${vp.width}px)` : ''}`} style={{ padding: '2px 7px', borderRadius: 4, fontSize: '0.68rem', cursor: 'pointer', border: `1px solid ${viewportMode === vp.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`, background: viewportMode === vp.id ? 'var(--accent-dim)' : 'var(--surface-raised)', color: viewportMode === vp.id ? 'var(--accent)' : 'var(--text-muted)' }}>
+                          <button type="button" key={vp.id} onClick={() => setViewportMode(vp.id)} title={`${vp.label}${vp.width ? ` (${vp.width}px)` : ''}`}
+                            className={`uiux-viewport-btn${viewportMode === vp.id ? ' active' : ''}`}>
                             {vp.icon}
                           </button>
                         ))}
-                        <span style={{ fontSize: '0.6rem', color: 'var(--text-disabled)', alignSelf: 'center', marginLeft: 3 }}>{VIEWPORT_OPTIONS.find((v) => v.id === viewportMode)?.label}</span>
+                        <span className="uiux-viewport-label">{VIEWPORT_OPTIONS.find((v) => v.id === viewportMode)?.label}</span>
                       </div>
                     )}
 
                     {/* Version breadcrumb */}
                     {versionHistory.length > 1 && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginLeft: 4, borderLeft: '1px solid var(--surface-border)', paddingLeft: 6 }}>
+                      <div className="uiux-version-group">
                         {versionHistory.map((_, idx) => (
                           <React.Fragment key={idx}>
-                            {idx > 0 && <span style={{ color: 'var(--text-disabled)', fontSize: '0.6rem' }}>→</span>}
-                            <button type="button" onClick={() => restoreVersion(idx)} title={idx === 0 ? 'Original' : `Refinement: ${versionHistory[idx].refinementPrompt}`} style={{ padding: '1px 6px', borderRadius: 4, fontSize: '0.62rem', cursor: 'pointer', border: `1px solid ${currentVersion === idx ? 'var(--accent-muted)' : 'var(--surface-border)'}`, background: currentVersion === idx ? 'var(--accent-dim)' : 'var(--surface-raised)', color: currentVersion === idx ? 'var(--accent)' : 'var(--text-muted)' }}>
+                            {idx > 0 && <span className="uiux-version-sep">→</span>}
+                            <button type="button" onClick={() => restoreVersion(idx)} title={idx === 0 ? 'Original' : `Refinement: ${versionHistory[idx].refinementPrompt}`}
+                              className={`uiux-version-btn${currentVersion === idx ? ' active' : ''}`}>
                               v{idx + 1}
                             </button>
                           </React.Fragment>
@@ -886,29 +889,30 @@ export default function UIUXStudio() {
                     {/* Meta + duration */}
                     {currentResult && (
                       <div style={{ display: 'flex', gap: 3, alignItems: 'center', marginLeft: 4 }}>
-                        <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: 3, background: 'var(--surface-overlay)', color: 'var(--text-muted)', border: '1px solid var(--surface-border)' }}>{FRAMEWORKS.find((f) => f.id === currentResult.framework)?.label}</span>
-                        <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: 3, background: 'var(--surface-overlay)', color: 'var(--text-muted)', border: '1px solid var(--surface-border)' }}>{COMPONENT_TYPES.find((c) => c.id === currentResult.componentType)?.label}</span>
-                        {currentResult.durationMs > 0 && <span style={{ fontSize: '0.6rem', color: 'var(--text-disabled)' }}>{(currentResult.durationMs / 1000).toFixed(1)}s</span>}
+                        <span className="uiux-meta-tag">{FRAMEWORKS.find((f) => f.id === currentResult.framework)?.label}</span>
+                        <span className="uiux-meta-tag">{COMPONENT_TYPES.find((c) => c.id === currentResult.componentType)?.label}</span>
+                        {currentResult.durationMs > 0 && <span className="uiux-meta-duration">{(currentResult.durationMs / 1000).toFixed(1)}s</span>}
                       </div>
                     )}
 
-                    <div style={{ flex: 1 }} />
+                    <div className="sidebar-spacer" />
 
                     {/* Actions */}
                     {currentResult && (
                       <div style={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap' }}>
-                        <button type="button" onClick={handleCopyCode} style={{ padding: '3px 7px', borderRadius: 4, background: copied ? 'rgba(34,197,94,0.1)' : 'var(--surface-raised)', color: copied ? '#22c55e' : 'var(--text-secondary)', fontSize: '0.7rem', cursor: 'pointer', border: copied ? '1px solid rgba(34,197,94,0.3)' : '1px solid var(--surface-border)' }}>
+                        <button type="button" onClick={handleCopyCode} className={`uiux-action-btn${copied ? ' uiux-action-btn--copied' : ''}`}>
                           {copied ? 'Copied!' : 'Copy'}
                         </button>
-                        <button type="button" onClick={stableHandleDownload} style={{ padding: '3px 7px', borderRadius: 4, border: '1px solid var(--surface-border)', background: 'var(--surface-raised)', color: 'var(--text-secondary)', fontSize: '0.7rem', cursor: 'pointer' }}>↓ Download</button>
-                        <button type="button" onClick={stableHandleZipExport} title="Export as ZIP (multi-file for React)" style={{ padding: '3px 7px', borderRadius: 4, border: '1px solid var(--surface-border)', background: 'var(--surface-raised)', color: 'var(--text-secondary)', fontSize: '0.7rem', cursor: 'pointer' }}>⊞ Export</button>
+                        <button type="button" onClick={stableHandleDownload} className="uiux-action-btn">↓ Download</button>
+                        <button type="button" onClick={stableHandleZipExport} title="Export as ZIP (multi-file for React)" className="uiux-action-btn">⊞ Export</button>
                         {session?.user && (
                           <>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: 3, cursor: 'pointer' }}>
+                            <label className="uiux-gallery-label">
                               <input type="checkbox" checked={galleryIsPublic} onChange={(e) => setGalleryIsPublic(e.target.checked)} style={{ accentColor: 'var(--purple)', width: 10, height: 10 }} />
-                              <span style={{ fontSize: '0.62rem', color: 'var(--text-disabled)' }}>public</span>
+                              <span>public</span>
                             </label>
-                            <button type="button" onClick={handleSaveToGallery} disabled={isSavingToGallery || gallerySaved} style={{ padding: '3px 7px', borderRadius: 4, fontSize: '0.7rem', cursor: isSavingToGallery || gallerySaved ? 'not-allowed' : 'pointer', border: `1px solid ${gallerySaved ? 'rgba(34,197,94,0.4)' : 'var(--surface-border)'}`, background: gallerySaved ? 'rgba(34,197,94,0.08)' : 'var(--surface-raised)', color: gallerySaved ? '#22c55e' : 'var(--text-secondary)' }}>
+                            <button type="button" onClick={handleSaveToGallery} disabled={isSavingToGallery || gallerySaved}
+                              className={`uiux-action-btn${gallerySaved ? ' uiux-action-btn--saved' : ''}`}>
                               {gallerySaved ? 'Saved' : isSavingToGallery ? '…' : 'Save'}
                             </button>
                           </>
@@ -1154,25 +1158,28 @@ function UIUXLibraryResults({
           const isPreviewable = res && (res.framework === 'html-tailwind' || res.framework === 'vanilla-css');
 
           return (
-            <div key={ct} style={{ border: '1px solid var(--surface-border)', borderRadius: 9, overflow: 'hidden', background: 'var(--surface-raised)', opacity: isPending ? 0.45 : 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 10px', borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-overlay)' }}>
+            <div key={ct} className="uiux-batch-item" style={{ opacity: isPending ? 0.45 : 1 }}>
+              <div className="uiux-batch-header">
                 <span style={{ fontSize: '0.95rem' }}>{ctInfo?.icon}</span>
-                <span style={{ fontWeight: 600, fontSize: '0.78rem', color: 'var(--text-primary)' }}>{ctInfo?.label}</span>
+                <span className="uiux-batch-header-title">{ctInfo?.label}</span>
                 {isCurrentlyGenerating && <span style={{ fontSize: '0.65rem', color: 'var(--pink)' }}>Generating…</span>}
                 {isPending && <span style={{ fontSize: '0.65rem', color: 'var(--text-disabled)' }}>Queued</span>}
                 {res && (
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: 3 }}>
                     {isPreviewable && (
-                      <button type="button" onClick={() => setActiveTabs((p) => ({ ...p, [ct]: 'preview' }))} style={{ padding: '2px 7px', borderRadius: 4, fontSize: '0.62rem', cursor: 'pointer', border: `1px solid ${tab === 'preview' ? 'var(--accent-muted)' : 'var(--surface-border)'}`, background: tab === 'preview' ? 'var(--accent-dim)' : 'transparent', color: tab === 'preview' ? 'var(--accent)' : 'var(--text-muted)' }}>◈</button>
+                      <button type="button" onClick={() => setActiveTabs((p) => ({ ...p, [ct]: 'preview' }))}
+                        className={`uiux-batch-tab-btn${tab === 'preview' ? ' active' : ''}`}>◈</button>
                     )}
-                    <button type="button" onClick={() => setActiveTabs((p) => ({ ...p, [ct]: 'code' }))} style={{ padding: '2px 7px', borderRadius: 4, fontSize: '0.62rem', cursor: 'pointer', border: `1px solid ${tab === 'code' ? 'var(--accent-muted)' : 'var(--surface-border)'}`, background: tab === 'code' ? 'var(--accent-dim)' : 'transparent', color: tab === 'code' ? 'var(--accent)' : 'var(--text-muted)' }}>{ '{ }' }</button>
-                    <button type="button" onClick={() => copyCode(ct, res.code)} style={{ padding: '2px 7px', borderRadius: 4, fontSize: '0.62rem', cursor: 'pointer', border: '1px solid var(--surface-border)', background: 'transparent', color: copiedId === ct ? '#22c55e' : 'var(--text-muted)' }}>{copiedId === ct ? '✓' : '⎘'}</button>
-                    <button type="button" onClick={() => triggerDownload(res.code, `wokgen-${ct}.${ext}`)} style={{ padding: '2px 7px', borderRadius: 4, fontSize: '0.62rem', cursor: 'pointer', border: '1px solid var(--surface-border)', background: 'transparent', color: 'var(--text-muted)' }}>↓</button>
+                    <button type="button" onClick={() => setActiveTabs((p) => ({ ...p, [ct]: 'code' }))}
+                      className={`uiux-batch-tab-btn${tab === 'code' ? ' active' : ''}`}>{'{ }'}</button>
+                    <button type="button" onClick={() => copyCode(ct, res.code)} className="uiux-batch-tab-btn"
+                      style={{ color: copiedId === ct ? '#22c55e' : undefined }}>{copiedId === ct ? '✓' : '⎘'}</button>
+                    <button type="button" onClick={() => triggerDownload(res.code, `wokgen-${ct}.${ext}`)} className="uiux-batch-tab-btn">↓</button>
                   </div>
                 )}
               </div>
               {res && (
-                <div style={{ height: 260 }}>
+                <div className="uiux-batch-content" style={{ height: 260 }}>
                   {tab === 'preview' && isPreviewable ? (
                     <LibraryPreviewFrame code={res.code} />
                   ) : (
@@ -1216,9 +1223,9 @@ function LibraryRefineBar({
   };
 
   return (
-    <div style={{ display: 'flex', gap: 5, padding: '5px 9px', borderTop: '1px solid var(--surface-border)', background: 'var(--surface-overlay)' }}>
-      <input type="text" value={refPrompt} onChange={(e) => setRefPrompt(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleRefine(); }} placeholder="Refine this component…" disabled={isLoading} style={{ flex: 1, padding: '3px 7px', borderRadius: 4, border: '1px solid var(--surface-border)', background: 'var(--bg)', color: 'var(--text-primary)', fontSize: '0.7rem', outline: 'none', fontFamily: 'inherit' }} />
-      <button type="button" onClick={handleRefine} disabled={isLoading || !refPrompt.trim()} style={{ padding: '3px 9px', borderRadius: 4, border: 'none', background: refPrompt.trim() ? 'linear-gradient(135deg,#a855f7,#ec4899)' : 'var(--surface-border)', color: refPrompt.trim() ? '#fff' : 'var(--text-disabled)', fontSize: '0.68rem', cursor: refPrompt.trim() ? 'pointer' : 'not-allowed' }}>
+    <div className="uiux-refine-bar">
+      <input type="text" value={refPrompt} onChange={(e) => setRefPrompt(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleRefine(); }} placeholder="Refine this component…" disabled={isLoading} className="uiux-refine-input" />
+      <button type="button" onClick={handleRefine} disabled={isLoading || !refPrompt.trim()} className="uiux-refine-btn">
         {isLoading ? '…' : '→'}
       </button>
     </div>
@@ -1241,48 +1248,48 @@ function UIUXPageBuilder({
 }) {
   if (order.length === 0) {
     return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '2rem', color: 'var(--text-muted)' }}>
-        <div style={{ fontSize: '2.5rem', opacity: 0.2 }}>⊞</div>
-        <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Page Builder is empty</div>
-        <div style={{ fontSize: '0.78rem', textAlign: 'center', maxWidth: 360, lineHeight: 1.65 }}>Generate components in the Studio tab — they appear here automatically. Then assemble them into a complete page.</div>
+      <div className="uiux-pb-empty">
+        <div className="uiux-pb-empty-icon">⊞</div>
+        <div className="uiux-pb-empty-title">Page Builder is empty</div>
+        <div className="uiux-pb-empty-desc">Generate components in the Studio tab — they appear here automatically. Then assemble them into a complete page.</div>
       </div>
     );
   }
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '9px 14px', borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-raised)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-        <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-primary)' }}>⊞ Page Builder — {order.length} component{order.length !== 1 ? 's' : ''}</span>
-        <div style={{ flex: 1 }} />
-        <button type="button" onClick={onAssemble} style={{ padding: '5px 13px', borderRadius: 6, border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer' }}>⬡ Assemble Page →</button>
+    <div className="uiux-pb-shell">
+      <div className="uiux-pb-header">
+        <span className="uiux-pb-title">⊞ Page Builder — {order.length} component{order.length !== 1 ? 's' : ''}</span>
+        <div className="sidebar-spacer" />
+        <button type="button" onClick={onAssemble} className="btn btn-generate">⬡ Assemble Page →</button>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+      <div className="uiux-pb-list">
         {order.map((id, idx) => {
           const item = items.get(id);
           if (!item) return null;
           const ctInfo = COMPONENT_TYPES.find((c) => c.id === item.componentType);
           const fw = FRAMEWORKS.find((f) => f.id === item.result.framework);
           return (
-            <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 11px', borderRadius: 7, border: '1px solid var(--surface-border)', background: 'var(--surface-raised)' }}>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-disabled)', fontFamily: 'monospace', width: 18, textAlign: 'right', flexShrink: 0 }}>{idx + 1}</span>
-              <span style={{ fontSize: '0.95rem', flexShrink: 0 }}>{ctInfo?.icon}</span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 600, fontSize: '0.78rem', color: 'var(--text-primary)' }}>{ctInfo?.label}</div>
-                <div style={{ fontSize: '0.62rem', color: 'var(--text-disabled)' }}>{fw?.label} · {item.result.code.split('\n').length} lines</div>
+            <div key={id} className="uiux-pb-item">
+              <span className="uiux-pb-item__idx">{idx + 1}</span>
+              <span className="uiux-pb-item__icon">{ctInfo?.icon}</span>
+              <div className="uiux-pb-item__info">
+                <div className="uiux-pb-item__name">{ctInfo?.label}</div>
+                <div className="uiux-pb-item__meta">{fw?.label} · {item.result.code.split('\n').length} lines</div>
               </div>
-              <div style={{ display: 'flex', gap: 3 }}>
-                <button type="button" onClick={() => onMove(id, 'up')} disabled={idx === 0} aria-label="Move up" style={{ padding: '3px 6px', borderRadius: 4, border: '1px solid var(--surface-border)', background: 'transparent', color: idx === 0 ? 'var(--text-disabled)' : 'var(--text-muted)', cursor: idx === 0 ? 'not-allowed' : 'pointer', fontSize: '0.78rem' }}>↑</button>
-                <button type="button" onClick={() => onMove(id, 'down')} disabled={idx === order.length - 1} aria-label="Move down" style={{ padding: '3px 6px', borderRadius: 4, border: '1px solid var(--surface-border)', background: 'transparent', color: idx === order.length - 1 ? 'var(--text-disabled)' : 'var(--text-muted)', cursor: idx === order.length - 1 ? 'not-allowed' : 'pointer', fontSize: '0.78rem' }}>↓</button>
-                <button type="button" onClick={() => onRemove(id)} aria-label="Remove" style={{ padding: '3px 6px', borderRadius: 4, border: '1px solid var(--danger-border)', background: 'var(--danger-bg)', color: 'var(--danger)', cursor: 'pointer', fontSize: '0.78rem' }}>✕</button>
+              <div className="uiux-pb-item__actions">
+                <button type="button" onClick={() => onMove(id, 'up')} disabled={idx === 0} aria-label="Move up" className="uiux-pb-item-btn">↑</button>
+                <button type="button" onClick={() => onMove(id, 'down')} disabled={idx === order.length - 1} aria-label="Move down" className="uiux-pb-item-btn">↓</button>
+                <button type="button" onClick={() => onRemove(id)} aria-label="Remove" className="uiux-pb-item-btn uiux-pb-item-btn--remove">✕</button>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div style={{ padding: '8px 14px', borderTop: '1px solid var(--surface-border)', background: 'var(--surface-raised)', flexShrink: 0 }}>
-        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', lineHeight: 1.55 }}>
+      <div className="uiux-pb-footer">
+        <div className="uiux-pb-footer-hint">
           Assembles components in order into one {framework === 'react-tsx' || framework === 'next-tsx' ? 'React page (AssembledPage.tsx) with import stubs' : 'HTML file (assembled-page.html)'}. HTML components are stitched by extracting each &lt;body&gt; section.
         </div>
       </div>

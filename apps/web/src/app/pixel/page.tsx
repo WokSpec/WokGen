@@ -51,12 +51,12 @@ export default function PixelLanding() {
         <div className="landing-hero-inner">
           <div className="landing-hero-content">
             <div className="landing-badge">
-              <span className="landing-badge-dot" style={{ background: 'var(--accent)' }} />
+              <span className="landing-badge-dot" />
               <span>WokGen Pixel</span>
             </div>
             <h1 className="landing-h1">
               Game asset generation.<br />
-              <span style={{ color: 'var(--accent)' }}>Pixel-perfect.</span>
+              <span className="landing-h1-accent">Pixel-perfect.</span>
             </h1>
             <p className="landing-desc">
               Sprites, animations, tilesets, and game-ready assets — generated with AI.

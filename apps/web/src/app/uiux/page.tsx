@@ -42,12 +42,12 @@ export default function UIUXLanding() {
         <div className="landing-hero-inner">
           <div className="landing-hero-content">
             <div className="landing-badge">
-              <span className="landing-badge-dot" style={{ background: 'var(--accent)' }} />
+              <span className="landing-badge-dot" />
               <span>WokGen UI/UX</span>
             </div>
             <h1 className="landing-h1">
               Components &amp; design systems.<br />
-              <span style={{ color: 'var(--accent)' }}>Ship faster.</span>
+              <span className="landing-h1-accent">Ship faster.</span>
             </h1>
             <p className="landing-desc">
               Generate React components, wireframes, design tokens, and full design systems

@@ -42,12 +42,12 @@ export default function CodeLanding() {
         <div className="landing-hero-inner">
           <div className="landing-hero-content">
             <div className="landing-badge">
-              <span className="landing-badge-dot" style={{ background: 'var(--accent)' }} />
+              <span className="landing-badge-dot" />
               <span>WokGen Code</span>
             </div>
             <h1 className="landing-h1">
               AI code generation.<br />
-              <span style={{ color: 'var(--accent)' }}>Production-ready.</span>
+              <span className="landing-h1-accent">Production-ready.</span>
             </h1>
             <p className="landing-desc">
               React components, SQL queries, API endpoints, documentation, and full project scaffolds —

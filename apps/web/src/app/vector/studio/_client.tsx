@@ -115,16 +115,7 @@ function buildVectorPrompt(
 function Spinner() {
   return (
     <span
-      style={{
-        display: 'inline-block',
-        width: 20,
-        height: 20,
-        borderRadius: '50%',
-        border: '2px solid var(--surface-border)',
-        borderTopColor: 'var(--green)',
-        animation: 'spin 0.7s linear infinite',
-        flexShrink: 0,
-      }}
+      className="vector-spinner"
       aria-hidden="true"
     />
   );
@@ -445,7 +436,7 @@ function VectorStudioInner() {
         </div>
 
         {/* Workspace selector */}
-        <div className="studio-control-section" style={{ paddingBottom: 0 }}>
+        <div className="studio-control-section studio-control-section--pb0">
           <WorkspaceSelector
             mode="vector"
             activeWorkspaceId={activeWorkspaceId}
@@ -454,7 +445,7 @@ function VectorStudioInner() {
         </div>
 
         {/* Brand context selector */}
-        <div className="studio-control-section" style={{ paddingTop: 6, paddingBottom: 0 }}>
+        <div className="studio-control-section studio-control-section--pt6 studio-control-section--pb0">
           <BrandContextSelector value={brandKitId} onChange={setBrandKitId} />
         </div>
 
@@ -468,23 +459,13 @@ function VectorStudioInner() {
             placeholder={EXAMPLE_PROMPTS[activeTool]}
             rows={4}
           />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+                    <div className="flex-end-row">
             <button
               type="button"
               onClick={handleEnhancePrompt}
               disabled={isEnhancing || !prompt.trim()}
               title="AI-enhance your prompt with style details"
-              style={{
-                fontSize: '0.65rem',
-                padding: '2px 8px',
-                borderRadius: 4,
-                background: isEnhancing ? 'var(--surface-overlay)' : 'rgba(139,92,246,0.15)',
-                border: '1px solid var(--accent-glow)',
-                color: isEnhancing ? 'var(--text-disabled)' : 'var(--accent)',
-                cursor: isEnhancing || !prompt.trim() ? 'not-allowed' : 'pointer',
-                opacity: !prompt.trim() ? 0.4 : 1,
-                transition: 'all 0.15s',
-              }}
+              className="vector-enhance-btn"
             >
               {isEnhancing ? 'Enhancing…' : 'Enhance'}
             </button>
@@ -511,7 +492,7 @@ function VectorStudioInner() {
         {/* Size */}
         <div className="studio-control-section">
           <label className="studio-label">Size (px)</label>
-          <div className="studio-preset-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          <div className="studio-preset-grid studio-preset-grid--3">
             {(activeTool === 'icon' ? ICON_SIZES : ILLUSTRATION_SIZES).map(s => {
               const active = activeTool === 'icon' ? iconSize === s : illustSize === s;
               return (
@@ -544,7 +525,7 @@ function VectorStudioInner() {
         {/* Background */}
         <div className="studio-control-section">
           <label className="studio-label">Background</label>
-          <div className="studio-preset-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          <div className="studio-preset-grid studio-preset-grid--3">
             {([
               { id: 'transparent', label: 'Clear' },
               { id: 'white',       label: '⬜ White' },
@@ -564,7 +545,7 @@ function VectorStudioInner() {
         {/* Batch count */}
         <div className="studio-control-section">
           <label className="studio-label">Batch</label>
-          <div className="studio-preset-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          <div className="studio-preset-grid studio-preset-grid--3">
             {BATCH_COUNTS.map(n => (
               <button type="button"
                 key={n}
@@ -580,7 +561,7 @@ function VectorStudioInner() {
         {/* HD quality */}
         <div className="studio-control-section">
           <div className="studio-row studio-row--spaced">
-            <label className="studio-label" style={{ margin: 0 }}>
+            <label className="studio-label studio-label--no-margin">
               HD Quality
               <span className="studio-label-opt"> (uses 2 credits)</span>
             </label>
@@ -604,7 +585,7 @@ function VectorStudioInner() {
         {session && (
           <div className="studio-control-section">
             <div className="studio-row studio-row--spaced">
-              <label className="studio-label" style={{ margin: 0 }}>Share to Gallery</label>
+              <label className="studio-label studio-label--no-margin">Share to Gallery</label>
               <button type="button"
                 className={`toggle-track${isPublic ? ' on' : ''}`}
                 onClick={() => setIsPublic(v => !v)}
@@ -632,7 +613,7 @@ function VectorStudioInner() {
               ? `Generate ×${batchCount}`
               : 'Generate'}
           </button>
-          <p className="studio-hint" style={{ textAlign: 'right', marginTop: '0.25rem' }}>⌘↵</p>
+          <p className="studio-hint studio-hint--right">⌘↵</p>
         </div>
 
       </aside>
@@ -663,8 +644,7 @@ function VectorStudioInner() {
                     </a>
                   ) : (
                     <button type="button"
-                      className="btn-ghost btn-xs"
-                      style={{ position: 'absolute', bottom: 6, right: 6 }}
+                      className="btn-ghost btn-xs vector-dl-btn"
                       onClick={() => r.resultUrl && handleDownload(r.resultUrl, i)}
                     >
                       ↓
@@ -699,14 +679,7 @@ function VectorStudioInner() {
                   <button type="button"
                     onClick={() => handleBgRemove(displayUrl ?? displayResult.resultUrl!)}
                     disabled={bgRemoving}
-                    style={{
-                      position: 'absolute', top: 8, right: 8, opacity: 0,
-                      transition: 'opacity 0.15s', fontSize: '0.72rem', padding: '3px 8px',
-                      background: 'var(--overlay-70)', border: '1px solid var(--border-strong, var(--border))',
-                      borderRadius: 4, color: '#fff', cursor: bgRemoving ? 'wait' : 'pointer',
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '0'; }}
+                    className="vector-rm-bg-btn"
                     title="Remove background"
                   >
                     {bgRemoving ? 'Removing…' : 'Remove BG'}
@@ -825,7 +798,6 @@ function VectorStudioInner() {
                   src={item.resultUrl}
                   alt={item.prompt?.slice(0, 50) || 'Generated vector'}
                   className="studio-history-thumb"
-                  style={{ imageRendering: 'auto' }}
                 />
               ) : (
                 <div className="studio-history-thumb studio-history-thumb--empty">◈</div>

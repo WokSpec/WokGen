@@ -233,8 +233,7 @@ function UserAvatar() {
   if (status === 'loading') {
     return (
       <div
-        className="sidebar-avatar"
-        style={{ background: 'var(--surface-raised)', borderRadius: '50%', animation: 'pulse 1.5s ease-in-out infinite' }}
+        className="sidebar-avatar sidebar-avatar--skeleton"
         aria-hidden="true"
       />
     );
@@ -254,7 +253,7 @@ function UserAvatar() {
           alt={name}
           width={28}
           height={28}
-          style={{ borderRadius: '50%', objectFit: 'cover' }}
+          className="sidebar-avatar-img"
         />
       ) : (
         <span className="sidebar-avatar__initials">{initial}</span>

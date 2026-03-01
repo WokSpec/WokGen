@@ -319,7 +319,6 @@ export default function TextStudio() {
               placeholder={EXAMPLE_PROMPTS[contentType]}
               rows={5}
               className="studio-textarea"
-              style={{ width: '100%', boxSizing: 'border-box' }}
             />
           </div>
 
@@ -330,8 +329,7 @@ export default function TextStudio() {
             onClick={handleGenerate}
             disabled={!prompt.trim() || status === 'generating'}
             aria-label="Generate text"
-            className="btn btn-generate"
-            style={{ width: '100%' }}
+            className="btn btn-generate btn-full"
           >
             {status === 'generating' ? 'Generating…' : 'Generate Text'}
           </button>
@@ -389,7 +387,6 @@ export default function TextStudio() {
                 <button type="button"
                   onClick={() => setShowRawMarkdown(v => !v)}
                   className={`text-studio__stat text-studio__stat--toggle${showRawMarkdown ? ' active' : ''}`}
-                  style={{ marginLeft: 'auto' }}
                 >
                   {showRawMarkdown ? '⬤ Raw MD' : '◎ Rendered'}
                 </button>
@@ -404,22 +401,19 @@ export default function TextStudio() {
               <div className="text-studio__actions">
                 <button type="button"
                   onClick={handleCopy}
-                  className={`btn btn-secondary${copied ? ' btn--active' : ''}`}
-                  style={{ fontSize: '0.8rem' }}
+                  className={`btn btn-secondary btn-text-sm${copied ? ' btn--active' : ''}`}
                 >
                   {copied ? 'Copied!' : 'Copy'}
                 </button>
                 <button type="button"
                   onClick={() => downloadText(result.content, `wokgen-text-${Date.now()}.txt`)}
-                  className="btn btn-secondary"
-                  style={{ fontSize: '0.8rem' }}
+                  className="btn btn-secondary btn-text-sm"
                 >
                   ⬇ .txt
                 </button>
                 <button type="button"
                   onClick={() => downloadText(result.content, `wokgen-text-${Date.now()}.md`)}
-                  className="btn btn-secondary"
-                  style={{ fontSize: '0.8rem' }}
+                  className="btn btn-secondary btn-text-sm"
                 >
                   ⬇ .md
                 </button>
@@ -428,15 +422,13 @@ export default function TextStudio() {
                     setSavedMsg(true);
                     setTimeout(() => setSavedMsg(false), 2000);
                   }}
-                  className={`btn btn-secondary${savedMsg ? ' btn--active' : ''}`}
-                  style={{ fontSize: '0.8rem' }}
+                  className={`btn btn-secondary btn-text-sm${savedMsg ? ' btn--active' : ''}`}
                 >
                   {savedMsg ? 'Saved' : 'Save to Gallery'}
                 </button>
                 <button type="button"
                   onClick={() => { setStatus('idle'); void handleGenerate(); }}
-                  className="btn btn-secondary"
-                  style={{ fontSize: '0.8rem' }}
+                  className="btn btn-secondary btn-text-sm"
                 >
                   ↻ Regenerate
                 </button>

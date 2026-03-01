@@ -282,7 +282,7 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 gap-10 items-start">
           <div>
             <span className="landing-section-label">AI Director</span>
-            <h2 className="landing-section-h2" style={{ marginBottom: '0.75rem' }}>Eral</h2>
+            <h2 className="landing-section-h2 landing-section-h2--mb">Eral</h2>
             <p className="text-[var(--text-muted)] leading-relaxed mb-6 max-w-xs text-sm">
               Describe what you&apos;re building. Eral plans your asset pipeline, routes tasks to the right studio, and maintains context across your project.
             </p>
@@ -316,7 +316,7 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 gap-10 items-start">
           <div>
             <span className="landing-section-label">Programmatic</span>
-            <h2 className="landing-section-h2" style={{ marginBottom: '0.75rem' }}>API</h2>
+            <h2 className="landing-section-h2 landing-section-h2--mb">API</h2>
             <p className="text-[var(--text-muted)] leading-relaxed mb-6 max-w-xs text-sm">
               Programmatic access to every studio. Integrate generation into your own tools, pipelines, and workflows.
             </p>
@@ -339,8 +339,8 @@ export default function HomePage() {
               <span className="ml-2 text-xs text-[var(--text-faint)]">@wokspec/sdk</span>
             </div>
             <pre
-              className="p-4 text-xs leading-relaxed overflow-x-auto text-[var(--text-secondary)]"
-              style={{ fontFamily: 'var(--font-mono)' }}            >
+              className="p-4 text-xs leading-relaxed overflow-x-auto text-[var(--text-secondary)] landing-code-block"
+            >
               <code>{`import WokGen from '@wokspec/sdk';
 
 const wok = new WokGen({ apiKey: 'wok_...' });

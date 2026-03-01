@@ -42,12 +42,12 @@ export default function VectorLanding() {
         <div className="landing-hero-inner">
           <div className="landing-hero-content">
             <div className="landing-badge">
-              <span className="landing-badge-dot" style={{ background: 'var(--accent)' }} />
+              <span className="landing-badge-dot" />
               <span>WokGen Vector</span>
             </div>
             <h1 className="landing-h1">
               SVG icons &amp; illustrations.<br />
-              <span style={{ color: 'var(--accent)' }}>Infinitely scalable.</span>
+              <span className="landing-h1-accent">Infinitely scalable.</span>
             </h1>
             <p className="landing-desc">
               True vector output — not rasterised images. Icon sets, logo marks, illustrations,

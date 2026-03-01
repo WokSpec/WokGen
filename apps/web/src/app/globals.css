@@ -1420,6 +1420,10 @@ body {
   height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
+  background: var(--studio-accent, var(--accent));
+}
+.landing-h1-accent {
+  color: var(--studio-accent, var(--accent));
 }
 .landing-h1 {
   font-family: var(--font-heading, 'Space Grotesk', sans-serif);
@@ -2544,6 +2548,7 @@ body {
 /* ── Textarea / select / input aliases ────────────────────────────────────── */
 .studio-textarea {
   width: 100%;
+  box-sizing: border-box;
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -2952,6 +2957,7 @@ body {
   flex-shrink: 0;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
+  image-rendering: auto;
 }
 .studio-history-thumb--empty {
   display: flex;
@@ -22664,6 +22670,9 @@ select:focus-visible {
   border: 1px solid var(--border);
   border-radius: 10px 10px 10px 3px;
 }
+.landing-code-block {
+  font-family: var(--font-mono);
+}
 
 /* ============================================================
    Homepage — Bottom CTA box
@@ -22858,6 +22867,7 @@ select:focus-visible {
   cursor: pointer;
   border: 1px solid var(--border);
   transition: background 0.15s, color 0.15s, border-color 0.15s;
+  margin-left: auto;
 }
 .text-studio__stat--toggle.active {
   background: color-mix(in srgb, var(--studio-accent, var(--accent)) 12%, transparent);
@@ -23065,6 +23075,7 @@ input[type="range"].studio-range {
   margin-bottom: 0.5rem;
   line-height: 1.2;
 }
+.landing-section-h2--mb { margin-bottom: 0.75rem; }
 .landing-section-h2 .accent {
   color: var(--accent);
   -webkit-text-fill-color: initial;
@@ -23319,6 +23330,7 @@ input[type="range"].studio-range {
 }
 .studio-control-section--pb0 { padding-bottom: 0; }
 .studio-control-section--pt0 { padding-top: 0; }
+.studio-control-section--pt6 { padding-top: 6px; }
 
 /* ── UIUX studio ─────────────────────────────────────────────────────────── */
 .uiux-history-section-head {
@@ -24280,3 +24292,73 @@ input[type="range"].studio-range {
 .voice-audio-player { width: 100%; border-radius: 8px; }
 .voice-output-title { font-size: 0.875rem; font-weight: 600; margin: 0; }
 .voice-output-subtitle { font-size: 0.75rem; color: var(--text-muted); margin: 4px 0 0; }
+
+/* ── Sidebar avatar loading skeleton ────────────────────────────────────── */
+.sidebar-avatar--skeleton {
+  background: var(--bg-elevated);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+.sidebar-avatar img,
+.sidebar-avatar-img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ── Utility: full-width button, small text button ──────────────────────── */
+.btn-full { width: 100%; }
+.btn-text-sm { font-size: 0.8rem; }
+
+/* ── Utility: zero-margin label, flex end row ────────────────────────────── */
+.studio-label--no-margin { margin: 0; }
+.flex-end-row { display: flex; justify-content: flex-end; margin-top: 4px; }
+.vector-enhance-btn {
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(139,92,246,0.15);
+  border: 1px solid var(--accent-glow);
+  color: var(--accent);
+  cursor: pointer;
+  transition: opacity 0.12s, background 0.12s;
+}
+.vector-enhance-btn:disabled {
+  background: var(--surface-overlay);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* ── Vector studio spinner + output actions ─────────────────────────────── */
+.vector-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-border);
+  border-top-color: var(--green);
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+.vector-dl-btn {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+}
+.vector-rm-bg-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  background: var(--overlay-70);
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.vector-rm-bg-btn:hover { opacity: 1; }
+.vector-rm-bg-btn:disabled { cursor: wait; }
+.studio-hint--right { text-align: right; margin-top: 0.25rem; }

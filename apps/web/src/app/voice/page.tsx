@@ -42,12 +42,12 @@ export default function VoiceLanding() {
         <div className="landing-hero-inner">
           <div className="landing-hero-content">
             <div className="landing-badge">
-              <span className="landing-badge-dot" style={{ background: 'var(--accent)' }} />
+              <span className="landing-badge-dot" />
               <span>WokGen Voice</span>
             </div>
             <h1 className="landing-h1">
               Natural AI voiceovers.<br />
-              <span style={{ color: 'var(--accent)' }}>Any language.</span>
+              <span className="landing-h1-accent">Any language.</span>
             </h1>
             <p className="landing-desc">
               Text-to-speech, narration, voice cloning, music, and SFX — all in one studio.

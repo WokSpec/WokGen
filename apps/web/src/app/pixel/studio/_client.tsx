@@ -826,31 +826,12 @@ function OutputPanel({
             Describe what you want — or click an example below.
           </p>
           {onFillPrompt && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%' }}>
+            <div className="studio-idle-examples">
               {idleExamples.map((ex, i) => (
                 <button type="button"
                   key={i}
                   onClick={() => onFillPrompt(ex)}
-                  style={{
-                    textAlign: 'left',
-                    padding: '0.5rem 0.75rem',
-                    borderRadius: 4,
-                    border: '1px solid var(--surface-border)',
-                    background: 'var(--surface-raised)',
-                    color: 'var(--text-muted)',
-                    fontSize: '0.76rem',
-                    lineHeight: 1.4,
-                    cursor: 'pointer',
-                    transition: 'border-color 0.15s, color 0.15s',
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(167,139,250,.4)';
-                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--text)';
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--surface-border)';
-                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)';
-                  }}
+                  className="studio-idle-example-btn"
                 >
                   {ex}
                 </button>
@@ -3752,12 +3733,7 @@ function StudioInner() {
           <button
             type="button"
             data-generate-btn
-            className="btn btn-primary w-full"
-            style={{
-              height: 44,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-            }}
+            className="btn btn-generate"
             onClick={handleGenerate}
             disabled={!prompt.trim() || jobStatus === 'pending'}
             aria-label="Generate"

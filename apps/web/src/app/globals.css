@@ -499,7 +499,7 @@ body {
   width: 100%;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 0.25rem;
+  border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   color: var(--text);
@@ -510,7 +510,7 @@ body {
 .input::placeholder { color: var(--text-faint); }
 .input:focus {
   border-color: var(--accent-glow);
-  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
 }
 
 /* ---- Status dots ---- */
@@ -748,7 +748,7 @@ body {
   width: 100%;
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
-  border-radius: 0.25rem;
+  border-radius: var(--radius-md);
   padding: 0.625rem 0.75rem;
   font-size: 0.8rem;
   color: var(--text);
@@ -761,14 +761,14 @@ body {
 .textarea::placeholder { color: var(--text-faint); }
 .textarea:focus {
   border-color: var(--accent-glow);
-  box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
 }
 
 .select {
   width: 100%;
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
-  border-radius: 0.25rem;
+  border-radius: var(--radius-md);
   padding: 0.5rem 0.75rem;
   font-size: 0.8rem;
   color: var(--text);
@@ -782,7 +782,7 @@ body {
   background-position: right 0.75rem center;
   padding-right: 2rem;
 }
-.select:focus { border-color: var(--accent-glow); box-shadow: 0 0 0 3px rgba(124,58,237,0.08); }
+.select:focus { border-color: var(--accent-glow); box-shadow: 0 0 0 3px rgba(99,102,241,0.08); }
 .select option { background: var(--bg-elevated); }
 
 .range {
@@ -1065,6 +1065,32 @@ body {
   color: var(--text-muted);
   max-width: 22rem;
   line-height: 1.5;
+}
+
+/* ── Studio idle empty state ────────────────────────────────── */
+.studio-idle-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+.studio-idle-example-btn {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  font-family: var(--font-body, 'DM Sans'), system-ui, sans-serif;
+}
+.studio-idle-example-btn:hover {
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 40%, transparent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 5%, var(--surface-raised));
 }
 
 /* ── Panel (modal container) ────────────────────────────────────── */

@@ -104,32 +104,33 @@ const nextConfig = {
   },
 
   // ---------------------------------------------------------------------------
+  // Standalone output — required for Render.com self-hosted deployment.
+  // Render starts the server with: node .next/standalone/server.js
+  // ---------------------------------------------------------------------------
+  output: 'standalone',
+
+  // ---------------------------------------------------------------------------
   // Redirects — keep old paths working if ever restructured
   // ---------------------------------------------------------------------------
   async redirects() {
     return [
       // Legacy convenience aliases
-      { source: '/generate',        destination: '/studio?type=pixel',    permanent: false },
-      { source: '/art',             destination: '/pixel/gallery',         permanent: false },
-      // Old studio routes → unified studio
-      { source: '/pixel/studio',    destination: '/studio?type=pixel',    permanent: false },
-      { source: '/vector/studio',   destination: '/studio?type=vector',   permanent: false },
-      { source: '/uiux/studio',     destination: '/studio?type=uiux',     permanent: false },
-      { source: '/voice/studio',    destination: '/studio?type=voice',    permanent: false },
-      { source: '/business/studio', destination: '/studio?type=business', permanent: false },
-      // Removed/consolidated routes
-      { source: '/studio/tools',    destination: '/tools',                permanent: false },
-      { source: '/text/studio',     destination: '/eral',                 permanent: false },
-      { source: '/text/studio/:path*', destination: '/eral',              permanent: false },
+      { source: '/generate', destination: '/pixel/studio', permanent: false },
+      { source: '/art',      destination: '/pixel/gallery', permanent: false },
+      // Old unified /studio route → per-mode routes (reverse of old redirect)
+      { source: '/studio',                                  destination: '/pixel/studio',    permanent: false },
+      { source: '/studio',   destination: '/pixel/studio',  permanent: false, has: [{ type: 'query', key: 'type', value: 'pixel' }] },
+      { source: '/studio',   destination: '/vector/studio', permanent: false, has: [{ type: 'query', key: 'type', value: 'vector' }] },
+      { source: '/studio',   destination: '/uiux/studio',   permanent: false, has: [{ type: 'query', key: 'type', value: 'uiux' }] },
+      { source: '/studio',   destination: '/voice/studio',  permanent: false, has: [{ type: 'query', key: 'type', value: 'voice' }] },
+      { source: '/studio',   destination: '/business/studio', permanent: false, has: [{ type: 'query', key: 'type', value: 'business' }] },
+      { source: '/studio',   destination: '/code/studio',   permanent: false, has: [{ type: 'query', key: 'type', value: 'code' }] },
+      // Legacy tool/studio routes
+      { source: '/studio/tools',       destination: '/tools',  permanent: false },
+      { source: '/text/studio',        destination: '/eral',   permanent: false },
+      { source: '/text/studio/:path*', destination: '/eral',   permanent: false },
     ];
   },
-
-  // ---------------------------------------------------------------------------
-  // Standalone output — for Docker/self-hosted builds only.
-  // Disabled for Vercel (Vercel manages its own output format).
-  // Uncomment this line if building a Docker image:
-  // output: 'standalone',
-  // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
   // Webpack customisation

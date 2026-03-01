@@ -25503,3 +25503,126 @@ body {
     transparent 65%
   );
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Visual Enhancement Pass 7 — Studio Generate Area, Section Headers, Final
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Studio section header: more polished ──────────────────────────────── */
+.section-header {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 4%, var(--surface-overlay));
+  border-top: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, var(--surface-border));
+  border-bottom: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 8%, var(--surface-border));
+}
+.section-title {
+  color: color-mix(in srgb, var(--studio-accent, var(--accent)) 55%, var(--text-faint));
+  letter-spacing: 0.07em;
+}
+
+/* ── Generate zone padding ──────────────────────────────────────────────── */
+.pixel-section-border-t {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--studio-accent, var(--accent)) 3%, transparent) 0%,
+    transparent 100%
+  );
+  padding-top: 0.875rem;
+}
+
+/* ── Quality header: subtle layout ─────────────────────────────────────── */
+.pixel-quality-header {
+  background: transparent;
+  margin-bottom: 6px;
+}
+.pixel-quality-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+.pixel-quality-btn {
+  border-radius: 6px;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+}
+.pixel-quality-btn.active {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 15%, transparent);
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 40%, transparent);
+  color: var(--studio-accent, var(--accent));
+  font-weight: 600;
+}
+
+/* ── Label: consistent ──────────────────────────────────────────────────── */
+.label {
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  letter-spacing: -0.005em;
+}
+
+/* ── kbd hint: better styling ───────────────────────────────────────────── */
+.pixel-kbd-hint {
+  font-size: 0.62rem;
+  font-family: var(--font-mono, monospace);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  padding: 1px 4px;
+  color: var(--text-faint);
+}
+
+/* ── Dash stat card hover ───────────────────────────────────────────────── */
+.dash-stat-card:hover {
+  border-color: color-mix(in srgb, var(--stat-color, var(--accent)) 25%, var(--border));
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px color-mix(in srgb, var(--stat-color, var(--accent)) 10%, transparent);
+}
+
+/* ── Dash card hover: accent tint ───────────────────────────────────────── */
+.dash-card:hover {
+  border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 30%, var(--border));
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25), 0 0 0 1px color-mix(in srgb, var(--card-accent, var(--accent)) 10%, transparent);
+  transform: translateY(-1px);
+}
+.dash-card {
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.12s;
+}
+
+/* ── Dash quick btn: more polished ─────────────────────────────────────── */
+.dash-quick-btn {
+  background: rgba(255,255,255,0.03);
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.dash-quick-btn:hover {
+  background: color-mix(in srgb, var(--mode-accent, var(--accent)) 8%, rgba(255,255,255,0.03));
+}
+
+/* ── Landing section h2 accent span: gradient ───────────────────────────── */
+.landing-section-h2 .accent {
+  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, #fff) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Home section header margin ─────────────────────────────────────────── */
+.home-section-header {
+  margin-bottom: 28px;
+}
+
+/* ── Services grid: improve spacing ────────────────────────────────────── */
+.home-services-grid {
+  gap: 10px;
+}
+.home-service-card {
+  padding: 14px 16px;
+  gap: 4px;
+}
+
+/* ── Studio panel: stronger left border vs right content ───────────────── */
+.studio-shell__panel-body {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--studio-accent, var(--accent)) 1.5%, var(--bg)) 0%,
+    var(--bg) 30%
+  );
+}

@@ -102,7 +102,7 @@ const MODE_ICONS: Record<string, () => React.JSX.Element> = {
 
 export default function HomePage() {
   return (
-    <div className="homepage-root min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+    <div className="homepage-root min-h-screen">
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="relative flex flex-col items-center justify-center text-center px-6 pt-16 sm:pt-28 pb-16 sm:pb-24 overflow-hidden">
@@ -110,30 +110,12 @@ export default function HomePage() {
 
         {/* Status badge */}
         <div className="relative z-10 hero-status-badge">
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: 'var(--success)',
-              display: 'inline-block',
-              boxShadow: '0 0 6px var(--success)',
-              animation: 'pulse 2s ease-in-out infinite',
-            }}
-          />
+          <span className="hero-status-dot" />
           AI Generation Studio — Free Forever
         </div>
 
         {/* Wordmark */}
-        <h1
-          className="relative z-10 font-extrabold tracking-tight mb-5 gradient-text"
-          style={{
-            fontFamily: 'var(--font-display)',
-            letterSpacing: '-0.04em',
-            fontSize: 'clamp(3rem, 10vw, 6rem)',
-            lineHeight: 1,
-          }}
-        >
+        <h1 className="relative z-10 hero-wordmark gradient-text">
           WokGen
         </h1>
 
@@ -192,13 +174,7 @@ export default function HomePage() {
                   <span className="mode-card__name">
                     {mode.label}
                     {mode.status !== 'stable' && (
-                      <span
-                        className="ml-1.5 text-[0.6rem] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded align-middle"
-                        style={{
-                          background: `color-mix(in srgb, ${accent} 12%, transparent)`,
-                          color: accent,
-                        }}
-                      >
+                      <span className="mode-card__badge">
                         {mode.status === 'beta' ? 'Beta' : 'Soon'}
                       </span>
                     )}
@@ -271,9 +247,10 @@ export default function HomePage() {
 
       {/* ── Free Services ────────────────────────────────────── */}
       <section className="home-free-services max-w-4xl mx-auto px-6 pb-20">
+        {/* Section heading */}
         <div className="home-section-header">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-            Powered by <span style={{ color: 'var(--accent)' }}>10+ free AI services</span>
+          <h2 className="landing-section-h2">
+            Powered by <span className="accent">10+ free AI services</span>
           </h2>
           <p className="text-[var(--text-muted)] text-sm mb-8">Zero API cost by default. Add your free keys to unlock more.</p>
         </div>
@@ -304,8 +281,8 @@ export default function HomePage() {
       <section className="max-w-4xl mx-auto px-6 pb-20">
         <div className="grid md:grid-cols-2 gap-10 items-start">
           <div>
-            <span className="landing-section-label" style={{ color: 'var(--accent)' }}>AI Director</span>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3" style={{ fontFamily: 'var(--font-display)' }}>Eral</h2>
+            <span className="landing-section-label">AI Director</span>
+            <h2 className="landing-section-h2" style={{ marginBottom: '0.75rem' }}>Eral</h2>
             <p className="text-[var(--text-muted)] leading-relaxed mb-6 max-w-xs text-sm">
               Describe what you&apos;re building. Eral plans your asset pipeline, routes tasks to the right studio, and maintains context across your project.
             </p>
@@ -338,8 +315,8 @@ export default function HomePage() {
       <section className="max-w-4xl mx-auto px-6 pb-20">
         <div className="grid md:grid-cols-2 gap-10 items-start">
           <div>
-            <span className="landing-section-label" style={{ color: 'var(--accent)' }}>Programmatic</span>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3" style={{ fontFamily: 'var(--font-display)' }}>API</h2>
+            <span className="landing-section-label">Programmatic</span>
+            <h2 className="landing-section-h2" style={{ marginBottom: '0.75rem' }}>API</h2>
             <p className="text-[var(--text-muted)] leading-relaxed mb-6 max-w-xs text-sm">
               Programmatic access to every studio. Integrate generation into your own tools, pipelines, and workflows.
             </p>
@@ -363,8 +340,7 @@ export default function HomePage() {
             </div>
             <pre
               className="p-4 text-xs leading-relaxed overflow-x-auto text-[var(--text-secondary)]"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
+              style={{ fontFamily: 'var(--font-mono)' }}            >
               <code>{`import WokGen from '@wokspec/sdk';
 
 const wok = new WokGen({ apiKey: 'wok_...' });
@@ -384,10 +360,7 @@ console.log(asset.url);`}</code>
       <section className="max-w-4xl mx-auto px-6 pb-16">
         <div className="landing-cta-box">
           <div className="landing-cta-box__glow" aria-hidden="true" />
-          <h2
-            className="relative font-bold tracking-tight mb-3 gradient-text"
-            style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', fontFamily: 'var(--font-display)' }}
-          >
+          <h2 className="landing-cta-h2 gradient-text">
             Start generating for free
           </h2>
           <p className="relative text-[var(--text-muted)] text-sm mb-8 max-w-sm mx-auto leading-relaxed">
@@ -408,12 +381,7 @@ console.log(asset.url);`}</code>
       <section className="border-t border-[var(--border)] py-8 px-6">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-5 text-sm">
-            <span
-              className="text-[0.7rem] font-mono px-2 py-0.5 rounded border border-[var(--border)] text-[var(--text-faint)]"
-              style={{ background: 'var(--surface-raised)' }}
-            >
-              v0.1
-            </span>
+            <span className="footer-version-badge">v0.1</span>
             <a href="https://github.com/WokSpec/WokGen" target="_blank" rel="noopener noreferrer" className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">GitHub</a>
             <a href="/gallery" className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">Gallery</a>
             <a href="/changelog" className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">Changelog</a>
@@ -421,13 +389,7 @@ console.log(asset.url);`}</code>
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-center">
             {PROVIDERS.map((p) => (
-              <span
-                key={p}
-                className="text-xs text-[var(--text-faint)] px-2 py-1 rounded border border-[var(--border)]"
-                style={{ background: 'var(--surface-raised)' }}
-              >
-                {p}
-              </span>
+              <span key={p} className="provider-chip">{p}</span>
             ))}
           </div>
         </div>

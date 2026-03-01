@@ -25278,3 +25278,146 @@ body {
 .section-title {
   color: color-mix(in srgb, var(--studio-accent, var(--accent)) 70%, var(--text));
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Visual Enhancement Pass 5 — CTA Buttons, Animations, Typography
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Shimmer animation keyframe ─────────────────────────────────────────── */
+@keyframes shimmer-slide {
+  0%   { transform: translateX(-150%) skewX(-15deg); }
+  100% { transform: translateX(250%) skewX(-15deg); }
+}
+
+/* ── Hero primary button: gradient + shimmer ───────────────────────────── */
+.hero-btn-primary {
+  background: linear-gradient(135deg,
+    var(--accent) 0%,
+    color-mix(in srgb, var(--accent) 80%, #fff) 60%,
+    var(--accent) 100%
+  );
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 60%, #fff);
+}
+.hero-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+  animation: shimmer-slide 3.5s ease-in-out infinite;
+}
+.hero-btn-primary:active { transform: translateY(0); }
+
+/* ── Hero secondary button: polish ─────────────────────────────────────── */
+.hero-btn-secondary {
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(8px);
+}
+.hero-btn-secondary:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.18);
+}
+
+/* ── CTA box: stronger ──────────────────────────────────────────────────── */
+.landing-cta-box {
+  background: linear-gradient(145deg,
+    color-mix(in srgb, var(--accent) 10%, var(--bg-elevated)) 0%,
+    color-mix(in srgb, var(--accent) 5%, #0d0d14) 50%,
+    color-mix(in srgb, #a78bfa 6%, var(--bg-elevated)) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  box-shadow:
+    0 16px 60px rgba(0,0,0,0.6),
+    0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent),
+    0 1px 0 rgba(255,255,255,0.04) inset;
+}
+.landing-cta-box__glow {
+  background: radial-gradient(ellipse 70% 60% at 50% -15%,
+    color-mix(in srgb, var(--accent) 25%, transparent) 0%,
+    color-mix(in srgb, #a78bfa 12%, transparent) 40%,
+    transparent 70%
+  );
+}
+
+/* ── CTA heading: bigger ────────────────────────────────────────────────── */
+.landing-cta-h2 {
+  font-size: clamp(1.875rem, 6vw, 3rem);
+  letter-spacing: -0.04em;
+}
+
+/* ── Landing demo card: frosted glass ──────────────────────────────────── */
+.landing-demo-card {
+  box-shadow: 0 12px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.landing-demo-msg--user {
+  background: color-mix(in srgb, var(--accent) 10%, rgba(255,255,255,0.04));
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--text-secondary);
+}
+.landing-demo-msg--ai {
+  border-color: rgba(255,255,255,0.07);
+}
+
+/* ── Provider chip ───────────────────────────────────────────────────────── */
+.provider-chip {
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+/* ── App-topbar: slightly tinted ────────────────────────────────────────── */
+.app-topbar {
+  background: rgba(9,9,15,0.90);
+  border-bottom: 1px solid rgba(255,255,255,0.055);
+}
+
+/* ── Sidebar logo: enhanced ─────────────────────────────────────────────── */
+.sidebar-logo {
+  background: linear-gradient(135deg, #5558ee 0%, #818cf8 100%);
+  box-shadow: 0 0 14px rgba(99,102,241,0.5);
+}
+
+/* ── Sidebar active item: more vibrant ──────────────────────────────────── */
+.sidebar-item--active {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--sidebar-item-accent, var(--accent)) 30%, transparent),
+    0 2px 8px color-mix(in srgb, var(--sidebar-item-accent, var(--accent)) 20%, transparent);
+}
+
+/* ── Section: how-it-works accent dot on step connector ────────────────── */
+.how-step:not(:last-child)::after {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 40%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 20%, transparent) 100%
+  );
+}
+
+/* ── Topbar bottom gradient line: sharper ───────────────────────────────── */
+.app-topbar::after {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 50%, transparent) 25%,
+    color-mix(in srgb, var(--accent) 60%, transparent) 50%,
+    color-mix(in srgb, var(--accent) 50%, transparent) 75%,
+    transparent 100%
+  );
+  height: 1px;
+  opacity: 0.6;
+}
+
+/* ── Homepage model chip: accent hover ──────────────────────────────────── */
+.provider-chip:hover {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--text-muted);
+}

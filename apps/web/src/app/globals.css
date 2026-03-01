@@ -26050,3 +26050,238 @@ body {
   background: color-mix(in srgb, var(--card-accent, var(--accent)) 20%, rgba(255,255,255,0.05));
   box-shadow: 0 0 16px color-mix(in srgb, var(--card-accent, var(--accent)) 35%, transparent);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VISUAL ENHANCEMENT PASS 10 — Studio UX, generate button, idle states
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Generate button: full-width with glow + pulse on hover ─────────────── */
+.btn-generate {
+  position: relative;
+  width: 100%;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-radius: 10px;
+  padding: 0 20px;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg,
+    var(--studio-accent, var(--accent)) 0%,
+    color-mix(in srgb, var(--studio-accent, var(--accent)) 80%, #fff) 100%
+  );
+  color: #0a0a0a;
+  border: none;
+  box-shadow:
+    0 4px 16px color-mix(in srgb, var(--studio-accent, var(--accent)) 40%, transparent),
+    0 1px 3px rgba(0,0,0,0.3);
+  transition: all 0.2s;
+  overflow: hidden;
+}
+.btn-generate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+.btn-generate:hover::before {
+  transform: translateX(100%);
+}
+.btn-generate:hover {
+  box-shadow:
+    0 6px 28px color-mix(in srgb, var(--studio-accent, var(--accent)) 55%, transparent),
+    0 2px 6px rgba(0,0,0,0.3);
+  transform: translateY(-1px);
+}
+.btn-generate:active { transform: translateY(0); }
+.btn-generate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ── Studio idle: background mesh pattern ───────────────────────────────── */
+.studio-idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 100%;
+  min-height: 300px;
+  padding: 40px 24px;
+  background:
+    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--studio-accent, var(--accent)) 5%, transparent) 0%, transparent 65%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 40px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 40px);
+}
+.studio-idle-icon {
+  width: 64px;
+  height: 64px;
+  font-size: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 12%, rgba(255,255,255,0.03));
+  border: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 20%, rgba(255,255,255,0.05));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--studio-accent, var(--accent)) 20%, transparent);
+  margin-bottom: 4px;
+}
+.studio-idle-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+.studio-idle-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.55;
+}
+.studio-idle-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  max-width: 360px;
+}
+
+/* ── Studio tool tabs: cleaner active state ─────────────────────────────── */
+.studio-tool-tab {
+  position: relative;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.studio-tool-tab:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.04);
+}
+.studio-tool-tab--active,
+.studio-tool-tab.active {
+  color: var(--studio-accent, var(--accent));
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, rgba(255,255,255,0.02));
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 25%, rgba(255,255,255,0.06));
+  font-weight: 600;
+}
+
+/* ── Studio canvas: result image polished ───────────────────────────────── */
+.studio-result-img,
+.output-canvas img {
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+  max-width: 100%;
+}
+
+/* ── Studio section label: consistent with landing ───────────────────────── */
+.studio-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* ── Studio chip: stronger active state ──────────────────────────────────── */
+.studio-chip {
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.studio-chip:hover {
+  border-color: var(--studio-accent, var(--accent));
+  color: var(--studio-accent, var(--accent));
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 8%, transparent);
+}
+.studio-chip--active,
+.studio-chip.active {
+  border-color: var(--studio-accent, var(--accent));
+  color: var(--studio-accent, var(--accent));
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 12%, transparent);
+  font-weight: 600;
+}
+
+/* ── Studio history: cleaner header ──────────────────────────────────────── */
+.studio-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.15);
+}
+.studio-history-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.studio-history-gallery-link {
+  font-size: 0.7rem;
+  color: var(--studio-accent, var(--accent));
+  text-decoration: none;
+  font-weight: 500;
+  opacity: 0.8;
+  transition: opacity 0.12s;
+}
+.studio-history-gallery-link:hover { opacity: 1; }
+.studio-history-empty {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  text-align: center;
+  padding: 24px 16px;
+}
+
+/* ── Prompt textarea: glow on focus ──────────────────────────────────────── */
+.studio-shell__panel textarea:focus,
+textarea.studio-prompt:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--studio-accent, var(--accent)) 30%, transparent),
+              inset 0 0 0 1px color-mix(in srgb, var(--studio-accent, var(--accent)) 40%, transparent);
+  outline: none;
+}
+
+/* ── Nav / TopBar: breadcrumb accent ─────────────────────────────────────── */
+.app-topbar__breadcrumb-mode {
+  color: var(--studio-accent, var(--accent));
+  font-weight: 600;
+}
+
+/* ── Gallery page: better card hover ─────────────────────────────────────── */
+.gallery-card:hover {
+  box-shadow: 0 12px 36px rgba(0,0,0,0.5), 0 0 0 1px color-mix(in srgb, var(--accent) 25%, rgba(255,255,255,0.06));
+  transform: translateY(-2px);
+}
+.gallery-card {
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+/* ── Quota badge: accent colored bar ─────────────────────────────────────── */
+.quota-badge__bar-fill {
+  background: linear-gradient(90deg, var(--studio-accent, var(--accent)) 0%, color-mix(in srgb, var(--studio-accent, var(--accent)) 80%, #fff) 100%);
+}

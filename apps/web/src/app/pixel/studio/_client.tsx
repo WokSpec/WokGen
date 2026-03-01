@@ -3318,28 +3318,12 @@ function StudioInner() {
         </div>
 
         {/* Tool tabs */}
-        <div
-          className="flex flex-shrink-0"
-          style={{ borderBottom: '1px solid var(--surface-border)' }}
-        >
+        <div className="studio-tool-tabs studio-tool-tabs--row">
           {TOOLS.map((tool) => (
             <button type="button"
               key={tool.id}
               onClick={() => setActiveTool(tool.id)}
-              style={{
-                flex: 1,
-                padding: '0.5rem 0.25rem',
-                background: 'transparent',
-                border: 'none',
-                borderBottom: `2px solid ${activeTool === tool.id ? 'var(--accent)' : 'transparent'}`,
-                color: activeTool === tool.id ? 'var(--text-primary)' : 'var(--text-disabled)',
-                fontSize: '0.7rem',
-                fontWeight: activeTool === tool.id ? 600 : 400,
-                letterSpacing: '0.01em',
-                cursor: 'pointer',
-                transition: 'color 0.12s, border-bottom-color 0.12s',
-                marginBottom: -1,
-              }}
+              className={`studio-tool-tab${activeTool === tool.id ? ' studio-tool-tab--active' : ''}`}
               title={`${tool.label} (${tool.kbd})`}
               aria-label={tool.label}
               aria-pressed={activeTool === tool.id}

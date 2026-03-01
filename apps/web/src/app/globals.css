@@ -25421,3 +25421,85 @@ body {
   border-color: color-mix(in srgb, var(--accent) 30%, transparent);
   color: var(--text-muted);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Visual Enhancement Pass 6 — Mode Landings, Cards, Section Depth
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Mode landing: propagate accent-muted ──────────────────────────────── */
+.mode-landing--pixel    { --accent-muted: color-mix(in srgb, var(--accent-pixel) 60%, #000); }
+.mode-landing--vector   { --accent-muted: color-mix(in srgb, var(--accent-vector) 60%, #000); }
+.mode-landing--business { --accent-muted: color-mix(in srgb, var(--accent-business) 60%, #000); }
+.mode-landing--uiux     { --accent-muted: color-mix(in srgb, var(--accent-uiux) 60%, #000); }
+.mode-landing--voice    { --accent-muted: color-mix(in srgb, var(--accent-voice) 60%, #000); }
+.mode-landing--code     { --accent-muted: color-mix(in srgb, #f97316 60%, #000); }
+
+/* ── Landing tool card: polished ────────────────────────────────────────── */
+.landing-tool-card {
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.025) 0%,
+    rgba(255,255,255,0.01) 100%
+  );
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.landing-tool-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35), 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+/* ── Landing showcase card: polished ───────────────────────────────────── */
+.landing-showcase-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.landing-showcase-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+.landing-showcase-label { color: var(--text); }
+.landing-showcase-cta { color: var(--accent); }
+
+/* ── Landing alt section: richer bg ─────────────────────────────────────── */
+.landing-section--alt {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 3%, rgba(255,255,255,0.015)) 0%,
+    rgba(255,255,255,0.01) 100%
+  );
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ── Landing hero: taller on desktop ───────────────────────────────────── */
+.landing-hero {
+  padding: 6rem 1.5rem 5rem;
+}
+
+/* ── Landing badge: mode-aware bg ──────────────────────────────────────── */
+.landing-badge {
+  background: color-mix(in srgb, var(--accent) 8%, rgba(255,255,255,0.03));
+  backdrop-filter: blur(8px);
+}
+
+/* ── Topbar mode-aware: accent line per mode ─────────────────────────── */
+.app-topbar::after {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--studio-accent, var(--accent)) 55%, transparent) 30%,
+    color-mix(in srgb, var(--studio-accent, var(--accent)) 65%, transparent) 50%,
+    color-mix(in srgb, var(--studio-accent, var(--accent)) 55%, transparent) 70%,
+    transparent 100%
+  );
+}
+
+/* ── Mode landing hero ::before: stronger ──────────────────────────────── */
+.landing-hero::before {
+  width: 900px;
+  height: 450px;
+  background: radial-gradient(ellipse 70% 55% at 50% 0%,
+    color-mix(in srgb, var(--accent) 22%, transparent) 0%,
+    transparent 65%
+  );
+}

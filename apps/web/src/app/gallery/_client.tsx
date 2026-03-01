@@ -1,27 +1,128 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
-import { useInView } from 'react-intersection-observer';
+import Link from 'next/link';
 import { EmptyState } from '@/app/_components/EmptyState';
-import { Search } from 'lucide-react';
+
+// ── Types ─────────────────────────────────────────────────────────────────
 
 interface GalleryAsset {
   id: string;
   imageUrl: string;
   thumbUrl: string | null;
   prompt: string;
-  mode: string;
+  mode: string | null;
   tool: string;
+  provider: string;
   createdAt: string;
-  rarity?: string;
+  rarity: string | null;
+  user?: { name: string | null; image: string | null } | null;
 }
 
-const PAGE_SIZE = 24;
-const BLUR_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+interface GalleryResponse {
+  assets: GalleryAsset[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  total: number;
+}
 
-// simple debounce for search input
-function useDebounced(value: string, delay = 300) {
+// ── Constants ─────────────────────────────────────────────────────────────
+
+const MODE_FILTERS = [
+  { id: '',         label: 'All',      color: 'var(--accent)'  },
+  { id: 'pixel',    label: 'Pixel',    color: '#B06EFF'        },
+  { id: 'vector',   label: 'Vector',   color: '#41A6F6'        },
+  { id: 'uiux',     label: 'UI/UX',    color: '#73EFF7'        },
+  { id: 'business', label: 'Business', color: '#FFCD75'        },
+  { id: 'voice',    label: 'Voice',    color: '#38B764'        },
+  { id: 'code',     label: 'Code',     color: '#FF9D00'        },
+] as const;
+
+const SORT_OPTIONS = [
+  { id: 'newest', label: 'Latest'   },
+  { id: 'oldest', label: 'Oldest'   },
+] as const;
+
+const DATE_FILTERS = [
+  { id: '',       label: 'All Time'   },
+  { id: 'today',  label: 'Today'      },
+  { id: 'week',   label: 'This Week'  },
+  { id: 'month',  label: 'This Month' },
+] as const;
+
+const BLUR_PH = 'data:image/png;base64,iVBORw0KGgoAAAANSUBEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const s = Math.floor(diff / 1000);
+  if (s < 60)  return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60)  return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24)  return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 30)  return `${d}d ago`;
+  return `${Math.floor(d / 30)}mo ago`;
+}
+
+function modeColor(mode: string | null): string {
+  return MODE_FILTERS.find((m) => m.id === (mode ?? ''))?.color ?? 'var(--text-muted)';
+}
+
+function modeLabel(mode: string | null): string {
+  if (!mode) return 'Unknown';
+  return MODE_FILTERS.find((m) => m.id === mode)?.label ?? mode;
+}
+
+// ── GalleryCard ───────────────────────────────────────────────────────────
+
+function GalleryCard({ asset }: { asset: GalleryAsset }) {
+  const img = asset.thumbUrl ?? asset.imageUrl;
+  const color = modeColor(asset.mode);
+  return (
+    <div className="gallery-card break-inside-avoid">
+      <div className="gallery-card__img-wrap">
+        <Image
+          src={img}
+          alt={asset.prompt.slice(0, 60)}
+          width={400}
+          height={400}
+          className="gallery-card__img"
+          placeholder="blur"
+          blurDataURL={BLUR_PH}
+        />
+        <div className="gallery-card__hover-overlay">
+          <Link href={`/gallery/${asset.id}`} className="gallery-card__view-btn">View Full</Link>
+        </div>
+      </div>
+      <div className="gallery-card__body">
+        <div className="gallery-card__mode-badge" style={{ '--mode-color': color } as React.CSSProperties}>
+          <span className="gallery-card__mode-dot" />
+          {modeLabel(asset.mode)}
+        </div>
+        <p className="gallery-card__prompt">{asset.prompt}</p>
+        <div className="gallery-card__footer">
+          <div className="gallery-card__user">
+            {asset.user?.image ? (
+              <Image src={asset.user.image} alt="" width={20} height={20} className="gallery-card__avatar" />
+            ) : (
+              <div className="gallery-card__avatar gallery-card__avatar--default" />
+            )}
+            <span className="gallery-card__username">{asset.user?.name ?? 'anon'}</span>
+          </div>
+          <span className="gallery-card__time">{timeAgo(asset.createdAt)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────
+
+function useDebounced(value: string, delay = 350) {
   const [v, setV] = useState(value);
   useEffect(() => {
     const t = setTimeout(() => setV(value), delay);
@@ -31,158 +132,117 @@ function useDebounced(value: string, delay = 300) {
 }
 
 export default function GalleryClient() {
-  const [assets, setAssets] = useState<GalleryAsset[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedQuery = useDebounced(searchQuery, 350);
-  const [modeFilter, setModeFilter] = useState<string>('all');
-  const [selectedAsset, setSelectedAsset] = useState<GalleryAsset | null>(null);
+  const [mode,      setMode]      = useState('');
+  const [sort,      setSort]      = useState<'newest' | 'oldest'>('newest');
+  const [search,    setSearch]    = useState('');
+  const [dateRange, setDateRange] = useState('');
+  const [assets,    setAssets]    = useState<GalleryAsset[]>([]);
+  const [cursor,    setCursor]    = useState<string | null>(null);
+  const [hasMore,   setHasMore]   = useState(false);
+  const [loading,   setLoading]   = useState(true);
+  const [error,     setError]     = useState<string | null>(null);
 
-  const { ref: sentinelRef, inView } = useInView({ threshold: 0.1 });
+  const debouncedSearch = useDebounced(search);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const fetchAssets = useCallback(async (opts: { cursor?: string; search: string; mode: string; reset: boolean }) => {
+  const load = useCallback(async (reset: boolean, overrideCursor?: string | null) => {
+    if (abortRef.current) abortRef.current.abort();
+    abortRef.current = new AbortController();
     setLoading(true);
-    const params = new URLSearchParams({ mine: 'true', limit: String(PAGE_SIZE) });
-    if (opts.cursor) params.set('cursor', opts.cursor);
-    if (opts.search.trim()) params.set('search', opts.search.trim());
-    if (opts.mode !== 'all') params.set('mode', opts.mode);
-    // support new search endpoint if used
-    const endpoint = opts.search.trim() ? `/api/gallery/search?${params}` : `/api/gallery?${params}`;
-    const res = await fetch(endpoint);
-    if (res.ok) {
-      const d = await res.json();
-      const newAssets: GalleryAsset[] = d.assets ?? [];
-      setAssets(prev => opts.reset ? newAssets : [...prev, ...newAssets]);
-      setCursor(d.nextCursor ?? null);
-      setHasMore(d.hasMore ?? false);
+    setError(null);
+    try {
+      const params = new URLSearchParams({ sort, limit: '24' });
+      if (mode)                       params.set('mode',   mode);
+      if (debouncedSearch.trim())     params.set('search', debouncedSearch.trim());
+      if (!reset && overrideCursor)   params.set('cursor', overrideCursor);
+      const res = await fetch(`/api/gallery?${params}`, { signal: abortRef.current.signal });
+      if (!res.ok) throw new Error(`Gallery fetch failed (${res.status})`);
+      const data: GalleryResponse = await res.json();
+      setAssets((prev) => reset ? data.assets : [...prev, ...data.assets]);
+      setCursor(data.nextCursor);
+      setHasMore(data.hasMore);
+    } catch (e) {
+      if ((e as Error).name !== 'AbortError') {
+        setError(e instanceof Error ? e.message : 'Unknown error');
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, []);
+  }, [mode, sort, debouncedSearch]);
 
-  // Reset and fetch on filter change
   useEffect(() => {
     setCursor(null);
-    fetchAssets({ search: debouncedQuery, mode: modeFilter, reset: true });
-  }, [debouncedQuery, modeFilter, fetchAssets]);
+    load(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, sort, debouncedSearch, dateRange]);
 
-  // Load more when sentinel is visible
-  useEffect(() => {
-    if (inView && hasMore && !loading && cursor) {
-      fetchAssets({ cursor, search: searchQuery, mode: modeFilter, reset: false });
-    }
-  }, [inView, hasMore, loading, cursor, searchQuery, modeFilter, fetchAssets]);
+  function handleLoadMore() {
+    load(false, cursor);
+  }
 
-  if (loading && assets.length === 0) {
-    return <div className="gallery-page"><p style={{ color: 'var(--text-muted, #6b7280)', padding: '2rem' }}>Loading…</p></div>;
+  function handleReset() {
+    setMode('');
+    setSearch('');
+    setDateRange('');
+    setSort('newest');
   }
 
   return (
-    <div className="gallery-page">
-      <h1 style={{ margin: '0 0 1.5rem', fontSize: '1.5rem', color: 'var(--text)' }}>My Gallery</h1>
-
-      {/* Filter + search bar */}
-      <div className="flex gap-3 mb-6">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text)]/30" />
-          <input
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search by prompt..."
-            className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/10 rounded text-sm text-[var(--text)]/80 placeholder:text-[var(--text)]/30 focus:outline-none focus:border-white/30"
-          />
+    <div className="gallery-universal">
+      {/* ── Filters ─────────────────────────────────────────── */}
+      <div className="gallery-filters">
+        <div className="gallery-filters__modes">
+          {MODE_FILTERS.map((m) => (
+            <button
+              key={m.id}
+              className={`gallery-mode-pill${mode === m.id ? ' gallery-mode-pill--active' : ''}`}
+              style={{ '--pill-color': m.color } as React.CSSProperties}
+              onClick={() => setMode(m.id)}
+            >
+              {m.id && <span className="gallery-mode-pill__dot" />}
+              {m.label}
+            </button>
+          ))}
         </div>
-        <select
-          value={modeFilter}
-          onChange={e => setModeFilter(e.target.value)}
-          className="bg-white/5 border border-white/10 rounded px-3 py-2.5 text-sm text-[var(--text)]/60"
-        >
-          <option value="all">All modes</option>
-          <option value="pixel">Pixel</option>
-          <option value="vector">Vector</option>
-          <option value="uiux">UI/UX</option>
-          <option value="business">Business</option>
-        </select>
+        <div className="gallery-filters__controls">
+          <input
+            type="search"
+            placeholder="Search prompts…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="gallery-search"
+          />
+          <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="gallery-select">
+            {SORT_OPTIONS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+          </select>
+          <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="gallery-select">
+            {DATE_FILTERS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
+          </select>
+        </div>
       </div>
 
-      {assets.length === 0 && !loading ? (
+      {/* ── Grid ────────────────────────────────────────────── */}
+      {error ? (
+        <p className="gallery-state gallery-state--error">⚠ {error}</p>
+      ) : assets.length === 0 && !loading ? (
         <EmptyState
-          title="No assets yet"
-          description="Generated assets you make public will appear here."
-          action={{ label: 'Start generating', href: '/studio' }}
+          title="No generations found"
+          description="Try adjusting your filters or check back later."
+          action={{ label: 'Clear filters', href: '#' }}
         />
       ) : (
-        <>
-          {/* Masonry responsive grid */}
-          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-3 space-y-3">
-            {assets.map(a => (
-              <div
-                key={a.id}
-                onClick={() => setSelectedAsset(a)}
-                className="break-inside-avoid group relative cursor-pointer rounded overflow-hidden border border-white/5 hover:border-white/20 transition-all"
-              >
-                <Image
-                  src={a.thumbUrl ?? a.imageUrl}
-                  alt={a.prompt.slice(0, 60)}
-                  width={300}
-                  height={300}
-                  className="w-full"
-                  placeholder="blur"
-                  blurDataURL={BLUR_PLACEHOLDER}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-all">
-                  <div className="absolute bottom-0 left-0 right-0 p-3">
-                    <p className="text-xs text-[var(--text)] line-clamp-2">{a.prompt}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-[10px] text-[var(--text)]/40">{a.mode}</span>
-                      <button type="button" className="text-xs text-[var(--text)]/60 hover:text-[var(--text)]">View</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div ref={sentinelRef} style={{ height: 40, marginTop: 20 }} />
-          {loading && <p style={{ color: 'var(--text-muted, #6b7280)', padding: '1rem', textAlign: 'center' }}>Loading more…</p>}
-        </>
+        <div className="gallery-grid">
+          {assets.map((a) => <GalleryCard key={a.id} asset={a} />)}
+        </div>
       )}
 
-      {/* Lightbox */}
-      {selectedAsset && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedAsset(null)}
-        >
-          <div
-            className="max-w-2xl w-full rounded overflow-hidden border border-white/10"
-              style={{ background: 'var(--bg-elevated)' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="relative aspect-square">
-              <Image
-                src={selectedAsset.imageUrl}
-                alt={selectedAsset.prompt || ''}
-                fill
-                className="object-contain"
-              />
-            </div>
-            <div className="p-4">
-              <p className="text-sm text-[var(--text)]/80 mb-3">{selectedAsset.prompt}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-[var(--text)]/30">
-                  {selectedAsset.mode} • {new Date(selectedAsset.createdAt).toLocaleDateString()}
-                </span>
-                <a
-                  href={selectedAsset.imageUrl}
-                  download
-                  className="text-xs bg-white text-black px-3 py-1.5 rounded-lg font-medium hover:bg-white/90"
-                >
-                  Download
-                </a>
-              </div>
-            </div>
-          </div>
+      {loading && <p className="gallery-loading">Loading…</p>}
+
+      {!loading && hasMore && (
+        <div style={{ textAlign: 'center', marginTop: 32 }}>
+          <button className="gallery-load-more" onClick={handleLoadMore}>
+            Load more
+          </button>
         </div>
       )}
     </div>

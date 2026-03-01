@@ -7,15 +7,25 @@ const PRODUCT_LINKS = [
   { label: 'Pixel Studio',  href: '/pixel/studio',    ext: false },
   { label: 'Vector Studio', href: '/vector/studio',   ext: false },
   { label: 'Tools',         href: '/tools',            ext: false },
+  { label: 'Prompt Lab',    href: '/prompt-lab',       ext: false },
   { label: 'Community',     href: '/community',        ext: false },
   { label: 'Open Source',   href: '/open-source',      ext: false },
 ];
 
+const TOOLS_LINKS = [
+  { label: 'Upscaler',       href: '/tools/upscale',  ext: false },
+  { label: 'SFX Library',    href: '/tools/sfx',       ext: false },
+  { label: 'Asset Library',  href: '/tools/assets',    ext: false },
+  { label: 'Color Palette',  href: '/tools/palette',   ext: false },
+  { label: 'Gallery',        href: '/gallery',          ext: false },
+];
+
 const RESOURCES_LINKS = [
-  { label: 'Docs',      href: '/docs',                             ext: false },
-  { label: 'Changelog', href: '/changelog',                        ext: false },
-  { label: 'GitHub',    href: 'https://github.com/WokSpec/WokGen', ext: true  },
-  { label: 'Status',    href: '/status',                           ext: false },
+  { label: 'Docs',        href: '/docs',                             ext: false },
+  { label: 'Changelog',   href: '/changelog',                        ext: false },
+  { label: 'Developers',  href: '/developers',                       ext: false },
+  { label: 'GitHub',      href: 'https://github.com/WokSpec/WokGen', ext: true  },
+  { label: 'Status',      href: '/status',                           ext: false },
 ];
 
 const SUPPORT_LINKS = [
@@ -57,11 +67,19 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-6 py-12">
 
         {/* Column links */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-faint)] mb-3">Product</p>
             <ul className="space-y-2">
               {PRODUCT_LINKS.map(l => (
+                <li key={l.label}><FooterLink href={l.href} label={l.label} ext={l.ext} /></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-faint)] mb-3">Tools</p>
+            <ul className="space-y-2">
+              {TOOLS_LINKS.map(l => (
                 <li key={l.label}><FooterLink href={l.href} label={l.label} ext={l.ext} /></li>
               ))}
             </ul>

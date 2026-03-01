@@ -316,7 +316,7 @@ export function Sidebar() {
       <SidebarItem href="/tools" label="Tools" active={isActive('/tools')}>
         <ToolsIcon />
       </SidebarItem>
-      <SidebarItem href="/library" label="Library" active={isActive('/library') || isActive('/gallery')}>
+      <SidebarItem href="/gallery" label="Gallery" active={isActive('/library') || isActive('/gallery')}>
         <GalleryIcon />
       </SidebarItem>
       <SidebarItem href="/tools/music" label="Music" active={isActive('/tools/music')}>

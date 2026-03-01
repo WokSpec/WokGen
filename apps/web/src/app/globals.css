@@ -26668,3 +26668,180 @@ textarea.studio-prompt:focus {
   color: var(--text-muted);
   margin-top: 4px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Settings Page — CSS classes (replaces inline styles)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.settings-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+.settings-page__title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.settings-page__subtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 2.5rem;
+  line-height: 1.55;
+}
+.settings-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.settings-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  background: var(--bg-elevated, var(--surface-card));
+}
+.settings-card--danger {
+  border-color: var(--danger-border, rgba(248,113,113,0.3));
+  background: var(--danger-bg, rgba(220,38,38,0.05));
+}
+.settings-card__title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.settings-card__title--danger {
+  color: var(--danger, #f87171);
+}
+.settings-card__desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.settings-card__desc--mb { margin-bottom: 16px; }
+
+/* Profile */
+.settings-profile-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+.settings-avatar-img {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+.settings-avatar-placeholder {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 2px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.settings-profile-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.settings-profile-email {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* Sign-in providers */
+.settings-providers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.settings-provider-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+}
+.settings-provider-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.settings-provider-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.settings-provider-label {
+  font-size: 0.875rem;
+  color: var(--text);
+}
+.settings-provider-status {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+/* Developer links */
+.settings-dev-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.settings-dev-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.settings-dev-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+/* Danger button */
+.btn-danger {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--danger, #f87171);
+  border-radius: 8px;
+  color: var(--danger, #f87171);
+  font-size: 0.8125rem;
+  font-family: var(--font-body, 'DM Sans'), sans-serif;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.btn-danger:hover {
+  background: rgba(248,113,113,0.1);
+  color: #fca5a5;
+}

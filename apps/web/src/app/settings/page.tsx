@@ -19,45 +19,45 @@ export default async function SettingsPage() {
   if (!session?.user?.id) redirect('/login?callbackUrl=/settings');
 
   return (
-    <div style={{ maxWidth: '720px', margin: '0 auto', padding: '3rem 1.5rem' }}>
-      <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>Account Settings</h1>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem' }}>Manage your WokGen account, privacy, and security settings.</p>
+    <div className="settings-page">
+      <h1 className="settings-page__title">Account Settings</h1>
+      <p className="settings-page__subtitle">Manage your WokGen account, privacy, and security settings.</p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div className="settings-sections">
         {/* Profile */}
-        <section style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', background: 'var(--surface-card)' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Profile</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem' }}>
+        <section className="settings-card">
+          <h2 className="settings-card__title">Profile</h2>
+          <div className="settings-profile-row">
             {session.user.image ? (
-              <Image src={session.user.image} alt={session.user.name || 'Avatar'} width={56} height={56} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)' }} />
+              <Image src={session.user.image} alt={session.user.name || 'Avatar'} width={56} height={56} className="settings-avatar-img" />
             ) : (
-              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--accent-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.25rem', color: 'var(--accent)' }}>
+              <div className="settings-avatar-placeholder">
                 {(session.user.name || session.user.email || 'U')[0].toUpperCase()}
               </div>
             )}
             <div>
-              <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{session.user.name || 'Anonymous'}</div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{session.user.email}</div>
+              <div className="settings-profile-name">{session.user.name || 'Anonymous'}</div>
+              <div className="settings-profile-email">{session.user.email}</div>
             </div>
           </div>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Profile information is synced from your OAuth provider (GitHub or Google). To update your name or avatar, change it on your provider account.</p>
+          <p className="settings-card__desc">Profile information is synced from your OAuth provider (GitHub or Google). To update your name or avatar, change it on your provider account.</p>
         </section>
 
         {/* Sign-in Methods */}
-        <section style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', background: 'var(--surface-card)' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.375rem' }}>Sign-in Methods</h2>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>WokGen uses OAuth-only authentication — no passwords to manage or leak.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+        <section className="settings-card">
+          <h2 className="settings-card__title">Sign-in Methods</h2>
+          <p className="settings-card__desc settings-card__desc--mb">WokGen uses OAuth-only authentication — no passwords to manage or leak.</p>
+          <div className="settings-providers">
             {([
               { id: 'github', label: 'GitHub', icon: 'GH' },
               { id: 'google', label: 'Google', icon: 'G' },
             ] as const).map(provider => (
-              <div key={provider.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--surface-card)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'var(--surface-hover)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 700 }}>{provider.icon}</span>
-                  <span style={{ fontSize: '0.9375rem' }}>{provider.label}</span>
+              <div key={provider.id} className="settings-provider-row">
+                <div className="settings-provider-left">
+                  <span className="settings-provider-icon">{provider.icon}</span>
+                  <span className="settings-provider-label">{provider.label}</span>
                 </div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', padding: '0.2rem 0.625rem', border: '1px solid var(--border)', borderRadius: '999px' }}>
+                <span className="settings-provider-status">
                   {(session as any).provider === provider.id ? 'Connected' : 'Not connected'}
                 </span>
               </div>
@@ -66,8 +66,8 @@ export default async function SettingsPage() {
         </section>
 
         {/* Notifications */}
-        <section style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', background: 'var(--surface-card)' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Notifications</h2>
+        <section className="settings-card">
+          <h2 className="settings-card__title">Notifications</h2>
           <NotificationSettingsClient />
         </section>
 
@@ -75,26 +75,20 @@ export default async function SettingsPage() {
         <AppearanceSettings />
 
         {/* AI Services / BYOK */}
-        <section style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', background: 'var(--surface-card)' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.375rem' }}>AI Services</h2>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Bring your own API keys (BYOK) for external AI and media services.</p>
+        <section className="settings-card">
+          <h2 className="settings-card__title">AI Services</h2>
+          <p className="settings-card__desc settings-card__desc--mb">Bring your own API keys (BYOK) for external AI and media services.</p>
           <AiServicesSettings />
         </section>
 
         {/* API Access / Developer */}
-        <section style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', background: 'var(--surface-card)' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.375rem' }}>Developer</h2>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Create API keys, configure webhooks, and access the SDK to use WokGen programmatically.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <a href="/account/api-keys" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', color: 'var(--text-secondary)', textDecoration: 'none' }}>
-              API Keys <span style={{ opacity: 0.5 }}>→</span>
-            </a>
-            <a href="/account/webhooks" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', color: 'var(--text-secondary)', textDecoration: 'none' }}>
-              Webhooks <span style={{ opacity: 0.5 }}>→</span>
-            </a>
-            <a href="/docs/api" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', color: 'var(--text-secondary)', textDecoration: 'none' }}>
-              SDK Docs <span style={{ opacity: 0.5 }}>→</span>
-            </a>
+        <section className="settings-card">
+          <h2 className="settings-card__title">Developer</h2>
+          <p className="settings-card__desc settings-card__desc--mb">Create API keys, configure webhooks, and access the SDK to use WokGen programmatically.</p>
+          <div className="settings-dev-links">
+            <a href="/account/api-keys" className="settings-dev-link">API Keys <span aria-hidden="true">→</span></a>
+            <a href="/account/webhooks" className="settings-dev-link">Webhooks <span aria-hidden="true">→</span></a>
+            <a href="/docs/api" className="settings-dev-link">SDK Docs <span aria-hidden="true">→</span></a>
           </div>
         </section>
 
@@ -102,17 +96,11 @@ export default async function SettingsPage() {
         <BillingSection />
 
         {/* Danger zone */}
-        <section style={{ border: '1px solid var(--danger-border)', borderRadius: '12px', padding: '1.5rem', background: 'var(--danger-bg)' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.375rem', color: 'var(--danger)' }}>Danger Zone</h2>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Permanently delete your account and all data. This cannot be undone.</p>
+        <section className="settings-card settings-card--danger">
+          <h2 className="settings-card__title settings-card__title--danger">Danger Zone</h2>
+          <p className="settings-card__desc settings-card__desc--mb">Permanently delete your account and all data. This cannot be undone.</p>
           <form action="/api/account/delete" method="POST">
-            <button
-              type="submit"
-              style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--danger)', borderRadius: '8px', color: 'var(--danger)', fontSize: '0.875rem', cursor: 'pointer', fontFamily: 'inherit' }}
-            
-            >
-              Delete Account
-            </button>
+            <button type="submit" className="btn-danger">Delete Account</button>
           </form>
         </section>
       </div>

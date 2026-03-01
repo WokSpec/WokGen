@@ -428,7 +428,7 @@ export default function AdminPage() {
             </p>
           )}
         </div>
-        <Link href="/studio" className="admin-header__back">← Studio</Link>
+        <Link href="/pixel/studio" className="admin-header__back">← Studio</Link>
       </div>
 
       {loading && <p className="admin-loading">Loading…</p>}

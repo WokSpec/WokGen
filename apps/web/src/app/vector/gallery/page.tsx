@@ -615,7 +615,7 @@ function EmptyState({ search }: { search: string }) {
           Generate your first vector in Vector mode.
         </p>
         <a
-          href="/studio"
+          href="/vector/studio"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -825,7 +825,7 @@ export default function VectorGalleryPage() {
               </div>
 
               <a
-                href="/studio"
+                href="/vector/studio"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',

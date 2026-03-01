@@ -19,11 +19,11 @@ interface SearchResult {
 }
 
 const NAV_COMMANDS = [
-  { id: 'nav-pixel',    label: 'Pixel mode',           href: '/studio?type=pixel',    group: 'Modes'    },
-  { id: 'nav-business', label: 'Business mode',        href: '/studio?type=business', group: 'Modes'    },
-  { id: 'nav-vector',   label: 'Vector mode',          href: '/studio?type=vector',   group: 'Modes'    },
-  { id: 'nav-voice',    label: 'Voice mode',           href: '/studio?type=voice',    group: 'Modes'    },
-  { id: 'nav-uiux',     label: 'UI/UX mode',           href: '/studio?type=uiux',     group: 'Modes'    },
+  { id: 'nav-pixel',    label: 'Pixel Studio',         href: '/pixel/studio',         group: 'Modes'    },
+  { id: 'nav-business', label: 'Business Studio',      href: '/business/studio',      group: 'Modes'    },
+  { id: 'nav-vector',   label: 'Vector Studio',        href: '/vector/studio',        group: 'Modes'    },
+  { id: 'nav-voice',    label: 'Voice Studio',         href: '/voice/studio',         group: 'Modes'    },
+  { id: 'nav-uiux',     label: 'UI/UX Studio',         href: '/uiux/studio',          group: 'Modes'    },
   { id: 'nav-gallery',  label: 'Community Gallery',    href: '/gallery',              group: 'Platform' },
   { id: 'nav-projects', label: 'Projects',             href: '/projects',             group: 'Platform' },
   { id: 'nav-brand',    label: 'Brand Kits',           href: '/brand',                group: 'Platform' },

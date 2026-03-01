@@ -12,7 +12,7 @@ export default function StudioErrorPage({ error, reset }: { error: Error & { dig
         <button type="button" onClick={reset} style={{ padding: '0.5rem 1.25rem', background: 'var(--accent-subtle)', border: '1px solid var(--accent-glow)', borderRadius: '6px', color: 'var(--accent)', cursor: 'pointer', fontSize: '0.875rem' }}>
           Try again
         </button>
-        <a href="/studio?type=pixel" style={{ padding: '0.5rem 1.25rem', background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-muted)', fontSize: '0.875rem', textDecoration: 'none' }}>
+        <a href="/voice/studio" style={{ padding: '0.5rem 1.25rem', background: 'var(--surface-raised)', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-muted)', fontSize: '0.875rem', textDecoration: 'none' }}>
           Back to studio
         </a>
       </div>

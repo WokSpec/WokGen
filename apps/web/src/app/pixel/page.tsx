@@ -63,8 +63,8 @@ export default function PixelLanding() {
               Free standard quality. HD for serious projects.
             </p>
             <div className="landing-cta-row">
-              <Link href="/studio" className="btn-primary btn-lg">
-                Open Pixel mode →
+              <Link href="/pixel/studio" className="btn-primary btn-lg">
+                Open Pixel Studio →
               </Link>
               <Link href="/pixel/gallery" className="btn-ghost btn-lg">
                 Browse Gallery
@@ -100,7 +100,7 @@ export default function PixelLanding() {
                 </div>
                 <p className="landing-tool-desc">{t.desc}</p>
                 <Link
-                  href={`/studio?tool=${t.id}&prompt=${encodeURIComponent(t.example)}`}
+                  href={`/pixel/studio?tool=${t.id}&prompt=${encodeURIComponent(t.example)}`}
                   className="landing-tool-example"
                 >
                   <span className="landing-tool-example-label">Try:</span>
@@ -122,7 +122,7 @@ export default function PixelLanding() {
             {SHOWCASE.map(s => (
               <Link
                 key={s.label}
-                href={`/studio?prompt=${encodeURIComponent(s.prompt)}`}
+                href={`/pixel/studio?prompt=${encodeURIComponent(s.prompt)}`}
                 className="landing-showcase-card"
               >
                 <div className="landing-showcase-label">{s.label}</div>

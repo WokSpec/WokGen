@@ -240,7 +240,7 @@ export default function VoiceGallery() {
             <h1 className="gallery-title">Voice Gallery</h1>
             <p className="gallery-desc">AI-generated speech and character voices</p>
           </div>
-          <Link href="/studio" className="btn-primary btn-sm">
+          <Link href="/voice/studio" className="btn-primary btn-sm">
             + New Clip
           </Link>
         </div>
@@ -297,7 +297,7 @@ export default function VoiceGallery() {
           <p className="gallery-empty-desc">
             Generate your first audio in Voice mode.
           </p>
-          <Link href="/studio" className="btn-primary btn-sm">
+          <Link href="/voice/studio" className="btn-primary btn-sm">
             Go to Voice mode →
           </Link>
         </div>

@@ -205,7 +205,7 @@ export default function StudioToolsPage() {
 
         {/* Footer */}
         <div className="tools-page__footer">
-          <Link href="/studio" className="tools-page__footer-link">Back to Studio</Link>
+          <Link href="/pixel/studio" className="tools-page__footer-link">Back to Studio</Link>
           <Link href="/tools" className="tools-page__footer-link">Browse all free tools</Link>
         </div>
       </div>

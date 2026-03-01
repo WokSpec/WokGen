@@ -53,19 +53,26 @@ function buildBreadcrumbs(pathname: string): BreadcrumbItem[] {
   return items;
 }
 
-export function Breadcrumb() {
+export function Breadcrumb({ separator }: { separator?: string }) {
   const pathname = usePathname();
 
-  // Don't show on homepage
+  // Don't show on homepage — caller's separator/wrapper also hides
   if (!pathname || pathname === '/') return null;
 
   const items = buildBreadcrumbs(pathname);
+  // Skip single-item breadcrumb (just "Home") — not useful
+  if (items.length <= 1) return null;
 
   return (
     <nav className="breadcrumb" aria-label="Breadcrumb">
+      {separator && (
+        <span className="breadcrumb-prefix-sep" aria-hidden="true">{separator}</span>
+      )}
       <ol className="breadcrumb-list">
         {items.map((item, idx) => {
           const isLast = idx === items.length - 1;
+          // Skip "Home" in topbar context — too noisy
+          if (idx === 0) return null;
           return (
             <li key={item.href} className="breadcrumb-item">
               {isLast ? (

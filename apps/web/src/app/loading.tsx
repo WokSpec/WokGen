@@ -1,7 +1,8 @@
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+    <div className="page-loading">
+      <div className="page-loading__spinner" aria-hidden="true" />
+      <span className="page-loading__text">Loading…</span>
     </div>
   );
 }

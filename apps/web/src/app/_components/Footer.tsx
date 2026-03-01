@@ -4,11 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const PRODUCT_LINKS = [
-  { label: 'Studio',      href: '/studio?type=pixel', ext: false },
-  { label: 'Tools',       href: '/tools',             ext: false },
-  { label: 'Community',   href: '/community',         ext: false },
-  { label: 'Eral',        href: '/eral',              ext: false },
-  { label: 'Open Source', href: '/open-source',       ext: false },
+  { label: 'Pixel Studio',  href: '/pixel/studio',    ext: false },
+  { label: 'Vector Studio', href: '/vector/studio',   ext: false },
+  { label: 'Tools',         href: '/tools',            ext: false },
+  { label: 'Community',     href: '/community',        ext: false },
+  { label: 'Open Source',   href: '/open-source',      ext: false },
 ];
 
 const RESOURCES_LINKS = [
@@ -39,7 +39,18 @@ function FooterLink({ href, label, ext }: { href: string; label: string; ext?: b
 
 export function Footer() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/studio')) return null;
+  if (
+    pathname?.startsWith('/studio') ||
+    pathname?.startsWith('/pixel/studio') ||
+    pathname?.startsWith('/vector/studio') ||
+    pathname?.startsWith('/business/studio') ||
+    pathname?.startsWith('/uiux/studio') ||
+    pathname?.startsWith('/voice/studio') ||
+    pathname?.startsWith('/code/studio') ||
+    pathname?.startsWith('/text/studio') ||
+    pathname?.startsWith('/eral') ||
+    pathname?.startsWith('/tools/')
+  ) return null;
 
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--bg)]">

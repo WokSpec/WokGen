@@ -47,7 +47,7 @@ export default function PixelStudioError({
         Try Again
       </button>
       <a
-        href="/studio"
+        href="/pixel/studio"
         style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', textDecoration: 'none' }}
       >
         Back to Studio

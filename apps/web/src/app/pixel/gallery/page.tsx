@@ -814,7 +814,7 @@ function EmptyState({ search }: { search: string }) {
         <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1rem', maxWidth: 300, margin: '0 auto 1rem' }}>
           Generate your first pixel art in Pixel mode.
         </p>
-        <a href="/studio" style={{
+        <a href="/pixel/studio" style={{
           display: 'inline-block', padding: '0.45rem 1.1rem',
           background: 'var(--accent)', color: 'white', borderRadius: 6,
           fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none',
@@ -1010,7 +1010,7 @@ export default function GalleryPage() {
 
             <div style={{ marginLeft: 'auto' }}>
               <a
-                href="/studio"
+                href="/pixel/studio"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',

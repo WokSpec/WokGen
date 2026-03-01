@@ -13,6 +13,8 @@
     "web:lint": "npm run lint --workspace=apps/web",
     "start": "node scripts/tui.mjs",
     "clean": "node scripts/clean-generated.mjs",
+    "purge:assets": "node scripts/purge-assets.mjs",
+    "purge:assets:confirm": "node scripts/purge-assets.mjs --confirm",
     "prompts": "node scripts/generate-prompts.mjs",
     "gen": "node scripts/cloud-generate.mjs",
     "gen:hq": "node scripts/cloud-generate-oneshot.mjs --workflow comfyui/workflows/pixel_icon_hq_workflow.json",

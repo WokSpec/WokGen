@@ -158,7 +158,7 @@ export default function UIUXGallery() {
             <h1 className="gallery-title">UI/UX Component Gallery</h1>
             <p className="gallery-desc">Hero sections, pricing tables, navbars, and more</p>
           </div>
-          <Link href="/studio" className="btn-primary btn-sm">
+          <Link href="/uiux/studio" className="btn-primary btn-sm">
             + New Component
           </Link>
         </div>
@@ -235,7 +235,7 @@ export default function UIUXGallery() {
           <div className="gallery-empty-icon"></div>
           <p className="gallery-empty-title">No UI/UX components yet</p>
           <p className="gallery-empty-desc">Generate your first UI component in UI/UX mode.</p>
-          <Link href="/studio" className="btn-primary btn-sm">Go to UI/UX mode →</Link>
+          <Link href="/uiux/studio" className="btn-primary btn-sm">Go to UI/UX mode →</Link>
         </div>
       ) : (
         <div className="gallery-grid gallery-grid--uiux">

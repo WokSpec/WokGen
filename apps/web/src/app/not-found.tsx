@@ -84,7 +84,7 @@ export default function NotFound() {
 
         <div className="nf-actions">
           <Link href="/" className="nf-btn nf-btn--primary">← Home</Link>
-          <Link href="/studio" className="nf-btn nf-btn--ghost">Open Studio</Link>
+          <Link href="/pixel/studio" className="nf-btn nf-btn--ghost">Open Studio</Link>
         </div>
 
         <nav aria-label="Quick navigation" className="nf-quicknav">

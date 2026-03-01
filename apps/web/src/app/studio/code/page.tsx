@@ -133,8 +133,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
     <div className="min-h-screen text-[var(--text)]" style={{ background: 'var(--bg)' }}>
       <div className="app-topbar">
         <div className="app-topbar__left">
-          <span style={{ color: 'var(--blue, #60a5fa)' }}><IconCode2 size={16} /></span>
-          <span className="app-topbar__wordmark-gen" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Code Studio</span>
+          <span style={{ color: 'var(--studio-accent, #60a5fa)' }}><IconCode2 size={16} /></span>
+          <span className="studio-shell__panel-title" style={{ fontSize: '0.85rem' }}>Code Studio</span>
           <span className="app-topbar__sep">·</span>
           <span className="text-xs text-[var(--text)]/40">React + Tailwind</span>
         </div>
@@ -142,15 +142,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
 
       <div className="flex h-[calc(100vh-61px)]">
         {/* Left panel — input */}
-        <div className="w-80 flex flex-col" style={{ borderRight: '1px solid var(--border)' }}>
+        <div className="studio-sidebar">
           <div className="p-4 flex-1 flex flex-col">
-            <label className="text-xs text-[var(--text)]/40 mb-2">Describe your component</label>
+            <label className="studio-label mb-2">Describe your component</label>
             <textarea
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
               placeholder="A pricing table with 3 tiers, feature comparison, and CTA buttons..."
-              className="flex-1 border p-3 text-sm resize-none focus:outline-none min-h-32"
-              style={{ background: 'var(--surface-raised)', borderColor: 'var(--border)', color: 'var(--text)', borderRadius: 'var(--radius)' }}
+              className="studio-textarea flex-1 resize-none min-h-32"
               onKeyDown={e => {
                 if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) generate();
               }}
@@ -170,7 +169,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
             </button>
 
             {error && (
-              <div className="mt-3 p-3" style={{ background: 'var(--danger-bg)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '8px' }}>
+              <div className="mt-3 p-3 rounded-lg" style={{ background: 'var(--danger-bg)', border: '1px solid rgba(248,113,113,0.2)' }}>
                 <p className="text-xs" style={{ color: 'var(--danger)' }}>{error}</p>
               </div>
             )}

@@ -568,24 +568,25 @@ export default function UIUXStudio() {
   return (
     <div className="uiux-studio-root">
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 14px', height: 44, borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-raised)', flexShrink: 0 }}>
-        
-        <span style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-primary)' }}>WokGen UI/UX</span>
-        <div style={{ width: 1, height: 18, background: 'var(--surface-border)', margin: '0 4px' }} />
+      <div className="app-topbar" style={{ height: 44, flexShrink: 0 }}>
+        <span className="app-topbar__title" style={{ fontSize: '0.88rem' }}>WokGen UI/UX</span>
+        <div className="app-topbar__divider" />
         {/* Studio / Page Builder tabs */}
-        <div style={{ display: 'flex', gap: 2 }}>
+        <div className="app-topbar__tabs">
           {([['studio', '◈ Studio'], ['page-builder', '⊞ Page Builder']] as [StudioTab, string][]).map(([tab, label]) => (
-            <button type="button" key={tab} onClick={() => setStudioTab(tab)} style={{ padding: '3px 12px', borderRadius: 5, border: 'none', cursor: 'pointer', fontSize: '0.75rem', background: studioTab === tab ? 'var(--accent-dim)' : 'transparent', color: studioTab === tab ? 'var(--accent)' : 'var(--text-muted)', fontWeight: studioTab === tab ? 600 : 400 }}>
+            <button type="button" key={tab} onClick={() => setStudioTab(tab)}
+              className={`app-topbar__tab${studioTab === tab ? ' active' : ''}`}>
               {label}
             </button>
           ))}
         </div>
         <div style={{ flex: 1 }} />
         <QuotaBadge />
-        <button type="button" onClick={() => setHistorySidebarOpen((v) => !v)} style={{ padding: '3px 10px', borderRadius: 5, border: '1px solid var(--surface-border)', background: 'transparent', color: 'var(--text-muted)', fontSize: '0.7rem', cursor: 'pointer' }}>
+        <button type="button" onClick={() => setHistorySidebarOpen((v) => !v)}
+          className="btn btn-secondary" style={{ padding: '3px 10px', fontSize: '0.7rem' }}>
           {historySidebarOpen ? '⊟ History' : '⊞ History'}
         </button>
-        <Link href="/" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', padding: '3px 8px', textDecoration: 'none' }}>← Platform</Link>
+        <Link href="/" className="app-topbar__back-link">← Platform</Link>
       </div>
 
       {/* ── Body ────────────────────────────────────────────────────────────── */}

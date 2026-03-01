@@ -3253,14 +3253,9 @@ function StudioInner() {
         }}
       >
         {/* Panel header */}
-        <div
-          className="pixel-studio-panel-header"
-          style={{ borderBottom: '1px solid var(--surface-border)' }}
-        >
-          <div className="pixel-studio-panel-header__title">
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent)' }}>Pixel</span>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-disabled)', marginLeft: '0.4rem' }}>Studio</span></div>
-          <div className="pixel-studio-panel-header__actions">
+        <div className="studio-shell__panel-header" style={{ borderBottom: '1px solid var(--surface-border)' }}>
+          <span className="studio-shell__panel-title">Pixel Studio</span>
+          <div className="studio-shell__panel-actions">
             <ProviderBadge provider={provider} />
             <QuotaBadge />
             <button

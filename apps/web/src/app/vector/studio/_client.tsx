@@ -421,12 +421,11 @@ function VectorStudioInner() {
       <aside className="studio-sidebar">
 
         {/* Sidebar header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.625rem 1rem', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: ACCENT }}>Vector</span>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-disabled)' }}>Studio</span>
+        <div className="studio-shell__panel-header">
+          <span className="studio-shell__panel-title">Vector Studio</span>
+          <div className="studio-shell__panel-actions">
+            <QuotaBadge />
           </div>
-          <QuotaBadge />
         </div>
 
         {/* Tool tabs */}

@@ -597,21 +597,11 @@ function BusinessStudioInner() {
       {/* ────────────────────────────── LEFT PANEL ──────────────────────────── */}
       <aside className="studio-sidebar">
         {/* Sidebar header */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0.625rem 1rem',
-            borderBottom: '1px solid var(--border)',
-            flexShrink: 0,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent-business, #60a5fa)' }}>Business</span>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-disabled)' }}>Studio</span>
+        <div className="studio-shell__panel-header">
+          <span className="studio-shell__panel-title">Business Studio</span>
+          <div className="studio-shell__panel-actions">
+            <QuotaBadge />
           </div>
-          <QuotaBadge />
         </div>
 
         {showWizard ? (

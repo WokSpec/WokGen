@@ -233,7 +233,7 @@ export default function TextStudio() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
+    <div className="text-studio-layout">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="app-topbar">
@@ -243,7 +243,7 @@ export default function TextStudio() {
             <span className="app-topbar__wordmark-gen">Gen</span>
           </Link>
           <span className="app-topbar__sep">/</span>
-          <span style={{ color: ACCENT, fontWeight: 600, fontSize: '0.8rem' }}>Text mode</span>
+          <span className="studio-shell__panel-title">Text mode</span>
           <span className="tag tag-purple">BETA</span>
         </div>
         <div className="app-topbar__right">
@@ -257,38 +257,21 @@ export default function TextStudio() {
       <div className="studio-grid-2col">
 
         {/* ── Left panel ─────────────────────────────────────────────── */}
-        <div style={{
-          borderRight: '1px solid var(--surface-border)',
-          padding: 24,
-          display: 'flex', flexDirection: 'column', gap: 20,
-          overflowY: 'auto',
-        }}>
+        <div className="text-studio-panel-left">
 
           {/* Content type grid */}
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 10 }}>
-              Content Type
-            </label>
-            <div style={{
-              display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8,
-            }}>
+            <label className="text-studio__section-label">Content Type</label>
+            <div className="text-studio__type-grid">
               {CONTENT_TYPES.map(ct => (
                 <button type="button"
                   key={ct.id}
                   onClick={() => setContentType(ct.id)}
-                  style={{
-                    padding: '10px 12px', borderRadius: 8, textAlign: 'left',
-                    border: `1px solid ${contentType === ct.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: contentType === ct.id ? 'var(--accent-subtle)' : 'var(--surface)',
-                    color: contentType === ct.id ? ACCENT : 'var(--text)',
-                    cursor: 'pointer', transition: 'all 0.15s',
-                  }}
+                  className={`text-studio__type-btn${contentType === ct.id ? ' active' : ''}`}
                 >
-                  <div style={{ fontSize: 18, marginBottom: 3 }}></div>
-                  <div style={{ fontSize: 12, fontWeight: 600 }}>{ct.label}</div>
-                  <div style={{ fontSize: 11, color: contentType === ct.id ? ACCENT : 'var(--text-muted)', marginTop: 1 }}>
-                    {ct.desc}
-                  </div>
+                  <div className="text-studio__type-btn__icon"></div>
+                  <div className="text-studio__type-btn__name">{ct.label}</div>
+                  <div className="text-studio__type-btn__desc">{ct.desc}</div>
                 </button>
               ))}
             </div>
@@ -296,22 +279,13 @@ export default function TextStudio() {
 
           {/* Tone pills */}
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 10 }}>
-              Tone
-            </label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <label className="text-studio__section-label">Tone</label>
+            <div className="text-studio__pill-row">
               {TONES.map(t => (
                 <button type="button"
                   key={t.id}
                   onClick={() => setTone(t.id)}
-                  style={{
-                    padding: '6px 14px', borderRadius: 20, fontSize: 12,
-                    border: `1px solid ${tone === t.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: tone === t.id ? 'var(--accent-subtle)' : 'var(--surface)',
-                    color: tone === t.id ? ACCENT : 'var(--text)',
-                    cursor: 'pointer', fontWeight: tone === t.id ? 600 : 400,
-                    transition: 'all 0.15s',
-                  }}
+                  className={`text-studio__pill${tone === t.id ? ' active' : ''}`}
                 >
                   {t.label}
                 </button>
@@ -321,25 +295,16 @@ export default function TextStudio() {
 
           {/* Length pills */}
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 10 }}>
-              Length
-            </label>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <label className="text-studio__section-label">Length</label>
+            <div className="text-studio__length-row">
               {LENGTHS.map(l => (
                 <button type="button"
                   key={l.id}
                   onClick={() => setLength(l.id)}
-                  style={{
-                    flex: 1, padding: '8px 4px', borderRadius: 8, fontSize: 12,
-                    border: `1px solid ${length === l.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: length === l.id ? 'var(--accent-subtle)' : 'var(--surface)',
-                    color: length === l.id ? ACCENT : 'var(--text)',
-                    cursor: 'pointer', fontWeight: length === l.id ? 600 : 400,
-                    transition: 'all 0.15s', textAlign: 'center',
-                  }}
+                  className={`text-studio__length-btn${length === l.id ? ' active' : ''}`}
                 >
                   <div>{l.label}</div>
-                  <div style={{ fontSize: 10, opacity: 0.7 }}>{l.words}</div>
+                  <div className="text-studio__length-btn__hint">{l.words}</div>
                 </button>
               ))}
             </div>
@@ -347,21 +312,14 @@ export default function TextStudio() {
 
           {/* Prompt textarea */}
           <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-              Prompt
-            </label>
+            <label className="text-studio__section-label">Prompt</label>
             <textarea
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
               placeholder={EXAMPLE_PROMPTS[contentType]}
               rows={5}
-              style={{
-                width: '100%', boxSizing: 'border-box',
-                background: 'var(--surface)', border: '1px solid var(--surface-border)',
-                borderRadius: 8, padding: '10px 12px',
-                color: 'var(--text)', fontSize: 14, resize: 'vertical',
-                fontFamily: 'inherit', lineHeight: 1.5,
-              }}
+              className="studio-textarea"
+              style={{ width: '100%', boxSizing: 'border-box' }}
             />
           </div>
 
@@ -380,17 +338,13 @@ export default function TextStudio() {
         </div>
 
         {/* ── Right panel ─────────────────────────────────────────────── */}
-        <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="text-studio-panel-right">
 
           {/* Loading skeleton */}
           {status === 'generating' && (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: ACCENT, fontSize: 14 }}>
-                <span style={{
-                  display: 'inline-block', width: 14, height: 14, borderRadius: '50%',
-                  border: '2px solid var(--accent-glow)', borderTopColor: ACCENT,
-                  animation: 'spin 0.7s linear infinite',
-                }} />
+              <div className="text-studio__loading-row">
+                <span className="text-studio__spinner" />
                 {loadingMsg} {msToSecs(elapsedMs)}
               </div>
               <div className="studio-shimmer-wrap">
@@ -415,93 +369,57 @@ export default function TextStudio() {
 
           {/* Result */}
           {result && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div className="text-studio__result">
               {/* Stats row */}
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{
-                  padding: '3px 10px', borderRadius: 4, fontSize: 12,
-                  background: 'var(--accent-subtle)', color: ACCENT, fontWeight: 600,
-                }}>
+              <div className="text-studio__stats-row">
+                <span className="text-studio__stat text-studio__stat--accent">
                   {result.wordCount} words
                 </span>
-                <span style={{
-                  padding: '3px 10px', borderRadius: 4, fontSize: 12,
-                  background: 'var(--surface)', border: '1px solid var(--surface-border)',
-                  color: 'var(--text-muted)',
-                }}>
+                <span className="text-studio__stat">
                   {result.charCount} chars
                 </span>
-                <span style={{
-                  padding: '3px 10px', borderRadius: 4, fontSize: 12,
-                  background: 'var(--surface)', border: '1px solid var(--surface-border)',
-                  color: 'var(--text-muted)',
-                }}>
+                <span className="text-studio__stat">
                   ~{Math.max(1, Math.ceil(result.wordCount / 200))} min read
                 </span>
                 {result.model && (
-                  <span style={{
-                    padding: '3px 10px', borderRadius: 4, fontSize: 11,
-                    background: 'var(--surface)', border: '1px solid var(--surface-border)',
-                    color: 'var(--text-muted)',
-                  }}>
+                  <span className="text-studio__stat text-studio__stat--sm">
                     {result.model.split('/').pop()}
                   </span>
                 )}
                 <button type="button"
                   onClick={() => setShowRawMarkdown(v => !v)}
-                  style={{
-                    marginLeft: 'auto', padding: '3px 10px', borderRadius: 4, fontSize: 12,
-                    background: showRawMarkdown ? 'var(--accent-subtle)' : 'var(--surface)',
-                    border: `1px solid ${showRawMarkdown ? ACCENT : 'var(--surface-border)'}`,
-                    color: showRawMarkdown ? ACCENT : 'var(--text-muted)',
-                    cursor: 'pointer', fontWeight: showRawMarkdown ? 600 : 400,
-                  }}
+                  className={`text-studio__stat text-studio__stat--toggle${showRawMarkdown ? ' active' : ''}`}
+                  style={{ marginLeft: 'auto' }}
                 >
                   {showRawMarkdown ? '⬤ Raw MD' : '◎ Rendered'}
                 </button>
               </div>
 
               {/* Content area */}
-              <div style={{
-                padding: 20, borderRadius: 10, minHeight: 240,
-                background: 'var(--surface)', border: '1px solid var(--surface-border)',
-                fontSize: 15, lineHeight: 1.7, color: 'var(--text)',
-                whiteSpace: 'pre-wrap', overflowY: 'auto', maxHeight: '50vh',
-                fontFamily: showRawMarkdown || contentType === 'code-snippet' ? 'monospace' : 'inherit',
-              }}>
+              <div className={`text-studio__content${showRawMarkdown || contentType === 'code-snippet' ? ' mono' : ''}`}>
                 {result.content}
               </div>
 
               {/* Action buttons */}
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <div className="text-studio__actions">
                 <button type="button"
                   onClick={handleCopy}
-                  style={{
-                    padding: '8px 16px', borderRadius: 6, border: 'none',
-                    background: copied ? 'var(--accent-subtle)' : 'var(--surface-border)',
-                    color: copied ? ACCENT : 'var(--text)', fontSize: 13, cursor: 'pointer',
-                    fontWeight: copied ? 600 : 400,
-                  }}
+                  className={`btn btn-secondary${copied ? ' btn--active' : ''}`}
+                  style={{ fontSize: '0.8rem' }}
                 >
                   {copied ? 'Copied!' : 'Copy'}
                 </button>
                 <button type="button"
                   onClick={() => downloadText(result.content, `wokgen-text-${Date.now()}.txt`)}
-                  style={{
-                    padding: '8px 16px', borderRadius: 6, border: 'none',
-                    background: 'var(--surface-border)', color: 'var(--text)',
-                    fontSize: 13, cursor: 'pointer',
-                  }}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.8rem' }}
                 >
                   ⬇ .txt
                 </button>
                 <button type="button"
                   onClick={() => downloadText(result.content, `wokgen-text-${Date.now()}.md`)}
-                  style={{
-                    padding: '8px 16px', borderRadius: 6, border: 'none',
-                    background: 'var(--surface-border)', color: 'var(--text)',
-                    fontSize: 13, cursor: 'pointer',
-                  }}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.8rem' }}
                 >
                   ⬇ .md
                 </button>
@@ -510,12 +428,8 @@ export default function TextStudio() {
                     setSavedMsg(true);
                     setTimeout(() => setSavedMsg(false), 2000);
                   }}
-                  style={{
-                    padding: '8px 16px', borderRadius: 6, border: 'none',
-                    background: savedMsg ? 'var(--accent-subtle)' : 'var(--surface-border)',
-                    color: savedMsg ? ACCENT : 'var(--text)',
-                    fontSize: 13, cursor: 'pointer',
-                  }}
+                  className={`btn btn-secondary${savedMsg ? ' btn--active' : ''}`}
+                  style={{ fontSize: '0.8rem' }}
                 >
                   {savedMsg ? 'Saved' : 'Save to Gallery'}
                 </button>
@@ -537,7 +451,7 @@ export default function TextStudio() {
               <p className="studio-empty-canvas__title">Generate your first text</p>
               <p className="studio-empty-canvas__desc">
                 Choose a content type, set your tone and length, then click{' '}
-                <strong style={{ color: ACCENT }}>Generate Text</strong>.
+                <strong className="text-studio__strong">Generate Text</strong>.
               </p>
             </div>
           )}

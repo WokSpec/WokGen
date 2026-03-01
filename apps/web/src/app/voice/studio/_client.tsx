@@ -284,13 +284,8 @@ function VoiceStudioInner() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'var(--bg)',
-        color: 'var(--text)',
-        fontFamily: 'var(--font-sans, system-ui)',
-      }}
+    <div className="text-studio-layout"
+      style={{ fontFamily: 'var(--font-sans, system-ui)' }}
     >
       {/* Main layout */}
       <div
@@ -298,75 +293,33 @@ function VoiceStudioInner() {
         className="studio-grid-2col"
       >
         {/* ── Left panel ─────────────────────────────────────────────── */}
-        <div
-          style={{
-            borderRight: '1px solid var(--surface-border)',
-            padding: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 0,
-            overflowY: 'auto',
-          }}
-        >
+        <div className="studio-sidebar">
           {/* Panel header */}
-          <div className="pixel-studio-panel-header" style={{ borderBottom: '1px solid var(--surface-border)' }}>
-            <div className="pixel-studio-panel-header__title">
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent)' }}>Voice</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-disabled)', marginLeft: '0.4rem' }}>Studio</span>
-            </div>
-            <div className="pixel-studio-panel-header__actions" />
+          <div className="studio-shell__panel-header">
+            <span className="studio-shell__panel-title">Voice Studio</span>
+            <div className="studio-shell__panel-actions" />
           </div>
-          <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20, overflowY: 'auto', flex: 1 }}>
+          <div className="voice-studio-body">
           {/* Voice style selector */}
           <div>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                marginBottom: 10,
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-              }}
-            >
-              Voice Style
-            </div>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                gap: 8,
-              }}
-            >
+            <div className="voice-studio__section-label">Voice Style</div>
+            <div className="voice-studio__style-grid">
               {VOICE_STYLES.map(v => (
                 <button type="button"
                   key={v.id}
                   onClick={() => setStyle(v.id)}
                   title={v.desc}
-                  style={{
-                    padding: '10px 6px',
-                    borderRadius: 8,
-                    border: `1px solid ${style === v.id ? ACCENT : 'var(--surface-border)'}`,
-                    background: style === v.id ? 'var(--accent-subtle)' : 'var(--surface)',
-                    color: style === v.id ? ACCENT : 'var(--text)',
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                    transition: 'all 0.15s',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 4,
-                  }}
+                  className={`voice-studio__style-btn${style === v.id ? ' active' : ''}`}
                 >
-                  <span style={{ fontSize: 18 }}>{v.icon}</span>
-                  <span style={{ fontSize: 11, fontWeight: 600 }}>{v.label}</span>
+                  <span className="voice-studio__style-btn__icon">{v.icon}</span>
+                  <span className="voice-studio__style-btn__label">{v.label}</span>
                 </button>
               ))}
             </div>
 
             {/* Character presets — quick access shortcuts for common use cases */}
             <div style={{ marginTop: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>
+              <div className="voice-studio__section-label" style={{ marginBottom: 6, fontSize: '0.68rem' }}>
                 Character Presets
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -391,21 +344,7 @@ function VoiceStudioInner() {
 
             {/* Selected voice preview */}
             {liveVoice && (
-              <div
-                style={{
-                  marginTop: 10,
-                  padding: '8px 12px',
-                  borderRadius: 6,
-                  background: 'var(--surface)',
-                  border: '1px solid var(--surface-border)',
-                  fontSize: 12,
-                  color: 'var(--text-muted)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-              >
-                
+              <div className="voice-studio__voice-preview">
                 <span>
                   Voice: <strong style={{ color: 'var(--text)' }}>{liveVoice.name}</strong>
                   {liveContentType && (
@@ -420,17 +359,8 @@ function VoiceStudioInner() {
                 <button type="button"
                   onClick={handleVoicePreview}
                   title={previewPlaying ? 'Stop preview' : 'Preview voice'}
-                  style={{
-                    marginLeft: 'auto',
-                    padding: '2px 8px',
-                    borderRadius: 4,
-                    border: '1px solid var(--surface-border)',
-                    background: previewPlaying ? 'var(--accent-subtle)' : 'transparent',
-                    color: previewPlaying ? ACCENT : 'var(--text-muted)',
-                    fontSize: 11,
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                  }}
+                  className={`btn btn-secondary${previewPlaying ? ' btn--active' : ''}`}
+                  style={{ marginLeft: 'auto', padding: '2px 8px', fontSize: '0.68rem', flexShrink: 0 }}
                 >
                   {previewPlaying ? '■ Stop' : '▶ Preview'}
                 </button>
@@ -440,27 +370,9 @@ function VoiceStudioInner() {
 
           {/* Text input */}
           <div>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                marginBottom: 8,
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
+            <div className="voice-studio__text-header">
               <span>Text</span>
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 400,
-                  color: isOverLimit ? 'var(--danger)' : charsLeft < 500 ? ACCENT : 'var(--text-muted)',
-                }}
-              >
+              <span className={`voice-studio__char-count${isOverLimit ? ' voice-studio__char-count--danger' : charsLeft < 500 ? ' voice-studio__char-count--warn' : ''}`}>
                 {isOverLimit ? `${Math.abs(charsLeft)} over limit` : `${charsLeft.toLocaleString()} left`}
               </span>
             </div>
@@ -469,50 +381,24 @@ function VoiceStudioInner() {
               onChange={e => setText(e.target.value)}
               placeholder="Enter text to synthesize… (Markdown is stripped automatically)"
               rows={7}
+              className="studio-textarea"
               style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: 8,
-                background: 'var(--surface)',
-                border: `1px solid ${isOverLimit ? 'var(--danger)' : 'var(--surface-border)'}`,
-                color: 'var(--text)',
-                fontSize: 13,
-                lineHeight: 1.6,
-                resize: 'vertical',
-                outline: 'none',
-                boxSizing: 'border-box',
+                width: '100%', boxSizing: 'border-box',
+                borderColor: isOverLimit ? 'var(--danger)' : undefined,
               }}
             />
           </div>
 
           {/* Language selector */}
           <div>
-            <label
-              style={{
-                display: 'block',
-                fontSize: 13,
-                fontWeight: 600,
-                marginBottom: 8,
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-              }}
-            >
+            <label className="voice-studio__section-label" style={{ display: 'block' }}>
               Language
             </label>
             <select
               value={language}
               onChange={e => setLanguage(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 8,
-                background: 'var(--surface)',
-                border: '1px solid var(--surface-border)',
-                color: 'var(--text)',
-                fontSize: 13,
-                cursor: 'pointer',
-              }}
+              className="studio-select"
+              style={{ width: '100%' }}
             >
               {LANGUAGES.map(l => (
                 <option key={l.id} value={l.id}>{l.label}</option>
@@ -526,135 +412,71 @@ function VoiceStudioInner() {
           </div>
 
           {/* HD toggle */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 14px',
-              borderRadius: 8,
-              background: 'var(--surface)',
-              border: `1px solid ${hd ? ACCENT + '55' : 'var(--surface-border)'}`,
-            }}
-          >
+          <div className={`voice-studio__toggle-row${hd ? ' active' : ''}`}>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>HD Quality</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+              <div className="voice-studio__toggle-title">HD Quality</div>
+              <div className="voice-studio__toggle-desc">
                 ElevenLabs multilingual v2 · costs 1 credit
               </div>
             </div>
             <button type="button"
               onClick={() => setHd(h => !h)}
               aria-label="Toggle HD"
-              style={{
-                width: 44,
-                height: 24,
-                borderRadius: 12,
-                border: 'none',
-                cursor: 'pointer',
-                background: hd ? ACCENT : 'var(--surface-border)',
-                position: 'relative',
-                transition: 'background 0.2s',
-                flexShrink: 0,
-              }}
-            >
-              <span
-                style={{
-                  position: 'absolute',
-                  top: 3,
-                  left: hd ? 23 : 3,
-                  width: 18,
-                  height: 18,
-                  borderRadius: '50%',
-                  background: 'var(--text)',
-                  transition: 'left 0.2s',
-                }}
-              />
-            </button>
+              className={`voice-studio__toggle-switch${hd ? ' on' : ' off'}`}
+            />
           </div>
 
           {/* Emotion controls */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-              }}
-            >
-              Voice Controls
-            </div>
+            <div className="voice-studio__section-label">Voice Controls</div>
 
             {/* Emotion Intensity */}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 12, fontWeight: 600 }}>Emotion Intensity</span>
-                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{emotionIntensity.toFixed(2)}</span>
+            <div className="voice-studio__range-row">
+              <div className="voice-studio__range-header">
+                <span className="voice-studio__range-label">Emotion Intensity</span>
+                <span className="voice-studio__range-val">{emotionIntensity.toFixed(2)}</span>
               </div>
               <input
                 type="range" min={0} max={1} step={0.05}
                 value={emotionIntensity}
                 onChange={e => setEmotionIntensity(Number(e.target.value))}
-                style={{ width: '100%', accentColor: ACCENT }}
+                className="studio-range"
               />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+              <div className="voice-studio__range-hints">
                 <span>Neutral</span><span>Expressive</span>
               </div>
             </div>
 
             {/* Voice Clarity */}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 12, fontWeight: 600 }}>Voice Clarity</span>
-                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{voiceClarity.toFixed(2)}</span>
+            <div className="voice-studio__range-row">
+              <div className="voice-studio__range-header">
+                <span className="voice-studio__range-label">Voice Clarity</span>
+                <span className="voice-studio__range-val">{voiceClarity.toFixed(2)}</span>
               </div>
               <input
                 type="range" min={0} max={1} step={0.05}
                 value={voiceClarity}
                 onChange={e => setVoiceClarity(Number(e.target.value))}
-                style={{ width: '100%', accentColor: ACCENT }}
+                className="studio-range"
               />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+              <div className="voice-studio__range-hints">
                 <span>Warm</span><span>Crisp</span>
               </div>
             </div>
 
             {/* Natural Pauses toggle */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '10px 12px',
-                borderRadius: 8,
-                background: 'var(--surface)',
-                border: `1px solid ${naturalPauses ? ACCENT + '55' : 'var(--surface-border)'}`,
-              }}
-            >
+            <div className={`voice-studio__toggle-row${naturalPauses ? ' active' : ''}`}>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 600 }}>Natural Pauses</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                <div className="voice-studio__toggle-title">Natural Pauses</div>
+                <div className="voice-studio__toggle-desc">
                   Auto-insert pauses at punctuation
                 </div>
               </div>
               <button type="button"
                 onClick={() => setNaturalPauses(p => !p)}
                 aria-label="Toggle natural pauses"
-                style={{
-                  width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer',
-                  background: naturalPauses ? ACCENT : 'var(--surface-border)',
-                  position: 'relative', transition: 'background 0.2s', flexShrink: 0,
-                }}
-              >
-                <span style={{
-                  position: 'absolute', top: 2,
-                  left: naturalPauses ? 18 : 2,
-                  width: 16, height: 16, borderRadius: '50%',
-                  background: 'var(--text)', transition: 'left 0.2s',
-                }} />
-              </button>
+                className={`voice-studio__toggle-switch${naturalPauses ? ' on' : ' off'}`}
+              />
             </div>
           </div>
 
@@ -688,11 +510,11 @@ function VoiceStudioInner() {
               </button>
             )}
           </div>
-          </div>{/* inner scroll wrapper */}
+          </div>{/* voice-studio-body */}
         </div>
 
         {/* ── Right panel ─────────────────────────────────────────────── */}
-        <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="voice-studio-body" style={{ gap: '1.25rem' }}>
 
           {/* Error banners */}
           <StudioErrorBanner

@@ -1457,7 +1457,7 @@ function GenerateForm({
           <div className="flex items-center justify-between mb-1.5">
             <label className="label mb-0">Prompt</label>
             <div className="flex items-center gap-2">
-              <span className="text-2xs" className="text-2xs" style={{ color: promptLenColor }}>
+              <span className="text-2xs" style={{ color: promptLenColor }}>
                 {promptLen}/200
               </span>
               {/* Save as Favorite */}
@@ -1497,22 +1497,21 @@ function GenerateForm({
             </div>
             {/* History dropdown */}
             {promptHistory.length > 0 && (
-              <div style={{ position: 'relative' }}>
+              <div className="pixel-history-wrap">
                 <button
                   type="button"
                   className="btn-ghost btn-xs"
                   onClick={() => setShowPromptHistory(v => !v)}
                   title="Recent prompts"
-                  style={{ fontSize: '0.65rem', padding: '0 2px' }}
                 >
                   History ▾
                 </button>
                 {showPromptHistory && (
-                  <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 100, background: 'var(--surface-overlay, #1a1a2e)', border: '1px solid var(--surface-border, #303050)', borderRadius: 6, minWidth: 280, maxHeight: 220, overflowY: 'auto', padding: 4, marginTop: 4 }}>
+                  <div className="pixel-history-dropdown">
                     {promptHistory.map((p, i) => (
                       <button type="button"
                         key={i}
-                        style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', fontSize: 12, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 4 }}
+                        className="pixel-history-item"
                         onClick={() => { setPrompt(p); setShowPromptHistory(false); }}
                       >
                         {p.slice(0, 80)}{p.length > 80 ? '…' : ''}
@@ -1743,12 +1742,7 @@ function GenerateForm({
             <button type="button"
               key={bg.id}
               onClick={() => setBgMode(bg.id)}
-              className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-              style={{
-                background: bgMode === bg.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                border: `1px solid ${bgMode === bg.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                color: bgMode === bg.id ? 'var(--accent)' : 'var(--text-muted)',
-              }}
+              className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${bgMode === bg.id ? ' active' : ''}`}
             >
               {bg.label}
             </button>
@@ -1773,12 +1767,7 @@ function GenerateForm({
             <button type="button"
               key={o.id}
               onClick={() => setOutlineStyle(o.id)}
-              className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-              style={{
-                background: outlineStyle === o.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                border: `1px solid ${outlineStyle === o.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                color: outlineStyle === o.id ? 'var(--accent)' : 'var(--text-muted)',
-              }}
+              className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${outlineStyle === o.id ? ' active' : ''}`}
             >
               {o.label}
             </button>
@@ -1798,13 +1787,8 @@ function GenerateForm({
               <button type="button"
                 key={p}
                 onClick={() => setPaletteSize(p)}
-                className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-                style={{
-                  background: paletteSize === p ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                  border: `1px solid ${paletteSize === p ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                  color: paletteSize === p ? 'var(--accent)' : 'var(--text-muted)',
-                  minWidth: 32,
-                }}
+                className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${paletteSize === p ? ' active' : ''}`}
+                style={{ minWidth: 32 }}
               >
                 {p}
               </button>
@@ -1836,15 +1820,10 @@ function GenerateForm({
                 <button type="button"
                   key={atype.id}
                   onClick={() => setAnimationType(atype.id)}
-                  className="flex flex-col gap-0.5 p-2 rounded-md text-left transition-all duration-150"
-                  style={{
-                    background: animationType === atype.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                    border: `1px solid ${animationType === atype.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                    color: animationType === atype.id ? 'var(--accent)' : 'var(--text-secondary)',
-                  }}
+                  className={`flex flex-col gap-0.5 p-2 rounded-md text-left transition-all duration-150 pixel-preset-btn${animationType === atype.id ? ' active' : ''}`}
                 >
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>{atype.label}</span>
-                  <span style={{ fontSize: '0.6rem', color: animationType === atype.id ? 'var(--text-muted)' : 'var(--text-disabled)' }}>{atype.desc}</span>
+                  <span className="text-xs font-semibold">{atype.label}</span>
+                  <span className="pixel-preset-desc">{atype.desc}</span>
                 </button>
               ))}
             </div>
@@ -1853,43 +1832,33 @@ function GenerateForm({
           <SectionHeader>GIF Settings</SectionHeader>
           <div className="p-4 flex flex-col gap-3">
             <div>
-              <label className="label" style={{ marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
+              <label className="label pixel-label-row">
                 <span>Frames</span>
-                <span style={{ color: 'var(--accent)', fontWeight: 600 }}>{animFrameCount}</span>
+                <span className="pixel-label-value">{animFrameCount}</span>
               </label>
               <div className="flex gap-1.5">
                 {([2, 4, 6, 8, 12] as number[]).map((fc) => (
                   <button type="button" key={fc} onClick={() => setAnimFrameCount(fc)}
-                    className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-                    style={{
-                      background: animFrameCount === fc ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                      border: `1px solid ${animFrameCount === fc ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                      color: animFrameCount === fc ? 'var(--accent)' : 'var(--text-muted)',
-                    }}
+                    className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${animFrameCount === fc ? ' active' : ''}`}
                   >{fc}</button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="label" style={{ marginBottom: 6, display: 'flex', justifyContent: 'space-between' }}>
+              <label className="label pixel-label-row">
                 <span>FPS</span>
-                <span style={{ color: 'var(--accent)', fontWeight: 600 }}>{animFps}</span>
+                <span className="pixel-label-value">{animFps}</span>
               </label>
               <div className="flex gap-1.5">
                 {([4, 8, 12, 18, 24] as number[]).map((f) => (
                   <button type="button" key={f} onClick={() => setAnimFps(f)}
-                    className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-                    style={{
-                      background: animFps === f ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                      border: `1px solid ${animFps === f ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                      color: animFps === f ? 'var(--accent)' : 'var(--text-muted)',
-                    }}
+                    className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${animFps === f ? ' active' : ''}`}
                   >{f}</button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="label" style={{ marginBottom: 6 }}>Loop Mode</label>
+              <label className="label">Loop Mode</label>
               <div className="flex gap-1.5">
                 {([
                   { id: 'infinite', label: 'Loop'      },
@@ -1897,12 +1866,7 @@ function GenerateForm({
                   { id: 'once',     label: 'Once'      },
                 ] as { id: typeof animLoop; label: string }[]).map((lm) => (
                   <button type="button" key={lm.id} onClick={() => setAnimLoop(lm.id)}
-                    className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-                    style={{
-                      background: animLoop === lm.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                      border: `1px solid ${animLoop === lm.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                      color: animLoop === lm.id ? 'var(--accent)' : 'var(--text-muted)',
-                    }}
+                    className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${animLoop === lm.id ? ' active' : ''}`}
                   >{lm.label}</button>
                 ))}
               </div>
@@ -1912,19 +1876,14 @@ function GenerateForm({
               {animLoop === 'pingpong' ? ` (×2 ping-pong = ${((animFrameCount * 2 - 2) / animFps).toFixed(1)}s)` : ''}
             </p>
             <div>
-              <label className="label" style={{ marginBottom: 6 }}>Output Format</label>
+              <label className="label">Output Format</label>
               <div className="flex gap-1.5">
                 {([
                   { id: 'gif',          label: 'GIF'         },
                   { id: 'png_sequence', label: 'PNG Sequence' },
                 ] as { id: 'gif' | 'png_sequence'; label: string }[]).map((fmt) => (
                   <button type="button" key={fmt.id} onClick={() => setAnimOutputFormat(fmt.id)}
-                    className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-                    style={{
-                      background: animOutputFormat === fmt.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                      border: `1px solid ${animOutputFormat === fmt.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                      color: animOutputFormat === fmt.id ? 'var(--accent)' : 'var(--text-muted)',
-                    }}
+                    className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${animOutputFormat === fmt.id ? ' active' : ''}`}
                   >{fmt.label}</button>
                 ))}
               </div>
@@ -1942,15 +1901,10 @@ function GenerateForm({
             <div className="flex gap-1.5">
               {([4, 8] as (4|8)[]).map((n) => (
                 <button type="button" key={n} onClick={() => setDirectionCount(n)}
-                  className="flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150 flex flex-col items-center"
-                  style={{
-                    background: directionCount === n ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                    border: `1px solid ${directionCount === n ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                    color: directionCount === n ? 'var(--accent)' : 'var(--text-muted)',
-                  }}
+                  className={`flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150 flex flex-col items-center pixel-option-btn${directionCount === n ? ' active' : ''}`}
                 >
                   <span className="font-bold">{n}</span>
-                  <span style={{ fontSize: '0.58rem', marginTop: 2 }}>
+                  <span className="pixel-dir-label">
                     {n === 4 ? 'N/S/E/W' : 'N/NE/E/SE/S/SW/W/NW'}
                   </span>
                 </button>
@@ -1958,7 +1912,7 @@ function GenerateForm({
             </div>
             <p className="form-hint">4-dir: top-down RPG. 8-dir: isometric or fighting games.</p>
             <div>
-              <label className="label" style={{ marginBottom: 6 }}>Reference Image</label>
+              <label className="label">Reference Image</label>
               <input
                 ref={refImageInputRef}
                 type="file"
@@ -2041,11 +1995,11 @@ function GenerateForm({
           <SectionHeader>Grid Size</SectionHeader>
           <div className="p-4">
             <div className="flex items-center gap-2">
-              <label className="text-xs" style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Grid size</label>
+              <label className="text-xs text-muted">Grid size</label>
               <select
                 value={mapSize}
                 onChange={e => setMapSize(e.target.value)}
-                style={{ fontSize: '0.75rem', background: 'var(--surface-overlay)', border: '1px solid var(--surface-border)', borderRadius: 4, padding: '2px 8px', color: 'var(--text-secondary)' }}
+                className="pixel-select"
               >
                 <option value="2x2">2×2</option>
                 <option value="4x4">4×4</option>
@@ -2068,17 +2022,11 @@ function GenerateForm({
               <button type="button"
                 key={s}
                 onClick={() => setSize(s)}
-                className="flex flex-col items-center flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-                style={{
-                  background: size === s ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                  border: `1px solid ${size === s ? 'var(--accent-muted)' : isRec ? 'var(--accent-faint, rgba(99,102,241,.3))' : 'var(--surface-border)'}`,
-                  color: size === s ? 'var(--accent)' : 'var(--text-muted)',
-                  minWidth: 42,
-                  boxShadow: isRec && size !== s ? '0 0 0 1px var(--accent-faint, rgba(99,102,241,.2))' : 'none',
-                }}
+                className={`flex flex-col items-center flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${size === s ? ' active' : ''}${isRec && size !== s ? ' pixel-option-btn--rec' : ''}`}
+                style={{ minWidth: 42 }}
               >
                 <span>{s}</span>
-                <span style={{ fontSize: '0.55rem', color: isRec ? 'var(--accent-muted)' : 'var(--text-disabled)', marginTop: 1 }}>
+                <span className={`pixel-size-label${isRec ? ' rec' : ''}`}>
                   {SIZE_LABELS[s]}
                 </span>
               </button>
@@ -2086,7 +2034,7 @@ function GenerateForm({
           })}
         </div>
         {size < PRESET_CONFIG[stylePreset].size && (
-          <p className="form-hint mt-2" style={{ color: 'var(--warning)' }}>
+          <p className="form-hint mt-2 pixel-warning-hint">
             Below recommended size — detail loss likely
           </p>
         )}
@@ -2112,14 +2060,9 @@ function GenerateForm({
               <button type="button"
                 key={ar.id}
                 onClick={() => setAspectRatio(ar.id)}
-                className="flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150 flex flex-col items-center gap-1"
+                className={`flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150 flex flex-col items-center gap-1 pixel-option-btn${aspectRatio === ar.id ? ' active' : ''}`}
                 title={`${ar.label} — ${ar.use}`}
-                style={{
-                  background: aspectRatio === ar.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                  border: `1px solid ${aspectRatio === ar.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                  color: aspectRatio === ar.id ? 'var(--accent)' : 'var(--text-muted)',
-                  minWidth: 42,
-                }}
+                style={{ minWidth: 42 }}
               >
                 <svg width={tw} height={th} viewBox={`0 0 ${tw} ${th}`} style={{ display: 'block' }}>
                   <rect x={0.5} y={0.5} width={tw - 1} height={th - 1} rx={1}
@@ -2128,7 +2071,7 @@ function GenerateForm({
                     strokeWidth={1}
                   />
                 </svg>
-                <span style={{ fontSize: '0.6rem' }}>{ar.label}</span>
+                <span className="pixel-size-badge">{ar.label}</span>
               </button>
             );
           })}
@@ -2172,24 +2115,15 @@ function GenerateForm({
                   {PROVIDER_LABELS[pid]}
                 </span>
                 {info?.configured ? (
-                  <span
-                    className="text-2xs font-medium"
-                    style={{ fontSize: '0.62rem', color: 'var(--success)' }}
-                  >
+                  <span className="pixel-provider-status pixel-provider-status--ready">
                     ✓ ready
                   </span>
                 ) : pid === 'comfyui' ? (
-                  <span
-                    className="text-2xs"
-                    style={{ fontSize: '0.62rem', color: 'var(--text-disabled)' }}
-                  >
+                  <span className="pixel-provider-status pixel-provider-status--local">
                     local
                   </span>
                 ) : (
-                  <span
-                    className="text-2xs"
-                    style={{ fontSize: '0.62rem', color: 'var(--warning)' }}
-                  >
+                  <span className="pixel-provider-status pixel-provider-status--key">
                     needs key
                   </span>
                 )}

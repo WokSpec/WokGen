@@ -101,44 +101,44 @@ export default function TextTo3DPage() {
         <p className="tool-page-desc">Generate 3D models from text descriptions using Meshy AI. Download as GLB, FBX, or OBJ.</p>
       </div>
       <div className="tool-section">
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '240px' }}>
-            <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Describe your 3D model</label>
+        <div className="tool-input-row">
+          <div className="tool-input-row__main">
+            <label className="tool-field-label">Describe your 3D model</label>
             <input
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && generate()}
               placeholder="e.g. low-poly medieval sword, fantasy potion bottle, sci-fi helmet"
-              style={{ width: '100%', background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.625rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.9375rem', outline: 'none' }}
+              className="tool-field-input"
             />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Art style</label>
-            <select value={artStyle} onChange={e => setArtStyle(e.target.value)} style={{ background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.625rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.875rem', outline: 'none' }}>
+            <label className="tool-field-label">Art style</label>
+            <select value={artStyle} onChange={e => setArtStyle(e.target.value)} className="tool-field-select">
               {ART_STYLES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
         </div>
-        <button type="button" onClick={generate} disabled={loading || !prompt.trim()} className="btn btn-primary" style={{ padding: '0.625rem 1.5rem' }}>
+        <button type="button" onClick={generate} disabled={loading || !prompt.trim()} className="btn btn-primary tool-submit-btn">
           {loading ? 'Submitting...' : 'Generate 3D Model'}
         </button>
 
         {(polling || taskId) && !result && !error && (
-          <div style={{ marginTop: '1.5rem', padding: '1.25rem', border: '1px solid var(--accent-glow)', borderRadius: '10px', background: 'rgba(var(--accent-rgb, 129,140,248), 0.05)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--accent-glow)', borderTopColor: 'var(--accent)', animation: 'spin 600ms linear infinite', flexShrink: 0 }} />
+          <div className="tool-progress-card">
+            <div className="tool-spinner" aria-hidden="true" />
             <div>
-              <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{progressMessages[progressStep]}</div>
-              <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Meshy AI is building your model. This takes 1–3 minutes.</div>
+              <div className="tool-progress-msg">{progressMessages[progressStep]}</div>
+              <div className="tool-progress-sub">Meshy AI is building your model. This takes 1–3 minutes.</div>
             </div>
           </div>
         )}
 
         {error && (
-          <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid var(--danger-border)', borderRadius: '8px', background: 'var(--danger-bg)' }}>
-            <p style={{ color: 'var(--danger)', fontSize: '0.875rem' }}>{error}</p>
+          <div className="tool-error-card">
+            <p className="tool-error">{error}</p>
             {error.includes('MESHY_API_KEY') && (
-              <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                Get a free API key at <a href="https://www.meshy.ai/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>meshy.ai</a> — 200 free credits/month.
+              <p className="tool-error-hint">
+                Get a free API key at <a href="https://www.meshy.ai/" target="_blank" rel="noopener noreferrer" className="tool-link">meshy.ai</a> — 200 free credits/month.
               </p>
             )}
           </div>
@@ -149,7 +149,7 @@ export default function TextTo3DPage() {
           const fbxUrl = result.modelUrls?.fbx || null;
           const objUrl = result.modelUrls?.obj || null;
           return (
-            <div style={{ marginTop: '1.5rem' }}>
+            <div className="tool-result">
               {glbUrl ? (
                 <div className="relative rounded overflow-hidden border border-white/10 bg-black"
                      style={{ minHeight: 400 }}>
@@ -174,12 +174,12 @@ export default function TextTo3DPage() {
                   </div>
                 </div>
               ) : (
-                <div style={{ border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
-                  <div style={{ padding: '1.25rem' }}>
-                    <div style={{ fontWeight: 600, marginBottom: '0.875rem' }}>Download 3D Model</div>
-                    <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
+                <div className="tool-download-card">
+                  <div className="tool-download-card__inner">
+                    <div className="tool-download-card__label">Download 3D Model</div>
+                    <div className="tool-download-card__formats">
                       {result.modelUrls && Object.entries(result.modelUrls).filter(([, v]) => v).map(([fmt, url]) => (
-                        <a key={fmt} href={url as string} download target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', textDecoration: 'none', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
+                        <a key={fmt} href={url as string} download target="_blank" rel="noopener noreferrer" className="btn btn-secondary tool-format-btn">
                           {fmt}
                         </a>
                       ))}
@@ -192,9 +192,9 @@ export default function TextTo3DPage() {
         })()}
       </div>
 
-      <div className="tool-section" style={{ marginTop: '1.5rem' }}>
-        <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, marginBottom: '0.75rem' }}>About Meshy AI</h3>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+      <div className="tool-section tool-about-section">
+        <h3 className="tool-about-h3">About Meshy AI</h3>
+        <p className="tool-about-p">
           Meshy AI generates production-ready 3D meshes from text or images. Models are exported in GLB, FBX, USDZ, and OBJ formats — ready for Unity, Unreal Engine, Blender, or web. Free tier includes 200 credits/month.
         </p>
       </div>

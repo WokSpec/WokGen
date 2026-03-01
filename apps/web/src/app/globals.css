@@ -20856,18 +20856,22 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--accent-pixel);
-  color: #0a0a0a;
+  background: var(--accent);
+  color: #fff;
   border: none;
   border-radius: 8px;
   padding: 10px 20px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  box-shadow: 0 2px 16px color-mix(in srgb, var(--accent) 30%, transparent);
+  transition: box-shadow 0.15s, opacity 0.15s;
 }
-.prompt-lab__btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.prompt-lab__btn-primary:not(:disabled):hover { opacity: 0.85; }
+.prompt-lab__btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.prompt-lab__btn-primary:not(:disabled):hover {
+  box-shadow: 0 4px 24px color-mix(in srgb, var(--accent) 45%, transparent);
+  transform: translateY(-1px);
+}
 .prompt-lab__btn-ghost {
   background: transparent;
   border: 1px solid var(--border);
@@ -20883,8 +20887,8 @@ select:focus-visible {
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(0,0,0,0.2);
-  border-top-color: #0a0a0a;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

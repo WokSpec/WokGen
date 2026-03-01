@@ -131,17 +131,18 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
 
   return (
     <div className="min-h-screen text-[var(--text)]" style={{ background: 'var(--bg)' }}>
-      <div className="border-b border-white/5 px-6 py-4 flex items-center gap-3">
-        <span style={{ color: 'var(--blue, #60a5fa)' }}><IconCode2 size={20} /></span>
-        <div>
-          <h1 className="font-semibold text-sm">Code Studio</h1>
-          <p className="text-xs text-[var(--text)]/30">Generate React + Tailwind components with AI</p>
+      <div className="app-topbar">
+        <div className="app-topbar__left">
+          <span style={{ color: 'var(--blue, #60a5fa)' }}><IconCode2 size={16} /></span>
+          <span className="app-topbar__wordmark-gen" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Code Studio</span>
+          <span className="app-topbar__sep">·</span>
+          <span className="text-xs text-[var(--text)]/40">React + Tailwind</span>
         </div>
       </div>
 
       <div className="flex h-[calc(100vh-61px)]">
         {/* Left panel — input */}
-        <div className="w-80 border-r border-white/5 flex flex-col">
+        <div className="w-80 flex flex-col" style={{ borderRight: '1px solid var(--border)' }}>
           <div className="p-4 flex-1 flex flex-col">
             <label className="text-xs text-[var(--text)]/40 mb-2">Describe your component</label>
             <textarea
@@ -176,7 +177,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
           </div>
 
           {/* Templates */}
-          <div className="border-t border-white/5 p-4">
+          <div className="p-4" style={{ borderTop: '1px solid var(--border)' }}>
             <p className="text-[10px] text-[var(--text)]/30 uppercase tracking-wider mb-2">Templates</p>
             <div className="space-y-1">
               {TEMPLATES.map(t => (
@@ -197,7 +198,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
           {code ? (
             <>
               {/* Toolbar */}
-              <div className="border-b border-white/5 px-4 py-2 flex items-center gap-2">
+              <div className="px-4 py-2 flex items-center gap-2" style={{ borderBottom: '1px solid var(--border)' }}>
                 <div className="flex rounded-lg overflow-hidden border border-white/10">
                   <button type="button"
                     onClick={() => setView('code')}
@@ -229,7 +230,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
                 <div className="flex-1 overflow-auto">
                   <div className="flex h-full">
                     {/* Line numbers */}
-                    <div className="bg-white/[0.02] text-[var(--text)]/20 px-3 py-4 text-right select-none min-w-[3rem] font-mono text-xs leading-5 border-r border-white/5">
+                    <div className="text-[var(--text)]/20 px-3 py-4 text-right select-none min-w-[3rem] font-mono text-xs leading-5" style={{ background: 'var(--surface-muted, var(--bg-elevated))', borderRight: '1px solid var(--border)' }}>
                       {code.split('\n').map((_, i) => <div key={i}>{i + 1}</div>)}
                     </div>
                     <pre className="flex-1 p-4 text-xs font-mono text-[var(--text)]/80 leading-5 overflow-x-auto whitespace-pre">

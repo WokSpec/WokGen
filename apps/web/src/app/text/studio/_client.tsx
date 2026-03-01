@@ -236,29 +236,21 @@ export default function TextStudio() {
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div style={{
-        borderBottom: '1px solid var(--surface-border)',
-        padding: '16px 24px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: 14 }}>
-            WokGen
+      <div className="app-topbar">
+        <div className="app-topbar__left">
+          <Link href="/" className="app-topbar__wordmark">
+            <span className="app-topbar__wordmark-wok">Wok</span>
+            <span className="app-topbar__wordmark-gen">Gen</span>
           </Link>
-          <span style={{ color: 'var(--text-muted)' }}>/</span>
-          <span style={{ color: ACCENT, fontWeight: 600 }}>Text mode</span>
-          <span style={{
-            padding: '2px 8px', borderRadius: 4, fontSize: '0.7rem',
-            background: 'var(--accent-subtle)', color: ACCENT,
-            border: '1px solid var(--accent-glow)', fontWeight: 600,
-          }}>BETA</span>
+          <span className="app-topbar__sep">/</span>
+          <span style={{ color: ACCENT, fontWeight: 600, fontSize: '0.8rem' }}>Text mode</span>
+          <span className="tag tag-purple">BETA</span>
         </div>
-        <Link
-          href="/text/gallery"
-          style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: 13 }}
-        >
-          Gallery →
-        </Link>
+        <div className="app-topbar__right">
+          <Link href="/text/gallery" className="btn btn-ghost btn-sm">
+            Gallery →
+          </Link>
+        </div>
       </div>
 
       {/* ── Main layout ────────────────────────────────────────────────── */}

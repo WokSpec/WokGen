@@ -662,7 +662,7 @@ export default function UIUXStudio() {
                         const disabled = !checked && selectedLibraryTypes.length >= 6;
                         return (
                           <label key={ct.id} className={`uiux-config-type-btn${checked ? ' active' : ''}`} style={{ opacity: disabled ? 0.35 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}>
-                            <input type="checkbox" checked={checked} disabled={disabled} onChange={(e) => { if (e.target.checked) setSelectedLibraryTypes((p) => [...p, ct.id]); else setSelectedLibraryTypes((p) => p.filter((x) => x !== ct.id)); }} style={{ accentColor: 'var(--accent)', width: 11, height: 11 }} />
+                            <input type="checkbox" checked={checked} disabled={disabled} onChange={(e) => { if (e.target.checked) setSelectedLibraryTypes((p) => [...p, ct.id]); else setSelectedLibraryTypes((p) => p.filter((x) => x !== ct.id)); }} className="uiux-checkbox" />
                             <span>{ct.icon} {ct.label}</span>
                           </label>
                         );
@@ -691,11 +691,6 @@ export default function UIUXStudio() {
                         <button type="button" key={ct.id}
                           className={`uiux-type-btn${componentType === ct.id ? ' active' : ''}`}
                           onClick={() => setComponentType(ct.id)}
-                          style={{
-                            background: componentType === ct.id ? 'var(--accent-dim)' : 'var(--surface-raised)',
-                            border: `1px solid ${componentType === ct.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                            color: componentType === ct.id ? 'var(--accent)' : 'var(--text-secondary)',
-                          }}
                         >
                           <span className="uiux-config-type-icon">{ct.icon}</span>
                           <span className="uiux-config-type-label">{ct.label}</span>
@@ -760,7 +755,7 @@ export default function UIUXStudio() {
                 </div>
 
                 {/* Advanced */}
-                <div className="uiux-config-section" style={{ paddingTop: 5, paddingBottom: 8 }}>
+                <div className="uiux-config-section uiux-config-section--py">
                   <button type="button" onClick={() => setShowAdvanced((v) => !v)} className="uiux-advanced-toggle">
                     <span>Advanced</span>
                     <span className="uiux-advanced-toggle-icon">{showAdvanced ? '▲' : '▼'}</span>
@@ -774,7 +769,7 @@ export default function UIUXStudio() {
                       <div className="uiux-advanced-checkrow">
                         {([['Dark mode', darkMode, setDarkMode], ['Responsive', responsive, setResponsive]] as [string, boolean, React.Dispatch<React.SetStateAction<boolean>>][]).map(([label, val, setter]) => (
                           <label key={label} className="uiux-advanced-check-label">
-                            <input type="checkbox" checked={val} onChange={(e) => setter(e.target.checked)} style={{ accentColor: 'var(--purple)' }} />
+                            <input type="checkbox" checked={val} onChange={(e) => setter(e.target.checked)} className="uiux-checkbox-sm" />
                             <span >{label}</span>
                           </label>
                         ))}
@@ -790,7 +785,7 @@ export default function UIUXStudio() {
                 {(isLoading || isRefining || isGeneratingLibrary) ? (
                   <div className="uiux-gen-progress">
                     <div className="uiux-gen-progress-row">
-                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                      <span className="uiux-cfg-hint">
                         {isGeneratingLibrary ? `Generating ${COMPONENT_TYPES.find((c) => c.id === libraryCurrentType)?.label ?? '…'} (${libraryProcessed}/${selectedLibraryTypes.length})` : isRefining ? 'Refining…' : (loadingStage || 'Generating…')}
                       </span>
                       <span className="uiux-gen-progress-elapsed">{(elapsedMs / 1000).toFixed(1)}s</span>
@@ -846,7 +841,7 @@ export default function UIUXStudio() {
                   {/* Output toolbar */}
                   <div className="uiux-output-toolbar">
                     {/* Tabs */}
-                    <div style={{ display: 'flex', gap: 2 }}>
+                    <div className="uiux-tab-btns-row">
                       {(['preview', 'code', 'accessibility'] as OutputTab[]).map((tab) => {
                         const labels: Record<OutputTab, string> = { preview: 'Preview', code: '{ } Code', accessibility: 'A11y' };
                         return (
@@ -888,7 +883,7 @@ export default function UIUXStudio() {
 
                     {/* Meta + duration */}
                     {currentResult && (
-                      <div style={{ display: 'flex', gap: 3, alignItems: 'center', marginLeft: 4 }}>
+                      <div className="uiux-meta-row">
                         <span className="uiux-meta-tag">{FRAMEWORKS.find((f) => f.id === currentResult.framework)?.label}</span>
                         <span className="uiux-meta-tag">{COMPONENT_TYPES.find((c) => c.id === currentResult.componentType)?.label}</span>
                         {currentResult.durationMs > 0 && <span className="uiux-meta-duration">{(currentResult.durationMs / 1000).toFixed(1)}s</span>}
@@ -899,7 +894,7 @@ export default function UIUXStudio() {
 
                     {/* Actions */}
                     {currentResult && (
-                      <div style={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <div className="uiux-actions-row">
                         <button type="button" onClick={handleCopyCode} className={`uiux-action-btn${copied ? ' uiux-action-btn--copied' : ''}`}>
                           {copied ? 'Copied!' : 'Copy'}
                         </button>
@@ -908,7 +903,7 @@ export default function UIUXStudio() {
                         {session?.user && (
                           <>
                             <label className="uiux-gallery-label">
-                              <input type="checkbox" checked={galleryIsPublic} onChange={(e) => setGalleryIsPublic(e.target.checked)} style={{ accentColor: 'var(--purple)', width: 10, height: 10 }} />
+                              <input type="checkbox" checked={galleryIsPublic} onChange={(e) => setGalleryIsPublic(e.target.checked)} className="uiux-checkbox-sm" />
                               <span>public</span>
                             </label>
                             <button type="button" onClick={handleSaveToGallery} disabled={isSavingToGallery || gallerySaved}
@@ -995,7 +990,7 @@ function UIUXPreview({
         <div className="uiux-preview-unavail-icon">◈</div>
         <div className="uiux-preview-unavail-title">Live preview unavailable for {fwLabel}</div>
         <div className="uiux-preview-unavail-desc">
-          Switch to the <strong style={{ color: 'var(--accent)' }}>Code</strong> tab to copy.
+          Switch to the <strong className="uiux-preview-accent">Code</strong> tab to copy.
           {framework === 'vue3' && ' Paste into a .vue file in your Vue 3 project.'}
           {framework === 'svelte' && ' Paste into a .svelte file in your SvelteKit project.'}
         </div>
@@ -1009,12 +1004,12 @@ function UIUXPreview({
     <div className="uiux-preview-frame">
       <div className="uiux-preview-toolbar">
         <div className="uiux-browser-dots">
-          <span style={{ background: 'var(--danger)' }} />
-          <span style={{ background: 'var(--warning)' }} />
-          <span style={{ background: 'var(--success)' }} />
+          <span className="uiux-browser-dot--red" />
+          <span className="uiux-browser-dot--yellow" />
+          <span className="uiux-browser-dot--green" />
         </div>
         <div className="uiux-browser-bar">
-          {viewportMode !== 'desktop' && <span style={{ marginRight: 5 }}>{VIEWPORT_OPTIONS.find((v) => v.id === viewportMode)?.icon} {vpWidth}px</span>}
+          {viewportMode !== 'desktop' && <span className="uiux-viewport-px-info">{VIEWPORT_OPTIONS.find((v) => v.id === viewportMode)?.icon} {vpWidth}px</span>}
           localhost / preview
         </div>
         <button type="button" className="btn-ghost btn-xs" onClick={() => setIframeKey((k) => k + 1)} title="Reload preview">↺</button>
@@ -1037,9 +1032,9 @@ function UIUXCodePane({ code, ext, onCopy, copied }: { code: string; ext: string
   return (
     <div className="uiux-code-pane">
       <div className="uiux-code-header">
-        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>component.{ext}</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: '0.62rem', color: 'var(--text-disabled)' }}>{code.split('\n').length} lines · {(new Blob([code]).size / 1024).toFixed(1)} KB</span>
+        <span className="uiux-code-filename">component.{ext}</span>
+        <div className="uiux-code-header-actions">
+          <span className="uiux-code-stats">{code.split('\n').length} lines · {(new Blob([code]).size / 1024).toFixed(1)} KB</span>
           <button type="button" className="btn-ghost btn-xs" onClick={onCopy}>{copied ? 'Copied!' : 'Copy'}</button>
         </div>
       </div>
@@ -1055,26 +1050,26 @@ function UIUXCodePane({ code, ext, onCopy, copied }: { code: string; ext: string
 function UIUXAccessibilityPanel({ hints }: { hints: string[] }) {
   if (hints.length === 0) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 10, padding: '2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '2rem' }}>✓</div>
-        <div style={{ fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No accessibility issues detected</div>
-        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: 320, lineHeight: 1.6 }}>The component appears to follow accessibility best practices. Always test with a screen reader for full verification.</div>
+      <div className="uiux-a11y-pass">
+        <div className="uiux-a11y-pass-icon">✓</div>
+        <div className="uiux-a11y-pass-title">No accessibility issues detected</div>
+        <div className="uiux-a11y-pass-desc">The component appears to follow accessibility best practices. Always test with a screen reader for full verification.</div>
       </div>
     );
   }
   return (
-    <div style={{ padding: '14px 18px', overflowY: 'auto', height: '100%' }}>
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>Accessibility Review</div>
-        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{hints.length} hint{hints.length !== 1 ? 's' : ''} found</div>
+    <div className="uiux-a11y-panel">
+      <div className="uiux-a11y-panel-head">
+        <div className="uiux-a11y-panel-title">Accessibility Review</div>
+        <div className="uiux-a11y-count">{hints.length} hint{hints.length !== 1 ? 's' : ''} found</div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+      <div className="uiux-a11y-hints">
         {hints.map((hint, i) => {
           const isWarning = /warning|missing|lacks|no\s+alt|no\s+label/i.test(hint) || hint.includes('Warning');
           return (
             <div key={i} style={{ display: 'flex', gap: 9, padding: '9px 11px', borderRadius: 7, background: isWarning ? '!' : '→', border: `1px solid ${isWarning ? '!' : '→'}` }}>
-              <span style={{ fontSize: '0.95rem', flexShrink: 0, marginTop: 1 }}>{isWarning ? '!' : '→'}</span>
-              <div style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>{hint}</div>
+              <span className="uiux-a11y-hint-icon">{isWarning ? '!' : '→'}</span>
+              <div className="uiux-a11y-hint-text">{hint}</div>
             </div>
           );
         })}
@@ -1102,8 +1097,8 @@ function UIUXEmptyState({ onSelect }: { onSelect: (ct: ComponentType) => void })
           );
         })}
       </div>
-      <div style={{ marginTop: 18, fontSize: '0.7rem', color: 'var(--text-disabled)' }}>
-        Press <kbd style={{ padding: '1px 5px', borderRadius: 3, border: '1px solid var(--surface-border)', background: 'var(--surface-overlay)', fontSize: '0.65rem' }}>⌘↵</kbd> to generate
+      <div className="uiux-empty-hint">
+        Press <kbd className="uiux-empty-kbd">⌘↵</kbd> to generate
       </div>
     </div>
   );
@@ -1133,21 +1128,21 @@ function UIUXLibraryResults({
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div className="uiux-lib-results">
       {/* Header */}
-      <div style={{ padding: '7px 12px', borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-raised)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)' }}>Library — {processed}/{total}</span>
-        <div style={{ flex: 1, height: 4, background: 'var(--surface-overlay)', borderRadius: 2, overflow: 'hidden' }}>
-          <div style={{ height: '100%', borderRadius: 2, background: 'linear-gradient(90deg,var(--purple),var(--pink))', width: `${(processed / total) * 100}%`, transition: 'width 0.4s' }} />
+      <div className="uiux-lib-header">
+        <span className="uiux-lib-title">Library — {processed}/{total}</span>
+        <div className="uiux-lib-progress">
+          <div className="uiux-lib-progress-fill" style={{ width: `${(processed / total) * 100}%` }} />
         </div>
-        {isGenerating && currentType && <span style={{ fontSize: '0.68rem', color: 'var(--pink)', whiteSpace: 'nowrap' }}>Generating {COMPONENT_TYPES.find((c) => c.id === currentType)?.label}…</span>}
+        {isGenerating && currentType && <span className="uiux-lib-generating">Generating {COMPONENT_TYPES.find((c) => c.id === currentType)?.label}…</span>}
         {!isGenerating && processed > 0 && (
-          <button type="button" onClick={onExportAll} style={{ padding: '3px 10px', borderRadius: 5, border: '1px solid var(--accent-muted)', background: 'var(--accent-dim)', color: 'var(--accent)', fontSize: '0.7rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>⊞ Export All</button>
+          <button type="button" onClick={onExportAll} className="uiux-lib-export-btn">⊞ Export All</button>
         )}
       </div>
 
       {/* Items */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div className="uiux-lib-items">
         {queue.map((ct) => {
           const res = results[ct];
           const ctInfo = COMPONENT_TYPES.find((c) => c.id === ct);
@@ -1160,12 +1155,12 @@ function UIUXLibraryResults({
           return (
             <div key={ct} className="uiux-batch-item" style={{ opacity: isPending ? 0.45 : 1 }}>
               <div className="uiux-batch-header">
-                <span style={{ fontSize: '0.95rem' }}>{ctInfo?.icon}</span>
+                <span className="uiux-batch-icon">{ctInfo?.icon}</span>
                 <span className="uiux-batch-header-title">{ctInfo?.label}</span>
-                {isCurrentlyGenerating && <span style={{ fontSize: '0.65rem', color: 'var(--pink)' }}>Generating…</span>}
-                {isPending && <span style={{ fontSize: '0.65rem', color: 'var(--text-disabled)' }}>Queued</span>}
+                {isCurrentlyGenerating && <span className="uiux-batch-generating">Generating…</span>}
+                {isPending && <span className="uiux-batch-pending">Queued</span>}
                 {res && (
-                  <div style={{ marginLeft: 'auto', display: 'flex', gap: 3 }}>
+                  <div className="uiux-batch-actions">
                     {isPreviewable && (
                       <button type="button" onClick={() => setActiveTabs((p) => ({ ...p, [ct]: 'preview' }))}
                         className={`uiux-batch-tab-btn${tab === 'preview' ? ' active' : ''}`}>◈</button>
@@ -1179,7 +1174,7 @@ function UIUXLibraryResults({
                 )}
               </div>
               {res && (
-                <div className="uiux-batch-content" style={{ height: 260 }}>
+                <div className="uiux-batch-content uiux-batch-content--lg">
                   {tab === 'preview' && isPreviewable ? (
                     <LibraryPreviewFrame code={res.code} />
                   ) : (
@@ -1199,7 +1194,7 @@ function UIUXLibraryResults({
 function LibraryPreviewFrame({ code }: { code: string }) {
   const [key, setKey] = useState(0);
   useEffect(() => setKey((k) => k + 1), [code]);
-  return <iframe key={key} srcDoc={code} title="Preview" sandbox="allow-scripts allow-same-origin" style={{ width: '100%', height: '100%', border: 'none', background: '#fff', display: 'block' }} />;
+  return <iframe key={key} srcDoc={code} title="Preview" sandbox="allow-scripts allow-same-origin" className="uiux-lib-iframe" />;
 }
 
 function LibraryRefineBar({

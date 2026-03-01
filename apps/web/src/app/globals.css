@@ -24532,3 +24532,48 @@ input[type="range"].studio-range {
   color: var(--studio-accent, var(--accent));
   font-weight: 600;
 }
+
+/* UIUX studio additions */
+.uiux-type-btn.active { background: var(--accent-dim); border: 1px solid var(--accent-muted); color: var(--accent); }
+.uiux-checkbox { accent-color: var(--accent); width: 11px; height: 11px; }
+.uiux-checkbox-sm { accent-color: var(--purple); width: 10px; height: 10px; }
+.uiux-config-section--py { padding-top: 5px; padding-bottom: 8px; }
+.uiux-cfg-hint { font-size: 0.68rem; color: var(--text-muted); }
+.uiux-tab-btns-row { display: flex; gap: 2px; }
+.uiux-meta-row { display: flex; gap: 3px; align-items: center; margin-left: 4px; }
+.uiux-actions-row { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; }
+.uiux-preview-accent { color: var(--accent); }
+.uiux-browser-dot--red { background: var(--danger); }
+.uiux-browser-dot--yellow { background: var(--warning); }
+.uiux-browser-dot--green { background: var(--success); }
+.uiux-viewport-px-info { margin-right: 5px; }
+.uiux-code-filename { font-size: 0.7rem; color: var(--text-muted); font-family: monospace; }
+.uiux-code-header-actions { display: flex; align-items: center; gap: 8px; }
+.uiux-code-stats { font-size: 0.62rem; color: var(--text-disabled); }
+.uiux-a11y-pass { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; padding: 2rem; text-align: center; }
+.uiux-a11y-pass-icon { font-size: 2rem; }
+.uiux-a11y-pass-title { font-weight: 600; color: var(--text-secondary); font-size: 0.9rem; }
+.uiux-a11y-pass-desc { font-size: 0.75rem; color: var(--text-muted); max-width: 320px; line-height: 1.6; }
+.uiux-a11y-panel { padding: 14px 18px; overflow-y: auto; height: 100%; }
+.uiux-a11y-panel-head { margin-bottom: 10px; }
+.uiux-a11y-panel-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.uiux-a11y-count { font-size: 0.72rem; color: var(--text-muted); }
+.uiux-a11y-hints { display: flex; flex-direction: column; gap: 7px; }
+.uiux-a11y-hint-icon { font-size: 0.95rem; flex-shrink: 0; margin-top: 1px; }
+.uiux-a11y-hint-text { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.55; }
+.uiux-empty-hint { margin-top: 18px; font-size: 0.7rem; color: var(--text-disabled); }
+.uiux-empty-kbd { padding: 1px 5px; border-radius: 3px; border: 1px solid var(--surface-border); background: var(--surface-overlay); font-size: 0.65rem; }
+.uiux-lib-results { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.uiux-lib-header { padding: 7px 12px; border-bottom: 1px solid var(--surface-border); background: var(--surface-raised); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.uiux-lib-title { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); }
+.uiux-lib-progress { flex: 1; height: 4px; background: var(--surface-overlay); border-radius: 2px; overflow: hidden; }
+.uiux-lib-progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--purple), var(--pink)); transition: width 0.4s; }
+.uiux-lib-generating { font-size: 0.68rem; color: var(--pink); white-space: nowrap; }
+.uiux-lib-export-btn { padding: 3px 10px; border-radius: 5px; border: 1px solid var(--accent-muted); background: var(--accent-dim); color: var(--accent); font-size: 0.7rem; cursor: pointer; white-space: nowrap; }
+.uiux-lib-items { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
+.uiux-batch-icon { font-size: 0.95rem; }
+.uiux-batch-generating { font-size: 0.65rem; color: var(--pink); }
+.uiux-batch-pending { font-size: 0.65rem; color: var(--text-disabled); }
+.uiux-batch-actions { margin-left: auto; display: flex; gap: 3px; }
+.uiux-batch-content--lg { height: 260px; }
+.uiux-lib-iframe { width: 100%; height: 100%; border: none; background: #fff; display: block; }

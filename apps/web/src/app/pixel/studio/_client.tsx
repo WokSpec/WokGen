@@ -333,17 +333,9 @@ function randomSeed(): number {
 // ---------------------------------------------------------------------------
 
 function Spinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
-  const dim = size === 'sm' ? 14 : size === 'lg' ? 32 : 20;
   return (
     <span
-      className="inline-block rounded-full flex-shrink-0"
-      style={{
-        width: dim,
-        height: dim,
-        border: '2px solid var(--surface-border)',
-        borderTopColor: 'var(--accent)',
-        animation: 'spin 0.7s linear infinite',
-      }}
+      className={`pixel-spinner pixel-spinner--${size}`}
       aria-hidden="true"
     />
   );
@@ -352,25 +344,14 @@ function Spinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 function ProgressBar({ indeterminate }: { indeterminate?: boolean }) {
   return (
     <div
-      className="relative w-full overflow-hidden rounded-full"
-      style={{ height: 3, background: 'var(--surface-border)' }}
+      className="pixel-progress-track"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label="Generation progress"
     >
       <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          height: '100%',
-          borderRadius: '9999px',
-          background: 'linear-gradient(90deg, var(--accent), var(--accent-hover))',
-          ...(indeterminate
-            ? { width: '40%', animation: 'indeterminate-slide 1.4s ease-in-out infinite' }
-            : { width: '100%', transition: 'width 0.3s ease' }),
-        }}
+        className={`pixel-progress-fill${indeterminate ? ' pixel-progress-fill--indeterminate' : ''}`}
       />
     </div>
   );
@@ -470,14 +451,13 @@ function SettingsModal({
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-5 py-4 flex-shrink-0"
-          style={{ borderBottom: '1px solid var(--surface-border)' }}
+          className="flex items-center justify-between px-5 py-4 flex-shrink-0 pixel-section-border-b"
         >
           <div>
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="text-sm font-semibold pixel-text-primary">
               Provider Settings
             </h2>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs mt-0.5 pixel-text-muted">
               API keys are stored in your browser only — never sent to the server unless generating.
             </p>
           </div>
@@ -504,20 +484,17 @@ function SettingsModal({
                       className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                       style={{ background: PROVIDER_COLORS[pid] }}
                     />
-                    <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    <span className="text-sm font-medium pixel-text-primary">
                       {PROVIDER_LABELS[pid]}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     {info?.configured && (
-                      <span className="badge-success text-2xs" style={{ fontSize: '0.65rem' }}>
+                      <span className="badge-success text-2xs pixel-badge-xs">
                         ✓ env configured
                       </span>
                     )}
-                    <span
-                      className="text-2xs"
-                      style={{ fontSize: '0.65rem', color: 'var(--text-disabled)', fontFamily: 'monospace' }}
-                    >
+                    <span className="text-2xs pixel-mono-xs">
                       {ENV_VARS[pid]}
                     </span>
                   </div>
@@ -538,8 +515,7 @@ function SettingsModal({
                   />
                   <button
                     type="button"
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs"
-                    style={{ color: 'var(--text-muted)' }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs pixel-text-muted"
                     onClick={() => setShowKeys((s) => ({ ...s, [pid]: !s[pid] }))}
                     tabIndex={-1}
                     aria-label={showKeys[pid] ? 'Hide key' : 'Show key'}
@@ -553,18 +529,17 @@ function SettingsModal({
 
           {/* ComfyUI host */}
           <div
-            className="pt-4"
-            style={{ borderTop: '1px solid var(--surface-border)' }}
+            className="pt-4 pixel-section-border-t"
           >
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="w-2.5 h-2.5 rounded-full"
                 style={{ background: PROVIDER_COLORS.comfyui }}
               />
-              <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+              <span className="text-sm font-medium pixel-text-primary">
                 Custom Pipeline
               </span>
-              <span className="badge-success text-2xs ml-auto" style={{ fontSize: '0.65rem' }}>
+              <span className="badge-success text-2xs ml-auto pixel-badge-xs">
                 Always free
               </span>
             </div>
@@ -598,8 +573,7 @@ function SettingsModal({
 
         {/* Footer */}
         <div
-          className="flex items-center justify-end gap-3 px-5 py-4 flex-shrink-0"
-          style={{ borderTop: '1px solid var(--surface-border)' }}
+          className="flex items-center justify-end gap-3 px-5 py-4 flex-shrink-0 pixel-section-border-t"
         >
           <button type="button" className="btn-ghost" onClick={onClose}>
             Cancel
@@ -641,8 +615,7 @@ function HistoryPanel({
       }}
     >
       <div
-        className="flex items-center justify-between px-4 py-3 flex-shrink-0"
-        style={{ borderBottom: '1px solid var(--surface-border)' }}
+        className="flex items-center justify-between px-4 py-3 flex-shrink-0 pixel-section-border-b"
       >
         <span className="section-title">History</span>
         <button type="button"
@@ -664,8 +637,7 @@ function HistoryPanel({
           <button type="button"
             key={item.id}
             onClick={() => onSelect(item)}
-            className="flex items-center gap-3 p-3 text-left w-full transition-colors duration-150"
-            style={{ borderBottom: '1px solid var(--surface-border)' }}
+            className="flex items-center gap-3 p-3 text-left w-full transition-colors duration-150 pixel-section-border-b"
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLElement).style.background = 'var(--surface-hover)';
             }}
@@ -689,22 +661,18 @@ function HistoryPanel({
                   decoding="async"
                 />
               ) : (
-                <span style={{ color: 'var(--text-disabled)', fontSize: 18 }}>?</span>
+                <span className="pixel-question-mark">?</span>
               )}
             </div>
             {/* Meta */}
             <div className="flex flex-col gap-0.5 min-w-0 flex-1">
               <p
-                className="text-xs font-medium truncate"
-                style={{ color: 'var(--text-primary)' }}
+                className="text-xs font-medium truncate pixel-text-primary"
               >
                 {item.prompt}
               </p>
               <div className="flex items-center gap-1.5">
-                <span
-                  className="text-2xs"
-                  style={{ fontSize: '0.6rem', color: 'var(--text-disabled)', fontFamily: 'monospace' }}
-                >
+                <span className="text-2xs pixel-mono-2xs">
                   {item.width}px
                 </span>
                 <ProviderBadge provider={item.provider} />
@@ -799,7 +767,7 @@ function OutputPanel({
     const idleExamples = (tool ? EXAMPLE_PROMPTS[tool as Tool] ?? EXAMPLE_PROMPTS.generate : EXAMPLE_PROMPTS.generate).slice(0, 4);
     return (
       <div className="output-canvas flex-1" style={{ background: 'var(--surface-muted)' }}>
-        <div className="empty-state" style={{ maxWidth: 380, textAlign: 'center' }}>
+        <div className="empty-state pixel-empty-state">
           {/* Pixel art inspired placeholder grid */}
           <div className="pixel-idle-grid" aria-hidden="true">
             {Array.from({ length: 64 }).map((_, i) => (
@@ -809,8 +777,8 @@ function OutputPanel({
               />
             ))}
           </div>
-          <h3 className="empty-state-title" style={{ marginBottom: '0.5rem' }}>Start with a prompt</h3>
-          <p className="empty-state-body" style={{ marginBottom: '1.25rem' }}>
+          <h3 className="empty-state-title empty-state-title--mb">Start with a prompt</h3>
+          <p className="empty-state-body empty-state-body--mb">
             Describe what you want — or click an example below.
           </p>
           {onFillPrompt && (
@@ -948,7 +916,7 @@ function OutputPanel({
           </button>
         )}
         {result?.jobId && !result.jobId.startsWith('anim-') && !result.jobId.startsWith('local') && (
-          <div style={{ display: 'flex', gap: 2 }}>
+          <div className="pixel-flex-row-xs">
             <RatingButton jobId={result.jobId} value={1} label="+" title="Good result" />
             <RatingButton jobId={result.jobId} value={-1} label="-" title="Bad result" />
           </div>
@@ -1142,8 +1110,7 @@ function OutputPanel({
 
       {batchResults && batchResults.length > 1 && !compareMode && (
         <div
-          className="flex items-center gap-2 px-4 py-2 flex-shrink-0 overflow-x-auto"
-          style={{ borderTop: '1px solid var(--surface-border)', background: 'var(--surface-overlay)' }}
+          className="flex items-center gap-2 px-4 py-2 flex-shrink-0 overflow-x-auto pixel-history-header"
         >
           {batchResults.map((br, i) => br.resultUrl && (
             <button type="button"
@@ -1164,12 +1131,11 @@ function OutputPanel({
               <img
                 src={br.resultUrl}
                 alt={`Variation ${i + 1}`}
-                className="pixel-art"
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                className="pixel-art pixel-history-thumb-full"
               />
             </button>
           ))}
-          <span style={{ fontSize: '0.72rem', color: 'var(--text-faint)', marginLeft: 4 }}>
+          <span className="pixel-count-label">
             {batchResults.length} variations — click to select
           </span>
         </div>
@@ -1217,9 +1183,8 @@ function OutputPanel({
               <div className="pixel-meta-bar-inner">
                 <button
                   type="button"
-                  className="btn btn--sm"
+                  className="btn btn--sm pixel-rename-input"
                   onClick={() => onSelectCompare?.(r)}
-                  style={{ flex: 1, fontSize: '0.65rem', padding: '3px 6px' }}
                 >
                   Use this
                 </button>
@@ -1240,7 +1205,7 @@ function OutputPanel({
           }}
         >
           {result.width && result.height && (
-            <span style={{ color: 'var(--text-muted)' }}>
+            <span className="pixel-meta-muted">
               {result.width}×{result.height} · PNG
               {' · ~'}{Math.round((result.width * result.height * 4) / 1024)}KB
             </span>
@@ -1254,17 +1219,17 @@ function OutputPanel({
                 navigator.clipboard.writeText(String(result.resolvedSeed)).catch(() => {});
               }}
             >
-              Seed: <code style={{ color: 'var(--text-muted)' }}>{result.resolvedSeed}</code> <span style={{ opacity: 0.5 }}>⎘</span>
+              Seed: <code className="pixel-meta-muted">{result.resolvedSeed}</code> <span className="pixel-copy-icon">⎘</span>
             </button>
           )}
           {urls.length > 1 && (
             <span>{urls.length} outputs</span>
           )}
           {result.provider && (
-            <span style={{ color: 'var(--text-disabled)' }}>via {result.provider}</span>
+            <span className="pixel-meta-disabled">via {result.provider}</span>
           )}
           {result.durationMs && (
-            <span style={{ color: 'var(--text-disabled)' }}>{(result.durationMs / 1000).toFixed(1)}s</span>
+            <span className="pixel-meta-disabled">{(result.durationMs / 1000).toFixed(1)}s</span>
           )}
         </div>
       )}
@@ -3255,12 +3220,12 @@ function StudioInner() {
         </div>
 
         {/* Canvas Presets accordion */}
-        <div className="flex-shrink-0" style={{ borderBottom: '1px solid var(--surface-border)' }}>
+        <div className="flex-shrink-0 pixel-section-border-b">
           <CanvasPresets currentSize={size} onSelect={setSize} />
         </div>
 
         {/* Style Preset quick-pick grid */}
-        <div className="flex-shrink-0 px-4 py-3" style={{ borderBottom: '1px solid var(--surface-border)' }}>
+        <div className="flex-shrink-0 px-4 py-3 pixel-section-border-b">
           <p className="pixel-studio-section-label">Style Presets</p>
           <StylePresetGrid
             value={stylePreset}
@@ -3269,64 +3234,59 @@ function StudioInner() {
         </div>
 
         {/* Generation Presets */}
-        <div className="flex-shrink-0 px-4 py-2" style={{ borderBottom: '1px solid var(--surface-border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+        <div className="flex-shrink-0 px-4 py-2 pixel-section-border-b">
+          <div className="pixel-presets-header"
                onClick={() => setShowGenPresets(v => !v)}>
             <p className="pixel-studio-section-label" style={{ margin: 0 }}>Generation Presets</p>
-            <span style={{ fontSize: 11, opacity: 0.6 }}>{showGenPresets ? '▲' : '▼'}</span>
+            <span className="pixel-presets-chevron">{showGenPresets ? '▲' : '▼'}</span>
           </div>
           {showGenPresets && (
-            <div style={{ marginTop: 6 }}>
+            <div className="pixel-presets-wrap">
               {genPresets.length === 0 && (
-                <p style={{ fontSize: 11, opacity: 0.5, margin: '4px 0' }}>No presets saved yet.</p>
+                <p className="pixel-presets-label">No presets saved yet.</p>
               )}
               {genPresets.map(p => (
-                <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                <div key={p.id} className="pixel-presets-item">
                   <button type="button"
                     onClick={() => setPrompt(p.prompt)}
-                    style={{ flex: 1, textAlign: 'left', fontSize: 11, padding: '3px 6px',
-                             background: 'var(--surface-2)', border: '1px solid var(--surface-border)',
-                             borderRadius: 4, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    className="pixel-presets-load-btn"
                     title={p.prompt}
                   >
                     {p.name}
                   </button>
                   <button type="button" onClick={() => deleteGenPreset(p.id)}
-                          style={{ fontSize: 10, padding: '2px 5px', background: 'transparent',
-                                   border: '1px solid var(--surface-border)', borderRadius: 4, cursor: 'pointer', opacity: 0.6 }}>
+                          className="pixel-presets-del-btn">
                     ✕
                   </button>
                 </div>
               ))}
               {showPresetNameInput ? (
-                <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                <div className="pixel-presets-row">
                   <input
                     autoFocus
                     value={presetNameInput}
                     onChange={e => setPresetNameInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') saveGenPreset(); if (e.key === 'Escape') { setShowPresetNameInput(false); setPresetNameInput(''); } }}
                     placeholder="Preset name"
-                    style={{ flex: 1, fontSize: 11, padding: '3px 6px', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 4, color: 'var(--text)' }}
+                    className="pixel-presets-name-input"
                   />
                   <button
                     type="button"
                     onClick={saveGenPreset}
                     disabled={!presetNameInput.trim()}
-                    style={{ fontSize: 11, padding: '3px 6px', background: 'var(--accent, var(--accent-muted))', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+                    className="pixel-presets-save-btn"
                   >Save</button>
                   <button
                     type="button"
                     onClick={() => { setShowPresetNameInput(false); setPresetNameInput(''); }}
-                    style={{ fontSize: 11, padding: '3px 6px', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer', color: 'var(--text-muted)' }}
+                    className="pixel-presets-cancel-btn"
                   >✕</button>
                 </div>
               ) : (
                 <button
                   type="button"
                   onClick={() => setShowPresetNameInput(true)}
-                  style={{ width: '100%', fontSize: 11, padding: '3px 0', marginTop: 4,
-                           background: 'var(--accent, var(--accent-muted))', color: '#fff', border: 'none',
-                           borderRadius: 4, cursor: 'pointer' }}
+                  className="pixel-presets-save-all-btn"
                 >
                   + Save current prompt
                 </button>
@@ -3408,7 +3368,7 @@ function StudioInner() {
         />
 
         
-        <div style={{ borderTop: '1px solid var(--surface-border)' }}>
+        <div className="pixel-section-border-t">
           <div
             className="px-4 py-3 flex items-center justify-between cursor-pointer transition-colors duration-150"
             onClick={() => setShowSoundsPanel((v) => !v)}
@@ -3418,7 +3378,7 @@ function StudioInner() {
             aria-expanded={showSoundsPanel}
           >
             <span className="section-title">Sounds</span>
-            <span style={{ color: 'var(--text-disabled)', fontSize: 12 }}>
+            <span className="pixel-sfx-chevron">
               {showSoundsPanel ? '▾' : '▸'}
             </span>
           </div>
@@ -3430,12 +3390,11 @@ function StudioInner() {
               <div style={{ borderTop: '1px solid var(--surface-border)', margin: '2px 0' }} />
               {/* Prompt label + Auto-suggest */}
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                <label className="text-xs font-medium pixel-sfx-label">
                   Describe the sound…
                 </label>
                 <button type="button"
-                  className="btn-secondary"
-                  style={{ fontSize: '0.7rem', padding: '2px 8px', height: 'auto' }}
+                  className="btn-secondary pixel-sfx-label-xs"
                   onClick={async () => {
                     if (!prompt.trim()) return;
                     try {
@@ -3465,8 +3424,8 @@ function StudioInner() {
               {/* Duration slider */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs" style={{ color: 'var(--text-secondary)' }}>Duration</label>
-                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{sfxDuration.toFixed(1)}s</span>
+                  <label className="text-xs pixel-sfx-duration-label">Duration</label>
+                  <span className="text-xs pixel-sfx-duration-val">{sfxDuration.toFixed(1)}s</span>
                 </div>
                 <input
                   type="range"
@@ -3477,7 +3436,7 @@ function StudioInner() {
                   value={sfxDuration}
                   onChange={(e) => setSfxDuration(Number(e.target.value))}
                 />
-                <div className="flex justify-between text-xs mt-0.5" style={{ color: 'var(--text-disabled)' }}>
+                <div className="flex justify-between text-xs mt-0.5 pixel-sfx-range-limits">
                   <span>0.5s</span>
                   <span>5.0s</span>
                 </div>
@@ -3485,7 +3444,7 @@ function StudioInner() {
 
               {/* Prompt influence */}
               <div>
-                <label className="text-xs mb-1 block" style={{ color: 'var(--text-secondary)' }}>Prompt influence</label>
+                <label className="text-xs mb-1 block pixel-sfx-influence-label">Prompt influence</label>
                 <div className="flex gap-1">
                   {([['Low', 0.3], ['Balanced', 0.6], ['Exact', 0.9]] as [string, number][]).map(([label, val]) => (
                     <button type="button"
@@ -3513,8 +3472,7 @@ function StudioInner() {
 
               {/* Generate button */}
               <button type="button"
-                className="btn btn-primary w-full"
-                style={{ height: 38, fontSize: '0.85rem', fontWeight: 600 }}
+                className="btn btn-primary w-full biz-gen-btn"
                 disabled={sfxLoading || !sfxPrompt.trim()}
                 onClick={async () => {
                   if (!sfxPrompt.trim()) return;
@@ -3551,19 +3509,18 @@ function StudioInner() {
 
               {/* Error */}
               {sfxError && (
-                <p className="text-xs" style={{ color: 'var(--error, #ef4444)' }}>{sfxError}</p>
+                <p className="text-xs pixel-sfx-error">{sfxError}</p>
               )}
 
               {/* Audio player */}
               {sfxAudio && (
                 <div className="flex flex-col gap-2">
                   {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-                  <audio controls src={sfxAudio} className="w-full" style={{ height: 36, borderRadius: 6 }} />
+                  <audio controls src={sfxAudio} className="w-full biz-audio-player" />
                   <a
                     href={sfxAudio}
                     download={`${sfxPrompt.slice(0, 30).replace(/[^a-z0-9]/gi, '_')}.mp3`}
-                    className="btn-secondary text-center"
-                    style={{ fontSize: '0.78rem', padding: '4px 0', display: 'block', textDecoration: 'none' }}
+                    className="btn-secondary text-center biz-sfx-dl-link"
                   >
                     ↓ Download .mp3
                   </a>
@@ -3571,7 +3528,7 @@ function StudioInner() {
               )}
 
               {/* Hint */}
-              <p className="text-xs" style={{ color: 'var(--text-disabled)', marginTop: -4 }}>
+              <p className="text-xs pixel-sfx-hint">
                 Free: 3 sounds/day · Great for game assets
               </p>
             </div>
@@ -3580,8 +3537,7 @@ function StudioInner() {
 
         {/* Studio Tools — quick access to processing tools */}
         <div
-          className="flex-shrink-0"
-          style={{ borderBottom: '1px solid var(--surface-border)' }}
+          className="flex-shrink-0 pixel-section-border-b"
         >
           <div className="px-4 py-3">
             <p className="pixel-studio-section-label mb-2">Tools</p>
@@ -3611,15 +3567,14 @@ function StudioInner() {
 
         {/* Generate button */}
         <div
-          className="flex flex-col gap-2 p-4 flex-shrink-0"
-          style={{ borderTop: '1px solid var(--surface-border)' }}
+          className="flex flex-col gap-2 p-4 flex-shrink-0 pixel-section-border-t"
         >
           {/* HD / Standard quality toggle */}
           <div className="flex items-center justify-between" style={{ marginBottom: 4 }}>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted, #666)' }}>
+              <span className="pixel-quality-label">
                 Quality
               </span>
-              <div className="flex gap-1" style={{ fontSize: '0.75rem' }}>
+              <div className="flex gap-1 pixel-quality-actions">
                 <button type="button"
                   style={{
                     padding: '2px 10px',
@@ -3692,10 +3647,7 @@ function StudioInner() {
 
           {/* HD credit balance widget (HD selected) */}
           {useHD && hdBalance !== null && (
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              fontSize: '0.72rem', color: 'var(--text-faint)', padding: '0.25rem 0',
-            }}>
+            <div className="pixel-hd-balance-row">
               <span>
                 <span style={{ color: hdBalance.monthly + hdBalance.topUp > 0 ? 'var(--text-muted)' : 'var(--danger)' }}>
                   HD:{' '}
@@ -3710,14 +3662,14 @@ function StudioInner() {
                   </span>
                 )}
               </span>
-              <a href="/billing" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.7rem' }}>
+              <a href="/billing" className="pixel-billing-link">
                 {hdBalance.monthly + hdBalance.topUp === 0 ? 'Add credits →' : 'Manage →'}
               </a>
             </div>
           )}
           {useHD && hdBalance === null && (
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-faint)', paddingTop: '0.25rem' }}>
-              <a href="/billing" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+            <div className="pixel-credits-wrap">
+              <a href="/billing" className="pixel-billing-link-sm">
                 HD credits — sign in or upgrade →
               </a>
             </div>
@@ -3725,7 +3677,7 @@ function StudioInner() {
           {!useHD && (
             <>
               {/* Batch count toggle */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '0.25rem' }}>
+              <div className="flex items-center justify-between text-xs pixel-text-muted pt-1">
                 <span>Batch</span>
                 <div className="flex gap-1">
                   {([1, 2, 4] as const).map(n => (
@@ -3774,8 +3726,8 @@ function StudioInner() {
                   Compare
                 </button>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', color: 'var(--text-faint)', paddingTop: '0.125rem' }}>
-                <span style={{ color: 'var(--success)', marginRight: '0.25rem' }}>∞</span>
+              <div className="pixel-hd-balance-sub">
+                <span className="pixel-hd-unlimited">∞</span>
                 Standard generation is always free
               </div>
             </>
@@ -3900,7 +3852,7 @@ function StudioInner() {
               <span className="modal__title">Keyboard Shortcuts</span>
               <button type="button" className="btn btn--ghost btn--sm btn--icon" onClick={() => setShowShortcuts(false)} aria-label="Close">&times;</button>
             </div>
-            <div className="modal__body" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="modal__body pixel-modal-body--col">
               {([
                 ['⌘ / Ctrl + Enter', 'Generate'],
                 ['⌘ / Ctrl + R', 'Regenerate'],
@@ -3908,9 +3860,9 @@ function StudioInner() {
                 ['1 – 5', 'Switch tool (Generate / Animate / Rotate / Inpaint / Scene)'],
                 ['?', 'Toggle this shortcut sheet'],
               ] as [string, string][]).map(([key, desc]) => (
-                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, fontSize: 13 }}>
-                  <kbd style={{ fontFamily: 'monospace', background: 'var(--bg-surface, #252538)', border: '1px solid var(--surface-border, #303050)', borderRadius: 4, padding: '2px 8px', color: 'var(--accent)', flexShrink: 0 }}>{key}</kbd>
-                  <span style={{ color: 'var(--text-muted)', textAlign: 'right' }}>{desc}</span>
+                <div key={key} className="pixel-shortcut-row">
+                  <kbd className="pixel-shortcut-key">{key}</kbd>
+                  <span className="pixel-shortcut-desc">{desc}</span>
                 </div>
               ))}
             </div>

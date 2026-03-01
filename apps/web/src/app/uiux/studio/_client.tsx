@@ -638,19 +638,19 @@ export default function UIUXStudio() {
             )}
 
             {/* ── Form column (col 2) ───────────────────────────────────── */}
-            <div className="studio-sidebar" style={{ width: 355, minWidth: 295, maxWidth: 395, flexShrink: 0 }}>
+            <div className="studio-sidebar uiux-sidebar">
               {/* Header + library mode toggle */}
               <div className="uiux-config-header">
                 <span className="uiux-config-header__title">Configure</span>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-                  <span style={{ fontSize: '0.65rem', color: libraryMode ? 'var(--accent)' : 'var(--text-muted)' }}>Library Mode</span>
-                  <div onClick={() => setLibraryMode((v) => !v)} style={{ width: 30, height: 16, borderRadius: 8, cursor: 'pointer', position: 'relative', background: libraryMode ? 'var(--accent-dim)' : 'var(--surface-overlay)', border: `1px solid ${libraryMode ? 'var(--accent-muted)' : 'var(--surface-border)'}`, transition: 'background 0.2s' }}>
-                    <div style={{ position: 'absolute', top: 2, left: libraryMode ? 13 : 2, width: 10, height: 10, borderRadius: '50%', background: libraryMode ? 'var(--accent)' : 'var(--text-disabled)', transition: 'left 0.15s' }} />
+                <label className="uiux-toggle-label">
+                  <span className={`${libraryMode ? 'active' : ''}`}>Library Mode</span>
+                  <div onClick={() => setLibraryMode((v) => !v)} className={`uiux-toggle-track${libraryMode ? ' active' : ''}`}>
+                    <div className={`uiux-toggle-knob${libraryMode ? ' active' : ''}`} />
                   </div>
                 </label>
               </div>
 
-              <div style={{ flex: 1, overflowY: 'auto' }}>
+              <div className="uiux-sidebar-scroll">
 
                 {/* Library checklist */}
                 {libraryMode && (
@@ -697,8 +697,8 @@ export default function UIUXStudio() {
                             color: componentType === ct.id ? 'var(--accent)' : 'var(--text-secondary)',
                           }}
                         >
-                          <span style={{ fontSize: '0.85rem' }}>{ct.icon}</span>
-                          <span style={{ fontSize: '0.7rem' }}>{ct.label}</span>
+                          <span className="uiux-config-type-icon">{ct.icon}</span>
+                          <span className="uiux-config-type-label">{ct.label}</span>
                         </button>
                       ))}
                     </div>
@@ -708,10 +708,10 @@ export default function UIUXStudio() {
                 {/* Framework */}
                 <div className="uiux-config-section">
                   <span className="uiux-config-section-label">Framework</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <div className="uiux-fw-list">
                     {FRAMEWORKS.map((fw) => (
-                      <button type="button" key={fw.id} onClick={() => setFramework(fw.id)} className="uiux-fw-btn" style={{ background: framework === fw.id ? 'var(--accent-dim)' : 'var(--surface-raised)', border: `1px solid ${framework === fw.id ? 'var(--accent-muted)' : 'var(--surface-border)'}` }}>
-                        <span className="uiux-fw-label" style={{ color: framework === fw.id ? 'var(--accent)' : 'var(--text-secondary)' }}>{fw.label}</span>
+                      <button type="button" key={fw.id} onClick={() => setFramework(fw.id)} className={`uiux-fw-btn${framework === fw.id ? ' active' : ''}`}>
+                        <span className={`uiux-fw-label${framework === fw.id ? ' active' : ''}`}>{fw.label}</span>
                         <span className="uiux-fw-desc">{fw.desc}</span>
                       </button>
                     ))}
@@ -721,61 +721,61 @@ export default function UIUXStudio() {
                 {/* Style preset */}
                 <div className="uiux-config-section">
                   <span className="uiux-config-section-label">Style</span>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+                  <div className="uiux-config-grid-2">
                     {STYLE_PRESETS.map((sp) => (
-                      <button type="button" key={sp.id} onClick={() => setStyle(sp.id)} className="uiux-style-btn" style={{ border: `1px solid ${style === sp.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`, background: style === sp.id ? 'var(--accent-dim)' : 'var(--surface-raised)' }}>
+                      <button type="button" key={sp.id} onClick={() => setStyle(sp.id)} className={`uiux-style-btn${style === sp.id ? ' active' : ''}`}>
                         <div className="uiux-style-swatches">{sp.colors.map((c, i) => <div key={i} className="uiux-style-swatch" style={{ background: c }} />)}</div>
-                        <span className="uiux-style-name" style={{ color: style === sp.id ? 'var(--accent)' : 'var(--text-secondary)' }}>{sp.label}</span>
+                        <span className={`uiux-style-name${style === sp.id ? ' active' : ''}`}>{sp.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Model selector */}
-                <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--surface-border)' }}>
-                  <div style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: 5 }}>Model</div>
-                  <div style={{ display: 'flex', gap: 4 }}>
+                <div className="uiux-config-section">
+                  <span className="uiux-config-section-label">Model</span>
+                  <div className="uiux-model-grid">
                     {MODEL_OPTIONS.map((m) => (
-                      <button type="button" key={m.id} onClick={() => setModelTier(m.id)} title={`${m.model} — ${m.speed}`} style={{ flex: 1, padding: '5px 4px', borderRadius: 6, cursor: 'pointer', textAlign: 'center', border: `1px solid ${modelTier === m.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`, background: modelTier === m.id ? 'var(--accent-dim)' : 'var(--surface-raised)', transition: 'all 0.1s' }}>
-                        <div style={{ fontSize: '0.88rem', lineHeight: 1, marginBottom: 2 }}>{m.badge}</div>
-                        <div style={{ fontSize: '0.62rem', fontWeight: 600, color: modelTier === m.id ? 'var(--accent)' : 'var(--text-secondary)' }}>{m.label}</div>
-                        <div style={{ fontSize: '0.55rem', color: 'var(--text-disabled)', marginTop: 1 }}>{m.speed}</div>
+                      <button type="button" key={m.id} onClick={() => setModelTier(m.id)} title={`${m.model} — ${m.speed}`} className={`uiux-model-btn${modelTier === m.id ? ' active' : ''}`}>
+                        <div className="uiux-model-badge">{m.badge}</div>
+                        <div className="uiux-model-name">{m.label}</div>
+                        <div className="uiux-model-speed">{m.speed}</div>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Prompt */}
-                <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--surface-border)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-                    <span style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)' }}>
+                <div className="uiux-prompt-section">
+                  <div className="uiux-prompt-header">
+                    <span className="uiux-prompt-header-label">
                       {libraryMode ? 'Library prompt (optional)' : 'Describe what to build'}
                     </span>
                     {!libraryMode && EXAMPLE_PROMPTS[componentType] && (
-                      <button type="button" onClick={handleUseExample} style={{ fontSize: '0.62rem', color: 'var(--accent)', background: 'transparent', border: 'none', cursor: 'pointer', padding: '1px 3px' }}>Use example ↗</button>
+                      <button type="button" onClick={handleUseExample} className="uiux-prompt-example-btn">Use example ↗</button>
                     )}
                   </div>
                   <textarea id="uiux-prompt" className="studio-textarea" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder={libraryMode ? 'Optional theme for all components…' : (EXAMPLE_PROMPTS[componentType] ?? 'Describe the component you want to generate…')} rows={5} maxLength={600} onKeyDown={(e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !libraryMode) handleGenerate(); }} />
-                  <div style={{ fontSize: '0.62rem', textAlign: 'right', marginTop: 3, color: prompt.length > 540 ? '#ef4444' : prompt.length > 480 ? '#f59e0b' : 'var(--text-disabled)' }}>{prompt.length}/600</div>
+                  <div className={`uiux-prompt-char-count${prompt.length > 540 ? ' error' : prompt.length > 480 ? ' warn' : ''}`}>{prompt.length}/600</div>
                 </div>
 
                 {/* Advanced */}
-                <div style={{ padding: '5px 14px 8px', borderBottom: '1px solid var(--surface-border)' }}>
-                  <button type="button" onClick={() => setShowAdvanced((v) => !v)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px 0', fontSize: '0.7rem' }}>
+                <div className="uiux-config-section" style={{ paddingTop: 5, paddingBottom: 8 }}>
+                  <button type="button" onClick={() => setShowAdvanced((v) => !v)} className="uiux-advanced-toggle">
                     <span>Advanced</span>
-                    <span style={{ fontSize: '0.62rem' }}>{showAdvanced ? '▲' : '▼'}</span>
+                    <span className="uiux-advanced-toggle-icon">{showAdvanced ? '▲' : '▼'}</span>
                   </button>
                   {showAdvanced && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+                    <div className="uiux-advanced-content">
                       <div>
-                        <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginBottom: 3, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Color scheme</div>
+                        <div className="uiux-advanced-sublabel">Color scheme</div>
                         <input type="text" className="studio-input" value={colorScheme} onChange={(e) => setColorScheme(e.target.value)} placeholder="e.g. indigo and slate" />
                       </div>
-                      <div style={{ display: 'flex', gap: 14 }}>
+                      <div className="uiux-advanced-checkrow">
                         {([['Dark mode', darkMode, setDarkMode], ['Responsive', responsive, setResponsive]] as [string, boolean, React.Dispatch<React.SetStateAction<boolean>>][]).map(([label, val, setter]) => (
-                          <label key={label} style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer' }}>
-                            <input type="checkbox" checked={val} onChange={(e) => setter(e.target.checked)} style={{ accentColor: 'var(--purple)', width: 12, height: 12 }} />
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{label}</span>
+                          <label key={label} className="uiux-advanced-check-label">
+                            <input type="checkbox" checked={val} onChange={(e) => setter(e.target.checked)} style={{ accentColor: 'var(--purple)' }} />
+                            <span >{label}</span>
                           </label>
                         ))}
                       </div>
@@ -785,26 +785,26 @@ export default function UIUXStudio() {
               </div>
 
               {/* Footer */}
-              <div style={{ padding: '8px 14px', borderTop: '1px solid var(--surface-border)', flexShrink: 0 }}>
+              <div className="uiux-gen-footer">
                 {error && <div className="uiux-error-msg">{error}</div>}
                 {(isLoading || isRefining || isGeneratingLibrary) ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div className="uiux-gen-progress">
+                    <div className="uiux-gen-progress-row">
                       <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
                         {isGeneratingLibrary ? `Generating ${COMPONENT_TYPES.find((c) => c.id === libraryCurrentType)?.label ?? '…'} (${libraryProcessed}/${selectedLibraryTypes.length})` : isRefining ? 'Refining…' : (loadingStage || 'Generating…')}
                       </span>
-                      <span style={{ fontSize: '0.62rem', color: 'var(--text-disabled)', fontFamily: 'monospace' }}>{(elapsedMs / 1000).toFixed(1)}s</span>
+                      <span className="uiux-gen-progress-elapsed">{(elapsedMs / 1000).toFixed(1)}s</span>
                     </div>
                     {isGeneratingLibrary ? (
-                      <div style={{ height: 4, background: 'var(--surface-overlay)', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', borderRadius: 2, background: 'linear-gradient(90deg,var(--purple),var(--pink))', width: `${(libraryProcessed / selectedLibraryTypes.length) * 100}%`, transition: 'width 0.4s' }} />
+                      <div className="uiux-gen-progress-bar uiux-gen-progress-bar--determined">
+                        <div className="uiux-gen-progress-fill" style={{ width: `${(libraryProcessed / selectedLibraryTypes.length) * 100}%` }} />
                       </div>
                     ) : (
-                      <div style={{ height: 3, background: 'var(--surface-overlay)', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: '40%', borderRadius: 2, background: 'linear-gradient(90deg,var(--purple),var(--pink))', animation: 'uiux-progress-slide 1.4s ease infinite' }} />
+                      <div className="uiux-gen-progress-bar uiux-gen-progress-bar--indeterminate">
+                        <div className="uiux-gen-progress-fill" />
                       </div>
                     )}
-                    <button type="button" onClick={handleCancel} style={{ padding: '6px', borderRadius: 6, border: '1px solid var(--surface-border)', background: 'var(--surface-raised)', color: 'var(--text-secondary)', fontSize: '0.75rem', cursor: 'pointer', width: '100%' }}>Cancel</button>
+                    <button type="button" onClick={handleCancel} className="uiux-cancel-btn">Cancel</button>
                   </div>
                 ) : libraryMode ? (
                   <button type="button" onClick={handleGenerateLibrary} disabled={selectedLibraryTypes.length < 2} className="btn btn-generate">
@@ -813,17 +813,17 @@ export default function UIUXStudio() {
                 ) : (
                   <button type="button" onClick={handleGenerate} disabled={isLoading} className="btn btn-generate">
                     <span>Generate {FRAMEWORKS.find((f) => f.id === framework)?.label ?? 'Code'}</span>
-                    <span style={{ fontSize: '0.6rem', opacity: 0.7, marginLeft: 'auto' }}>⌘↵</span>
+                    <span className="uiux-gen-shortcut">⌘↵</span>
                   </button>
                 )}
-                <div style={{ fontSize: '0.62rem', textAlign: 'center', color: 'var(--text-disabled)', marginTop: 5 }}>
-                  <span style={{ color: 'var(--success)' }}>∞</span> Free code generation
+                <div className="uiux-free-badge">
+                  <span className="text-success">∞</span> Free code generation
                 </div>
               </div>
             </div>
 
             {/* ── Output panel (col 3) ─────────────────────────────────── */}
-            <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+            <main className="uiux-output-col">
               {/* Library results */}
               {libraryMode && (Object.keys(libraryResults).length > 0 || isGeneratingLibrary) ? (
                 <UIUXLibraryResults
@@ -922,7 +922,7 @@ export default function UIUXStudio() {
                   </div>
 
                   {/* Output content */}
-                  <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+                  <div className="uiux-output-frame">
                     {!currentResult && !isLoading && !isRefining && <UIUXEmptyState onSelect={(ct) => { setComponentType(ct); setCategoryFilter(COMPONENT_TYPES.find((c) => c.id === ct)?.category ?? 'Sections'); }} />}
                     {(isLoading || isRefining) && (
                       <div className="uiux-loading-state">
@@ -931,7 +931,7 @@ export default function UIUXStudio() {
                         <div className="uiux-loading-sub">
                           {isRefining ? `Applying refinement to v${currentVersion + 1}…` : `Crafting ${COMPONENT_TYPES.find((c) => c.id === componentType)?.label ?? 'component'} in ${FRAMEWORKS.find((f) => f.id === framework)?.label}`}
                         </div>
-                        <div style={{ color: 'var(--text-disabled)', fontSize: '0.68rem', fontFamily: 'monospace', marginTop: 6 }}>{(elapsedMs / 1000).toFixed(1)}s</div>
+                        <div className="uiux-elapsed-badge">{(elapsedMs / 1000).toFixed(1)}s</div>
                       </div>
                     )}
                     {currentResult && !isLoading && !isRefining && outputTab === 'preview' && (
@@ -947,13 +947,13 @@ export default function UIUXStudio() {
 
                   {/* Refinement bar */}
                   {currentResult && !isLoading && !isRefining && (
-                    <div style={{ padding: '7px 10px', borderTop: '1px solid var(--surface-border)', background: 'var(--surface-raised)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7 }}>
-                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', flexShrink: 0 }}>✦ Refine</span>
-                      <input type="text" value={refinementPrompt} onChange={(e) => setRefinementPrompt(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleRefine(); }} placeholder="Describe what to change — e.g. 'make the CTA button larger', 'add a dark mode toggle'" style={{ flex: 1, padding: '5px 9px', borderRadius: 5, border: '1px solid var(--surface-border)', background: 'var(--surface-overlay)', color: 'var(--text-primary)', fontSize: '0.75rem', outline: 'none', fontFamily: 'inherit' }} />
-                      <button type="button" onClick={handleRefine} disabled={!refinementPrompt.trim()} style={{ padding: '5px 11px', borderRadius: 5, border: 'none', cursor: refinementPrompt.trim() ? 'pointer' : 'not-allowed', background: refinementPrompt.trim() ? 'linear-gradient(135deg,#a855f7,#ec4899)' : 'var(--surface-overlay)', color: refinementPrompt.trim() ? '#fff' : 'var(--text-disabled)', fontSize: '0.72rem', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    <div className="uiux-refine-bar uiux-refine-bar--single">
+                      <span className="uiux-refine-label">✦ Refine</span>
+                      <input type="text" value={refinementPrompt} onChange={(e) => setRefinementPrompt(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleRefine(); }} placeholder="Describe what to change — e.g. 'make the CTA button larger', 'add a dark mode toggle'" className="uiux-refine-input uiux-refine-input--lg" />
+                      <button type="button" onClick={handleRefine} disabled={!refinementPrompt.trim()} className="uiux-refine-btn uiux-refine-btn--lg">
                         Refine →
                       </button>
-                      {versionHistory.length > 0 && <span style={{ fontSize: '0.6rem', color: 'var(--text-disabled)', flexShrink: 0 }}>v{currentVersion + 1}/{versionHistory.length}</span>}
+                      {versionHistory.length > 0 && <span className="uiux-version-badge">v{currentVersion + 1}/{versionHistory.length}</span>}
                     </div>
                   )}
                 </>
@@ -992,9 +992,9 @@ function UIUXPreview({
     const fwLabel = FRAMEWORKS.find((f) => f.id === framework)?.label ?? framework;
     return (
       <div className="uiux-preview-unavailable">
-        <div style={{ fontSize: '1.5rem', marginBottom: 10, opacity: 0.4 }}>◈</div>
-        <div style={{ color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>Live preview unavailable for {fwLabel}</div>
-        <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', maxWidth: 340, textAlign: 'center', lineHeight: 1.6 }}>
+        <div className="uiux-preview-unavail-icon">◈</div>
+        <div className="uiux-preview-unavail-title">Live preview unavailable for {fwLabel}</div>
+        <div className="uiux-preview-unavail-desc">
           Switch to the <strong style={{ color: 'var(--accent)' }}>Code</strong> tab to copy.
           {framework === 'vue3' && ' Paste into a .vue file in your Vue 3 project.'}
           {framework === 'svelte' && ' Paste into a .svelte file in your SvelteKit project.'}

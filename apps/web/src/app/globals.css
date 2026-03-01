@@ -23930,3 +23930,316 @@ input[type="range"].studio-range {
   border-top: 1px solid var(--border);
   margin: 2px 0;
 }
+
+/* ── UIUX studio sidebar & configure extensions ─────────────────────────── */
+.uiux-sidebar {
+  width: 355px;
+  min-width: 295px;
+  max-width: 395px;
+  flex-shrink: 0;
+}
+.uiux-sidebar-scroll { flex: 1; overflow-y: auto; }
+.uiux-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.uiux-toggle-label span { font-size: 0.65rem; }
+.uiux-toggle-label span.active { color: var(--studio-accent, var(--accent)); }
+.uiux-toggle-label span:not(.active) { color: var(--text-muted); }
+.uiux-toggle-track {
+  width: 30px;
+  height: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+}
+.uiux-toggle-track.active {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 35%, transparent);
+}
+.uiux-toggle-track:not(.active) {
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+}
+.uiux-toggle-knob {
+  position: absolute;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transition: left 0.15s;
+}
+.uiux-toggle-knob.active { left: 13px; background: var(--studio-accent, var(--accent)); }
+.uiux-toggle-knob:not(.active) { left: 2px; background: var(--text-disabled); }
+
+/* ── UIUX model tier selector ────────────────────────────────────────────── */
+.uiux-model-grid { display: flex; gap: 4px; }
+.uiux-model-btn {
+  flex: 1;
+  padding: 5px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  transition: all 0.1s;
+}
+.uiux-model-btn.active {
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 35%, transparent);
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 12%, transparent);
+}
+.uiux-model-badge { font-size: 0.88rem; line-height: 1; margin-bottom: 2px; }
+.uiux-model-name {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.uiux-model-btn.active .uiux-model-name { color: var(--studio-accent, var(--accent)); }
+.uiux-model-speed { font-size: 0.55rem; color: var(--text-disabled); margin-top: 1px; }
+
+/* ── UIUX prompt section ─────────────────────────────────────────────────── */
+.uiux-prompt-section {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.uiux-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.uiux-prompt-header-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+.uiux-prompt-example-btn {
+  font-size: 0.62rem;
+  color: var(--studio-accent, var(--accent));
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 1px 3px;
+}
+.uiux-prompt-char-count {
+  font-size: 0.62rem;
+  text-align: right;
+  margin-top: 3px;
+  color: var(--text-disabled);
+}
+.uiux-prompt-char-count.warn { color: #f59e0b; }
+.uiux-prompt-char-count.error { color: #ef4444; }
+
+/* ── UIUX advanced options section ──────────────────────────────────────── */
+.uiux-advanced-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px 0;
+  font-size: 0.7rem;
+}
+.uiux-advanced-toggle-icon { font-size: 0.62rem; }
+.uiux-advanced-content { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.uiux-advanced-sublabel {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.uiux-advanced-checkrow { display: flex; gap: 14px; }
+.uiux-advanced-check-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.uiux-advanced-check-label span { font-size: 0.7rem; color: var(--text-secondary); }
+
+/* ── UIUX generate section footer ───────────────────────────────────────── */
+.uiux-gen-footer {
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.uiux-gen-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.uiux-gen-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.uiux-gen-progress-label { font-size: 0.68rem; color: var(--text-muted); }
+.uiux-gen-progress-elapsed { font-size: 0.62rem; color: var(--text-disabled); font-family: monospace; }
+.uiux-gen-progress-bar {
+  height: 4px;
+  background: var(--bg-overlay);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.uiux-gen-progress-bar--determined .uiux-gen-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--purple), var(--pink, #ec4899));
+  transition: width 0.4s;
+}
+.uiux-gen-progress-bar--indeterminate {
+  height: 3px;
+  background: var(--bg-overlay);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.uiux-gen-progress-bar--indeterminate .uiux-gen-progress-fill {
+  height: 100%;
+  width: 40%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--purple), var(--pink, #ec4899));
+  animation: uiux-progress-slide 1.4s ease infinite;
+}
+.uiux-cancel-btn {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+}
+.uiux-gen-shortcut { font-size: 0.6rem; opacity: 0.7; margin-left: auto; }
+
+/* ── UIUX framework/style active states → use CSS instead of inline ──────── */
+.uiux-fw-btn.active {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 12%, transparent);
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 30%, transparent) !important;
+}
+.uiux-fw-label.active { color: var(--studio-accent, var(--accent)); }
+.uiux-style-btn.active {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 12%, transparent);
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 30%, transparent) !important;
+}
+.uiux-style-name.active { color: var(--studio-accent, var(--accent)); }
+
+/* ── UIUX output column + misc ───────────────────────────────────────────── */
+.uiux-output-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.uiux-output-frame {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.uiux-fw-list { display: flex; flex-direction: column; gap: 3px; }
+.uiux-config-type-icon { font-size: 0.85rem; }
+.uiux-config-type-label { font-size: 0.7rem; }
+.uiux-free-badge {
+  font-size: 0.62rem;
+  text-align: center;
+  color: var(--text-disabled);
+  margin-top: 5px;
+}
+.text-success { color: var(--success, #22c55e); }
+
+/* ── UIUX refine bar variants ────────────────────────────────────────────── */
+.uiux-refine-bar--single {
+  padding: 7px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.uiux-refine-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.uiux-refine-input--lg {
+  flex: 1;
+  padding: 5px 9px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  outline: none;
+  font-family: inherit;
+}
+.uiux-refine-btn--lg {
+  padding: 5px 11px;
+  border-radius: 5px;
+  border: none;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.uiux-refine-btn--lg:disabled {
+  background: var(--bg-overlay);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+.uiux-version-badge {
+  font-size: 0.6rem;
+  color: var(--text-disabled);
+  flex-shrink: 0;
+}
+.uiux-elapsed-badge {
+  color: var(--text-disabled);
+  font-size: 0.68rem;
+  font-family: monospace;
+  margin-top: 6px;
+}
+
+/* ── UIUX preview unavailable state ─────────────────────────────────────── */
+.uiux-preview-unavail-icon {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  opacity: 0.4;
+}
+.uiux-preview-unavail-title {
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.uiux-preview-unavail-desc {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  max-width: 340px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ── UIUX fw-btn default bg (when not active) ────────────────────────────── */
+.uiux-fw-btn:not(.active) {
+  background: var(--bg-elevated);
+  border-color: var(--border);
+}
+.uiux-fw-label:not(.active) { color: var(--text-secondary); }
+.uiux-style-btn:not(.active) {
+  background: var(--bg-elevated);
+  border-color: var(--border);
+}
+.uiux-style-name:not(.active) { color: var(--text-secondary); }

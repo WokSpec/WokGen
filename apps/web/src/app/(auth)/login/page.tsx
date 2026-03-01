@@ -16,8 +16,7 @@ function LoginForm() {
       <div className="login-card">
         <div className="login-brand">
           <h1 className="login-title">
-            <span style={{ color: 'var(--text-muted)' }}>Wok</span>
-            <span style={{ color: 'var(--accent)' }}>Gen</span>
+            <span className="login-title-wok">Wok</span><span className="login-title-gen">Gen</span>
           </h1>
           <p className="login-sub">by Wok Specialists</p>
         </div>
@@ -75,17 +74,29 @@ function LoginForm() {
           justify-content: center;
           background: var(--bg, #0d0d0d);
           padding: 2rem;
+          position: relative;
+          overflow: hidden;
+        }
+        .login-container::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse 60% 50% at 50% 0%, color-mix(in srgb, var(--accent, #6366f1) 12%, transparent), transparent 70%);
+          pointer-events: none;
         }
         .login-card {
           width: 100%;
           max-width: 380px;
-          background: var(--bg-surface, #141414);
-          border: 1px solid var(--border);
-          border-radius: 4px;
+          background: color-mix(in srgb, var(--bg-surface, #141414) 85%, var(--accent, #6366f1) 3%);
+          border: 1px solid color-mix(in srgb, var(--accent, #6366f1) 18%, var(--border));
+          border-radius: 16px;
           padding: 2.5rem;
           display: flex;
           flex-direction: column;
           gap: 1.25rem;
+          position: relative;
+          z-index: 1;
+          box-shadow: 0 0 60px color-mix(in srgb, var(--accent, #6366f1) 10%, transparent), 0 24px 48px rgba(0,0,0,0.4);
         }
         .login-brand {
           text-align: center;
@@ -106,10 +117,23 @@ function LoginForm() {
           padding: 2px 8px;
         }
         .login-title {
-          font-size: 1.75rem;
-          font-weight: 700;
+          font-size: 2.25rem;
+          font-weight: 800;
           margin: 0;
           font-family: var(--font-heading);
+          letter-spacing: -0.03em;
+        }
+        .login-title-wok {
+          background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .login-title-gen {
+          background: linear-gradient(135deg, #818cf8, #6366f1);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
         .login-sub {
           font-size: 0.78rem;
@@ -134,19 +158,20 @@ function LoginForm() {
           justify-content: center;
           gap: 0.6rem;
           width: 100%;
-          padding: 0.7rem 1rem;
-          border-radius: 4px;
+          padding: 0.75rem 1rem;
+          border-radius: 10px;
           border: 1px solid var(--border);
           background: var(--surface-card);
           color: var(--text);
           font-size: 0.875rem;
           font-weight: 500;
           cursor: pointer;
-          transition: background 0.15s, border-color 0.15s;
+          transition: background 0.15s, border-color 0.15s, transform 0.1s;
         }
         .login-btn:hover {
           background: var(--surface-raised);
-          border-color: var(--border);
+          border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+          transform: translateY(-1px);
         }
         .login-btn--google {
           background: #fff;

@@ -301,13 +301,22 @@ function VoiceStudioInner() {
         <div
           style={{
             borderRight: '1px solid var(--surface-border)',
-            padding: 24,
+            padding: 0,
             display: 'flex',
             flexDirection: 'column',
-            gap: 20,
+            gap: 0,
             overflowY: 'auto',
           }}
         >
+          {/* Panel header */}
+          <div className="pixel-studio-panel-header" style={{ borderBottom: '1px solid var(--surface-border)' }}>
+            <div className="pixel-studio-panel-header__title">
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent)' }}>Voice</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-disabled)', marginLeft: '0.4rem' }}>Studio</span>
+            </div>
+            <div className="pixel-studio-panel-header__actions" />
+          </div>
+          <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20, overflowY: 'auto', flex: 1 }}>
           {/* Voice style selector */}
           <div>
             <div
@@ -716,6 +725,7 @@ function VoiceStudioInner() {
               </button>
             )}
           </div>
+          </div>{/* inner scroll wrapper */}
         </div>
 
         {/* ── Right panel ─────────────────────────────────────────────── */}

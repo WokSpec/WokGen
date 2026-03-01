@@ -24887,3 +24887,115 @@ input[type="range"].studio-range {
 .studio-tool-tabs--row {
   background: color-mix(in srgb, var(--studio-accent, var(--accent)) 2%, var(--surface-raised));
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Visual Enhancement Pass 2 — Inputs, Empty States, Scrollbars
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Mode-aware focus rings on inputs ──────────────────────────────────── */
+.input:focus,
+.input:focus-visible {
+  border-color: var(--studio-accent, var(--accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--studio-accent, var(--accent)) 14%, transparent);
+}
+.textarea:focus,
+.textarea:focus-visible {
+  border-color: var(--studio-accent, var(--accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, transparent);
+}
+.select:focus,
+.select:focus-visible {
+  border-color: var(--studio-accent, var(--accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, transparent);
+}
+
+/* ── Pixel prompt textarea ──────────────────────────────────────────────── */
+.pixel-prompt-textarea:focus {
+  border-color: var(--studio-accent, var(--accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, transparent);
+}
+
+/* ── Scrollbar — accent-tinted to match mode ───────────────────────────── */
+.studio-shell__panel-body {
+  scrollbar-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 25%, var(--border)) transparent;
+}
+.studio-shell__panel-body::-webkit-scrollbar { width: 4px; }
+.studio-shell__panel-body::-webkit-scrollbar-track { background: transparent; }
+.studio-shell__panel-body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 25%, var(--border));
+  border-radius: 2px;
+}
+
+/* ── Enhanced btn-primary (gradient) ───────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 75%, #fff) 100%);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 8px;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--accent-hover, var(--accent-dim)) 0%, var(--accent) 100%);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 50%, transparent), 0 1px 0 rgba(255,255,255,0.12) inset;
+}
+
+/* ── Empty state improvements ───────────────────────────────────────────── */
+.empty-state {
+  gap: 1.25rem;
+}
+.empty-state-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ── Homepage mode card subtle gradient bg ──────────────────────────────── */
+.mode-card::before {
+  width: 2.5px;
+  opacity: 0.6;
+}
+.mode-card:hover::before { opacity: 1; width: 3px; }
+
+/* ── How-it-works: number badge ─────────────────────────────────────────── */
+.how-step__num {
+  width: 36px;
+  height: 36px;
+  font-size: 0.875rem;
+}
+
+/* ── Service cards: animated FREE badge ─────────────────────────────────── */
+.home-service-badge {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+}
+.home-service-card:hover .home-service-badge {
+  background: var(--success-bg);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--success) 30%, transparent);
+}
+
+/* ── nav-bar bottom border: subtle accent line ──────────────────────────── */
+.nav-bar {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.04), 0 4px 16px rgba(0,0,0,0.3);
+}
+
+/* ── Demo cards: better code syntax highlight colors ───────────────────── */
+.landing-code-block {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Landing CTA box: stronger glow ─────────────────────────────────────── */
+.landing-cta-box {
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.landing-cta-box__glow {
+  background: radial-gradient(ellipse 60% 40% at 50% -5%,
+    color-mix(in srgb, var(--accent) 20%, transparent) 0%,
+    transparent 60%
+  );
+}
+
+/* ── Studio section dividers: better visual weight ──────────────────────── */
+.pixel-section-border-b,
+.pixel-section-border-t {
+  border-color: var(--surface-border);
+}

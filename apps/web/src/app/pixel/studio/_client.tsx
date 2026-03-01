@@ -556,15 +556,9 @@ function SettingsModal({
 
           {/* Note */}
           <div
-            className="rounded-lg px-3 py-2.5 text-xs"
-            style={{
-              background: 'var(--accent-dim)',
-              border: '1px solid var(--accent-muted)',
-              color: 'var(--text-muted)',
-              lineHeight: 1.6,
-            }}
+            className="rounded-lg px-3 py-2.5 text-xs pixel-byok-note"
           >
-            <strong style={{ color: 'var(--accent)' }}>BYOK mode:</strong> Keys entered here are
+            <strong className="pixel-byok-title">BYOK mode:</strong> Keys entered here are
             stored in <code>localStorage</code> and sent only with your generation requests.
             They are never logged or persisted server-side. Alternatively, set env vars in{' '}
             <code>.env.local</code> for server-side use.
@@ -607,12 +601,7 @@ function HistoryPanel({
 }) {
   return (
     <div
-      className="absolute right-0 top-0 bottom-0 w-64 z-30 flex flex-col animate-slide-right"
-      style={{
-        background: 'var(--surface-raised)',
-        borderLeft: '1px solid var(--surface-border)',
-        boxShadow: 'var(--shadow-lg)',
-      }}
+      className="absolute right-0 top-0 bottom-0 w-64 z-30 flex flex-col animate-slide-right pixel-history-panel"
     >
       <div
         className="flex items-center justify-between px-4 py-3 flex-shrink-0 pixel-section-border-b"
@@ -647,11 +636,7 @@ function HistoryPanel({
           >
             {/* Thumb */}
             <div
-              className="w-10 h-10 rounded overflow-hidden flex-shrink-0 flex items-center justify-center"
-              style={{
-                background: 'var(--surface-overlay)',
-                border: '1px solid var(--surface-border)',
-              }}
+              className="w-10 h-10 rounded overflow-hidden flex-shrink-0 flex items-center justify-center pixel-history-thumb"
             >
               {item.resultUrl ? (
                 <img
@@ -766,7 +751,7 @@ function OutputPanel({
   if (status === 'idle') {
     const idleExamples = (tool ? EXAMPLE_PROMPTS[tool as Tool] ?? EXAMPLE_PROMPTS.generate : EXAMPLE_PROMPTS.generate).slice(0, 4);
     return (
-      <div className="output-canvas flex-1" style={{ background: 'var(--surface-muted)' }}>
+      <div className="output-canvas flex-1 pixel-canvas-bg">
         <div className="empty-state pixel-empty-state">
           {/* Pixel art inspired placeholder grid */}
           <div className="pixel-idle-grid" aria-hidden="true">
@@ -887,7 +872,7 @@ function OutputPanel({
 
         {/* Duration */}
         {result?.durationMs && (
-          <span className="text-xs" style={{ color: 'var(--text-disabled)' }}>
+          <span className="text-xs text-disabled">
             {formatDuration(result.durationMs)}
           </span>
         )}
@@ -2188,26 +2173,17 @@ function GenerateForm({
               )}
             </div>
             {seed && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+              <div className="pixel-seed-lock-row">
                 <button
                   type="button"
                   title={lockSeed ? 'Unlock seed (will vary each generation)' : 'Lock seed (keep same across generations)'}
                   onClick={() => setLockSeed(v => !v)}
-                  style={{
-                    padding: '3px 8px',
-                    fontSize: 11,
-                    borderRadius: 4,
-                    border: '1px solid var(--surface-border, #303050)',
-                    background: lockSeed ? 'var(--accent-subtle)' : 'transparent',
-                    color: lockSeed ? 'var(--accent)' : 'var(--text-muted)',
-                    cursor: 'pointer',
-                    fontWeight: lockSeed ? 600 : 400,
-                  }}
+                  className={`pixel-seed-lock-btn${lockSeed ? ' active' : ''}`}
                 >
                   {lockSeed ? 'Locked' : 'Lock'}
                 </button>
                 {!lockSeed && (
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Will vary each gen</span>
+                  <span className="pixel-seed-hint">Will vary each gen</span>
                 )}
               </div>
             )}
@@ -2224,7 +2200,7 @@ function GenerateForm({
               value={steps}
               onChange={(e) => setSteps(Number(e.target.value))}
             />
-            <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--text-disabled)' }}>
+            <div className="flex justify-between text-xs mt-1 text-disabled">
               <span>1</span>
               <span>50</span>
             </div>
@@ -2241,7 +2217,7 @@ function GenerateForm({
               value={guidance}
               onChange={(e) => setGuidance(Number(e.target.value))}
             />
-            <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--text-disabled)' }}>
+            <div className="flex justify-between text-xs mt-1 text-disabled">
               <span>1</span>
               <span>20</span>
             </div>
@@ -2250,10 +2226,10 @@ function GenerateForm({
           {/* Public toggle */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-xs font-medium text-secondary">
                 Save to gallery
               </p>
-              <p className="text-xs" style={{ color: 'var(--text-disabled)' }}>
+              <p className="text-xs text-disabled">
                 Publishes result to the shared gallery
               </p>
             </div>
@@ -2976,12 +2952,7 @@ function StudioInner() {
 
       {/* ── Left panel (controls) ─────────────────────────────────────────── */}
       <div
-        className="flex flex-col flex-shrink-0 overflow-hidden"
-        style={{
-          width: 'var(--panel-width, 380px)',
-          background: 'var(--surface-raised)',
-          borderRight: '1px solid var(--surface-border)',
-        }}
+        className="flex flex-col flex-shrink-0 overflow-hidden studio-shell__left-panel"
       >
         {/* Panel header */}
         <div className="studio-shell__panel-header">
@@ -3004,16 +2975,7 @@ function StudioInner() {
             {/* History toggle */}
             <button
               type="button"
-              style={{
-                background: showHistory ? 'var(--surface-hover)' : 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: showHistory ? 'var(--text-secondary)' : 'var(--text-disabled)',
-                padding: '0.2rem 0.5rem',
-                fontSize: '0.68rem',
-                fontWeight: 600,
-                letterSpacing: '0.02em',
-              }}
+              className={`pixel-history-toggle-btn${showHistory ? ' active' : ''}`}
               onClick={() => setShowHistory((v) => !v)}
               title="History"
               aria-label="History"
@@ -3285,19 +3247,7 @@ function StudioInner() {
                     <button type="button"
                       key={label}
                       onClick={() => setSfxInfluence(val)}
-                      className="flex-1"
-                      style={{
-                        padding: '3px 0',
-                        borderRadius: 4,
-                        border: '1px solid',
-                        borderColor: sfxInfluence === val ? 'var(--accent-muted)' : 'var(--surface-border)',
-                        background:  sfxInfluence === val ? 'var(--accent-dim)'  : 'transparent',
-                        color:       sfxInfluence === val ? 'var(--accent)'      : 'var(--text-muted)',
-                        fontSize: '0.72rem',
-                        fontWeight: sfxInfluence === val ? 600 : 400,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s',
-                      }}
+                      className={`flex-1 pixel-option-btn${sfxInfluence === val ? ' active' : ''}`}
                     >
                       {label}
                     </button>
@@ -3405,38 +3355,20 @@ function StudioInner() {
           className="flex flex-col gap-2 p-4 flex-shrink-0 pixel-section-border-t"
         >
           {/* HD / Standard quality toggle */}
-          <div className="flex items-center justify-between" style={{ marginBottom: 4 }}>
+          <div className="flex items-center justify-between pixel-quality-header">
               <span className="pixel-quality-label">
                 Quality
               </span>
               <div className="flex gap-1 pixel-quality-actions">
                 <button type="button"
-                  style={{
-                    padding: '2px 10px',
-                    borderRadius: 4,
-                    border: '1px solid',
-                    borderColor: !useHD ? 'var(--success)' : 'var(--surface-border, #2a2a2a)',
-                    background:  !useHD ? 'rgba(16,185,129,.12)' : 'transparent',
-                    color:       !useHD ? 'var(--success)' : 'var(--text-muted, #666)',
-                    cursor: 'pointer',
-                    fontWeight: !useHD ? 600 : 400,
-                  }}
+                  className={`pixel-quality-btn pixel-quality-std-btn${!useHD ? ' active' : ''}`}
                   onClick={() => setUseHD(false)}
                 >
                   Standard
                 </button>
                 <button type="button"
-                  style={{
-                    padding: '2px 10px',
-                    borderRadius: 4,
-                    border: '1px solid',
-                    borderColor: useHD ? 'var(--warning)' : 'var(--surface-border, #2a2a2a)',
-                    background:  useHD ? 'var(--warning-bg)' : 'transparent',
-                    color:       useHD ? 'var(--warning)' : 'var(--text-muted, #666)',
-                    cursor: (!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0) ? 'not-allowed' : 'pointer',
-                    fontWeight: useHD ? 600 : 400,
-                    opacity: (!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0) ? 0.4 : 1,
-                  }}
+                  className={`pixel-quality-btn pixel-quality-hd-btn${useHD ? ' active' : ''}`}
+                  style={{ opacity: (!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0) ? 0.4 : 1, cursor: (!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0) ? 'not-allowed' : 'pointer' }}
                   onClick={() => setUseHD(true)}
                   disabled={!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0}
                   title={(!useHD && hdBalance !== null && hdBalance.monthly + hdBalance.topUp <= 0) ? `HD requires credits. ${hdBalance.monthly + hdBalance.topUp} remaining.` : 'Uses HD credits (Replicate). Requires Plus plan or top-up pack.'}
@@ -3464,8 +3396,7 @@ function StudioInner() {
                 
                 Generate
                 <kbd
-                  className="ml-auto opacity-60"
-                  style={{ fontSize: '0.65rem', background: 'var(--overlay-30)', border: '1px solid var(--border)' }}
+                  className="ml-auto opacity-60 pixel-kbd-hint"
                 >
                   ⌘↵
                 </kbd>
@@ -3519,17 +3450,7 @@ function StudioInner() {
                     <button type="button"
                       key={n}
                       onClick={() => { setBatchCount(n); setCompareMode(false); }}
-                      style={{
-                        padding: '2px 8px',
-                        borderRadius: 4,
-                        border: '1px solid',
-                        borderColor: batchCount === n ? 'var(--accent-muted)' : 'var(--surface-border)',
-                        background:  batchCount === n ? 'var(--accent-dim)' : 'transparent',
-                        color:       batchCount === n ? 'var(--accent)' : 'var(--text-muted)',
-                        cursor: 'pointer',
-                        fontSize: '0.72rem',
-                        fontWeight: batchCount === n ? 600 : 400,
-                      }}
+                      className={`pixel-option-btn${batchCount === n ? ' active' : ''}`}
                     >
                       ×{n}
                     </button>
@@ -3537,7 +3458,7 @@ function StudioInner() {
                 </div>
               </div>
               {/* Compare mode toggle */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '0.125rem' }}>
+              <div className="pixel-compare-row">
                 <button
                   type="button"
                   onClick={() => { 
@@ -3545,17 +3466,7 @@ function StudioInner() {
                   setCompareMode(nextCompareMode);
                   if (nextCompareMode) setBatchCount(1); // when comparing, ensure batch is 1
                 }}
-                  style={{
-                    padding: '4px 10px',
-                    fontSize: '0.72rem',
-                    borderRadius: 4,
-                    border: '1px solid',
-                    borderColor: compareMode ? 'var(--accent-muted)' : 'var(--surface-border)',
-                    background: compareMode ? 'var(--accent-dim)' : 'transparent',
-                    color: compareMode ? 'var(--accent)' : 'var(--text-muted)',
-                    cursor: 'pointer',
-                    fontWeight: compareMode ? 600 : 400,
-                  }}
+                  className={`pixel-option-btn${compareMode ? ' active' : ''}`}
                   title="Generate 2 variants side-by-side for comparison"
                 >
                   Compare

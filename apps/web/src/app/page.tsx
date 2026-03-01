@@ -22,7 +22,7 @@ const MODE_DESCS: Record<string, string> = {
   code:     'Components, docs, SQL, and boilerplate.',
 };
 
-const PROVIDERS = ['FLUX', 'Stable Diffusion', 'Llama 3.3', 'Kokoro'];
+const PROVIDERS = ['FLUX', 'Stable Diffusion', 'Llama 3.3', 'Kokoro', 'Real-ESRGAN', 'MusicGen', 'BLIP', 'Groq'];
 
 export default function HomePage() {
   return (
@@ -50,7 +50,7 @@ export default function HomePage() {
           WokGen
         </h1>
         <p className="text-[var(--text-muted)] text-sm sm:text-base max-w-sm mb-8 leading-relaxed">
-          One workspace for pixel art, brand assets, vectors, UI, voice, and code.
+          Generate pixel art, vectors, UI mockups, voice, music, and business assets — free, AI-powered, no limits.
         </p>
         <div className="flex gap-3 flex-wrap justify-center">
           <Link
@@ -58,7 +58,7 @@ export default function HomePage() {
             className="inline-flex items-center gap-2 font-semibold px-5 py-2.5 rounded-lg transition text-sm"
             style={{ background: 'var(--accent)', color: 'var(--text-on-accent)' }}
           >
-            Open Studio
+            Start Creating
           </Link>
           <Link
             href="/tools"
@@ -103,6 +103,37 @@ export default function HomePage() {
                 {MODE_DESCS[mode.id] ?? ''}
               </div>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Free Services ────────────────────────────────────── */}
+      <section className="home-free-services max-w-4xl mx-auto px-6 pb-20">
+        <div className="home-section-header">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+            Powered by <span style={{ color: 'var(--accent)' }}>10+ free AI services</span>
+          </h2>
+          <p className="text-[var(--text-muted)] text-sm mb-8">Zero API cost by default. Add your free keys to unlock more.</p>
+        </div>
+        <div className="home-services-grid">
+          {[
+            { name: 'FLUX.1-schnell', role: 'Image generation', free: true, via: 'Pollinations' },
+            { name: 'Stable Diffusion', role: '30+ SD models', free: true, via: 'Prodia' },
+            { name: 'Stable Horde', role: 'Federated GPU pool', free: true, via: 'Community' },
+            { name: 'Llama 3.3 70B', role: 'Prompt enhancement', free: true, via: 'Groq' },
+            { name: 'Llama 3.3 70B', role: 'Ultra-fast inference', free: true, via: 'Cerebras' },
+            { name: 'Gemini Flash 2.0', role: 'Multimodal analysis', free: true, via: 'Google' },
+            { name: 'Real-ESRGAN', role: '4× image upscaling', free: true, via: 'HuggingFace' },
+            { name: 'BLIP', role: 'Image interrogation', free: true, via: 'Salesforce' },
+            { name: 'MusicGen', role: 'Music generation', free: true, via: 'Meta' },
+            { name: 'Freesound + Pixabay', role: 'CC0 media library', free: true, via: 'Community' },
+          ].map((s) => (
+            <div key={s.name + s.role} className="home-service-card">
+              <span className="home-service-badge">FREE</span>
+              <strong>{s.name}</strong>
+              <span>{s.role}</span>
+              <small>via {s.via}</small>
+            </div>
           ))}
         </div>
       </section>

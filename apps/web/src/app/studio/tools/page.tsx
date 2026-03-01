@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description: 'All tools, integrated into your workflow.',
 };
 
-type ToolStatus = 'available' | 'pro';
+type ToolStatus = 'available' | 'pro' | 'live';
 
 interface Tool {
   id: string;
@@ -27,7 +27,8 @@ interface Tool {
   href: string;
   description: string;
   status: ToolStatus;
-  icon: React.ElementType;
+  icon: React.ElementType | string;
+  isNew?: boolean;
 }
 
 interface Category {
@@ -37,6 +38,16 @@ interface Category {
 }
 
 const CATEGORIES: Category[] = [
+  {
+    id: 'ai-enhancement',
+    label: '✨ AI Enhancement',
+    tools: [
+      { id: 'prompt-lab', label: 'Prompt Lab', href: '/prompt-lab', description: 'AI-powered prompt engineering with multi-mode support', status: 'live', icon: '🔮', isNew: true },
+      { id: 'upscale', label: '4× Upscaler', href: '/tools/upscale', description: 'Real-ESRGAN 4× image upscaling — free, no limits', status: 'live', icon: '🔍', isNew: true },
+      { id: 'interrogate', label: 'Image Interrogator', href: '/tools/interrogate', description: 'Reverse-engineer any image into a generation prompt', status: 'live', icon: '🔬', isNew: true },
+      { id: 'music-gen', label: 'Music Generator', href: '/tools/music', description: 'Generate AI background music from text — free with HF token', status: 'live', icon: '🎵', isNew: true },
+    ],
+  },
   {
     id: 'image',
     label: 'Image Processing',
@@ -157,7 +168,10 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-function StatusBadge({ status }: { status: ToolStatus }) {
+function StatusBadge({ status, isNew }: { status: ToolStatus; isNew?: boolean }) {
+  if (isNew) {
+    return <span className="tools-badge tools-badge--new">NEW</span>;
+  }
   if (status === 'pro') {
     return <span className="tools-badge tools-badge--pro">Pro</span>;
   }
@@ -181,14 +195,17 @@ export default function StudioToolsPage() {
               <h2 className="tools-category__label">{category.label}</h2>
               <div className="tools-category__grid">
                 {category.tools.map((tool) => {
-                  const Icon = tool.icon;
-                  return (
+                    const isEmojiIcon = typeof tool.icon === 'string';
+                    return (
                     <div key={tool.id} className="tool-card">
                       <div className="tool-card__top">
                         <div className="tool-card__icon-wrap">
-                          <Icon size={16} strokeWidth={1.5} />
+                          {isEmojiIcon
+                            ? <span style={{ fontSize: 16 }}>{tool.icon as string}</span>
+                            : (() => { const Icon = tool.icon as React.ElementType; return <Icon size={16} strokeWidth={1.5} />; })()
+                          }
                         </div>
-                        <StatusBadge status={tool.status} />
+                        <StatusBadge status={tool.status} isNew={tool.isNew} />
                       </div>
                       <p className="tool-card__name">{tool.label}</p>
                       <p className="tool-card__desc">{tool.description}</p>
@@ -294,6 +311,11 @@ export default function StudioToolsPage() {
           border-radius: 4px;
           text-transform: uppercase;
           letter-spacing: 0.05em;
+        }
+        .tools-badge--new {
+          background: rgba(167, 139, 250, 0.15);
+          color: var(--accent-pixel);
+          border: 1px solid rgba(167, 139, 250, 0.3);
         }
         .tools-badge--available {
           background: var(--success-bg);

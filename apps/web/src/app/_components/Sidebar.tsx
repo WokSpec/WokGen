@@ -73,6 +73,26 @@ function CodeIcon() {
   );
 }
 
+function SparkleIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M7.5 1v3M7.5 11v3M1 7.5h3M11 7.5h3M3.22 3.22l2.12 2.12M9.66 9.66l2.12 2.12M3.22 11.78l2.12-2.12M9.66 5.34l2.12-2.12" />
+    </svg>
+  );
+}
+
+function MusicNoteIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M9 3v7.5" />
+      <path d="M5 5v5.5" />
+      <path d="M9 3l4-1v3l-4 1V3z" />
+      <circle cx="5" cy="11" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="10.5" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 // ── Nav icons ────────────────────────────────────────────────────────────────
 
 function DashboardIcon() {
@@ -261,6 +281,13 @@ export function Sidebar() {
 
       <div className="sidebar-divider" aria-hidden="true" />
 
+      {/* Prompt Lab */}
+      <SidebarItem href="/prompt-lab" label="Prompt Lab" active={isActive('/prompt-lab')}>
+        <SparkleIcon />
+      </SidebarItem>
+
+      <div className="sidebar-divider" aria-hidden="true" />
+
       {/* App navigation */}
       <SidebarItem href="/dashboard" label="Dashboard" active={isActive('/dashboard')}>
         <DashboardIcon />
@@ -268,12 +295,11 @@ export function Sidebar() {
       <SidebarItem href="/tools" label="Tools" active={isActive('/tools')}>
         <ToolsIcon />
       </SidebarItem>
-      <SidebarItem
-        href="/library"
-        label="Library"
-        active={isActive('/library') || isActive('/gallery')}
-      >
+      <SidebarItem href="/library" label="Library" active={isActive('/library') || isActive('/gallery')}>
         <GalleryIcon />
+      </SidebarItem>
+      <SidebarItem href="/tools/music" label="Music" active={isActive('/tools/music')}>
+        <MusicNoteIcon />
       </SidebarItem>
       <SidebarItem href="/eral" label="Eral" active={isActive('/eral')}>
         <EralIcon />

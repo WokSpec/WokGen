@@ -651,44 +651,14 @@ function VectorStudioInner() {
 
         {/* Batch grid */}
         {jobStatus !== 'idle' && results.length > 1 && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: results.length === 4 ? 'repeat(2, 1fr)' : `repeat(${results.length}, 1fr)`,
-              gap: 12,
-              padding: 16,
-              maxWidth: 640,
-              width: '100%',
-            }}
-          >
+          <div className={`batch-result-grid batch-result-grid--${results.length}`}>
             {results.map((r, i) =>
               r.resultUrl ? (
-                <div
-                  key={r.jobId}
-                  style={{
-                    position: 'relative',
-                    background: 'var(--surface-raised)',
-                    border: '1px solid var(--surface-border)',
-                    borderRadius: 8,
-                    overflow: 'hidden',
-                  }}
-                >
+                <div key={r.jobId} className="batch-result-item">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={r.resultUrl}
-                    alt={`Variant ${i + 1}`}
-                    style={{ width: '100%', aspectRatio: '1', objectFit: 'contain', display: 'block' }}
-                  />
+                  <img src={r.resultUrl} alt={`Variant ${i + 1}`} />
                   {r.guestDownloadGated ? (
-                    <a
-                      href="/api/auth/signin"
-                      style={{
-                        position: 'absolute', bottom: 6, right: 6,
-                        padding: '2px 6px', borderRadius: 4,
-                        background: 'var(--warning-bg)', border: '1px solid var(--warning)',
-                        color: 'var(--warning)', fontSize: 10, fontWeight: 600, textDecoration: 'none',
-                      }}
-                    >
+                    <a href="/api/auth/signin" className="btn-sign-gate btn-sign-gate--abs">
                       Sign in →
                     </a>
                   ) : (
@@ -711,7 +681,7 @@ function VectorStudioInner() {
           <div className="studio-output-frame">
             {jobStatus === 'running' && (
               <div className="studio-output-loading">
-                <div className="studio-spinner" style={{ borderTopColor: ACCENT }} />
+                <div className="studio-spinner studio-spinner--accent" />
                 <span>Generating… {(elapsedMs / 1000).toFixed(1)}s</span>
               </div>
             )}
@@ -719,23 +689,12 @@ function VectorStudioInner() {
               <>
                 <div
                   key={displayResult.resultUrl}
-                  className="generated-result-enter"
-                  style={{
-                    position: 'relative',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 40,
-                    background: bgMode === 'dark' ? '#0d0d14' : bgMode === 'white' ? '#ffffff' : 'repeating-conic-gradient(#333 0% 25%, #1a1a2a 0% 50%) 0 0 / 20px 20px',
-                    minHeight: 300,
-                    borderRadius: '8px 8px 0 0',
-                  }}
+                  className={`vector-result-preview generated-result-enter vector-result-preview--${bgMode === 'dark' ? 'dark' : bgMode === 'white' ? 'white' : 'checker'}`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={displayUrl ?? displayResult.resultUrl}
                     alt="Generated vector asset"
-                    style={{ maxWidth: '100%', maxHeight: 400, objectFit: 'contain', imageRendering: 'auto' }}
                   />
                   <button type="button"
                     onClick={() => handleBgRemove(displayUrl ?? displayResult.resultUrl!)}
@@ -764,20 +723,7 @@ function VectorStudioInner() {
                     </span>
                   )}
                   {displayResult?.guestDownloadGated ? (
-                    <a
-                      href="/api/auth/signin"
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: 6,
-                        background: 'var(--warning-bg)',
-                        border: '1px solid var(--warning)',
-                        color: 'var(--warning)',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        textDecoration: 'none',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
+                    <a href="/api/auth/signin" className="btn-sign-gate">
                       Sign in to download →
                     </a>
                   ) : (
@@ -822,7 +768,7 @@ function VectorStudioInner() {
         {/* Idle state */}
         {jobStatus === 'idle' && (
           <div className="studio-idle">
-            <div className="studio-idle-icon" style={{ color: ACCENT }}>
+            <div className="studio-idle-icon">
               {''}
             </div>
             <p className="studio-idle-title">Vector mode</p>
@@ -854,16 +800,7 @@ function VectorStudioInner() {
           <span className="studio-history-title">History</span>
           <a
             href="/vector/gallery"
-            style={{
-              marginLeft: 'auto',
-              fontSize: '0.68rem',
-              color: ACCENT,
-              textDecoration: 'none',
-              opacity: 0.8,
-              transition: 'opacity 0.15s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-            onMouseLeave={e => (e.currentTarget.style.opacity = '0.8')}
+            className="studio-history-gallery-link"
           >
             Gallery →
           </a>

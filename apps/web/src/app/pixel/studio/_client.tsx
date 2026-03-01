@@ -801,23 +801,11 @@ function OutputPanel({
       <div className="output-canvas flex-1" style={{ background: 'var(--surface-muted)' }}>
         <div className="empty-state" style={{ maxWidth: 380, textAlign: 'center' }}>
           {/* Pixel art inspired placeholder grid */}
-          <div
-            aria-hidden="true"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(8, 10px)',
-              gap: 2,
-              marginBottom: '1.5rem',
-              opacity: 0.18,
-            }}
-          >
+          <div className="pixel-idle-grid" aria-hidden="true">
             {Array.from({ length: 64 }).map((_, i) => (
               <div
                 key={i}
-                style={{
-                  width: 10, height: 10, borderRadius: 2,
-                  background: [0, 7, 14, 21, 42, 49, 56, 63, 9, 18, 27, 36, 45, 54].includes(i) ? 'var(--accent)' : 'var(--surface-border, #333)',
-                }}
+                className={`pixel-idle-cell ${[0, 7, 14, 21, 42, 49, 56, 63, 9, 18, 27, 36, 45, 54].includes(i) ? 'pixel-idle-grid__cell--active' : 'pixel-idle-grid__cell--muted'}`}
               />
             ))}
           </div>
@@ -838,7 +826,7 @@ function OutputPanel({
               ))}
             </div>
           )}
-          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-disabled)', marginTop: '1.25rem' }}>
+          <div className="pixel-idle-kbd-hint">
             <kbd>⌘</kbd><span>+</span><kbd>↵</kbd>
             <span>to generate</span>
           </div>

@@ -457,7 +457,7 @@ export function Sidebar() {
       </SidebarItem>
 
       {/* Push bottom items down */}
-      <div style={{ flex: 1 }} aria-hidden="true" />
+      <div className="sidebar-spacer" aria-hidden="true" />
 
       <SidebarItem href="/community" label="Community" active={isActive('/community')}>
         <CommunityIcon />

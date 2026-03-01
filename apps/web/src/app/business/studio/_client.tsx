@@ -609,10 +609,9 @@ function BusinessStudioInner() {
         ) : (<>
         {/* Brand Wizard re-open button */}
         {wizardData && (
-          <div className="studio-control-section" style={{ paddingBottom: '0.5rem' }}>
+          <div className="studio-control-section studio-control-section--pb-sm">
             <button type="button"
-              className="btn-secondary"
-              style={{ width: '100%', fontSize: '0.78rem' }}
+              className="btn-secondary btn-full-sm"
               onClick={() => setShowWizard(true)}
             >
               ✦ Re-run Brand Wizard
@@ -636,7 +635,7 @@ function BusinessStudioInner() {
         </div>
 
         {/* Workspace selector */}
-        <div className="studio-control-section" style={{ paddingBottom: 0 }}>
+        <div className="studio-control-section studio-control-section--pb0">
           <WorkspaceSelector
             mode="business"
             activeWorkspaceId={activeWorkspaceId}
@@ -827,7 +826,7 @@ function BusinessStudioInner() {
         {/* Quality toggle */}
         <div className="studio-control-section">
           <div className="studio-row studio-row--spaced">
-            <label className="studio-label" style={{ margin: 0 }}>
+            <label className="studio-label studio-label--no-margin">
               HD Quality
               <span className="studio-label-opt"> (uses 1 credit)</span>
             </label>
@@ -851,7 +850,7 @@ function BusinessStudioInner() {
         {session && (
           <div className="studio-control-section">
             <div className="studio-row studio-row--spaced">
-              <label className="studio-label" style={{ margin: 0 }}>Share to Gallery</label>
+              <label className="studio-label studio-label--no-margin">Share to Gallery</label>
               <button type="button" className={`toggle-track${isPublic ? ' on' : ''}`} onClick={() => setIsPublic(v => !v)}>
                 <span className="toggle-thumb" />
               </button>
@@ -882,12 +881,11 @@ function BusinessStudioInner() {
               <div className="studio-section-divider" />
               {/* Prompt label + Auto-suggest */}
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                <label className="text-xs font-medium biz-sfx-label">
                   Describe the sound…
                 </label>
                 <button type="button"
-                  className="btn-secondary"
-                  style={{ fontSize: '0.7rem', padding: '2px 8px', height: 'auto' }}
+                  className="btn-secondary biz-sfx-range-btn"
                   onClick={async () => {
                     if (!prompt.trim()) return;
                     try {
@@ -918,7 +916,7 @@ function BusinessStudioInner() {
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs" >Duration</label>
-                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{sfxDuration.toFixed(1)}s</span>
+                  <span className="text-xs biz-sfx-sub">{sfxDuration.toFixed(1)}s</span>
                 </div>
                 <input
                   type="range"
@@ -929,7 +927,7 @@ function BusinessStudioInner() {
                   value={sfxDuration}
                   onChange={(e) => setSfxDuration(Number(e.target.value))}
                 />
-                <div className="flex justify-between text-xs mt-0.5" style={{ color: 'var(--text-disabled)' }}>
+                <div className="flex justify-between text-xs mt-0.5 biz-sfx-range-labels">
                   <span>1s</span>
                   <span>10s</span>
                 </div>
@@ -937,25 +935,13 @@ function BusinessStudioInner() {
 
               {/* Prompt influence */}
               <div>
-                <label className="text-xs mb-1 block" style={{ color: 'var(--text-secondary)' }}>Prompt influence</label>
+                <label className="text-xs mb-1 biz-sfx-influence-label">Prompt influence</label>
                 <div className="flex gap-1">
                   {([['Low', 0.3], ['Balanced', 0.6], ['Exact', 0.9]] as [string, number][]).map(([label, val]) => (
                     <button type="button"
                       key={label}
                       onClick={() => setSfxInfluence(val)}
-                      className="flex-1"
-                      style={{
-                        padding: '3px 0',
-                        borderRadius: 4,
-                        border: '1px solid',
-                        borderColor: sfxInfluence === val ? 'var(--accent-muted, #60a5fa66)' : 'var(--surface-border)',
-                        background:  sfxInfluence === val ? 'var(--accent-dim, rgba(96,165,250,0.12))' : 'transparent',
-                        color:       sfxInfluence === val ? 'var(--accent, #60a5fa)' : 'var(--text-muted)',
-                        fontSize: '0.72rem',
-                        fontWeight: sfxInfluence === val ? 600 : 400,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s',
-                      }}
+                      className={`biz-sfx-influence-btn${sfxInfluence === val ? ' active' : ''}`}
                     >
                       {label}
                     </button>
@@ -965,8 +951,7 @@ function BusinessStudioInner() {
 
               {/* Generate audio button */}
               <button type="button"
-                className="btn-primary w-full"
-                style={{ height: 38, fontSize: '0.85rem', fontWeight: 600 }}
+                className="btn-primary w-full biz-gen-btn"
                 disabled={sfxLoading || !sfxPrompt.trim()}
                 onClick={async () => {
                   if (!sfxPrompt.trim()) return;
@@ -1004,12 +989,11 @@ function BusinessStudioInner() {
               {sfxAudio && (
                 <div className="flex flex-col gap-2">
                   {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-                  <audio controls src={sfxAudio} style={{ width: '100%', height: 36, borderRadius: 6 }} />
+                  <audio controls src={sfxAudio} className="biz-audio-player" />
                   <a
                     href={sfxAudio}
                     download={`${sfxPrompt.slice(0, 30).replace(/[^a-z0-9]/gi, '_')}.mp3`}
-                    className="btn-secondary text-center"
-                    style={{ fontSize: '0.78rem', padding: '4px 0', display: 'block', textDecoration: 'none' }}
+                    className="btn-secondary text-center biz-sfx-dl-link"
                   >
                     ↓ Download .mp3
                   </a>
@@ -1017,7 +1001,7 @@ function BusinessStudioInner() {
               )}
 
               {/* Hint */}
-              <p className="text-xs text-faint" style={{ marginTop: -4 }}>
+              <p className="text-xs text-faint biz-sfx-hint">
                 Free: 3 sounds/day · Great for game assets
               </p>
             </div>
@@ -1076,12 +1060,11 @@ function BusinessStudioInner() {
           </div>
           {showCopyPanel && (
             <div className="px-4 pb-4 flex flex-col gap-3">
-              <p className="text-xs" style={{ color: 'var(--text-muted)', margin: 0 }}>
+              <p className="text-xs biz-sfx-sub">
                 Generate taglines, elevator pitch, and social bio from your brand context.
               </p>
               <button type="button"
-                className="btn-primary w-full"
-                style={{ height: 36, fontSize: '0.85rem', fontWeight: 600 }}
+                className="btn-primary w-full biz-gen-btn"
                 disabled={copyLoading || !prompt.trim()}
                 onClick={handleGenerateCopy}
               >
@@ -1109,8 +1092,7 @@ function BusinessStudioInner() {
                       <p className="biz-copy-group__label">Elevator Pitch</p>
                       <p className="biz-copy-pitch-text">{brandCopy.pitch}</p>
                       <button type="button"
-                        className="biz-copy-copy-btn"
-                        style={{ marginTop: 4 }}
+                        className="biz-copy-copy-btn biz-mt4"
                         onClick={() => { navigator.clipboard.writeText(brandCopy.pitch); toastSuccess('Copied'); }}
                       >Copy</button>
                     </div>
@@ -1120,8 +1102,7 @@ function BusinessStudioInner() {
                       <p className="biz-copy-group__label">Social Bio</p>
                       <p className="biz-copy-bio-text">{brandCopy.bio}</p>
                       <button type="button"
-                        className="biz-copy-copy-btn"
-                        style={{ marginTop: 4 }}
+                        className="biz-copy-copy-btn biz-mt4"
                         onClick={() => { navigator.clipboard.writeText(brandCopy.bio); toastSuccess('Copied'); }}
                       >Copy</button>
                     </div>
@@ -1148,7 +1129,7 @@ function BusinessStudioInner() {
               ? 'Generate Brand Kit (4 images)'
               : 'Generate'}
           </button>
-          <p className="studio-hint" style={{ textAlign: 'right', marginTop: '0.25rem' }}>⌘↵</p>
+          <p className="studio-hint studio-hint--right">⌘↵</p>
         </div>
 
         </>)}
@@ -1211,8 +1192,8 @@ function BusinessStudioInner() {
               <div className="studio-output-loading">
                 <div className="studio-spinner" />
                 <span>{loadingMsg} {(elapsedMs / 1000).toFixed(1)}s</span>
-                <div className="studio-shimmer-wrap" style={{ marginTop: 12, maxWidth: 360 }}>
-                  <div className="studio-shimmer-block" style={{ height: 240, borderRadius: 8 }} />
+                <div className="studio-shimmer-wrap biz-shimmer-wrap-sm">
+                  <div className="studio-shimmer-block biz-shimmer-asset" />
                   <div className="studio-shimmer-block" style={{ height: 14, width: '45%', alignSelf: 'center' }} />
                 </div>
               </div>
@@ -1300,8 +1281,7 @@ function BusinessStudioInner() {
             </div>
             <button
               type="button"
-              className="btn btn-primary"
-              style={{ width: '100%', marginTop: '0.75rem' }}
+              className="btn btn-primary biz-preview-logo-btn"
               onClick={handleExportAll}
             >
               ↓ Export All Sizes

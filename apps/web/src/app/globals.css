@@ -24493,3 +24493,42 @@ input[type="range"].studio-range {
 .voice-upgrade-link:hover { opacity: 0.85; }
 .voice-empty-strong { color: var(--studio-accent, var(--accent)); }
 .studio-loading-fallback { min-height: 100vh; background: var(--bg); }
+
+/* ── Business studio + shared utility classes ───────────────────────────── */
+.studio-control-section--pb-sm { padding-bottom: 0.5rem; }
+.btn-full-sm { width: 100%; font-size: 0.78rem; }
+.biz-sfx-label { color: var(--text-secondary); }
+.biz-sfx-sub { color: var(--text-muted); margin: 0; }
+.biz-sfx-disabled-label { color: var(--text-disabled); }
+.biz-sfx-influence-label { color: var(--text-secondary); margin-bottom: 4px; display: block; }
+.biz-sfx-range-btn { font-size: 0.7rem; padding: 2px 8px; height: auto; }
+.biz-gen-btn { height: 38px; font-size: 0.85rem; font-weight: 600; }
+.biz-audio-player { width: 100%; height: 36px; border-radius: 6px; }
+.biz-sfx-dl-link { font-size: 0.78rem; padding: 4px 0; display: block; text-decoration: none; }
+.biz-sfx-hint { margin-top: -4px; }
+.biz-sfx-pitch-label { color: var(--text-muted); margin: 0; }
+.biz-shimmer-wrap-sm { margin-top: 12px; max-width: 360px; }
+.biz-shimmer-asset { height: 240px; border-radius: 8px; }
+.biz-preview-logo-btn { width: 100%; margin-top: 0.75rem; }
+.biz-mt4 { margin-top: 4px; }
+
+/* ── Business SFX panel CSS classes ─────────────────────────────────────── */
+.biz-sfx-range-labels { color: var(--text-disabled); }
+.biz-sfx-influence-btn {
+  padding: 3px 0;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex: 1;
+}
+.biz-sfx-influence-btn.active {
+  border-color: var(--studio-accent, var(--accent));
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 12%, transparent);
+  color: var(--studio-accent, var(--accent));
+  font-weight: 600;
+}

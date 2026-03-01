@@ -25153,3 +25153,128 @@ body {
   box-shadow: 0 0 6px color-mix(in srgb, var(--studio-accent, var(--accent)) 70%, transparent);
   animation: pulse 2.5s ease-in-out infinite;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Visual Enhancement Pass 4 — Idle States, Studio Canvas, Loading
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Pixel idle grid: larger, animated glow ────────────────────────────── */
+.pixel-idle-grid {
+  grid-template-columns: repeat(8, 12px);
+  gap: 3px;
+  opacity: 0.35;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--studio-accent, var(--accent)) 50%, transparent));
+}
+.pixel-idle-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.pixel-idle-grid__cell--active {
+  box-shadow: 0 0 4px color-mix(in srgb, var(--studio-accent, var(--accent)) 60%, transparent);
+}
+
+/* ── Canvas background: subtle grid overlay ────────────────────────────── */
+.pixel-canvas-bg {
+  background: linear-gradient(135deg, #09090f 0%, #0d0d14 100%);
+}
+
+/* ── Studio idle examples: better button style ─────────────────────────── */
+.studio-idle-example-btn {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 4%, rgba(255,255,255,0.03));
+  border: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 15%, rgba(255,255,255,0.07));
+  border-radius: 8px;
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.studio-idle-example-btn:hover {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, rgba(255,255,255,0.04));
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 35%, transparent);
+  color: var(--text);
+}
+
+/* ── Loading state: stronger visual ────────────────────────────────────── */
+.pixel-loading-msg {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.pixel-loading-hint {
+  color: var(--text-faint);
+  font-size: 0.775rem;
+  margin-top: 4px;
+}
+
+/* ── Output image frame: accent border on active ───────────────────────── */
+.output-image-frame {
+  border-radius: 8px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+/* ── Action bar (above canvas): tighter + cleaner ───────────────────────── */
+.pixel-action-bar {
+  background: linear-gradient(180deg, var(--surface-raised) 0%, rgba(255,255,255,0.02) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 0.875rem;
+}
+
+/* ── Generate area (below prompt): strong CTA zone ─────────────────────── */
+.pixel-generate-zone {
+  padding: 0.875rem 1rem;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--studio-accent, var(--accent)) 2%, transparent) 0%,
+    transparent 100%
+  );
+}
+
+/* ── Studio scroll region: more padding ────────────────────────────────── */
+.scroll-region {
+  padding-bottom: 1rem;
+}
+
+/* ── Slider: mode-aware thumb color ────────────────────────────────────── */
+.slider::-webkit-slider-thumb {
+  background: var(--studio-accent, var(--accent));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--studio-accent, var(--accent)) 50%, transparent);
+}
+.slider::-moz-range-thumb {
+  background: var(--studio-accent, var(--accent));
+}
+.slider {
+  background: linear-gradient(90deg,
+    var(--studio-accent, var(--accent)) 0%,
+    var(--studio-accent, var(--accent)) var(--fill, 50%),
+    var(--surface-border) var(--fill, 50%),
+    var(--surface-border) 100%
+  );
+}
+
+/* ── Empty state: improved typography ──────────────────────────────────── */
+.empty-state-title {
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.empty-state-body {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* ── Chip: mode-aware hover ─────────────────────────────────────────────── */
+.chip:hover {
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 40%, transparent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 6%, transparent);
+}
+.chip.active {
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 50%, transparent);
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, transparent);
+  color: var(--studio-accent, var(--accent));
+}
+
+/* ── Section-header: mode-aware ─────────────────────────────────────────── */
+.section-title {
+  color: color-mix(in srgb, var(--studio-accent, var(--accent)) 70%, var(--text));
+}

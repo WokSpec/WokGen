@@ -1020,14 +1020,10 @@ function OutputPanel({
         {result && activeUrl && (
           <div className="pixel-size-readout">
             {activeUrl.startsWith('data:image/gif') && (
-              <span style={{
-                fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
-                padding: '2px 6px', borderRadius: 3,
-                background: 'rgba(52,211,153,.15)', color: 'var(--success)', border: '1px solid rgba(52,211,153,.3)',
-              }}>GIF</span>
+              <span className="pixel-gif-badge">GIF</span>
             )}
             {result.width && result.height && (
-              <span style={{ fontSize: '0.65rem', color: 'var(--text-disabled)', background: 'rgba(0,0,0,.5)', padding: '2px 6px', borderRadius: 3 }}>
+              <span className="pixel-dim-readout">
                 {result.width}×{result.height}
               </span>
             )}
@@ -1065,16 +1061,7 @@ function OutputPanel({
               key={i}
               onClick={() => onSelectBatch?.(i)}
               title={`Variation ${i + 1} — seed ${br.resolvedSeed ?? '?'}`}
-              style={{
-                flex: '0 0 auto',
-                width: 52, height: 52,
-                padding: 2,
-                border: `2px solid ${selectedBatch === i ? 'var(--accent)' : 'var(--surface-border)'}`,
-                borderRadius: 6,
-                background: 'var(--surface-raised)',
-                cursor: 'pointer',
-                overflow: 'hidden',
-              }}
+              className={`pixel-batch-thumb${selectedBatch === i ? ' active' : ''}`}
             >
               <img
                 src={br.resultUrl}
@@ -1175,14 +1162,12 @@ function RatingButton({ jobId, value, label, title }: { jobId: string; value: 1 
   };
   return (
     <button type="button"
-      className="btn-ghost btn-xs"
+      className="btn-ghost btn-xs pixel-rating-btn"
       onClick={handle}
       title={title}
       style={{
         opacity: rated === value ? 1 : 0.5,
         filter: rated === value ? 'none' : 'grayscale(1)',
-        transition: 'opacity 0.15s, filter 0.15s',
-        fontSize: 14,
       }}
     >{label}</button>
   );
@@ -1543,7 +1528,6 @@ function GenerateForm({
               <button type="button"
                 key={ex}
                 className="chip text-xs"
-                style={{ fontSize: '0.7rem' }}
                 onClick={() => setPrompt(ex)}
               >
                 {ex.length > 38 ? ex.slice(0, 36) + '…' : ex}
@@ -1697,13 +1681,8 @@ function GenerateForm({
             <button type="button"
               key={era.id}
               onClick={() => setPixelEra(era.id)}
-              className="flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150"
-              style={{
-                background: pixelEra === era.id ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                border: `1px solid ${pixelEra === era.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
-                color: pixelEra === era.id ? 'var(--accent)' : 'var(--text-muted)',
-                minWidth: 52,
-              }}
+              className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${pixelEra === era.id ? ' active' : ''}`}
+              style={{ minWidth: 52 }}
             >
               {era.label}
             </button>
@@ -1913,7 +1892,7 @@ function GenerateForm({
               {refImageUrl ? (
                 <div className="flex flex-col gap-1.5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={refImageUrl} alt="Reference" style={{ width: 64, height: 64, imageRendering: 'pixelated', borderRadius: 4, border: '1px solid var(--surface-border)', objectFit: 'contain', background: 'var(--surface-overlay)' }} />
+                  <img src={refImageUrl} alt="Reference" className="pixel-ref-img" />
                   <div className="flex gap-1.5">
                     <button type="button" className="btn-ghost btn-xs flex-1" onClick={() => refImageInputRef.current?.click()}>Change</button>
                     <button type="button" className="btn-ghost btn-xs flex-1" onClick={() => setRefImageUrl(null)}>Remove</button>
@@ -1923,17 +1902,6 @@ function GenerateForm({
                 <div
                   {...getRootProps()}
                   className={`studio-dropzone${isDragActive ? ' studio-dropzone--active' : ''}`}
-                  style={{
-                    border: `1px dashed ${isDragActive ? 'var(--accent)' : 'var(--surface-border)'}`,
-                    borderRadius: 6,
-                    padding: '12px 8px',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    background: isDragActive ? 'var(--accent-dim)' : 'var(--surface-overlay)',
-                    color: isDragActive ? 'var(--accent)' : 'var(--text-muted)',
-                    fontSize: '0.75rem',
-                    transition: 'all 0.15s',
-                  }}
                 >
                   {/* @ts-expect-error react-dropzone v12 input props type compat */}
                   <input {...getInputProps()} />
@@ -2131,7 +2099,7 @@ function GenerateForm({
         aria-expanded={showAdvanced}
       >
         <span className="section-title">Advanced</span>
-        <span style={{ color: 'var(--text-disabled)', fontSize: 12 }}>
+        <span className="pixel-advanced-chevron">
           {showAdvanced ? '▾' : '▸'}
         </span>
       </div>
@@ -3423,7 +3391,7 @@ function StudioInner() {
                   {' '}credit{hdBalance.monthly + hdBalance.topUp !== 1 ? 's' : ''} left
                 </span>
                 {hdBalance.topUp > 0 && (
-                  <span style={{ color: 'var(--text-faint)', marginLeft: 4 }}>
+                  <span className="pixel-hd-pack-hint">
                     ({hdBalance.monthly} monthly · {hdBalance.topUp} pack)
                   </span>
                 )}
@@ -3632,12 +3600,7 @@ export default function StudioPage() {
         >
           <div className="flex flex-col items-center gap-4">
             <div
-              className="w-16 h-16 rounded flex items-center justify-center text-3xl"
-              style={{
-                background: 'var(--surface-overlay)',
-                border: '1px solid var(--surface-border)',
-                animation: 'pulse-glow 2s ease-in-out infinite',
-              }}
+              className="w-16 h-16 rounded flex items-center justify-center text-3xl pixel-loading-icon"
             >
               ✦
             </div>

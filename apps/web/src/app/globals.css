@@ -24728,3 +24728,18 @@ input[type="range"].studio-range {
 .pixel-quality-hd-btn.active { border-color: var(--warning); background: var(--warning-bg, rgba(245,158,11,.12)); color: var(--warning); font-weight: 600; }
 .pixel-kbd-hint { font-size: 0.65rem; background: var(--overlay-30); border: 1px solid var(--border); }
 .pixel-compare-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); padding-top: 0.125rem; }
+
+/* Pixel studio batch 6 */
+.pixel-batch-thumb { flex: 0 0 auto; width: 52px; height: 52px; padding: 2px; border: 2px solid var(--surface-border); border-radius: 6px; background: var(--surface-raised); cursor: pointer; overflow: hidden; transition: border-color 0.15s; }
+.pixel-batch-thumb.active { border-color: var(--studio-accent, var(--accent)); }
+.pixel-advanced-chevron { color: var(--text-disabled); font-size: 12px; }
+.pixel-hd-pack-hint { color: var(--text-faint); margin-left: 4px; }
+.pixel-loading-icon { background: var(--surface-overlay); border: 1px solid var(--surface-border); animation: pulse-glow 2s ease-in-out infinite; }
+.pixel-gif-badge { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; background: rgba(52,211,153,.15); color: var(--success); border: 1px solid rgba(52,211,153,.3); }
+.pixel-dim-readout { font-size: 0.65rem; color: var(--text-disabled); background: rgba(0,0,0,.5); padding: 2px 6px; border-radius: 3px; }
+
+/* Pixel studio batch 6b */
+.pixel-rating-btn { transition: opacity 0.15s, filter 0.15s; font-size: 14px; }
+.pixel-ref-img { width: 64px; height: 64px; image-rendering: pixelated; border-radius: 4px; border: 1px solid var(--surface-border); object-fit: contain; background: var(--surface-overlay); }
+.studio-dropzone { border: 1px dashed var(--surface-border); border-radius: 6px; padding: 12px 8px; text-align: center; cursor: pointer; background: var(--surface-overlay); color: var(--text-muted); font-size: 0.75rem; transition: all 0.15s; }
+.studio-dropzone--active { border-color: var(--studio-accent, var(--accent)); background: var(--accent-dim); color: var(--studio-accent, var(--accent)); border-style: dashed; }

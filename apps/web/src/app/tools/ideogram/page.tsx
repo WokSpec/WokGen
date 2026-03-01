@@ -54,39 +54,39 @@ export default function IdeogramPage() {
         <p className="tool-page-desc">Generate images where text actually renders correctly. Posters, logos, banners — powered by Ideogram V2.</p>
       </div>
       <div className="tool-section">
-        <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Prompt (include text in quotes)</label>
+        <label className="tool-field-label">Prompt (include text in quotes)</label>
         <textarea
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           placeholder='e.g. A dark fantasy movie poster with the text "SHADOW REALM" in glowing gothic letters'
           rows={3}
-          style={{ width: '100%', background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.625rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.9375rem', outline: 'none', resize: 'vertical', marginBottom: '0.75rem' }}
+          className="tool-field-textarea"
         />
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.875rem', flexWrap: 'wrap' }}>
+        <div className="tool-options-row">
           <div>
-            <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Aspect ratio</label>
-            <select value={aspect} onChange={e => setAspect(e.target.value)} style={{ background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.875rem', outline: 'none' }}>
+            <label className="tool-field-label">Aspect ratio</label>
+            <select value={aspect} onChange={e => setAspect(e.target.value)} className="tool-field-select">
               {ASPECT_RATIOS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
             </select>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Style</label>
-            <select value={style} onChange={e => setStyle(e.target.value)} style={{ background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.875rem', outline: 'none' }}>
+            <label className="tool-field-label">Style</label>
+            <select value={style} onChange={e => setStyle(e.target.value)} className="tool-field-select">
               {STYLE_TYPES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
         </div>
-        <button type="button" onClick={generate} disabled={loading || !prompt.trim()} className="btn btn-primary" style={{ padding: '0.625rem 1.5rem' }}>
+        <button type="button" onClick={generate} disabled={loading || !prompt.trim()} className="btn btn-primary tool-submit-btn">
           {loading ? 'Generating...' : 'Generate with Ideogram'}
         </button>
-        {error && <p style={{ marginTop: '0.875rem', color: 'var(--danger)', fontSize: '0.875rem' }}>{error}</p>}
+        {error && <p className="tool-error">{error}</p>}
         {result?.url && (
-          <div style={{ marginTop: '1.5rem' }}>
-            <div style={{ position: 'relative', width: '100%', maxWidth: '600px', aspectRatio: '1', borderRadius: '10px', border: '1px solid var(--border)', overflow: 'hidden' }}>
+          <div className="tool-result">
+            <div className="tool-image-single">
               <Image src={result.url} alt={result.prompt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 600px" />
             </div>
-            <div style={{ marginTop: '0.875rem', display: 'flex', gap: '0.625rem' }}>
-              <a href={result.url} download="ideogram.png" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem', textDecoration: 'none' }}>Download</a>
+            <div className="tool-image-single__actions">
+              <a href={result.url} download="ideogram.png" target="_blank" rel="noopener noreferrer" className="btn btn-primary tool-action-btn">Download</a>
             </div>
           </div>
         )}

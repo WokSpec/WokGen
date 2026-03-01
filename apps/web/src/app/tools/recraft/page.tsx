@@ -53,41 +53,41 @@ export default function RecraftPage() {
         <p className="tool-page-desc">Generate brand-quality illustrations, icons, and vector-style images. Recraft v3 excels at consistent, professional creative assets.</p>
       </div>
       <div className="tool-section">
-        <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Describe your image</label>
+        <label className="tool-field-label">Describe your image</label>
         <textarea
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           rows={3}
           placeholder="e.g. A minimal flat icon of a rocket ship in brand blue on white background"
-          style={{ width: '100%', background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.625rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.9375rem', outline: 'none', resize: 'vertical', marginBottom: '0.75rem' }}
+          className="tool-field-textarea"
         />
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.875rem', flexWrap: 'wrap' }}>
+        <div className="tool-options-row">
           <div>
-            <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Style</label>
-            <select value={style} onChange={e => setStyle(e.target.value)} style={{ background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.875rem', outline: 'none' }}>
+            <label className="tool-field-label">Style</label>
+            <select value={style} onChange={e => setStyle(e.target.value)} className="tool-field-select">
               {STYLES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Size</label>
-            <select value={size} onChange={e => setSize(e.target.value)} style={{ background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 0.875rem', color: 'var(--text-primary)', fontSize: '0.875rem', outline: 'none' }}>
+            <label className="tool-field-label">Size</label>
+            <select value={size} onChange={e => setSize(e.target.value)} className="tool-field-select">
               {SIZES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
         </div>
-        <button type="button" onClick={generate} disabled={loading || !prompt.trim()} className="btn btn-primary" style={{ padding: '0.625rem 1.5rem' }}>
+        <button type="button" onClick={generate} disabled={loading || !prompt.trim()} className="btn btn-primary tool-submit-btn">
           {loading ? 'Generating...' : 'Generate with Recraft'}
         </button>
-        {error && <p style={{ marginTop: '0.875rem', color: 'var(--danger)', fontSize: '0.875rem' }}>{error}</p>}
+        {error && <p className="tool-error">{error}</p>}
         {images.length > 0 && (
-          <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+          <div className="tool-image-grid">
             {images.map((url, i) => (
-              <div key={i} style={{ border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
-                <div style={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
+              <div key={i} className="tool-image-card">
+                <div className="tool-image-card__img-wrap">
                   <Image src={url} alt={`Generated ${i + 1}`} fill className="object-cover" sizes="(max-width: 640px) 100vw, 260px" />
                 </div>
-                <div style={{ padding: '0.75rem' }}>
-                  <a href={url} download={`recraft-${i + 1}.png`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ display: 'block', padding: '0.375rem', fontSize: '0.8125rem', textAlign: 'center', textDecoration: 'none' }}>Download</a>
+                <div className="tool-image-card__footer">
+                  <a href={url} download={`recraft-${i + 1}.png`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary tool-image-card__dl">Download</a>
                 </div>
               </div>
             ))}

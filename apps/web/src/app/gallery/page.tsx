@@ -27,32 +27,6 @@ export default function GalleryPage() {
           <GalleryClient />
         </ErrorBoundary>
       </div>
-
-      <style>{`
-        .gallery-page-root {
-          min-height: 80vh;
-          padding: 40px 24px 64px;
-        }
-        .gallery-page-inner {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-        .gallery-page-header {
-          margin-bottom: 32px;
-        }
-        .gallery-page-title {
-          font-size: clamp(1.75rem, 4vw, 2.5rem);
-          font-weight: 700;
-          letter-spacing: -0.02em;
-          color: var(--text);
-          margin: 0 0 6px;
-        }
-        .gallery-page-subtitle {
-          font-size: 1rem;
-          color: var(--text-secondary);
-          margin: 0;
-        }
-      `}</style>
     </div>
   );
 }

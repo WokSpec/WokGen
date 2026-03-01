@@ -26483,3 +26483,188 @@ textarea.studio-prompt:focus {
   line-height: 0.95;
   margin-bottom: 16px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VISUAL ENHANCEMENT PASS 12 — Final polish, hierarchy, depth
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Studio sidebar: stronger left panel contrast ────────────────────────── */
+.studio-sidebar {
+  background: linear-gradient(180deg, #0d0d14 0%, #0a0a10 100%);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  position: relative;
+}
+.studio-sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0; right: -1px;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--studio-accent, var(--accent)) 40%, transparent) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+/* ── Studio canvas: subtle mesh + fade ───────────────────────────────────── */
+.studio-layout > main,
+.studio-layout > .output-canvas,
+.studio-layout > .studio-canvas {
+  background:
+    radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--studio-accent, var(--accent)) 4%, transparent) 0%, transparent 55%),
+    linear-gradient(180deg, #0c0c13 0%, #09090f 100%);
+}
+
+/* ── Section heading in studio sidebar ───────────────────────────────────── */
+.studio-control-section > .studio-label:first-child {
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ── Homepage: tighter mode card grid gap ────────────────────────────────── */
+.homepage-root .grid {
+  gap: 12px;
+}
+
+/* ── Mode card: ensure ::after is visible on hover ───────────────────────── */
+.mode-card {
+  position: relative;
+}
+
+/* ── Studio placeholder: the empty state icon should be visible ───────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 24px;
+  text-align: center;
+}
+.empty-state-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.empty-state-body {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 20px;
+  max-width: 260px;
+}
+
+/* ── PromptFAB: stronger glassmorphism ───────────────────────────────────── */
+.prompt-fab__panel {
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow:
+    0 24px 64px rgba(0,0,0,0.8),
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 0 40px color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+/* ── Studio generate zone: subtle background ─────────────────────────────── */
+.studio-generate-zone,
+.studio-control-section:last-of-type {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 2%, rgba(0,0,0,0.2));
+  padding-bottom: 16px;
+}
+
+/* ── Topbar: slightly more pronounced ────────────────────────────────────── */
+.app-topbar {
+  background: rgba(9,9,15,0.95);
+  border-bottom: 1px solid rgba(255,255,255,0.055);
+}
+
+/* ── Sidebar logo: gradient text ─────────────────────────────────────────── */
+.sidebar-logo {
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(129,140,248,0.3);
+}
+
+/* ── Footer: clean and minimal ───────────────────────────────────────────── */
+.app-footer {
+  background: transparent;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 16px 24px;
+}
+
+/* ── Tool hub sidebar: accent active item ────────────────────────────────── */
+.toolhub-sidebar-item.--active {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, rgba(255,255,255,0.03));
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, rgba(255,255,255,0.06));
+}
+.toolhub-sidebar-item:hover:not(.--active) {
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+}
+.toolhub-sidebar-count {
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+/* ── Search input: stronger styling ──────────────────────────────────────── */
+.toolhub-search {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-family: var(--font-body, 'DM Sans'), sans-serif;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.toolhub-search:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 50%, rgba(255,255,255,0.1));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.toolhub-search::placeholder { color: var(--text-faint); }
+
+/* ── Dashboard: accent-tinted progress ───────────────────────────────────── */
+.dash-usage-bar {
+  height: 4px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.06);
+}
+.dash-usage-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 75%, #fff) 100%);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 50%, transparent);
+  transition: width 0.4s ease;
+}
+.dash-usage-bar-fill--danger {
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+  box-shadow: 0 0 8px rgba(239,68,68,0.4);
+}
+
+/* ── Gallery page: consistent background ─────────────────────────────────── */
+.gallery-page-root {
+  background: var(--bg, #09090f);
+  min-height: calc(100dvh - 44px);
+}
+.gallery-page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+.gallery-page-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}

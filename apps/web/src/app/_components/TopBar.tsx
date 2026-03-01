@@ -29,6 +29,12 @@ export function TopBar() {
 
       {/* Right: Actions */}
       <div className="app-topbar__right">
+        <Link href="/search" className="app-topbar__search-btn" aria-label="Search" title="Search">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="m10 10 3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </Link>
         <span className="app-topbar__cmdk-wrap">
           <CmdKButton />
         </span>

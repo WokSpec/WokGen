@@ -97,6 +97,27 @@ const ENTERPRISE_FEATURES = [
   'Dedicated account manager',
 ];
 
+/* ── FAQ ─────────────────────────────────────────────────────────────────── */
+
+const FAQ_ITEMS = [
+  {
+    q: 'Is WokGen really free?',
+    a: 'Yes. WokGen is free forever. All core features are available without a subscription or credit card. The free tier includes 100 generations per day, all creative tools, and community access.',
+  },
+  {
+    q: 'What are the daily generation limits?',
+    a: 'Free users get 100 standard generations per day — plenty for regular creative work. Guest users (no account) get 10. Limits reset at midnight UTC. Self-hosting removes all limits.',
+  },
+  {
+    q: 'What providers are used for generation?',
+    a: 'WokGen uses Pollinations.ai and Prodia for standard generation (free, no key needed), and optionally FAL, Replicate, and Stability AI for HD quality. You can connect your own API keys in Settings.',
+  },
+  {
+    q: 'Can I self-host WokGen?',
+    a: 'Absolutely. The entire stack is MIT-licensed and documented. Use ComfyUI for local image generation and Ollama for language models. No quotas, no rate limits, full control over your data.',
+  },
+] as const;
+
 /* ── Page ────────────────────────────────────────────────────────────────── */
 
 export default function PricingPage() {
@@ -116,7 +137,29 @@ export default function PricingPage() {
       </section>
 
       {/* Tier comparison */}
-      <section style={{ maxWidth: '1060px', margin: '0 auto', padding: '0 1.5rem 4rem' }}>
+      <section style={{ maxWidth: '1060px', margin: '0 auto', padding: '0 1.5rem 2rem' }}>
+
+        {/* 10 free integrations callout */}
+        <div style={{
+          border: '1px solid rgba(129,140,248,0.3)',
+          borderRadius: '12px',
+          padding: '1rem 1.5rem',
+          background: 'rgba(129,140,248,0.07)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.875rem',
+          flexWrap: 'wrap',
+          marginBottom: '1.75rem',
+        }}>
+          <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>🔌</span>
+          <div>
+            <strong style={{ color: 'var(--accent)' }}>All plans include 10 free AI service integrations.</strong>
+            <span style={{ color: 'var(--text-secondary)', marginLeft: '0.5rem', fontSize: '0.875rem' }}>
+              Connect FAL, Replicate, Stability AI, and more — free tier keys included, no account required.
+            </span>
+          </div>
+        </div>
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
 
           {/* FREE */}
@@ -229,6 +272,35 @@ export default function PricingPage() {
           </div>
 
         </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{ maxWidth: '740px', margin: '0 auto', padding: '0 1.5rem 4rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text)' }}>
+          FAQ
+        </h2>
+        {FAQ_ITEMS.map(({ q, a }) => (
+          <details key={q} style={{ borderBottom: '1px solid var(--border)', padding: '1rem 0' }}>
+            <summary style={{
+              fontSize: '0.9375rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              color: 'var(--text)',
+              listStyle: 'none',
+              userSelect: 'none',
+            }}>
+              {q}
+            </summary>
+            <p style={{
+              marginTop: '0.75rem',
+              fontSize: '0.9375rem',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.65,
+            }}>
+              {a}
+            </p>
+          </details>
+        ))}
       </section>
 
       {/* Models */}

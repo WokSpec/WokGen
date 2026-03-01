@@ -128,6 +128,25 @@ export default function CommandPalette() {
               {searching ? 'Searching…' : 'No results found.'}
             </Command.Empty>
 
+            {/* Full-page search shortcut */}
+            {query.trim() && (
+              <Command.Group className="cmdk-group" heading={<span className="cmdk-group-label">Search</span>}>
+                <Command.Item
+                  className="cmdk-item"
+                  onSelect={() => runCommand(`/search?q=${encodeURIComponent(query.trim())}`)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, opacity: 0.6 }} aria-hidden="true">
+                    <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="m10 10 3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                  <div className="cmdk-item-text">
+                    <span className="cmdk-item-label">Search all results for &ldquo;{query.trim()}&rdquo;</span>
+                    <span className="cmdk-item-hint">/search</span>
+                  </div>
+                </Command.Item>
+              </Command.Group>
+            )}
+
             {/* Asset search results */}
             {results.length > 0 && (
               <Command.Group className="cmdk-group" heading={<span className="cmdk-group-label">Assets</span>}>

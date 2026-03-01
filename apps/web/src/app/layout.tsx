@@ -12,6 +12,7 @@ import { Toaster } from 'sonner';
 import { PageLoadingBar } from '@/components/PageLoadingBar';
 import { ERAL_ENABLED } from '@/lib/eral-integration';
 import { PromptFAB } from './_components/PromptFAB';
+import { GenerationStatus } from './_components/GenerationStatus';
 
 // Eral is a standalone product — only mount the companion widget when enabled.
 // Set NEXT_PUBLIC_ERAL_ENABLED=true in .env.local to activate.
@@ -128,6 +129,7 @@ export default function RootLayout({
             <Sidebar />
             <div className="app-shell__body">
               <TopBar />
+              <GenerationStatus />
               <main id="main-content" style={{ flex: 1 }}>{children}</main>
               <Footer />
             </div>

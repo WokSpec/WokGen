@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -262,6 +263,129 @@ function UserAvatar() {
   );
 }
 
+// ── SidebarQuota ──────────────────────────────────────────────────────────────
+
+interface QuotaData {
+  planId:      string;
+  dailyLimit:  number;
+  todayUsed:   number;
+  hdAlloc:     number;
+  hdUsed:      number;
+  hdAvailable: number;
+}
+
+const QUOTA_CACHE_KEY = 'wokgen-sidebar-quota-v1';
+const QUOTA_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function SidebarQuota() {
+  const { data: session, status } = useSession();
+  const [quota, setQuota]         = useState<QuotaData | null>(null);
+  const [open, setOpen]           = useState(false);
+  const wrapRef                   = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+
+    // Try cache first
+    try {
+      const raw = localStorage.getItem(QUOTA_CACHE_KEY);
+      if (raw) {
+        const { data, ts } = JSON.parse(raw) as { data: QuotaData; ts: number };
+        if (Date.now() - ts < QUOTA_CACHE_TTL) {
+          setQuota(data);
+          return;
+        }
+      }
+    } catch { /* ignore */ }
+
+    // Fetch fresh
+    fetch('/api/usage')
+      .then(r => r.ok ? r.json() : null)
+      .then(json => {
+        if (!json?.quota) return;
+        const q = json.quota as QuotaData;
+        setQuota(q);
+        try {
+          localStorage.setItem(QUOTA_CACHE_KEY, JSON.stringify({ data: q, ts: Date.now() }));
+        } catch { /* ignore */ }
+      })
+      .catch(() => { /* non-critical */ });
+  }, [status]);
+
+  // Close popup on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  if (status !== 'authenticated' || !quota) return null;
+
+  const isUnlimited = quota.dailyLimit === -1;
+  const pct         = isUnlimited ? 0 : Math.min(100, Math.round((quota.todayUsed / quota.dailyLimit) * 100));
+  const fillColor   = pct >= 90 ? 'var(--danger)' : pct >= 70 ? 'var(--warning)' : 'var(--success)';
+
+  return (
+    <div className="sidebar-quota" ref={wrapRef}>
+      <button
+        className="sidebar-quota__btn"
+        onClick={() => setOpen(o => !o)}
+        title="Daily quota"
+        aria-label="View daily quota"
+        aria-expanded={open}
+      >
+        <div className="sidebar-quota__bar">
+          <div
+            className="sidebar-quota__fill"
+            style={{
+              width:      isUnlimited ? '100%' : `${pct}%`,
+              background: isUnlimited ? 'var(--accent)' : fillColor,
+            }}
+          />
+        </div>
+      </button>
+
+      {open && (
+        <div className="sidebar-quota__popup" role="dialog" aria-label="Quota details">
+          <div className="sidebar-quota__popup-header">
+            Daily usage
+            <span className="sidebar-quota__plan-badge" data-plan={quota.planId}>
+              {quota.planId}
+            </span>
+          </div>
+
+          <div className="sidebar-quota__popup-row">
+            <span>Generations</span>
+            <span>
+              {isUnlimited ? '∞' : `${quota.todayUsed} / ${quota.dailyLimit}`}
+            </span>
+          </div>
+
+          {quota.hdAlloc > 0 && (
+            <div className="sidebar-quota__popup-row">
+              <span>HD credits</span>
+              <span>{quota.hdUsed} / {quota.hdAlloc}</span>
+            </div>
+          )}
+
+          <Link
+            href="/pricing"
+            className="sidebar-quota__upgrade"
+            onClick={() => setOpen(false)}
+          >
+            Upgrade plan →
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Sidebar ──────────────────────────────────────────────────────────────
 
 export function Sidebar() {
@@ -341,6 +465,7 @@ export function Sidebar() {
       <SidebarItem href="/settings" label="Settings" active={isActive('/settings')}>
         <SettingsIcon />
       </SidebarItem>
+      <SidebarQuota />
       <UserAvatar />
     </aside>
   );

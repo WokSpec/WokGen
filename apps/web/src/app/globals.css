@@ -24243,3 +24243,31 @@ input[type="range"].studio-range {
   border-color: var(--border);
 }
 .uiux-style-name:not(.active) { color: var(--text-secondary); }
+
+/* ── Pixel studio modal overlay ─────────────────────────────────────────── */
+.pixel-modal-overlay {
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+}
+
+/* ── Pixel studio provider selector ─────────────────────────────────────── */
+.pixel-seed-copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-disabled);
+  font-size: inherit;
+  padding: 0;
+}
+
+/* ── Pixel studio output meta bar ───────────────────────────────────────── */
+.pixel-meta-bar {
+  border-top: 1px solid var(--border);
+  background: var(--bg-overlay);
+  overflow-x: auto;
+}
+.pixel-meta-bar-inner {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}

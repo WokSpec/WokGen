@@ -461,7 +461,7 @@ function SettingsModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'var(--overlay-70)', backdropFilter: 'blur(4px)' }}
+      className="pixel-modal-overlay"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
@@ -1179,7 +1179,7 @@ function OutputPanel({
       {compareMode && compareResults && compareResults.length === 2 && (
         <div
           className="flex items-center justify-center gap-4 px-4 py-4 flex-shrink-0"
-          style={{ borderTop: '1px solid var(--surface-border)', background: 'var(--surface-overlay)', overflowX: 'auto' }}
+          className="pixel-meta-bar"
         >
           {compareResults.map((r: GenerationResult, i: number) => r.resultUrl && (
             <div
@@ -1214,7 +1214,7 @@ function OutputPanel({
                   }}
                 />
               </div>
-              <div style={{ display: 'flex', gap: 6, width: '100%' }}>
+              <div className="pixel-meta-bar-inner">
                 <button
                   type="button"
                   className="btn btn--sm"
@@ -1249,7 +1249,7 @@ function OutputPanel({
             <button type="button"
               className="flex items-center gap-1"
               title="Click to copy seed"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-disabled)', fontSize: 'inherit', padding: 0 }}
+              className="pixel-seed-copy-btn"
               onClick={() => {
                 navigator.clipboard.writeText(String(result.resolvedSeed)).catch(() => {});
               }}
@@ -1556,7 +1556,7 @@ function GenerateForm({
           <div className="flex items-center justify-between mb-1.5">
             <label className="label mb-0">Prompt</label>
             <div className="flex items-center gap-2">
-              <span className="text-2xs" style={{ fontSize: '0.65rem', color: promptLenColor }}>
+              <span className="text-2xs" className="text-2xs" style={{ color: promptLenColor }}>
                 {promptLen}/200
               </span>
               {/* Save as Favorite */}
@@ -1564,27 +1564,27 @@ function GenerateForm({
                 title={favSaved ? 'Saved!' : 'Save prompt as favorite'}
                 aria-label={favSaved ? 'Saved!' : 'Save prompt as favorite'}
                 onClick={savePromptAsFavorite}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', lineHeight: 1, color: favSaved ? '#f59e0b' : 'var(--text-disabled)', transition: 'color 0.15s' }}
+                className={`biz-fav-btn${favSaved ? ' biz-fav-btn--saved' : ''}`}
               >
                 {favSaved ? '+' : '+'}
               </button>
               {/* My Prompts dropdown */}
               {favPrompts.length > 0 && (
-                <div data-fav-menu style={{ position: 'relative' }}>
+                <div data-fav-menu className="biz-fav-menu-wrap">
                   <button type="button"
                     title="My saved prompts"
                     onClick={() => setShowFavMenu(v => !v)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.65rem', color: 'var(--text-disabled)', padding: '0 2px' }}
+                    className="biz-fav-menu-trigger"
                   >
                     My Prompts ▾
                   </button>
                   {showFavMenu && (
-                    <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 50, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, minWidth: 220, maxHeight: 180, overflowY: 'auto', boxShadow: '0 4px 12px var(--overlay-30)' }}>
+                    <div className="biz-fav-dropdown">
                       {favPrompts.map(f => (
                         <button type="button"
                           key={f.id}
                           onClick={() => { setPrompt(f.prompt); setShowFavMenu(false); }}
-                          style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 10px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.7rem', color: 'var(--text-primary)', borderBottom: '1px solid var(--border)' }}
+                          className="biz-fav-item"
                         >
                           {f.prompt.length > 60 ? f.prompt.slice(0, 58) + '…' : f.prompt}
                         </button>

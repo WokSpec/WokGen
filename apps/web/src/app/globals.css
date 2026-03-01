@@ -23318,3 +23318,142 @@ input[type="range"].studio-range {
 }
 .studio-control-section--pb0 { padding-bottom: 0; }
 .studio-control-section--pt0 { padding-top: 0; }
+
+/* ── UIUX studio ─────────────────────────────────────────────────────────── */
+.uiux-history-section-head {
+  padding: 8px 12px 5px;
+  border-bottom: 1px solid var(--border);
+}
+.uiux-history-section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+.uiux-history-empty {
+  padding: 18px 12px;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 0.72rem;
+}
+.uiux-history-empty-icon {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+  opacity: 0.3;
+}
+.uiux-history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.12s;
+}
+.uiux-history-item:hover { background: var(--bg-elevated); }
+.uiux-history-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.uiux-history-item__icon { font-size: 0.82rem; }
+.uiux-history-item__type {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.uiux-history-item__prompt {
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 165px;
+}
+.uiux-history-item__time {
+  font-size: 0.6rem;
+  color: var(--text-faint);
+}
+
+/* UIUX left configure panel */
+.uiux-config-header {
+  padding: 8px 14px 7px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.uiux-config-header__title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.uiux-config-section {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.uiux-config-section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+  display: block;
+}
+.uiux-config-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+}
+.uiux-config-type-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.68rem;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.uiux-config-type-btn.active {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 12%, transparent);
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 30%, transparent);
+  color: var(--studio-accent, var(--accent));
+}
+.uiux-config-type-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.uiux-config-filter-row {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+.uiux-config-filter-btn {
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all 0.12s;
+}
+.uiux-config-filter-btn.active {
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 30%, transparent);
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, transparent);
+  color: var(--studio-accent, var(--accent));
+}
+.uiux-config-count {
+  font-size: 0.62rem;
+  color: var(--text-faint);
+  margin-top: 4px;
+}

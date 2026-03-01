@@ -610,26 +610,27 @@ export default function UIUXStudio() {
             {/* ── History sidebar (col 1) ───────────────────────────────── */}
             {historySidebarOpen && (
               <div className="studio-history-sidebar">
-                <div style={{ padding: '8px 12px 5px', borderBottom: '1px solid var(--surface-border)' }}>
-                  <span style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-disabled)' }}>
-                    Recent
-                  </span>
+                <div className="uiux-history-section-head">
+                  <span className="uiux-history-section-label">Recent</span>
                 </div>
                 {generationHistory.length === 0 ? (
-                  <div style={{ padding: '18px 12px', textAlign: 'center', color: 'var(--text-disabled)', fontSize: '0.72rem' }}>
-                    <div style={{ fontSize: '1.4rem', marginBottom: 6, opacity: 0.3 }}>◌</div>
+                  <div className="uiux-history-empty">
+                    <div className="uiux-history-empty-icon">◌</div>
                     No generations yet
                   </div>
                 ) : generationHistory.map((h) => {
                   const ct = COMPONENT_TYPES.find((c) => c.id === h.componentType);
                   return (
-                    <button type="button" key={h.id} onClick={() => { setResult(h.result); setVersionHistory([]); setCurrentVersion(0); setOutputTab('preview'); }} style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '7px 12px', background: 'transparent', border: 'none', borderBottom: '1px solid var(--surface-border)', cursor: 'pointer', textAlign: 'left' }} onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--surface-overlay)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ fontSize: '0.82rem' }}>{ct?.icon}</span>
-                        <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{ct?.label}</span>
+                    <button type="button" key={h.id}
+                      className="uiux-history-item"
+                      onClick={() => { setResult(h.result); setVersionHistory([]); setCurrentVersion(0); setOutputTab('preview'); }}
+                    >
+                      <div className="uiux-history-item__meta">
+                        <span className="uiux-history-item__icon">{ct?.icon}</span>
+                        <span className="uiux-history-item__type">{ct?.label}</span>
                       </div>
-                      <div style={{ fontSize: '0.65rem', color: 'var(--text-disabled)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 165 }}>{h.prompt.slice(0, 55)}</div>
-                      <div style={{ fontSize: '0.6rem', color: 'var(--text-faint)' }}>{new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      <div className="uiux-history-item__prompt">{h.prompt.slice(0, 55)}</div>
+                      <div className="uiux-history-item__time">{new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </button>
                   );
                 })}
@@ -639,8 +640,8 @@ export default function UIUXStudio() {
             {/* ── Form column (col 2) ───────────────────────────────────── */}
             <div className="studio-sidebar" style={{ width: 355, minWidth: 295, maxWidth: 395, flexShrink: 0 }}>
               {/* Header + library mode toggle */}
-              <div style={{ padding: '8px 14px 7px', borderBottom: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-primary)' }}>Configure</span>
+              <div className="uiux-config-header">
+                <span className="uiux-config-header__title">Configure</span>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                   <span style={{ fontSize: '0.65rem', color: libraryMode ? 'var(--accent)' : 'var(--text-muted)' }}>Library Mode</span>
                   <div onClick={() => setLibraryMode((v) => !v)} style={{ width: 30, height: 16, borderRadius: 8, cursor: 'pointer', position: 'relative', background: libraryMode ? 'var(--accent-dim)' : 'var(--surface-overlay)', border: `1px solid ${libraryMode ? 'var(--accent-muted)' : 'var(--surface-border)'}`, transition: 'background 0.2s' }}>
@@ -653,38 +654,49 @@ export default function UIUXStudio() {
 
                 {/* Library checklist */}
                 {libraryMode && (
-                  <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--surface-border)' }}>
-                    <div style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: 6 }}>Select Components (2–6)</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+                  <div className="uiux-config-section">
+                    <span className="uiux-config-section-label">Select Components (2–6)</span>
+                    <div className="uiux-config-grid-2">
                       {COMPONENT_TYPES.filter((c) => c.id !== 'custom').map((ct) => {
                         const checked = selectedLibraryTypes.includes(ct.id);
                         const disabled = !checked && selectedLibraryTypes.length >= 6;
                         return (
-                          <label key={ct.id} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 7px', borderRadius: 5, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.35 : 1, background: checked ? 'var(--accent-dim)' : 'var(--surface-overlay)', border: `1px solid ${checked ? 'var(--accent-muted)' : 'var(--surface-border)'}` }}>
+                          <label key={ct.id} className={`uiux-config-type-btn${checked ? ' active' : ''}`} style={{ opacity: disabled ? 0.35 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}>
                             <input type="checkbox" checked={checked} disabled={disabled} onChange={(e) => { if (e.target.checked) setSelectedLibraryTypes((p) => [...p, ct.id]); else setSelectedLibraryTypes((p) => p.filter((x) => x !== ct.id)); }} style={{ accentColor: 'var(--accent)', width: 11, height: 11 }} />
-                            <span style={{ fontSize: '0.68rem', color: checked ? 'var(--accent)' : 'var(--text-secondary)' }}>{ct.icon} {ct.label}</span>
+                            <span>{ct.icon} {ct.label}</span>
                           </label>
                         );
                       })}
                     </div>
-                    <div style={{ fontSize: '0.62rem', color: 'var(--text-disabled)', marginTop: 4 }}>{selectedLibraryTypes.length}/6 selected</div>
+                    <div className="uiux-config-count">{selectedLibraryTypes.length}/6 selected</div>
                   </div>
                 )}
 
                 {/* Component selector */}
                 {!libraryMode && (
-                  <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--surface-border)' }}>
-                    <div style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: 5 }}>Component</div>
-                    <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 5 }}>
+                  <div className="uiux-config-section">
+                    <span className="uiux-config-section-label">Component</span>
+                    <div className="uiux-config-filter-row">
                       {COMPONENT_CATEGORIES.map((cat) => (
-                        <button type="button" key={cat} onClick={() => setCategoryFilter(cat)} style={{ padding: '2px 7px', borderRadius: 4, fontSize: '0.62rem', cursor: 'pointer', border: `1px solid ${categoryFilter === cat ? 'var(--accent-muted)' : 'transparent'}`, background: categoryFilter === cat ? 'var(--accent-dim)' : 'transparent', color: categoryFilter === cat ? 'var(--accent)' : 'var(--text-muted)' }}>
+                        <button type="button" key={cat}
+                          className={`uiux-config-filter-btn${categoryFilter === cat ? ' active' : ''}`}
+                          onClick={() => setCategoryFilter(cat)}
+                        >
                           {cat}
                         </button>
                       ))}
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+                    <div className="uiux-config-grid-2">
                       {COMPONENT_TYPES.filter((c) => c.category === categoryFilter).map((ct) => (
-                        <button type="button" key={ct.id} onClick={() => setComponentType(ct.id)} className="uiux-type-btn" style={{ background: componentType === ct.id ? 'var(--accent-dim)' : 'var(--surface-raised)', border: `1px solid ${componentType === ct.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`, color: componentType === ct.id ? 'var(--accent)' : 'var(--text-secondary)' }}>
+                        <button type="button" key={ct.id}
+                          className={`uiux-type-btn${componentType === ct.id ? ' active' : ''}`}
+                          onClick={() => setComponentType(ct.id)}
+                          style={{
+                            background: componentType === ct.id ? 'var(--accent-dim)' : 'var(--surface-raised)',
+                            border: `1px solid ${componentType === ct.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`,
+                            color: componentType === ct.id ? 'var(--accent)' : 'var(--text-secondary)',
+                          }}
+                        >
                           <span style={{ fontSize: '0.85rem' }}>{ct.icon}</span>
                           <span style={{ fontSize: '0.7rem' }}>{ct.label}</span>
                         </button>
@@ -694,8 +706,8 @@ export default function UIUXStudio() {
                 )}
 
                 {/* Framework */}
-                <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--surface-border)' }}>
-                  <div style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: 5 }}>Framework</div>
+                <div className="uiux-config-section">
+                  <span className="uiux-config-section-label">Framework</span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     {FRAMEWORKS.map((fw) => (
                       <button type="button" key={fw.id} onClick={() => setFramework(fw.id)} className="uiux-fw-btn" style={{ background: framework === fw.id ? 'var(--accent-dim)' : 'var(--surface-raised)', border: `1px solid ${framework === fw.id ? 'var(--accent-muted)' : 'var(--surface-border)'}` }}>
@@ -707,8 +719,8 @@ export default function UIUXStudio() {
                 </div>
 
                 {/* Style preset */}
-                <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--surface-border)' }}>
-                  <div style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: 5 }}>Style</div>
+                <div className="uiux-config-section">
+                  <span className="uiux-config-section-label">Style</span>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
                     {STYLE_PRESETS.map((sp) => (
                       <button type="button" key={sp.id} onClick={() => setStyle(sp.id)} className="uiux-style-btn" style={{ border: `1px solid ${style === sp.id ? 'var(--accent-muted)' : 'var(--surface-border)'}`, background: style === sp.id ? 'var(--accent-dim)' : 'var(--surface-raised)' }}>

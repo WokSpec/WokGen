@@ -24,14 +24,14 @@ export function AppearanceSettings() {
   };
 
   return (
-    <section style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', background: 'var(--surface-card)' }}>
-      <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Appearance</h2>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+    <section className="appear-section">
+      <h2 className="appear-heading">Appearance</h2>
+      <div className="appear-row">
         <div>
-          <p style={{ fontSize: '0.9375rem', fontWeight: 500, marginBottom: '0.25rem' }}>Theme</p>
-          <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Choose how WokGen looks to you.</p>
+          <p className="appear-label">Theme</p>
+          <p className="appear-desc">Choose how WokGen looks to you.</p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="appear-swatches">
           {(['dark', 'light', 'system'] as Theme[]).map(t => (
             <button type="button"
               key={t}

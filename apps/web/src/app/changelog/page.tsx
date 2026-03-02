@@ -81,11 +81,11 @@ export default function ChangelogPage() {
   return (
     <div className="changelog-page">
       <div className="changelog-inner">
-        <header style={{ marginBottom: 48 }}>
-          <h1 style={{ fontSize: 'clamp(1.75rem,4vw,2.5rem)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)', margin: '0 0 8px' }}>
+        <header className="changelog-header">
+          <h1 className="changelog-title">
             Changelog
           </h1>
-          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>
+          <p className="changelog-subtitle">
             Version history and release notes for WokGen.
           </p>
         </header>

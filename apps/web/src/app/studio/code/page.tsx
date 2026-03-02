@@ -130,11 +130,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
 </html>`;
 
   return (
-    <div className="min-h-screen text-[var(--text)]" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-screen text-[var(--text)] code-st-wrap">
       <div className="app-topbar">
         <div className="app-topbar__left">
-          <span style={{ color: 'var(--studio-accent, #60a5fa)' }}><IconCode2 size={16} /></span>
-          <span className="studio-shell__panel-title" style={{ fontSize: '0.85rem' }}>Code Studio</span>
+          <span className="code-st-icon-accent"><IconCode2 size={16} /></span>
+          <span className="studio-shell__panel-title code-st-panel-title">Code Studio</span>
           <span className="app-topbar__sep">·</span>
           <span className="text-xs text-[var(--text)]/40">React + Tailwind</span>
         </div>
@@ -169,14 +169,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
             </button>
 
             {error && (
-              <div className="mt-3 p-3 rounded-lg" style={{ background: 'var(--danger-bg)', border: '1px solid rgba(248,113,113,0.2)' }}>
-                <p className="text-xs" style={{ color: 'var(--danger)' }}>{error}</p>
+              <div className="mt-3 p-3 rounded-lg code-st-error">
+                <p className="text-xs code-st-error-text">{error}</p>
               </div>
             )}
           </div>
 
           {/* Templates */}
-          <div className="p-4" style={{ borderTop: '1px solid var(--border)' }}>
+          <div className="p-4 code-st-templates">
             <p className="text-[10px] text-[var(--text)]/30 uppercase tracking-wider mb-2">Templates</p>
             <div className="space-y-1">
               {TEMPLATES.map(t => (
@@ -197,7 +197,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
           {code ? (
             <>
               {/* Toolbar */}
-              <div className="px-4 py-2 flex items-center gap-2" style={{ borderBottom: '1px solid var(--border)' }}>
+              <div className="px-4 py-2 flex items-center gap-2 code-st-toolbar">
                 <div className="flex rounded-lg overflow-hidden border border-white/10">
                   <button type="button"
                     onClick={() => setView('code')}
@@ -229,7 +229,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
                 <div className="flex-1 overflow-auto">
                   <div className="flex h-full">
                     {/* Line numbers */}
-                    <div className="text-[var(--text)]/20 px-3 py-4 text-right select-none min-w-[3rem] font-mono text-xs leading-5" style={{ background: 'var(--surface-muted, var(--bg-elevated))', borderRight: '1px solid var(--border)' }}>
+                    <div className="text-[var(--text)]/20 px-3 py-4 text-right select-none min-w-[3rem] font-mono text-xs leading-5 code-st-line-nums">
                       {code.split('\n').map((_, i) => <div key={i}>{i + 1}</div>)}
                     </div>
                     <pre className="flex-1 p-4 text-xs font-mono text-[var(--text)]/80 leading-5 overflow-x-auto whitespace-pre">
@@ -238,7 +238,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
                   </div>
                 </div>
               ) : (
-                <div className="flex-1" style={{ background: 'var(--bg-surface)' }}>
+                <div className="flex-1 code-st-preview">
                   <iframe
                     srcDoc={previewHtml}
                     className="w-full h-full border-0"

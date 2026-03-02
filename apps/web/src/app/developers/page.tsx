@@ -53,7 +53,7 @@ export default function DevelopersPage() {
       <aside className="dev-sidebar">
         <p className="dev-sidebar__heading">API Reference</p>
         <DevSidebarNav sections={NAV_SECTIONS} />
-        <div style={{ marginTop: 'auto', paddingTop: 24 }}>
+        <div className="dev-sidebar-footer">
           <Link href="/account/api-keys" className="dev-sidebar__cta">Get API Key →</Link>
         </div>
       </aside>
@@ -64,15 +64,15 @@ export default function DevelopersPage() {
         <div className="dev-hero">
           <div className="dev-hero__badge">Developer Preview</div>
           <h1 className="dev-hero__title">
-            <span style={{ color: 'var(--text-secondary)' }}>Build with </span>
-            <span style={{ color: 'var(--accent)' }}>WokAPI</span>
+            <span className="dev-text-secondary">Build with </span>
+            <span className="dev-text-accent">WokAPI</span>
           </h1>
           <p className="dev-hero__desc">
             Programmatic access to WokGen&apos;s full AI generation surface. REST API + TypeScript SDK.
           </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Link href="/account/api-keys" className="btn btn-primary" style={{ padding: '0.625rem 1.25rem' }}>Get API Key</Link>
-            <a href="#overview" className="btn btn-secondary" style={{ padding: '0.625rem 1.25rem' }}>View Docs</a>
+          <div className="dev-hero-btns">
+            <Link href="/account/api-keys" className="btn btn-primary dev-btn-cta">Get API Key</Link>
+            <a href="#overview" className="btn btn-secondary dev-btn-cta">View Docs</a>
           </div>
         </div>
 
@@ -93,7 +93,7 @@ export default function DevelopersPage() {
 
         {/* Auth */}
         <Section id="auth" title="Authentication">
-          <p className="dev-p">Pass your API key as a Bearer token in the <code className="dev-inline-code">Authorization</code> header. Obtain keys at <Link href="/account/api-keys" style={{ color: 'var(--accent)' }}>/account/api-keys</Link>.</p>
+          <p className="dev-p">Pass your API key as a Bearer token in the <code className="dev-inline-code">Authorization</code> header. Obtain keys at <Link href="/account/api-keys" className="dev-link-accent">/account/api-keys</Link>.</p>
           <CodeBlock>{`Authorization: Bearer wok_your_key_here`}</CodeBlock>
           <h3 className="dev-section__sub">Rate Limits</h3>
           <div className="dev-rate-grid">
@@ -125,7 +125,7 @@ export default function DevelopersPage() {
   "quality": "standard",
   "provider": "auto"
 }`}</CodeBlock>
-          <p className="dev-p" style={{ marginTop: 12 }}>Response:</p>
+          <p className="dev-p dev-p--mt">Response:</p>
           <CodeBlock>{`{
   "jobId": "job_abc123",
   "status": "completed",
@@ -204,7 +204,7 @@ export default function DevelopersPage() {
 
         {/* Webhooks */}
         <Section id="webhooks" title="Webhooks">
-          <p className="dev-p">Receive a POST to your endpoint when an async generation completes. Configure in <Link href="/account/api-keys" style={{ color: 'var(--accent)' }}>API settings</Link>.</p>
+          <p className="dev-p">Receive a POST to your endpoint when an async generation completes. Configure in <Link href="/account/api-keys" className="dev-link-accent">API settings</Link>.</p>
           <CodeBlock>{`// POST to your webhook URL
 {
   "event": "generation.completed",
@@ -232,7 +232,7 @@ const enhanced = await client.enhancePrompt({ prompt: 'dragon', mode: 'pixel' })
 // Upscale image
 const upscaled = await client.upscale({ imageUrl: result.imageUrl, scale: 4 });`}</CodeBlock>
           <p className="dev-p">
-            Or <a href="/sdk/wokgen.ts" download style={{ color: 'var(--accent)' }}>download wokgen.ts</a> directly — no npm install required.
+            Or <a href="/sdk/wokgen.ts" download className="dev-link-accent">download wokgen.ts</a> directly — no npm install required.
           </p>
         </Section>
 

@@ -87,7 +87,7 @@ function ApiKeyRow({ service, isSet, onSave }: {
   return (
     <div className="api-key-row">
       <div className="api-key-row__header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="ai-svc-dot-label">
           <span
             className={`api-key-row__dot${isSet ? ' api-key-row__dot--set' : ''}`}
             title={isSet ? 'Key is set' : 'Key not set'}
@@ -111,12 +111,11 @@ function ApiKeyRow({ service, isSet, onSave }: {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           autoComplete="off"
-          style={{ flex: 1 }}
+          className="input ai-svc-input"
         />
         <button
           type="button"
-          className="btn btn--primary"
-          style={{ fontSize: 13, padding: '6px 14px', flexShrink: 0 }}
+          className="btn btn--primary ai-svc-btn-save"
           onClick={handleSave}
           disabled={saving || !value.trim()}
         >
@@ -125,8 +124,7 @@ function ApiKeyRow({ service, isSet, onSave }: {
         {isSet && (
           <button
             type="button"
-            className="btn"
-            style={{ fontSize: 13, padding: '6px 10px', flexShrink: 0, color: 'var(--color-error)', border: '1px solid var(--color-error)', background: 'transparent' }}
+            className="btn ai-svc-btn-clear"
             onClick={handleClear}
             disabled={saving}
             title="Remove key"
@@ -135,7 +133,7 @@ function ApiKeyRow({ service, isSet, onSave }: {
           </button>
         )}
       </div>
-      <span style={{ fontSize: 12, color: 'var(--text-faint)' }}>{service.hint}</span>
+      <span className="ai-svc-hint">{service.hint}</span>
     </div>
   );
 }
@@ -163,18 +161,18 @@ export function AiServicesSettings() {
     setKeyStatus((prev) => ({ ...prev, [key]: !!value }));
   }, []);
 
-  if (loading) return <div style={{ color: 'var(--text-faint)', fontSize: 13 }}>Loading…</div>;
+  if (loading) return <div className="ai-svc-loading">Loading…</div>;
 
   return (
     <div className="settings-api-keys">
-      <div style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+      <div className="ai-svc-desc-wrap">
+        <p className="ai-svc-desc">
           Bring your own API keys to unlock premium features. Your keys are stored securely server-side
           and take precedence over platform defaults. Keys are never returned in plaintext.
         </p>
       </div>
-      {error && <div className="tool-page__error" style={{ marginBottom: 12 }}>{error}</div>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {error && <div className="tool-page__error ai-svc-error">{error}</div>}
+      <div className="ai-svc-list">
         {SERVICES.map((svc) => (
           <ApiKeyRow
             key={svc.key}

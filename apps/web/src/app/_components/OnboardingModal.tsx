@@ -225,7 +225,7 @@ export default function OnboardingModal({ onComplete }: Props) {
             {genError && <p className="onboard-error">{genError}</p>}
             {genResult ? (
               <div className="onboard-result">
-                <div className="onboard-result-img" style={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
+                <div className="onboard-result-img onboard-result-img--square">
                   <Image src={genResult} alt="Generated result" fill className="object-cover" unoptimized sizes="400px" />
                 </div>
                 <button type="button" className="btn-primary onboard-cta" onClick={goToStep3}>

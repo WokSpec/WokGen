@@ -24,55 +24,37 @@ export default function ProWaitlistForm() {
 
   if (status === 'done') {
     return (
-      <div style={{ padding: '0.75rem 1rem', borderRadius: '8px', background: 'var(--info-bg)', border: '1px solid var(--info)', fontSize: '0.875rem', color: 'var(--info)', textAlign: 'center' }}>
+      <div className="pwl-success">
         ✓ You&apos;re on the list! We&apos;ll notify you when Pro launches.
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-      <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', margin: 0 }}>
+    <form onSubmit={handleSubmit} className="pwl-form">
+      <p className="pwl-label">
         Join the waitlist for early access:
       </p>
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
+      <div className="pwl-row">
         <input
           type="email"
           placeholder="you@example.com"
           value={email}
           onChange={e => setEmail(e.target.value)}
           required
-          style={{
-            flex: 1,
-            padding: '0.5rem 0.75rem',
-            borderRadius: '7px',
-            border: '1px solid var(--info)',
-            background: 'var(--surface-card)',
-            color: 'var(--text-primary)',
-            fontSize: '0.875rem',
-            outline: 'none',
-          }}
+          className="pwl-input"
         />
         <button
           type="submit"
           disabled={status === 'loading'}
-          style={{
-            padding: '0.5rem 1rem',
-            borderRadius: '7px',
-            border: '1px solid var(--info)',
-            background: 'var(--info-bg)',
-            color: 'var(--info)',
-            fontWeight: 600,
-            fontSize: '0.875rem',
-            cursor: status === 'loading' ? 'not-allowed' : 'pointer',
-            opacity: status === 'loading' ? 0.6 : 1,
-          }}
+          className="pwl-btn"
+          data-loading={status === 'loading' || undefined}
         >
           {status === 'loading' ? '...' : 'Notify me'}
         </button>
       </div>
       {status === 'error' && (
-        <p style={{ fontSize: '0.8rem', color: 'var(--danger)', margin: 0 }}>Something went wrong. Please try again.</p>
+        <p className="pwl-error">Something went wrong. Please try again.</p>
       )}
     </form>
   );

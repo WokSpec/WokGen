@@ -11,20 +11,20 @@ const EFFECTIVE = 'February 22, 2025';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text)', fontFamily: 'var(--font-heading)', margin: 0 }}>{title}</h2>
-      <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.8 }}>{children}</div>
+    <section className="legal-section">
+      <h2 className="legal-section-title">{title}</h2>
+      <div className="legal-section-body">{children}</div>
     </section>
   );
 }
 
 export default function TermsPage() {
   return (
-    <main style={{ maxWidth: 680, margin: '0 auto', padding: '4rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      <div>
-        <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)', marginBottom: '0.5rem' }}>Last updated: {EFFECTIVE}</p>
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '-0.02em', fontFamily: 'var(--font-heading)', color: 'var(--text)', margin: 0 }}>Terms of Service</h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.75rem', lineHeight: 1.7 }}>
+    <main className="legal-page">
+      <div className="legal-header">
+        <p className="legal-date">Last updated: {EFFECTIVE}</p>
+        <h1 className="legal-title">Terms of Service</h1>
+        <p className="legal-subtitle">
           These Terms govern your use of WokGen, operated by Wok Specialists LLC (&ldquo;we&rdquo;, &ldquo;us&rdquo;).
           By using WokGen you agree to these Terms. If you do not agree, do not use the service.
         </p>
@@ -44,14 +44,14 @@ export default function TermsPage() {
 
       <Section title="3. Acceptable Use">
         <p>You may not use WokGen to generate content that:</p>
-        <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.3rem', marginTop: '0.5rem' }}>
+        <ul className="legal-list legal-list-mt">
           <li>Depicts minors in a sexual manner</li>
           <li>Constitutes harassment, hate speech, or incitement to violence</li>
           <li>Violates any applicable law or regulation</li>
           <li>Infringes third-party intellectual property rights</li>
           <li>Is intended to deceive, defraud, or cause harm</li>
         </ul>
-        <p style={{ marginTop: '0.75rem' }}>We reserve the right to remove content and terminate accounts that violate these rules without notice.</p>
+        <p className="legal-p-gap">We reserve the right to remove content and terminate accounts that violate these rules without notice.</p>
       </Section>
 
       <Section title="4. Payments and Refunds">
@@ -88,11 +88,11 @@ export default function TermsPage() {
       </Section>
 
       <Section title="10. Contact">
-        <p>Questions? Email us at <a href="mailto:team@wokspec.org" style={{ color: 'var(--accent)', textDecoration: 'none' }}>team@wokspec.org</a>.</p>
+        <p>Questions? Email us at <a href="mailto:team@wokspec.org" className="legal-link">team@wokspec.org</a>.</p>
       </Section>
 
-      <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-        <Link href="/" style={{ fontSize: '0.8rem', color: 'var(--text-faint)', textDecoration: 'none' }}>← Back to WokGen</Link>
+      <div className="legal-footer">
+        <Link href="/" className="legal-back-link">← Back to WokGen</Link>
       </div>
     </main>
   );

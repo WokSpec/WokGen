@@ -96,15 +96,12 @@ export function PromptFAB() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows={3}
-              style={{ width: '100%', fontSize: '0.8rem', marginTop: 4 }}
+              className="textarea prompt-fab__textarea"
             />
 
             <button
               type="button"
-              className="btn btn-generate"
-              onClick={enhance}
-              disabled={loading || !prompt.trim()}
-              style={{ width: '100%', marginTop: 8 }}
+              className="btn btn-generate prompt-fab__btn"
             >
               {loading ? 'Enhancing…' : '✨ Enhance'}
             </button>
@@ -123,8 +120,7 @@ export function PromptFAB() {
                 </div>
                 <button
                   type="button"
-                  className="btn btn-generate"
-                  style={{ width: '100%', fontSize: '0.75rem' }}
+                  className="btn btn-generate prompt-fab__btn prompt-fab__btn--sm"
                   onClick={() => usePrompt(enhancedPrompt)}
                 >
                   Use this prompt ↗

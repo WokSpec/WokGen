@@ -218,16 +218,16 @@ export default function UIUXGallery() {
 
       {/* Grid */}
       {loading ? (
-        <div className="gallery-grid gallery-grid--uiux" style={{ padding: '24px' }}>
+        <div className="gallery-grid gallery-grid--uiux uiux-gal-loading-grid">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="gallery-card--skeleton-tall" style={{ animationDelay: `${i * 0.07}s`, minHeight: 160 }} />
+            <div key={i} className="gallery-card--skeleton-tall uiux-gal-skeleton-base" style={{ animationDelay: `${i * 0.07}s` }} />
           ))}
         </div>
       ) : error ? (
         <div className="gallery-error">
           <span>!</span>
           <p>Failed to load gallery</p>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
+          <p className="uiux-gal-error-hint">Check your connection and try again</p>
           <button type="button" className="btn-ghost btn-sm" onClick={() => fetchAssets(null, true)}>Retry</button>
         </div>
       ) : assets.length === 0 ? (
@@ -291,7 +291,7 @@ export default function UIUXGallery() {
       )}
 
       {/* Load more sentinel */}
-      <div ref={sentinelRef} style={{ height: 1 }} />
+      <div ref={sentinelRef} className="uiux-gal-sentinel" />
       {loadingMore && (
         <div className="gallery-loading-more"><div className="studio-spinner studio-spinner--sm" /></div>
       )}

@@ -47,14 +47,14 @@ export default function MarkdownPreviewPage() {
         <h1 className="tool-page-title">Markdown Previewer</h1>
         <p className="tool-page-desc">Write Markdown and see a live preview. Runs entirely in your browser.</p>
       </div>
-      <div className="tool-section" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', minHeight: '400px' }}>
+      <div className="tool-section mdpv-editor-grid">
         <div>
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Input</div>
-          <textarea value={md} onChange={e => setMd(e.target.value)} style={{ width: '100%', height: '380px', background: 'var(--surface-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.875rem', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.875rem', outline: 'none', resize: 'vertical', lineHeight: 1.6 }} />
+          <div className="mdpv-col-label">Input</div>
+          <textarea value={md} onChange={e => setMd(e.target.value)} className="mdpv-textarea" />
         </div>
         <div>
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Preview</div>
-          <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: markdownToHtml(md) }} style={{ height: '380px', overflowY: 'auto', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.875rem', background: 'var(--surface-card)', fontSize: '0.9375rem', lineHeight: 1.6 }} />
+          <div className="mdpv-col-label">Preview</div>
+          <div className="markdown-preview mdpv-preview-box" dangerouslySetInnerHTML={{ __html: markdownToHtml(md) }} />
         </div>
       </div>
     </div>

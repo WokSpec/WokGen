@@ -87,11 +87,11 @@ export default async function DashboardPage() {
             </svg>
           </div>
           <div className="dash-stat-card__body">
-            <div className="dash-stat-card__value" style={{ textTransform: 'capitalize' }}>{planId}</div>
+            <div className="dash-stat-card__value dash-capitalize">{planId}</div>
             <div className="dash-stat-card__label">Current plan</div>
           </div>
           {planId === 'free' && (
-            <a href="/pricing" className="dash-stat-card__badge dash-stat-card__badge--yellow" style={{ textDecoration: 'none' }}>
+            <a href="/pricing" className="dash-stat-card__badge dash-stat-card__badge--yellow dash-no-underline">
               Upgrade
             </a>
           )}

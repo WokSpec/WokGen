@@ -42,12 +42,12 @@ export default function NewProjectClient({ name, brief }: { name: string; brief:
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: '4rem auto', padding: '0 1rem' }}>
-      <h1 style={{ fontSize: '1.5rem', color: 'var(--text)', marginBottom: '1.5rem' }}>New Project</h1>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div className="proj-n-container">
+      <h1 className="proj-n-title">New Project</h1>
+      <form onSubmit={handleSubmit} className="proj-n-form">
         <div>
-          <label style={{ display: 'block', fontSize: 13, color: 'var(--text-muted)', marginBottom: 4 }}>
-            Project name <span style={{ color: 'var(--danger)' }}>*</span>
+          <label className="proj-n-label">
+            Project name <span className="proj-n-required">*</span>
           </label>
           <input
             type="text"
@@ -55,17 +55,17 @@ export default function NewProjectClient({ name, brief }: { name: string; brief:
             onChange={e => setProjectName(e.target.value)}
             placeholder="e.g. Game Kit 2024"
             required
-            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, background: 'var(--surface-card)', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 14, boxSizing: 'border-box' }}
+            className="proj-n-field-input"
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 13, color: 'var(--text-muted)', marginBottom: 4 }}>
+          <label className="proj-n-label">
             Use case
           </label>
           <select
             value={useCase}
             onChange={e => setUseCase(e.target.value)}
-            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, background: 'var(--surface-card)', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 14, boxSizing: 'border-box' }}
+            className="proj-n-field-input"
           >
             {USE_CASES.map(uc => (
               <option key={uc.value} value={uc.value}>{uc.label}</option>
@@ -73,7 +73,7 @@ export default function NewProjectClient({ name, brief }: { name: string; brief:
           </select>
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 13, color: 'var(--text-muted)', marginBottom: 4 }}>
+          <label className="proj-n-label">
             Brief (optional)
           </label>
           <textarea
@@ -81,22 +81,22 @@ export default function NewProjectClient({ name, brief }: { name: string; brief:
             onChange={e => setProjectBrief(e.target.value)}
             placeholder="Describe the project..."
             rows={3}
-            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, background: 'var(--surface-card)', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 14, resize: 'vertical', boxSizing: 'border-box' }}
+            className="proj-n-textarea"
           />
         </div>
-        {error && <p style={{ color: 'var(--danger)', fontSize: 13 }}>{error}</p>}
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        {error && <p className="proj-n-error">{error}</p>}
+        <div className="proj-n-actions">
           <button
             type="submit"
             disabled={loading || !projectName.trim()}
-            style={{ background: 'var(--accent)', color: 'var(--text-on-accent)', padding: '8px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 14, opacity: loading ? 0.6 : 1 }}
+            className="proj-n-btn-submit" style={{ opacity: loading ? 0.6 : 1 }}
           >
             {loading ? 'Creating…' : 'Create Project'}
           </button>
           <button
             type="button"
             onClick={() => router.push('/projects')}
-            style={{ background: 'transparent', color: 'var(--text-muted)', padding: '8px 16px', borderRadius: 6, border: '1px solid var(--border)', cursor: 'pointer', fontSize: 14 }}
+            className="proj-n-btn-cancel"
           >
             Cancel
           </button>

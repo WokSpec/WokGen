@@ -107,7 +107,7 @@ function PlanItemCard({
 
       {/* Result preview */}
       {item.resultUrl && (
-        <div className="director-item__preview" style={{ position: 'relative', minHeight: '120px' }}>
+        <div className="director-item__preview director-item__preview--rel">
           <Image src={item.resultUrl} alt={item.label} fill className="director-item__preview-img object-cover" sizes="200px" />
         </div>
       )}
@@ -346,7 +346,7 @@ export default function EralDirectorClient() {
           <div className="director-brief__options">
             <div className="director-brief__option">
               <label>Mode focus</label>
-              <select className="input" value={mode} onChange={e => setMode(e.target.value)} style={{ width: 160 }}>
+              <select className="input director-mode-select" value={mode} onChange={e => setMode(e.target.value)}>
                 <option value="">Auto (all modes)</option>
                 <option value="pixel">Pixel art</option>
                 <option value="business">Business</option>
@@ -358,7 +358,7 @@ export default function EralDirectorClient() {
             </div>
             <div className="director-brief__option">
               <label>Assets to plan</label>
-              <select className="input" value={count} onChange={e => setCount(Number(e.target.value))} style={{ width: 80 }}>
+              <select className="input director-count-select" value={count} onChange={e => setCount(Number(e.target.value))}>
                 {[4, 6, 8, 10, 12, 16].map(n => <option key={n} value={n}>{n}</option>)}
               </select>
             </div>

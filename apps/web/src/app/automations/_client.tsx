@@ -190,7 +190,7 @@ function AutomationRow({
           <p className="automation-row__error">{auto.lastRunError}</p>
         )}
         {testMsg && (
-          <p style={{ fontSize: '0.75rem', color: testMsg.ok ? 'var(--success)' : 'var(--danger)', marginTop: '0.25rem' }}>{testMsg.text}</p>
+          <p className="auto-test-msg" style={{ color: testMsg.ok ? 'var(--success)' : 'var(--danger)' }}>{testMsg.text}</p>
         )}
       </div>
       <div className="automation-row__actions">
@@ -207,11 +207,10 @@ function AutomationRow({
         {auto.targetType === 'webhook' && (
           <button
             type="button"
-            className="btn btn--ghost btn--sm"
+            className="btn btn--ghost btn--sm auto-btn-muted"
             onClick={handleTest}
             disabled={testing}
             title="Send test event to webhook"
-            style={{ color: 'var(--text-muted)' }}
           >
             {testing ? '…' : 'Test'}
           </button>
@@ -219,11 +218,10 @@ function AutomationRow({
         {auto.targetType !== 'webhook' && (
           <button
             type="button"
-            className="btn btn--ghost btn--sm"
+            className="btn btn--ghost btn--sm auto-btn-muted"
             onClick={handleTest}
             disabled={testing}
             title="Run automation once immediately"
-            style={{ color: 'var(--text-muted)' }}
           >
             {testing ? '…' : 'Test run'}
           </button>
@@ -232,7 +230,7 @@ function AutomationRow({
           {deleting ? '…' : confirmDelete ? 'Confirm?' : 'Delete'}
         </button>
         {confirmDelete && (
-          <button type="button" onClick={() => setConfirmDelete(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.75rem', padding: '0 4px' }}>Cancel</button>
+          <button type="button" onClick={() => setConfirmDelete(false)} className="auto-cancel-confirm">Cancel</button>
         )}
       </div>
     </div>
@@ -269,7 +267,7 @@ export default function AutomationsClient() {
         <div>
           <h1 className="automations-page__title">
             Automations
-            <span style={{ fontSize: '0.625rem', padding: '0.2rem 0.5rem', borderRadius: '999px', fontWeight: 600, marginLeft: '0.5rem', background: 'var(--info-bg)', color: 'var(--blue, #60a5fa)', verticalAlign: 'middle', letterSpacing: '0.04em' }}>Beta</span>
+            <span className="auto-beta-badge">Beta</span>
           </h1>
           <p className="automations-page__subtitle">Schedule messages, webhooks, and alerts on a cron timer.</p>
         </div>

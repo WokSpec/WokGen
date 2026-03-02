@@ -1014,9 +1014,9 @@ function UIUXPreview({
         </div>
         <button type="button" className="btn-ghost btn-xs" onClick={() => setIframeKey((k) => k + 1)} title="Reload preview">↺</button>
       </div>
-      <div style={{ flex: 1, overflow: 'auto', background: vpWidth ? '#1a1a1a' : '#fff', display: 'flex', justifyContent: 'center', padding: vpWidth ? '12px 0' : 0 }}>
-        <div style={{ width: vpWidth ?? '100%', height: vpWidth ? undefined : '100%', minHeight: vpWidth ? 600 : undefined, boxShadow: vpWidth ? '0 4px 24px var(--overlay-50)' : 'none', borderRadius: vpWidth ? 8 : 0, overflow: 'hidden', flex: vpWidth ? undefined : 1 }}>
-          <iframe key={iframeKey} srcDoc={code} title="Component preview" className="uiux-iframe" sandbox="allow-scripts allow-same-origin" style={{ border: 'none', width: '100%', height: vpWidth ? 600 : '100%', display: 'block', minHeight: vpWidth ? 600 : undefined }} />
+      <div className="uiux-st-preview-scroll" style={{ background: vpWidth ? '#1a1a1a' : '#fff', padding: vpWidth ? '12px 0' : 0 }}>
+        <div className="uiux-st-preview-inner" style={{ width: vpWidth ?? '100%', height: vpWidth ? undefined : '100%', minHeight: vpWidth ? 600 : undefined, boxShadow: vpWidth ? '0 4px 24px var(--overlay-50)' : 'none', borderRadius: vpWidth ? 8 : 0, flex: vpWidth ? undefined : 1 }}>
+          <iframe key={iframeKey} srcDoc={code} title="Component preview" className="uiux-iframe uiux-st-iframe-base" sandbox="allow-scripts allow-same-origin" style={{ height: vpWidth ? 600 : '100%', minHeight: vpWidth ? 600 : undefined }} />
         </div>
       </div>
     </div>
@@ -1067,7 +1067,7 @@ function UIUXAccessibilityPanel({ hints }: { hints: string[] }) {
         {hints.map((hint, i) => {
           const isWarning = /warning|missing|lacks|no\s+alt|no\s+label/i.test(hint) || hint.includes('Warning');
           return (
-            <div key={i} style={{ display: 'flex', gap: 9, padding: '9px 11px', borderRadius: 7, background: isWarning ? '!' : '→', border: `1px solid ${isWarning ? '!' : '→'}` }}>
+            <div key={i} className="uiux-st-a11y-hint" style={{ background: isWarning ? '!' : '→', border: `1px solid ${isWarning ? '!' : '→'}` }}>
               <span className="uiux-a11y-hint-icon">{isWarning ? '!' : '→'}</span>
               <div className="uiux-a11y-hint-text">{hint}</div>
             </div>

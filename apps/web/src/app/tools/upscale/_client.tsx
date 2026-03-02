@@ -111,12 +111,12 @@ export function UpscaleClient() {
             ref={fileRef}
             type="file"
             accept="image/*"
-            style={{ display: 'none' }}
+            className="ups-file-hidden"
             onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
           />
 
           {/* Scale selector */}
-          <label className="tool-page__label" style={{ marginTop: 16 }}>Scale factor</label>
+          <label className="tool-page__label ups-mt16">Scale factor</label>
           <div className="tool-page__toggle-row">
             {([2, 4] as Scale[]).map((s) => (
               <button
@@ -133,11 +133,10 @@ export function UpscaleClient() {
           {error && <div className="tool-page__error">{error}</div>}
 
           <button
-            className="tool-page__btn-primary"
+            className="tool-page__btn-primary ups-mt16"
             onClick={handleUpscale}
             disabled={loading || !imageUrl.trim()}
             type="button"
-            style={{ marginTop: 16 }}
           >
             {loading ? <><span className="tool-page__spinner" />Upscaling…</> : 'Upscale Image'}
           </button>
@@ -160,8 +159,7 @@ export function UpscaleClient() {
             <a
               href={result.url}
               download="upscaled.png"
-              className="tool-page__btn-primary"
-              style={{ display: 'inline-flex', marginTop: 16, textDecoration: 'none' }}
+              className="tool-page__btn-primary ups-download-link"
             >
               ↓ Download
             </a>

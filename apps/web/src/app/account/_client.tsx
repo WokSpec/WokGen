@@ -425,7 +425,7 @@ function UsageTab() {
                       <div key={mode} className="mode-breakdown__row">
                         <span className="mode-breakdown__label">{mode.charAt(0).toUpperCase() + mode.slice(1)}</span>
                         <div className="mode-breakdown__track">
-                          <div className="mode-breakdown__fill" style={{ width: `${Math.round((count / total) * 100)}%`, background: 'var(--accent)' }} />
+                          <div className="mode-breakdown__fill" style={{ width: `${Math.round((count / total) * 100)}%` }} />
                         </div>
                         <span className="mode-breakdown__count">{count}</span>
                       </div>

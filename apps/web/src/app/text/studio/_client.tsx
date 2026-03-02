@@ -346,14 +346,14 @@ export default function TextStudio() {
                 {loadingMsg} {msToSecs(elapsedMs)}
               </div>
               <div className="studio-shimmer-wrap">
-                <div className="studio-shimmer-block" style={{ height: 18, width: '92%' }} />
-                <div className="studio-shimmer-block" style={{ height: 18, width: '78%' }} />
-                <div className="studio-shimmer-block" style={{ height: 18, width: '86%' }} />
-                <div className="studio-shimmer-block" style={{ height: 18, width: '62%' }} />
-                <div className="studio-shimmer-block" style={{ height: 18, width: '80%' }} />
-                <div className="studio-shimmer-block" style={{ height: 18, width: '55%' }} />
-                <div className="studio-shimmer-block" style={{ height: 18, width: '70%' }} />
-                <div className="studio-shimmer-block" style={{ height: 18, width: '88%' }} />
+                <div className="studio-shimmer-block txt-st-sh-1" />
+                <div className="studio-shimmer-block txt-st-sh-2" />
+                <div className="studio-shimmer-block txt-st-sh-3" />
+                <div className="studio-shimmer-block txt-st-sh-4" />
+                <div className="studio-shimmer-block txt-st-sh-5" />
+                <div className="studio-shimmer-block txt-st-sh-6" />
+                <div className="studio-shimmer-block txt-st-sh-7" />
+                <div className="studio-shimmer-block txt-st-sh-8" />
               </div>
             </>
           )}

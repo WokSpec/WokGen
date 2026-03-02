@@ -111,18 +111,13 @@ export function InterrogateClient() {
             ref={fileRef}
             type="file"
             accept="image/*"
-            style={{ display: 'none' }}
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+            className="sr-only interrog-file-hidden"
           />
 
           {error && <div className="tool-page__error">{error}</div>}
 
           <button
-            className="tool-page__btn-primary"
-            onClick={handleInterrogate}
-            disabled={loading || !imageUrl.trim()}
-            type="button"
-            style={{ marginTop: 16 }}
+            className="tool-page__btn-primary interrog-btn"
           >
             {loading ? <><span className="tool-page__spinner" />Analyzing image…</> : 'Interrogate Image'}
           </button>
@@ -148,7 +143,7 @@ export function InterrogateClient() {
 
             {/* Tags */}
             <div className="tool-page__card">
-              <div className="tool-page__result-title" style={{ marginBottom: 12 }}>Tags</div>
+              <div className="tool-page__result-title interrog-tags-title">Tags</div>
               <div className="tool-interrogate__tags">
                 {result.tags.map((tag) => (
                   <button

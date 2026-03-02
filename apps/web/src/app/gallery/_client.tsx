@@ -239,7 +239,7 @@ export default function GalleryClient() {
       {loading && <p className="gallery-loading">Loading…</p>}
 
       {!loading && hasMore && (
-        <div style={{ textAlign: 'center', marginTop: 32 }}>
+        <div className="gallery-load-more-wrap">
           <button className="gallery-load-more" onClick={handleLoadMore}>
             Load more
           </button>

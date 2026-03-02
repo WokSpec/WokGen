@@ -34458,3 +34458,25 @@ pre {
   color: #fff !important;
   border-color: var(--accent) !important;
 }
+
+/* ── Business gallery grid ── */
+.biz-gallery-grid { padding: 24px; }
+.gallery-error__hint { font-size: 0.8rem; color: var(--text-muted); }
+.gallery-sentinel { height: 1px; }
+
+/* ── Tools loading skeleton ── */
+.tl-title    { height: 1.75rem; width: 200px; margin-bottom: 0.5rem; }
+.tl-subtitle { height: 1rem; width: 320px; }
+.tl-search   { height: 2.5rem; }
+
+/* ── Profile client ── */
+.profile-avatar--img { border-radius: 50%; object-fit: cover; }
+.profile-recent-thumb--rel { position: relative; }
+
+/* ── Gallery load more ── */
+.gallery-load-more-wrap { text-align: center; margin-top: 32px; }
+
+/* ── Tools interrogate ── */
+.interrog-file-hidden { display: none; }
+.interrog-btn { margin-top: 16px; }
+.interrog-tags-title { margin-bottom: 12px; }

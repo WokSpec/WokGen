@@ -178,7 +178,7 @@ export default function BusinessGallery() {
 
       {/* Grid */}
       {loading ? (
-        <div className="gallery-grid gallery-grid--natural" style={{ padding: '24px' }}>
+        <div className="gallery-grid gallery-grid--natural biz-gallery-grid">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="gallery-card gallery-card--skeleton" style={{ animationDelay: `${i * 0.07}s` }} />
           ))}
@@ -187,7 +187,7 @@ export default function BusinessGallery() {
         <div className="gallery-error">
           <span className="gallery-warn-icon">!</span>
           <p>Failed to load gallery</p>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Check your connection and try again</p>
+          <p className="gallery-error__hint">Check your connection and try again</p>
           <button type="button" className="btn-ghost btn-sm" onClick={() => fetchAssets(null, true)}>Retry</button>
         </div>
       ) : assets.length === 0 ? (
@@ -239,7 +239,7 @@ export default function BusinessGallery() {
       )}
 
       {/* Load more sentinel */}
-      <div ref={sentinelRef} style={{ height: 1 }} />
+      <div ref={sentinelRef} className="gallery-sentinel" />
       {loadingMore && (
         <div className="gallery-loading-more"><div className="studio-spinner studio-spinner--sm" /></div>
       )}

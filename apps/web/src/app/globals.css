@@ -32089,3 +32089,519 @@ select:focus {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* ═══════════════════════ PASS 21h — Pixel Studio CSS ═══════════════════════ */
+
+/* pixel/error.tsx */
+.pixel-st-error-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  text-align: center;
+  padding: 2rem;
+}
+.pixel-st-error-icon {
+  font-size: 32px;
+}
+.pixel-st-error-heading {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.pixel-st-error-msg {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  max-width: 400px;
+}
+.pixel-st-error-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.pixel-st-error-link {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+/* pixel/loading.tsx */
+.pixel-st-loading-wrap {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pixel-st-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-subtle);
+  border-top-color: var(--accent);
+  animation: spin 600ms linear infinite;
+}
+
+/* pixel/_client.tsx utility classes */
+.pixel-st-minw-52 { min-width: 52px; }
+.pixel-st-minw-32 { min-width: 32px; }
+.pixel-st-minw-42 { min-width: 42px; }
+.pixel-st-hidden  { display: none; }
+.pixel-st-svg-block { display: block; }
+
+/* ═══════════════════════ PASS 21h — Vector Studio CSS ══════════════════════ */
+
+/* vector/error.tsx */
+.vector-st-error-wrap {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+.vector-st-error-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.vector-st-error-msg {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+.vector-st-error-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+.vector-st-error-retry {
+  padding: 0.5rem 1.25rem;
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-glow);
+  border-radius: 6px;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+.vector-st-error-back {
+  padding: 0.5rem 1.25rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+/* vector/loading.tsx */
+.vector-st-loading-wrap {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vector-st-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-glow);
+  border-top-color: var(--accent);
+  animation: spin 600ms linear infinite;
+}
+
+/* ═══════════════════════ PASS 21h — Voice Studio CSS ═══════════════════════ */
+
+/* voice/error.tsx */
+.voice-st-error-wrap {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+.voice-st-error-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.voice-st-error-msg {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+.voice-st-error-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+.voice-st-error-retry {
+  padding: 0.5rem 1.25rem;
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-glow);
+  border-radius: 6px;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+.voice-st-error-back {
+  padding: 0.5rem 1.25rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+/* voice/loading.tsx */
+.voice-st-loading-wrap {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.voice-st-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-glow);
+  border-top-color: var(--accent);
+  animation: spin 600ms linear infinite;
+}
+
+/* voice/_client.tsx shimmer utilities */
+.voice-st-shimmer-55 { height: 16px; width: 55%; }
+.voice-st-shimmer-38 { height: 16px; width: 38%; }
+
+/* ═══════════════════════ PASS 21h — Business Studio CSS ════════════════════ */
+
+/* business/error.tsx */
+.biz-st-error-wrap {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+.biz-st-error-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.biz-st-error-msg {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+.biz-st-error-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+.biz-st-error-retry {
+  padding: 0.5rem 1.25rem;
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-glow);
+  border-radius: 6px;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+.biz-st-error-back {
+  padding: 0.5rem 1.25rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+/* business/loading.tsx */
+.biz-st-loading-wrap {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.biz-st-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-glow);
+  border-top-color: var(--accent);
+  animation: spin 600ms linear infinite;
+}
+
+/* business/_client.tsx shimmer utilities */
+.biz-st-shimmer-sm {
+  height: 14px;
+  width: 45%;
+  align-self: center;
+}
+
+/* ═══════════════════════ PASS 21h — UI/UX Studio CSS ═══════════════════════ */
+
+/* uiux/error.tsx */
+.uiux-st-error-wrap {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+.uiux-st-error-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.uiux-st-error-msg {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+.uiux-st-error-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+.uiux-st-error-retry {
+  padding: 0.5rem 1.25rem;
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-glow);
+  border-radius: 6px;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+.uiux-st-error-back {
+  padding: 0.5rem 1.25rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+/* uiux/loading.tsx */
+.uiux-st-loading-wrap {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.uiux-st-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-subtle);
+  border-top-color: var(--accent);
+  animation: spin 600ms linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PASS 24 — Studio Experience Polish
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Generate button ── */
+.btn-generate,
+.biz-gen-btn {
+  position: relative;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(
+    135deg,
+    var(--studio-accent, var(--accent)) 0%,
+    color-mix(in srgb, var(--studio-accent, var(--accent)) 65%, #c084fc) 100%
+  );
+  color: #080810;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  box-shadow:
+    0 2px 0 color-mix(in srgb, var(--studio-accent, var(--accent)) 30%, transparent),
+    0 6px 24px color-mix(in srgb, var(--studio-accent, var(--accent)) 28%, transparent);
+}
+.btn-generate::after,
+.biz-gen-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, transparent 60%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+.btn-generate:not(:disabled):hover,
+.biz-gen-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 0 color-mix(in srgb, var(--studio-accent, var(--accent)) 30%, transparent),
+    0 10px 36px color-mix(in srgb, var(--studio-accent, var(--accent)) 38%, transparent);
+}
+.btn-generate:not(:disabled):active,
+.biz-gen-btn:not(:disabled):active {
+  transform: translateY(0px);
+}
+.btn-generate:disabled,
+.biz-gen-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Studio layout ── */
+.studio-layout {
+  background: var(--bg, #080810);
+}
+
+/* ── Left panel ── */
+.studio-shell__left-panel {
+  background: color-mix(in srgb, var(--bg, #080810) 97%, var(--studio-accent, var(--accent))) !important;
+  border-right: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 12%, var(--border)) !important;
+}
+
+/* ── Panel header ── */
+.studio-shell__panel-header {
+  border-bottom: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, var(--border)) !important;
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 4%, var(--surface)) !important;
+}
+.studio-shell__panel-title {
+  font-weight: 700 !important;
+  background: linear-gradient(135deg, var(--text) 40%, var(--studio-accent, var(--accent)) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* ── Tool tabs ── */
+.studio-tool-tab {
+  transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+}
+.studio-tool-tab--active {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 14%, transparent) !important;
+  color: var(--studio-accent, var(--accent)) !important;
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 25%, transparent) !important;
+}
+
+/* ── Prompt textarea ── */
+.studio-textarea,
+.pixel-prompt-textarea,
+.pixel-neg-textarea {
+  background: color-mix(in srgb, var(--surface) 70%, transparent) !important;
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, var(--border)) !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
+  resize: none !important;
+}
+.studio-textarea:focus,
+.pixel-prompt-textarea:focus,
+.pixel-neg-textarea:focus {
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 45%, var(--border)) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, transparent) !important;
+}
+
+/* ── Section labels in studio sidebar ── */
+.pixel-studio-section-label {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: color-mix(in srgb, var(--studio-accent, var(--accent)) 70%, var(--text-muted)) !important;
+}
+
+/* ── Studio canvas / output area ── */
+.studio-canvas-area,
+.studio-result-area,
+.studio-output {
+  background: color-mix(in srgb, var(--bg, #080810) 98%, var(--studio-accent, var(--accent))) !important;
+}
+
+/* ── Idle state examples ── */
+.studio-idle-examples { margin-top: 12px; }
+.studio-idle-example-btn {
+  border: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 15%, var(--border)) !important;
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 5%, transparent) !important;
+  color: var(--text-secondary, var(--text-muted)) !important;
+  transition: border-color 0.15s, color 0.15s, background 0.15s !important;
+}
+.studio-idle-example-btn:hover {
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 40%, var(--border)) !important;
+  color: var(--studio-accent, var(--accent)) !important;
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, transparent) !important;
+}
+
+/* ── Loading spinner per-mode accent ── */
+.studio-spinner {
+  border-top-color: var(--studio-accent, var(--accent)) !important;
+}
+
+/* ── Quality toggle buttons ── */
+.pixel-quality-btn {
+  border: 1px solid var(--border) !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  transition: border-color 0.15s, color 0.15s, background 0.15s !important;
+}
+.pixel-quality-btn.active {
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 40%, var(--border)) !important;
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, transparent) !important;
+  color: var(--studio-accent, var(--accent)) !important;
+}
+
+/* ── Studio actions bar ── */
+.pixel-studio-actions-bar {
+  border-top: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 8%, var(--border)) !important;
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 3%, var(--surface)) !important;
+}
+.pixel-studio-action-btn {
+  transition: color 0.15s, background 0.15s !important;
+}
+.pixel-studio-action-btn:hover {
+  color: var(--studio-accent, var(--accent)) !important;
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 8%, transparent) !important;
+}
+
+/* ── Eral button in studio ── */
+.pixel-studio-eral-btn {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 10%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--studio-accent, var(--accent)) 25%, transparent) !important;
+  color: var(--studio-accent, var(--accent)) !important;
+  transition: background 0.15s, box-shadow 0.15s !important;
+}
+.pixel-studio-eral-btn:hover {
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 18%, transparent) !important;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--studio-accent, var(--accent)) 20%, transparent) !important;
+}
+
+/* ── Studio dropzone ── */
+.studio-dropzone {
+  border: 2px dashed color-mix(in srgb, var(--studio-accent, var(--accent)) 20%, var(--border)) !important;
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 3%, transparent) !important;
+  transition: border-color 0.15s, background 0.15s !important;
+}
+.studio-dropzone--active {
+  border-color: color-mix(in srgb, var(--studio-accent, var(--accent)) 60%, var(--border)) !important;
+  background: color-mix(in srgb, var(--studio-accent, var(--accent)) 8%, transparent) !important;
+}
+
+/* ── Gallery card images ── */
+.gallery-card-img {
+  transition: transform 0.3s ease !important;
+}
+
+/* ── kbd hint styling ── */
+.pixel-kbd-hint {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.3);
+  font-family: inherit;
+  color: rgba(0,0,0,0.6);
+}

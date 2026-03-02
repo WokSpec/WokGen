@@ -14,41 +14,23 @@ export default function PixelStudioError({
   }, [error]);
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '60vh',
-      gap: '16px',
-      textAlign: 'center',
-      padding: '2rem',
-    }}>
-      <div style={{ fontSize: '32px' }}>⚠</div>
-      <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+    <div className="pixel-st-error-wrap">
+      <div className="pixel-st-error-icon">⚠</div>
+      <h2 className="pixel-st-error-heading">
         Studio encountered an error
       </h2>
-      <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', maxWidth: '400px' }}>
+      <p className="pixel-st-error-msg">
         {error.message || 'Something went wrong loading the studio. Please try again.'}
       </p>
       <button type="button"
         onClick={reset}
-        style={{
-          background: 'var(--accent)',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 'var(--radius)',
-          padding: '8px 20px',
-          fontSize: '0.875rem',
-          fontWeight: 500,
-          cursor: 'pointer',
-        }}
+        className="pixel-st-error-btn"
       >
         Try Again
       </button>
       <a
         href="/pixel/studio"
-        style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', textDecoration: 'none' }}
+        className="pixel-st-error-link"
       >
         Back to Studio
       </a>

@@ -1194,7 +1194,7 @@ function BusinessStudioInner() {
                 <span>{loadingMsg} {(elapsedMs / 1000).toFixed(1)}s</span>
                 <div className="studio-shimmer-wrap biz-shimmer-wrap-sm">
                   <div className="studio-shimmer-block biz-shimmer-asset" />
-                  <div className="studio-shimmer-block" style={{ height: 14, width: '45%', alignSelf: 'center' }} />
+                  <div className="studio-shimmer-block biz-st-shimmer-sm" />
                 </div>
               </div>
             )}

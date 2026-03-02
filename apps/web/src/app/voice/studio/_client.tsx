@@ -604,8 +604,8 @@ function VoiceStudioInner() {
               </div>
               <div className="studio-shimmer-wrap">
                 <div className="studio-shimmer-block voice-shimmer-audio" />
-                <div className="studio-shimmer-block" style={{ height: 16, width: '55%' }} />
-                <div className="studio-shimmer-block" style={{ height: 16, width: '38%' }} />
+                <div className="studio-shimmer-block voice-st-shimmer-55" />
+                <div className="studio-shimmer-block voice-st-shimmer-38" />
               </div>
             </div>
           )}

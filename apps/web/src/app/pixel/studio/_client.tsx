@@ -1681,8 +1681,7 @@ function GenerateForm({
             <button type="button"
               key={era.id}
               onClick={() => setPixelEra(era.id)}
-              className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${pixelEra === era.id ? ' active' : ''}`}
-              style={{ minWidth: 52 }}
+              className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn pixel-st-minw-52${pixelEra === era.id ? ' active' : ''}`}
             >
               {era.label}
             </button>
@@ -1751,8 +1750,7 @@ function GenerateForm({
               <button type="button"
                 key={p}
                 onClick={() => setPaletteSize(p)}
-                className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${paletteSize === p ? ' active' : ''}`}
-                style={{ minWidth: 32 }}
+                className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn pixel-st-minw-32${paletteSize === p ? ' active' : ''}`}
               >
                 {p}
               </button>
@@ -1881,7 +1879,7 @@ function GenerateForm({
                 ref={refImageInputRef}
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
-                style={{ display: 'none' }}
+                className="pixel-st-hidden"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (!f) return;
@@ -1975,8 +1973,7 @@ function GenerateForm({
               <button type="button"
                 key={s}
                 onClick={() => setSize(s)}
-                className={`flex flex-col items-center flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn${size === s ? ' active' : ''}${isRec && size !== s ? ' pixel-option-btn--rec' : ''}`}
-                style={{ minWidth: 42 }}
+                className={`flex flex-col items-center flex-1 py-1.5 rounded-md text-xs font-medium transition-all duration-150 pixel-option-btn pixel-st-minw-42${size === s ? ' active' : ''}${isRec && size !== s ? ' pixel-option-btn--rec' : ''}`}
               >
                 <span>{s}</span>
                 <span className={`pixel-size-label${isRec ? ' rec' : ''}`}>
@@ -2013,11 +2010,10 @@ function GenerateForm({
               <button type="button"
                 key={ar.id}
                 onClick={() => setAspectRatio(ar.id)}
-                className={`flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150 flex flex-col items-center gap-1 pixel-option-btn${aspectRatio === ar.id ? ' active' : ''}`}
+                className={`flex-1 py-2 rounded-md text-xs font-medium transition-all duration-150 flex flex-col items-center gap-1 pixel-option-btn pixel-st-minw-42${aspectRatio === ar.id ? ' active' : ''}`}
                 title={`${ar.label} — ${ar.use}`}
-                style={{ minWidth: 42 }}
               >
-                <svg width={tw} height={th} viewBox={`0 0 ${tw} ${th}`} style={{ display: 'block' }}>
+                <svg width={tw} height={th} viewBox={`0 0 ${tw} ${th}`} className="pixel-st-svg-block">
                   <rect x={0.5} y={0.5} width={tw - 1} height={th - 1} rx={1}
                     fill={aspectRatio === ar.id ? 'var(--accent-dim)' : 'transparent'}
                     stroke={aspectRatio === ar.id ? 'var(--accent)' : 'var(--text-disabled)'}

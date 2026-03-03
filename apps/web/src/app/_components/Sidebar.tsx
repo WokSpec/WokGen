@@ -430,6 +430,15 @@ export function Sidebar() {
         <AssetsIcon />
       </SidebarItem>
 
+      {/* Animate */}
+      <SidebarItem href="/pixel/animate" label="Animate" active={isActive('/pixel/animate')}>
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="5" width="4" height="10" rx="1" fill="currentColor" opacity=".5"/>
+          <rect x="8" y="3" width="4" height="14" rx="1" fill="currentColor" opacity=".8"/>
+          <rect x="14" y="5" width="4" height="10" rx="1" fill="currentColor" opacity=".5"/>
+        </svg>
+      </SidebarItem>
+
       {/* Palette Studio */}
       <SidebarItem href="/pixel/palette" label="Palette Studio" active={isActive('/pixel/palette')}>
         <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

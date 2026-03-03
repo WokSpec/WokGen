@@ -25,7 +25,7 @@ export default function GalleryClient() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [modeFilter, setModeFilter] = useState<string>('all');
+  const [modeFilter, setModeFilter] = useState<string>('pixel');
   const [selectedAsset, setSelectedAsset] = useState<GalleryAsset | null>(null);
 
   const { ref: sentinelRef, inView } = useInView({ threshold: 0.1 });
@@ -84,11 +84,8 @@ export default function GalleryClient() {
           onChange={e => setModeFilter(e.target.value)}
           className="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white/60"
         >
-          <option value="all">All modes</option>
+          <option value="all">All</option>
           <option value="pixel">Pixel</option>
-          <option value="vector">Vector</option>
-          <option value="uiux">UI/UX</option>
-          <option value="business">Business</option>
         </select>
       </div>
 
@@ -164,6 +161,14 @@ export default function GalleryClient() {
                   className="text-xs bg-white text-black px-3 py-1.5 rounded-lg font-medium hover:bg-white/90"
                 >
                   Download
+                </a>
+                <a
+                  href={`/editor?import=${encodeURIComponent(selectedAsset.imageUrl)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-purple-500"
+                >
+                  Edit in Editor
                 </a>
               </div>
             </div>

@@ -5,7 +5,6 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 import { DAILY_STD_LIMIT } from '@/lib/quota';
-import { MODES_LIST } from '@/lib/modes';
 
 export const dynamic = 'force-dynamic';
 
@@ -162,17 +161,14 @@ export default async function DashboardPage() {
       <div className="dash-quick-create">
         <span className="dash-quick-label">Quick create</span>
         <div className="dash-quick-links">
-          {MODES_LIST.map((mode) => (
-            <Link
-              key={mode.id}
-              href={mode.routes.studio}
-              className="dash-quick-btn"
-              style={{ '--mode-accent': mode.accentColor } as React.CSSProperties}
-            >
-              {mode.shortLabel}
-            </Link>
-          ))}
-          <a href="https://tools.wokspec.org" className="dash-quick-btn" target="_blank" rel="noopener noreferrer">Tools</a>
+          <Link href="/pixel/studio?tool=generate" className="dash-quick-btn" style={{ '--mode-accent': '#7c3aed' } as React.CSSProperties}>🎨 Generate</Link>
+          <Link href="/pixel/studio?tool=animate" className="dash-quick-btn" style={{ '--mode-accent': '#7c3aed' } as React.CSSProperties}>🎬 Animate</Link>
+          <Link href="/pixel/studio?tool=inpaint" className="dash-quick-btn" style={{ '--mode-accent': '#7c3aed' } as React.CSSProperties}>🖌 Inpaint</Link>
+          <Link href="/pixel/studio?tool=scene" className="dash-quick-btn" style={{ '--mode-accent': '#7c3aed' } as React.CSSProperties}>🗺 Scene</Link>
+          <Link href="/editor" className="dash-quick-btn" style={{ '--mode-accent': '#059669' } as React.CSSProperties}>✏️ Editor</Link>
+          <Link href="/pixel/palette" className="dash-quick-btn" style={{ '--mode-accent': '#d97706' } as React.CSSProperties}>🎭 Palette</Link>
+          <Link href="/pixel/atlas" className="dash-quick-btn" style={{ '--mode-accent': '#2563eb' } as React.CSSProperties}>📦 Atlas</Link>
+          <Link href="/prompt-lab" className="dash-quick-btn" style={{ '--mode-accent': '#db2777' } as React.CSSProperties}>🧪 Prompt Lab</Link>
         </div>
       </div>
 

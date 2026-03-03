@@ -6,18 +6,15 @@ import { usePathname } from 'next/navigation';
 const PRODUCT_LINKS = [
   { label: 'Pixel Studio',  href: '/pixel/studio',    ext: false },
   { label: 'Vector Studio', href: '/vector/studio',   ext: false },
-  { label: 'Tools',         href: '/tools',            ext: false },
+  { label: 'Tools',         href: 'https://woktool.wokspec.org', ext: true  },
   { label: 'Prompt Lab',    href: '/prompt-lab',       ext: false },
   { label: 'Community',     href: '/community',        ext: false },
   { label: 'Open Source',   href: '/open-source',      ext: false },
 ];
 
 const TOOLS_LINKS = [
-  { label: 'Upscaler',       href: '/tools/upscale',  ext: false },
-  { label: 'SFX Library',    href: '/tools/sfx',       ext: false },
-  { label: 'Asset Library',  href: '/tools/assets',    ext: false },
-  { label: 'Color Palette',  href: '/tools/palette',   ext: false },
-  { label: 'Gallery',        href: '/gallery',          ext: false },
+  { label: 'WokTool',        href: 'https://woktool.wokspec.org',              ext: true  },
+  { label: 'Gallery',        href: '/gallery',                                  ext: false },
 ];
 
 const RESOURCES_LINKS = [
@@ -58,8 +55,7 @@ export function Footer() {
     pathname?.startsWith('/voice/studio') ||
     pathname?.startsWith('/code/studio') ||
     pathname?.startsWith('/text/studio') ||
-    pathname?.startsWith('/eral') ||
-    pathname?.startsWith('/tools/')
+    pathname?.startsWith('/eral')
   ) return null;
 
   return (

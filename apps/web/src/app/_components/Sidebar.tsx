@@ -436,20 +436,11 @@ export function Sidebar() {
       <SidebarItem href="/dashboard" label="Dashboard" active={isActive('/dashboard')}>
         <DashboardIcon />
       </SidebarItem>
-      <SidebarItem href="/tools" label="Tools" active={isActive('/tools')}>
+      <SidebarItem href="https://woktool.wokspec.org" label="WokTool" active={false}>
         <ToolsIcon />
       </SidebarItem>
       <SidebarItem href="/gallery" label="Gallery" active={isActive('/library') || isActive('/gallery')}>
         <GalleryIcon />
-      </SidebarItem>
-      <SidebarItem href="/tools/music" label="Music" active={isActive('/tools/music')}>
-        <MusicNoteIcon />
-      </SidebarItem>
-      <SidebarItem href="/tools/sfx" label="SFX" active={isActive('/tools/sfx')}>
-        <SfxIcon />
-      </SidebarItem>
-      <SidebarItem href="/tools/assets" label="Assets" active={isActive('/tools/assets')}>
-        <AssetsIcon />
       </SidebarItem>
       <SidebarItem href="/eral" label="Eral" active={isActive('/eral')}>
         <EralIcon />

@@ -93,33 +93,33 @@ export function StudioResult({
         >
           {saved ? '✓ Saved' : 'Save to Gallery'}
         </button>
-        <Link
-          href={`/tools/background-remover?image=${encoded}`}
+        <a
+          href={`https://woktool.wokspec.org/tools/background-remover?image=${encoded}`}
           className="studio-result__btn"
           target="_blank"
           rel="noopener noreferrer"
           title="Remove background"
         >
           Remove BG
-        </Link>
-        <Link
-          href={`/tools/image-resize?image=${encoded}`}
+        </a>
+        <a
+          href={`https://woktool.wokspec.org/tools/image-resize?image=${encoded}`}
           className="studio-result__btn"
           target="_blank"
           rel="noopener noreferrer"
           title="Resize image"
         >
           Resize
-        </Link>
-        <Link
-          href={`/tools/image-compress?image=${encoded}`}
+        </a>
+        <a
+          href={`https://woktool.wokspec.org/tools/image-compress?image=${encoded}`}
           className="studio-result__btn"
           target="_blank"
           rel="noopener noreferrer"
           title="Compress image"
         >
           Compress
-        </Link>
+        </a>
         <button
           className="studio-result__btn"
           onClick={handleShare}

@@ -131,9 +131,9 @@ export default function HomePage() {
               <path d="M3 7h8M8 4l3 3-3 3" />
             </svg>
           </Link>
-          <Link href="/tools" className="hero-btn-secondary">
+          <a href="https://woktool.wokspec.org" className="hero-btn-secondary" target="_blank" rel="noopener noreferrer">
             Browse Tools
-          </Link>
+          </a>
         </div>
 
         {/* Quick-try prompt examples */}

@@ -173,14 +173,12 @@ export function executeWAP(wap: WAPResponse, router?: { push: (path: string) => 
       // Dispatch as setParam so studios can handle it
       dispatchWAPAction({ type: 'setParam', key: 'hd', value: action.quality === 'hd' });
     } else if (action.type === 'openTool' && action.toolId) {
-      const path = `/tools/${action.toolId}`;
-      if (router) router.push(path);
-      else if (typeof window !== 'undefined') window.location.href = path;
+      const url = `https://woktool.wokspec.org/tools/${action.toolId}`;
+      if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
     } else if (action.type === 'processImage' && action.toolId) {
       const params = action.imageUrl ? `?imageUrl=${encodeURIComponent(action.imageUrl)}` : '';
-      const path = `/tools/${action.toolId}${params}`;
-      if (router) router.push(path);
-      else if (typeof window !== 'undefined') window.location.href = path;
+      const url = `https://woktool.wokspec.org/tools/${action.toolId}${params}`;
+      if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
     } else if (action.type === 'rememberFact' && action.key && action.value) {
       // Fire-and-forget: save to Eral memory API
       fetch('/api/eral/memory', {

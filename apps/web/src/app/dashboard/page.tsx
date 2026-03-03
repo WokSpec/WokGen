@@ -172,7 +172,7 @@ export default async function DashboardPage() {
               {mode.shortLabel}
             </Link>
           ))}
-          <Link href="/tools" className="dash-quick-btn">Tools</Link>
+          <a href="https://woktool.wokspec.org" className="dash-quick-btn" target="_blank" rel="noopener noreferrer">Tools</a>
         </div>
       </div>
 

@@ -125,11 +125,11 @@ const nextConfig = {
       { source: '/studio',   destination: '/voice/studio',  permanent: false, has: [{ type: 'query', key: 'type', value: 'voice' }] },
       { source: '/studio',   destination: '/business/studio', permanent: false, has: [{ type: 'query', key: 'type', value: 'business' }] },
       { source: '/studio',   destination: '/code/studio',   permanent: false, has: [{ type: 'query', key: 'type', value: 'code' }] },
-      // Tools moved to WokTool — redirect all /tools/* to woktool.wokspec.org
-      { source: '/tools',        destination: 'https://woktool.wokspec.org',                  permanent: false },
-      { source: '/tools/:path*', destination: 'https://woktool.wokspec.org/tools/:path*',     permanent: false },
+      // Tools moved to WokTool — redirect all /tools/* to tools.wokspec.org
+      { source: '/tools',        destination: 'https://tools.wokspec.org',                  permanent: false },
+      { source: '/tools/:path*', destination: 'https://tools.wokspec.org/tools/:path*',     permanent: false },
       // Legacy tool/studio routes
-      { source: '/studio/tools',       destination: 'https://woktool.wokspec.org', permanent: false },
+      { source: '/studio/tools',       destination: 'https://tools.wokspec.org', permanent: false },
       { source: '/text/studio',        destination: '/eral',   permanent: false },
       { source: '/text/studio/:path*', destination: '/eral',   permanent: false },
     ];

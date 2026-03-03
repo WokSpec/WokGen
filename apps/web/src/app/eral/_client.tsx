@@ -1045,7 +1045,7 @@ export function EralPage({ userId }: { userId?: string }) {
                   </a>
                 ))}
               </div>
-              <a href="https://woktool.wokspec.org" className="eral-tools-all" target="_blank" rel="noopener noreferrer">All tools on WokTool →</a>
+              <a href="https://tools.wokspec.org" className="eral-tools-all" target="_blank" rel="noopener noreferrer">All tools on WokTool →</a>
             </div>
 
             <div className="eral-sidebar-footer">
@@ -1354,7 +1354,7 @@ export function EralPage({ userId }: { userId?: string }) {
               <a href="/studio?type=pixel" className="eral-v2-panel-suggestion-btn">Pixel mode</a>
               <a href="/studio?type=business" className="eral-v2-panel-suggestion-btn">Business mode</a>
               <a href="/studio?type=voice" className="eral-v2-panel-suggestion-btn">Voice mode</a>
-              <a href="https://woktool.wokspec.org" className="eral-v2-panel-suggestion-btn" target="_blank" rel="noopener noreferrer">WokTool</a>
+              <a href="https://tools.wokspec.org" className="eral-v2-panel-suggestion-btn" target="_blank" rel="noopener noreferrer">WokTool</a>
             </div>
           </div>
 

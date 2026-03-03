@@ -6,14 +6,14 @@ import { usePathname } from 'next/navigation';
 const PRODUCT_LINKS = [
   { label: 'Pixel Studio',  href: '/pixel/studio',    ext: false },
   { label: 'Vector Studio', href: '/vector/studio',   ext: false },
-  { label: 'Tools',         href: 'https://woktool.wokspec.org', ext: true  },
+  { label: 'Tools',         href: 'https://tools.wokspec.org', ext: true  },
   { label: 'Prompt Lab',    href: '/prompt-lab',       ext: false },
   { label: 'Community',     href: '/community',        ext: false },
   { label: 'Open Source',   href: '/open-source',      ext: false },
 ];
 
 const TOOLS_LINKS = [
-  { label: 'WokTool',        href: 'https://woktool.wokspec.org',              ext: true  },
+  { label: 'WokTool',        href: 'https://tools.wokspec.org',              ext: true  },
   { label: 'Gallery',        href: '/gallery',                                  ext: false },
 ];
 

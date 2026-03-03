@@ -7,7 +7,7 @@ import { MODES_LIST } from '@/lib/modes';
 
 const NAV_ITEMS = [
   { href: '/',          label: 'Home' },
-  { href: 'https://woktool.wokspec.org', label: 'WokTool' },
+  { href: 'https://tools.wokspec.org', label: 'WokTool' },
   { href: '/eral',      label: 'Eral' },
   { href: '/community', label: 'Community' },
   { href: '/projects',  label: 'Projects' },

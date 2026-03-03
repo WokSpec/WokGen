@@ -11,7 +11,7 @@ import type { ToolDef } from '@/lib/tools-registry';
 const SITE_PAGES = [
   { label: 'Dashboard',      href: '/dashboard',          desc: 'Workspace overview' },
   { label: 'Gallery',        href: '/gallery',             desc: 'Community creations' },
-  { label: 'WokTool',        href: 'https://woktool.wokspec.org', desc: '80+ free browser-based tools' },
+  { label: 'WokTool',        href: 'https://tools.wokspec.org', desc: '80+ free browser-based tools' },
   { label: 'Pricing',        href: '/pricing',             desc: 'Free forever plans' },
   { label: 'Docs',           href: '/docs',                desc: 'Documentation & guides' },
   { label: 'Changelog',      href: '/changelog',           desc: 'Latest updates' },

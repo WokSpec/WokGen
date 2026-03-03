@@ -173,11 +173,11 @@ export function executeWAP(wap: WAPResponse, router?: { push: (path: string) => 
       // Dispatch as setParam so studios can handle it
       dispatchWAPAction({ type: 'setParam', key: 'hd', value: action.quality === 'hd' });
     } else if (action.type === 'openTool' && action.toolId) {
-      const url = `https://woktool.wokspec.org/tools/${action.toolId}`;
+      const url = `https://tools.wokspec.org/tools/${action.toolId}`;
       if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
     } else if (action.type === 'processImage' && action.toolId) {
       const params = action.imageUrl ? `?imageUrl=${encodeURIComponent(action.imageUrl)}` : '';
-      const url = `https://woktool.wokspec.org/tools/${action.toolId}${params}`;
+      const url = `https://tools.wokspec.org/tools/${action.toolId}${params}`;
       if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
     } else if (action.type === 'rememberFact' && action.key && action.value) {
       // Fire-and-forget: save to Eral memory API

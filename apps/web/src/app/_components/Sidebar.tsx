@@ -436,7 +436,7 @@ export function Sidebar() {
       <SidebarItem href="/dashboard" label="Dashboard" active={isActive('/dashboard')}>
         <DashboardIcon />
       </SidebarItem>
-      <SidebarItem href="https://woktool.wokspec.org" label="WokTool" active={false}>
+      <SidebarItem href="https://tools.wokspec.org" label="WokTool" active={false}>
         <ToolsIcon />
       </SidebarItem>
       <SidebarItem href="/gallery" label="Gallery" active={isActive('/library') || isActive('/gallery')}>

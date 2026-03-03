@@ -94,7 +94,7 @@ export function StudioResult({
           {saved ? '✓ Saved' : 'Save to Gallery'}
         </button>
         <a
-          href={`https://woktool.wokspec.org/tools/background-remover?image=${encoded}`}
+          href={`https://tools.wokspec.org/tools/background-remover?image=${encoded}`}
           className="studio-result__btn"
           target="_blank"
           rel="noopener noreferrer"
@@ -103,7 +103,7 @@ export function StudioResult({
           Remove BG
         </a>
         <a
-          href={`https://woktool.wokspec.org/tools/image-resize?image=${encoded}`}
+          href={`https://tools.wokspec.org/tools/image-resize?image=${encoded}`}
           className="studio-result__btn"
           target="_blank"
           rel="noopener noreferrer"
@@ -112,7 +112,7 @@ export function StudioResult({
           Resize
         </a>
         <a
-          href={`https://woktool.wokspec.org/tools/image-compress?image=${encoded}`}
+          href={`https://tools.wokspec.org/tools/image-compress?image=${encoded}`}
           className="studio-result__btn"
           target="_blank"
           rel="noopener noreferrer"

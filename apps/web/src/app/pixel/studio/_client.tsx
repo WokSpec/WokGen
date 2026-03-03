@@ -25,6 +25,7 @@ import { CanvasPresets } from '@/components/studio/CanvasPresets';
 import { StylePresetGrid } from '@/components/studio/StylePresetGrid';
 import { GenerationHistory, type GenHistoryEntry } from '@/components/studio/GenerationHistory';
 import { BrandContextSelector } from '@/components/studio/BrandContextSelector';
+import MaskPainterPanel from '@/components/studio/MaskPainterPanel';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1036,6 +1037,15 @@ function OutputPanel({
             mode="pixel"
             onResult={(_url, _tool) => { /* post-process result handled by toolbar */ }}
           />
+          {/* Edit in Pixel Editor CTA */}
+          <a
+            href={`/editor?import=${encodeURIComponent(displayUrl ?? activeUrl)}`}
+            className="btn-pixel-edit-cta"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ✏️ Edit in Pixel Editor →
+          </a>
         </div>
       )}
 
@@ -1904,27 +1914,16 @@ function GenerateForm({
         </>
       )}
 
-      {/* Mask upload (inpaint tool) */}
+      {/* Mask painter (inpaint tool) */}
       {toolControls.showMaskUpload && (
         <>
-          <SectionHeader>Mask Image</SectionHeader>
+          <SectionHeader>Paint Mask</SectionHeader>
           <div className="p-4">
-            <p className="form-hint mb-2">Upload a black/white mask. White = areas to inpaint.</p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={e => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = ev => setMaskUrl(ev.target?.result as string);
-                  reader.readAsDataURL(file);
-                }
-              }}
-              className="text-xs text-[var(--text)]/50 file:mr-2 file:text-xs file:bg-white/10 file:border-0 file:text-[var(--text)]/70 file:px-2 file:py-1 file:rounded"
+            <MaskPainterPanel
+              refImageUrl={refImageUrl}
+              onMaskChange={(dataUrl) => setMaskUrl(dataUrl)}
+              displaySize={272}
             />
-            {maskUrl && <img src={maskUrl} alt="Mask preview" className="mt-2 w-20 h-20 object-cover rounded opacity-70" />}
           </div>
         </>
       )}

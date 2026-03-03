@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 // ---------------------------------------------------------------------------
 // Types & Constants
@@ -192,6 +193,8 @@ export default function PixelEditorTool() {
   const loadRef      = useRef<HTMLInputElement>(null);
   const animTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const searchParams = useSearchParams();
+
   // State
   const [gridSize,    setGridSize]    = useState<typeof GRID_SIZES[number]>(16);
   const [zoom,        setZoom]        = useState<typeof ZOOM_LEVELS[number]>(2);
@@ -255,6 +258,39 @@ export default function PixelEditorTool() {
   }, [getActivePixels, gridSize, cellSize, showGrid]);
 
   useEffect(() => { redraw(); }, [redraw]);
+
+  // ------- Import from ?import= URL param ----------------------------------
+
+  useEffect(() => {
+    const importUrl = searchParams?.get('import');
+    if (!importUrl) return;
+    const img = new window.Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const offscreen = document.createElement('canvas');
+      offscreen.width  = gridSize;
+      offscreen.height = gridSize;
+      const ctx = offscreen.getContext('2d')!;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, 0, 0, gridSize, gridSize);
+      const data = ctx.getImageData(0, 0, gridSize, gridSize);
+      const px = makeBlankPixels();
+      for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+          const i = (y * gridSize + x) * 4;
+          const a = data.data[i + 3];
+          if (a > 0) {
+            const r = data.data[i], g = data.data[i+1], b = data.data[i+2];
+            px[y * MAX_DIM + x] = `rgba(${r},${g},${b},${(a/255).toFixed(2)})`;
+          }
+        }
+      }
+      setFrames([{ id: frameId(), pixels: px, label: 'Imported' }]);
+      setActiveFrame(0);
+    };
+    img.src = importUrl;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ------- Animation preview -----------------------------------------------
 

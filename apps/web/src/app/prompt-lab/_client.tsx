@@ -2,8 +2,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { MODES_LIST } from '@/lib/modes';
-import type { ModeId } from '@/lib/modes';
 
 interface EnhanceResult {
   original: string;
@@ -16,15 +14,19 @@ interface EnhanceResult {
 
 interface HistoryEntry {
   prompt: string;
-  mode: ModeId;
   ts: number;
 }
 
 const MAX_CHARS = 500;
 const HISTORY_KEY = 'prompt-lab-history';
 
+const PIXEL_STYLE_PRESETS = [
+  'NES 8-bit', 'SNES 16-bit', 'Game Boy', 'CGA 4-color',
+  'PICO-8', 'Atari 2600', 'MSX', 'Amiga pixel',
+  'isometric', 'top-down RPG', 'platformer sprite', 'retro sci-fi',
+];
+
 export function PromptLabClient() {
-  const [mode, setMode] = useState<ModeId>('pixel');
   const [style, setStyle] = useState('');
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,8 +42,8 @@ export function PromptLabClient() {
     } catch {}
   }, []);
 
-  const saveHistory = useCallback((p: string, m: ModeId) => {
-    const entry: HistoryEntry = { prompt: p, mode: m, ts: Date.now() };
+  const saveHistory = useCallback((p: string) => {
+    const entry: HistoryEntry = { prompt: p, ts: Date.now() };
     setHistory((prev) => {
       const next = [entry, ...prev.filter((h) => h.prompt !== p)].slice(0, 5);
       try { localStorage.setItem(HISTORY_KEY, JSON.stringify(next)); } catch {}
@@ -58,7 +60,7 @@ export function PromptLabClient() {
       const response = await fetch('/api/prompt/enhance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, mode, style }),
+        body: JSON.stringify({ prompt, mode: 'pixel', style }),
       });
       if (!response.ok) {
         const err = await response.json().catch(() => ({})) as { error?: string };
@@ -66,7 +68,7 @@ export function PromptLabClient() {
       }
       const data = await response.json() as EnhanceResult;
       setResult(data);
-      saveHistory(prompt, mode);
+      saveHistory(prompt);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to enhance prompt');
     } finally {
@@ -81,8 +83,6 @@ export function PromptLabClient() {
     });
   }, []);
 
-  const modeForResult = MODES_LIST.find((m) => m.id === mode);
-
   return (
     <div className="prompt-lab">
       <div className="prompt-lab__inner">
@@ -94,28 +94,25 @@ export function PromptLabClient() {
 
         {/* Form */}
         <div className="prompt-lab__form">
-          {/* Mode selector */}
-          <div className="prompt-lab__field-label">Mode</div>
-          <div className="prompt-lab__mode-tabs">
-            {MODES_LIST.map((m) => (
+          {/* Style input */}
+          <div className="prompt-lab__field-label">Style preset <span className="prompt-lab__optional">(optional)</span></div>
+          <div className="prompt-lab__style-presets">
+            {PIXEL_STYLE_PRESETS.map((s) => (
               <button
-                key={m.id}
-                className={`prompt-lab__mode-tab${mode === m.id ? ' prompt-lab__mode-tab--active' : ''}`}
-                style={mode === m.id ? { background: m.accentColor, color: '#0a0a0a', borderColor: m.accentColor } : { borderColor: m.accentColor + '40', color: m.accentColor }}
-                onClick={() => setMode(m.id)}
+                key={s}
                 type="button"
+                className={`prompt-lab__mode-tab${style === s ? ' prompt-lab__mode-tab--active' : ''}`}
+                style={style === s ? { background: '#7c3aed', color: '#fff', borderColor: '#7c3aed' } : {}}
+                onClick={() => setStyle(style === s ? '' : s)}
               >
-                {m.shortLabel}
+                {s}
               </button>
             ))}
           </div>
-
-          {/* Style input */}
-          <div className="prompt-lab__field-label">Style preset <span className="prompt-lab__optional">(optional)</span></div>
           <input
             className="prompt-lab__input"
             type="text"
-            placeholder="cinematic, dark, neon"
+            placeholder="Or type a custom style…"
             value={style}
             onChange={(e) => setStyle(e.target.value)}
           />
@@ -179,11 +176,9 @@ export function PromptLabClient() {
                   >
                     {copied === 'enhanced' ? '✓ Copied' : 'Copy'}
                   </button>
-                  {modeForResult && (
-                    <Link href={`/${mode}/studio`} className="prompt-lab__use-btn">
-                      Use in Studio →
-                    </Link>
-                  )}
+                  <Link href="/pixel/studio" className="prompt-lab__use-btn">
+                    Use in Studio →
+                  </Link>
                 </div>
               </div>
               <p className="prompt-lab__enhanced-text">{result.enhanced}</p>
@@ -205,7 +200,7 @@ export function PromptLabClient() {
                         >
                           {copied === `sug-${i}` ? '✓' : 'Copy'}
                         </button>
-                        <Link href={`/${mode}/studio`} className="prompt-lab__use-btn">
+                        <Link href="/pixel/studio" className="prompt-lab__use-btn">
                           Use →
                         </Link>
                       </div>
@@ -243,7 +238,7 @@ export function PromptLabClient() {
                 <button
                   key={i}
                   className="prompt-lab__history-chip"
-                  onClick={() => { setPrompt(h.prompt); setMode(h.mode); }}
+                  onClick={() => { setPrompt(h.prompt); }}
                   type="button"
                   title={h.prompt}
                 >

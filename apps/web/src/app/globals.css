@@ -35744,3 +35744,128 @@ hr {
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
 }
+
+/* ============================================================
+   MASK PAINTER PANEL  (mask-*)
+   ============================================================ */
+.mask-painter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.mask-painter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+.mask-painter-group {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.mask-painter-group-right {
+  margin-left: auto;
+}
+.mask-label {
+  font-size: 0.7rem;
+  color: var(--text-muted, rgba(255,255,255,0.45));
+  margin-right: 0.15rem;
+}
+.mask-btn {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: var(--text, #fff);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.mask-btn:hover  { background: rgba(255,255,255,0.12); }
+.mask-btn.active { background: rgba(220,30,80,0.3); border-color: rgba(220,30,80,0.6); }
+.mask-btn-danger { background: rgba(220,30,80,0.1); border-color: rgba(220,30,80,0.3); }
+.mask-btn-danger:hover { background: rgba(220,30,80,0.25); }
+.mask-size-btn {
+  font-size: 0.65rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: var(--text, #fff);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.mask-size-btn:hover  { background: rgba(255,255,255,0.1); }
+.mask-size-btn.active { background: rgba(100,160,255,0.3); border-color: rgba(100,160,255,0.6); }
+.mask-painter-canvas-wrap {
+  position: relative;
+  display: inline-block;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.mask-painter-canvas {
+  display: block;
+  border-radius: 8px;
+}
+.mask-painter-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  color: rgba(255,255,255,0.5);
+  font-size: 0.8rem;
+  gap: 0.3rem;
+  pointer-events: none;
+  padding: 1rem;
+  text-align: center;
+}
+.mask-painter-hint {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 0.15rem;
+}
+
+/* ============================================================
+   PIXEL EDITOR CTA BUTTON  (btn-pixel-edit-cta)
+   ============================================================ */
+.btn-pixel-edit-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+  width: 100%;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  color: #a78bfa;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn-pixel-edit-cta:hover {
+  background: rgba(124, 58, 237, 0.28);
+  border-color: rgba(124, 58, 237, 0.6);
+  color: #c4b5fd;
+}
+
+/* Prompt-lab pixel style preset chips */
+.prompt-lab__style-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}

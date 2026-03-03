@@ -89,7 +89,7 @@ export function handleGenerate(
     };
   }
 
-  const validModes = ['pixel', 'business', 'vector', 'uiux'];
+  const validModes = ['pixel'];
   if (!validModes.includes(mode)) {
     return {
       type: 4,

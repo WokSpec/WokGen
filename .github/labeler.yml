@@ -1,0 +1,39 @@
+"area:api":
+  - changed-files:
+    - any-glob-to-any-file: "apps/web/src/app/api/**"
+
+"area:generator":
+  - changed-files:
+    - any-glob-to-any-file:
+      - "apps/web/src/app/pixel/**"
+      - "apps/web/src/app/studio/**"
+
+"area:editor":
+  - changed-files:
+    - any-glob-to-any-file: "apps/web/src/app/editor/**"
+
+"area:gallery":
+  - changed-files:
+    - any-glob-to-any-file: "apps/web/src/app/gallery/**"
+
+"area:billing":
+  - changed-files:
+    - any-glob-to-any-file: "apps/web/src/app/billing/**"
+
+"database":
+  - changed-files:
+    - any-glob-to-any-file: "prisma/**"
+
+"infrastructure":
+  - changed-files:
+    - any-glob-to-any-file:
+      - ".github/**"
+      - "apps/web/next.config.*"
+
+"dependencies":
+  - changed-files:
+    - any-glob-to-any-file: "**/package*.json"
+
+"docs":
+  - changed-files:
+    - any-glob-to-any-file: "*.md"

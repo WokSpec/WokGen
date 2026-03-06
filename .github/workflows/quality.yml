@@ -18,8 +18,12 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm install --legacy-peer-deps --ignore-scripts
+      - name: Install app dependencies
+        run: npm install --legacy-peer-deps --ignore-scripts
+        working-directory: apps/web
       - name: Prisma generate
-        run: npx prisma generate --schema=apps/web/prisma/schema.prisma
+        run: npx prisma generate
+        working-directory: apps/web
         env:
           PRISMA_GENERATE_SKIP_AUTOINSTALL: '1'
           DATABASE_URL: 'postgresql://placeholder:placeholder@localhost:5432/placeholder'

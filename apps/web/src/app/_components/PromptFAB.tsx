@@ -33,10 +33,7 @@ export function PromptFAB() {
   const [variations, setVariations] = useState<string[]>([]);
   const [enhancedPrompt, setEnhancedPrompt] = useState('');
   const [error, setError] = useState<string | null>(null);
-
-  // Only render on studio pages
-  if (!pathname?.includes('/studio')) return null;
-
+  const onStudioPage = pathname?.includes('/studio');
   const mode = getMode(pathname);
 
   const enhance = useCallback(async () => {
@@ -63,12 +60,15 @@ export function PromptFAB() {
     }
   }, [prompt, mode]);
 
-  const usePrompt = (p: string) => {
-    navigator.clipboard.writeText(p).then(() => {
+  const applyPrompt = useCallback((value: string) => {
+    navigator.clipboard.writeText(value).then(() => {
       toast.success('Prompt copied to clipboard!');
       setOpen(false);
     }).catch(() => toast.error('Copy failed'));
-  };
+  }, []);
+
+  // Only render on studio pages
+  if (!onStudioPage) return null;
 
   return (
     <div className={`prompt-fab${open ? ' prompt-fab--open' : ''}`}>
@@ -122,7 +122,7 @@ export function PromptFAB() {
                 <button
                   type="button"
                   className="btn btn-generate prompt-fab__btn prompt-fab__btn--sm"
-                  onClick={() => usePrompt(enhancedPrompt)}
+                  onClick={() => applyPrompt(enhancedPrompt)}
                 >
                   Use this prompt ↗
                 </button>
@@ -137,7 +137,7 @@ export function PromptFAB() {
                     <button
                       key={i}
                       type="button"
-                      onClick={() => usePrompt(v)}
+                      onClick={() => applyPrompt(v)}
                       className="prompt-fab__variation-btn"
                     >
                       {v}

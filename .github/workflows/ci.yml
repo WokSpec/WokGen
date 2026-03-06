@@ -17,12 +17,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm install --legacy-peer-deps --ignore-scripts
+      - run: cd apps/web && npm install --legacy-peer-deps --ignore-scripts
       - name: Generate Prisma client
-        run: |
-          rm -rf apps/web/node_modules/.prisma
-          mkdir -p apps/web/node_modules/@prisma
-          cp -a node_modules/@prisma/client apps/web/node_modules/@prisma/client
-          cd apps/web && PRISMA_GENERATE_SKIP_AUTOINSTALL=1 npx prisma generate
+        run: cd apps/web && PRISMA_GENERATE_SKIP_AUTOINSTALL=1 npx prisma generate
       - name: TypeScript check
         run: cd apps/web && npx tsc --noEmit
 
@@ -36,6 +33,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm install --legacy-peer-deps --ignore-scripts
+      - run: cd apps/web && npm install --legacy-peer-deps --ignore-scripts
       - name: Lint
         run: cd apps/web && npx eslint --max-warnings 0 'src/**/*.{ts,tsx}' || true
 
@@ -50,6 +48,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm install --legacy-peer-deps --ignore-scripts
+      - run: cd apps/web && npm install --legacy-peer-deps --ignore-scripts
       - name: Build Storybook
         run: cd apps/web && npm run build-storybook
 

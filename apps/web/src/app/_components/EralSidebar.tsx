@@ -19,6 +19,7 @@ export interface EralSidebarProps {
 }
 
 type ModelVariant = 'eral-7c' | 'speed' | 'code' | 'creative';
+type Quality = 'fast' | 'balanced' | 'best';
 
 interface SidebarMessage {
   id: string;
@@ -46,6 +47,18 @@ const QUICK_COMMANDS: { label: string; path: string }[] = [
   { label: 'Pricing',         path: '/pricing'         },
 ];
 
+function qualityForModelVariant(model: ModelVariant): Quality {
+  switch (model) {
+    case 'speed':
+      return 'fast';
+    case 'code':
+    case 'creative':
+      return 'best';
+    default:
+      return 'balanced';
+  }
+}
+
 function SidebarBubble({ msg, isStreaming }: { msg: SidebarMessage; isStreaming?: boolean }) {
   const isUser = msg.role === 'user';
   return (
@@ -71,6 +84,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
+  const [convId, setConvId] = useState<string | null>(null);
   const [model, setModel] = useState<ModelVariant>('eral-7c');
   const [actionConfirmation, setActionConfirmation] = useState<string | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
@@ -138,7 +152,9 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
         signal: abort.signal,
         body: JSON.stringify({
           message: text.trim(),
+          conversationId: convId ?? undefined,
           modelVariant: model,
+          quality: qualityForModelVariant(model),
           context: { mode, tool, prompt, studioContext, projectId: selectedProjectId || undefined },
           stream: true,
         }),
@@ -172,6 +188,9 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
             if (parsed.token) {
               fullContent += parsed.token;
               setStreamingContent(fullContent);
+            }
+            if (parsed.conversationId) {
+              setConvId(parsed.conversationId as string);
             }
           } catch {}
         }
@@ -212,7 +231,7 @@ export function EralSidebar({ mode, tool, prompt, studioContext }: EralSidebarPr
       setStreamingContent('');
       abortRef.current = null;
     }
-  }, [loading, model, mode, tool, prompt, studioContext, selectedProjectId]);
+  }, [loading, convId, model, mode, tool, prompt, studioContext, selectedProjectId]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

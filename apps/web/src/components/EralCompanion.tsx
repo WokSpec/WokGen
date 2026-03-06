@@ -157,6 +157,7 @@ function EralCompanionInner() {
           message: text,
           conversationId: convId ?? undefined,
           modelVariant: 'standard',
+          quality: 'best',
           stream: false,
           context: { projectId, mode: 'companion', pathname },
         }),

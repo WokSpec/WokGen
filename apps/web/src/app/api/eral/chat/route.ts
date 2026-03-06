@@ -13,6 +13,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const ERAL_API = process.env.ERAL_API_URL ?? 'https://eral.wokspec.org/api';
+type Quality = 'fast' | 'balanced' | 'best';
 
 function getMetadata(value: unknown): Record<string, string | number | boolean> | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -30,6 +31,51 @@ function getMetadata(value: unknown): Record<string, string | number | boolean> 
   ) as Record<string, string | number | boolean>;
 
   return Object.keys(metadata).length > 0 ? metadata : undefined;
+}
+
+function resolveQuality(body: Record<string, unknown>): Quality {
+  if (body.quality === 'fast' || body.quality === 'balanced' || body.quality === 'best') {
+    return body.quality;
+  }
+
+  switch (body.modelVariant) {
+    case 'speed':
+      return 'fast';
+    case 'creative':
+    case 'code':
+      return 'best';
+    default:
+      return 'balanced';
+  }
+}
+
+function createStreamingResponse(payload: { reply: string; conversationId?: string; model?: string }) {
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(
+        encoder.encode(`data: ${JSON.stringify({
+          token: payload.reply,
+          conversationId: payload.conversationId,
+          model: payload.model,
+        })}\n\n`)
+      );
+      controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+      controller.close();
+    },
+  });
+
+  return new NextResponse(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+    },
+  });
+}
+
+function normalizeConversationId(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() ? value : undefined;
 }
 
 export async function POST(req: NextRequest) {
@@ -53,6 +99,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
+  const wantsStream = body.stream === true;
+  const quality = resolveQuality(body);
   const eralRes = await fetch(`${ERAL_API}/v1/chat`, {
     method: 'POST',
     headers: {
@@ -63,6 +111,7 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({
       message: body.message ?? body.prompt,
       sessionId: body.conversationId ?? body.sessionId ?? 'wokgen-default',
+      quality,
       product: 'wokgen',
       pageContext: body.context != null
         ? JSON.stringify(body.context)
@@ -79,16 +128,31 @@ export async function POST(req: NextRequest) {
     }),
   });
 
-  const data = await eralRes.json() as { data?: { response?: string; sessionId?: string; model?: string }; error?: unknown };
+  const data = await eralRes.json() as {
+    data?: {
+      response?: string;
+      sessionId?: string;
+      model?: { provider?: string; model?: string };
+    };
+    error?: unknown;
+  };
 
   if (!eralRes.ok) {
     return NextResponse.json(data.error ?? data, { status: eralRes.status });
   }
 
-  // Normalize to the shape WokGen clients expect
-  return NextResponse.json({
+  const normalized = {
     reply: data.data?.response ?? '',
-    conversationId: data.data?.sessionId ?? body.conversationId ?? body.sessionId,
-    model: data.data?.model ?? 'eral',
-  });
+    conversationId: normalizeConversationId(data.data?.sessionId)
+      ?? normalizeConversationId(body.conversationId)
+      ?? normalizeConversationId(body.sessionId),
+    model: data.data?.model?.model ?? 'eral',
+  };
+
+  if (wantsStream) {
+    return createStreamingResponse(normalized);
+  }
+
+  // Normalize to the shape WokGen clients expect
+  return NextResponse.json(normalized);
 }

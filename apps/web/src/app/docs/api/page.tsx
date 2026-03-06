@@ -158,6 +158,8 @@ const { items, total } = await res.json();`,
     requestBody: [
       { field: 'message', type: 'string', required: true, description: 'User message text' },
       { field: 'conversationId', type: 'string', required: false, description: 'Continue an existing conversation' },
+      { field: 'quality', type: '"fast" | "balanced" | "best"', required: false, description: 'Optional response quality hint for Eral routing' },
+      { field: 'stream', type: 'boolean', required: false, description: 'When true, returns text/event-stream chunks for live chat UIs' },
     ],
     responseBody: [
       { field: 'reply', type: 'string', description: 'Eral\'s response text' },
@@ -174,7 +176,7 @@ const { items, total } = await res.json();`,
     Authorization: 'Bearer wg_sk_...',
     'Content-Type': 'application/json',
   },
-  body: JSON.stringify({ message: 'What styles work for icons?' }),
+  body: JSON.stringify({ message: 'What styles work for icons?', quality: 'best' }),
 });
 const { reply, conversationId } = await res.json();`,
     errors: [

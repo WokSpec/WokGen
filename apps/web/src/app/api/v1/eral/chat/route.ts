@@ -55,6 +55,19 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify(body),
   });
 
+  const contentType = internalRes.headers.get('content-type') ?? '';
+  if (contentType.includes('text/event-stream')) {
+    return new NextResponse(internalRes.body, {
+      status: internalRes.status,
+      headers: {
+        ...CORS_HEADERS,
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+        Connection: 'keep-alive',
+      },
+    });
+  }
+
   const data = await internalRes.json().catch(() => ({}));
   return NextResponse.json(data, { status: internalRes.status, headers: CORS_HEADERS });
 }

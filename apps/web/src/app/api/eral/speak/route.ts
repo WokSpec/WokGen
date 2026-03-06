@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({
       message,
       sessionId: (body.conversationId ?? body.sessionId ?? 'wokgen-voice') as string,
+      quality: 'fast',
       product: 'wokgen',
       pageContext: VOICE_CONTEXT,
       integration: {
@@ -86,7 +87,10 @@ export async function POST(req: NextRequest) {
     }),
   });
 
-  const data = await eralRes.json() as { data?: { response?: string; sessionId?: string; model?: string }; error?: unknown };
+  const data = await eralRes.json() as {
+    data?: { response?: string; sessionId?: string; model?: { model?: string } };
+    error?: unknown;
+  };
 
   if (!eralRes.ok) {
     return NextResponse.json(data.error ?? data, { status: eralRes.status });
@@ -95,6 +99,6 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     reply: data.data?.response ?? '',
     conversationId: data.data?.sessionId,
-    model: data.data?.model ?? 'eral',
+    model: data.data?.model?.model ?? 'eral',
   });
 }

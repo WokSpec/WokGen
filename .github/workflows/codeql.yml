@@ -21,20 +21,33 @@ jobs:
       fail-fast: false
       matrix:
         language: [javascript-typescript]
+    env:
+      ENABLE_CODEQL: ${{ vars.ENABLE_CODEQL }}
 
     steps:
+      - name: Skip when Advanced Security is not enabled for this repo
+        if: ${{ env.ENABLE_CODEQL != 'true' }}
+        run: |
+          echo "Skipping CodeQL."
+          echo "Enable GitHub Advanced Security and set repository variable ENABLE_CODEQL=true to run CodeQL analysis."
+
       - name: Checkout
+        if: ${{ env.ENABLE_CODEQL == 'true' }}
         uses: actions/checkout@v4
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        if: ${{ env.ENABLE_CODEQL == 'true' }}
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
+          queries: security-extended
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+        if: ${{ env.ENABLE_CODEQL == 'true' }}
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        if: ${{ env.ENABLE_CODEQL == 'true' }}
+        uses: github/codeql-action/analyze@v4
         with:
           category: '/language:${{ matrix.language }}'

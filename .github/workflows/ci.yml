@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
@@ -51,7 +51,7 @@ jobs:
           echo "Set repository variable ENABLE_STORYBOOK_CI=true to run Storybook in CI."
       - uses: actions/checkout@v4
         if: ${{ env.ENABLE_STORYBOOK_CI == 'true' }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         if: ${{ env.ENABLE_STORYBOOK_CI == 'true' }}
         with:
           node-version: 20

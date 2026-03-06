@@ -41,15 +41,27 @@ jobs:
     name: Storybook Build
     runs-on: ubuntu-latest
     continue-on-error: true
+    env:
+      ENABLE_STORYBOOK_CI: ${{ vars.ENABLE_STORYBOOK_CI }}
     steps:
+      - name: Skip when Storybook CI is not enabled for this repo
+        if: ${{ env.ENABLE_STORYBOOK_CI != 'true' }}
+        run: |
+          echo "Skipping Storybook Build."
+          echo "Set repository variable ENABLE_STORYBOOK_CI=true to run Storybook in CI."
       - uses: actions/checkout@v4
+        if: ${{ env.ENABLE_STORYBOOK_CI == 'true' }}
       - uses: actions/setup-node@v4
+        if: ${{ env.ENABLE_STORYBOOK_CI == 'true' }}
         with:
           node-version: 20
           cache: npm
       - run: npm install --legacy-peer-deps --ignore-scripts
+        if: ${{ env.ENABLE_STORYBOOK_CI == 'true' }}
       - run: cd apps/web && npm install --legacy-peer-deps --ignore-scripts
+        if: ${{ env.ENABLE_STORYBOOK_CI == 'true' }}
       - name: Build Storybook
+        if: ${{ env.ENABLE_STORYBOOK_CI == 'true' }}
         run: cd apps/web && npm run build-storybook
 
   secret-scan:

@@ -13,6 +13,6 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --legacy-peer-deps --ignore-scripts
+      - run: npm install --legacy-peer-deps --ignore-scripts
       - run: cd apps/web && npx prisma generate
       - run: cd apps/web && npx tsc --noEmit

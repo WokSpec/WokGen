@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --legacy-peer-deps --ignore-scripts
+      - run: npm install --legacy-peer-deps --ignore-scripts
       - name: Generate Prisma client
         run: |
           rm -rf apps/web/node_modules/.prisma
@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --legacy-peer-deps --ignore-scripts
+      - run: npm install --legacy-peer-deps --ignore-scripts
       - name: Lint
         run: cd apps/web && npx eslint --max-warnings 0 'src/**/*.{ts,tsx}' || true
 
@@ -49,7 +49,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --legacy-peer-deps --ignore-scripts
+      - run: npm install --legacy-peer-deps --ignore-scripts
       - name: Build Storybook
         run: cd apps/web && npm run build-storybook
 
@@ -61,8 +61,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+      - name: Install Gitleaks CLI
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITLEAKS_VERSION: '8.24.2'
+        run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C "$RUNNER_TEMP/bin" gitleaks
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - name: Gitleaks
+        run: |
+          gitleaks git \
+            --redact \
+            --verbose \
+            --report-format sarif \
+            --report-path gitleaks.sarif

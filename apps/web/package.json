@@ -60,7 +60,7 @@
     "color-thief-browser": "^2.0.2",
     "date-fns": "^4.1.0",
     "edge-tts": "^1.0.1",
-    "framer-motion": "^12.34.3",
+    "framer-motion": "^12.35.1",
     "gifenc": "^1.0.3",
     "groq-sdk": "^0.37.0",
     "ioredis": "^5.9.3",

@@ -63,7 +63,7 @@
     "framer-motion": "^12.35.1",
     "gifenc": "^1.0.3",
     "groq-sdk": "^0.37.0",
-    "ioredis": "^5.9.3",
+    "ioredis": "^5.10.0",
     "jszip": "^3.10.1",
     "lucide-react": "^0.577.0",
     "marked": "^17.0.3",

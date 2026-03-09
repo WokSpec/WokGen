@@ -43,7 +43,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "^0.213.0",
     "@opentelemetry/sdk-node": "^0.213.0",
     "@opentelemetry/sdk-trace-base": "^2.6.0",
-    "@prisma/client": "5.14.0",
+    "@prisma/client": "5.22.0",
     "@react-email/render": "^2.0.4",
     "@sentry/nextjs": "^10.42.0",
     "@tanstack/react-query": "^5.90.21",

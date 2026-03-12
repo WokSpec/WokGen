@@ -78,6 +78,15 @@ WokGen/
 
 ---
 
+## Documentation
+
+- [WokGen Architecture](./docs/architecture.md)
+- [WokGen Deployment](./docs/deployment.md)
+- [WokSpec Ecosystem Overview](https://github.com/WokSpec/WokDocs)
+- [Contributing Guide](https://github.com/WokSpec/WokDocs/blob/main/CONTRIBUTING.md)
+
+---
+
 ## Related
 
 - [Vecto](https://github.com/WokSpec/Vecto) — vectors, brand, UI/UX, voice (`vecto.wokspec.org`)
